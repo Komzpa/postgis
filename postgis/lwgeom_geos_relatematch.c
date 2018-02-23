@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 #include "postgres.h"
 #include "fmgr.h"
 #include "funcapi.h"
@@ -68,4 +67,3 @@ Datum ST_RelateMatch(PG_FUNCTION_ARGS)
 	lwfree(pat);
 	PG_RETURN_BOOL(result);
 }
-

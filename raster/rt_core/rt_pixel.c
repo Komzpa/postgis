@@ -32,8 +32,8 @@
 #include "librtcore_internal.h"
 
 /******************************************************************************
-* rt_pixeltype
-******************************************************************************/
+ * rt_pixeltype
+ ******************************************************************************/
 
 int
 rt_pixtype_size(rt_pixtype pixtype)
@@ -67,8 +67,7 @@ rt_pixtype_size(rt_pixtype pixtype)
 		break;
 	}
 
-	RASTER_DEBUGF(3, "Pixel type = %s and size = %d bytes",
-	              rt_pixtype_name(pixtype), pixbytes);
+	RASTER_DEBUGF(3, "Pixel type = %s and size = %d bytes", rt_pixtype_name(pixtype), pixbytes);
 
 	return pixbytes;
 }
@@ -157,52 +156,52 @@ rt_pixtype_get_min_value(rt_pixtype pixtype)
 	{
 	case PT_1BB:
 	{
-		return (double) rt_util_clamp_to_1BB((double) CHAR_MIN);
+		return (double)rt_util_clamp_to_1BB((double)CHAR_MIN);
 	}
 	case PT_2BUI:
 	{
-		return (double) rt_util_clamp_to_2BUI((double) CHAR_MIN);
+		return (double)rt_util_clamp_to_2BUI((double)CHAR_MIN);
 	}
 	case PT_4BUI:
 	{
-		return (double) rt_util_clamp_to_4BUI((double) CHAR_MIN);
+		return (double)rt_util_clamp_to_4BUI((double)CHAR_MIN);
 	}
 	case PT_8BUI:
 	{
-		return (double) rt_util_clamp_to_8BUI((double) CHAR_MIN);
+		return (double)rt_util_clamp_to_8BUI((double)CHAR_MIN);
 	}
 	case PT_8BSI:
 	{
-		return (double) rt_util_clamp_to_8BSI((double) SCHAR_MIN);
+		return (double)rt_util_clamp_to_8BSI((double)SCHAR_MIN);
 	}
 	case PT_16BSI:
 	{
-		return (double) rt_util_clamp_to_16BSI((double) SHRT_MIN);
+		return (double)rt_util_clamp_to_16BSI((double)SHRT_MIN);
 	}
 	case PT_16BUI:
 	{
-		return (double) rt_util_clamp_to_16BUI((double) SHRT_MIN);
+		return (double)rt_util_clamp_to_16BUI((double)SHRT_MIN);
 	}
 	case PT_32BSI:
 	{
-		return (double) rt_util_clamp_to_32BSI((double) INT_MIN);
+		return (double)rt_util_clamp_to_32BSI((double)INT_MIN);
 	}
 	case PT_32BUI:
 	{
-		return (double) rt_util_clamp_to_32BUI((double) INT_MIN);
+		return (double)rt_util_clamp_to_32BUI((double)INT_MIN);
 	}
 	case PT_32BF:
 	{
-		return (double) -FLT_MAX;
+		return (double)-FLT_MAX;
 	}
 	case PT_64BF:
 	{
-		return (double) -DBL_MAX;
+		return (double)-DBL_MAX;
 	}
 	default:
 	{
 		rterror("rt_pixtype_get_min_value: Unknown pixeltype %d", pixtype);
-		return (double) rt_util_clamp_to_8BUI((double) CHAR_MIN);
+		return (double)rt_util_clamp_to_8BUI((double)CHAR_MIN);
 	}
 	}
 }
@@ -217,11 +216,8 @@ rt_pixtype_get_min_value(rt_pixtype pixtype)
  *
  * @return ES_NONE on success, ES_ERROR on error
  */
-rt_errorstate rt_pixtype_compare_clamped_values(
-    rt_pixtype pixtype,
-    double val, double refval,
-    int *isequal
-)
+rt_errorstate
+rt_pixtype_compare_clamped_values(rt_pixtype pixtype, double val, double refval, int* isequal)
 {
 	assert(isequal != NULL);
 	*isequal = 0;
@@ -229,48 +225,37 @@ rt_errorstate rt_pixtype_compare_clamped_values(
 	switch (pixtype)
 	{
 	case PT_1BB:
-		if (rt_util_clamp_to_1BB(val) == rt_util_clamp_to_1BB(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_1BB(val) == rt_util_clamp_to_1BB(refval)) *isequal = 1;
 		break;
 	case PT_2BUI:
-		if (rt_util_clamp_to_2BUI(val) == rt_util_clamp_to_2BUI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_2BUI(val) == rt_util_clamp_to_2BUI(refval)) *isequal = 1;
 		break;
 	case PT_4BUI:
-		if (rt_util_clamp_to_4BUI(val) == rt_util_clamp_to_4BUI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_4BUI(val) == rt_util_clamp_to_4BUI(refval)) *isequal = 1;
 		break;
 	case PT_8BSI:
-		if (rt_util_clamp_to_8BSI(val) == rt_util_clamp_to_8BSI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_8BSI(val) == rt_util_clamp_to_8BSI(refval)) *isequal = 1;
 		break;
 	case PT_8BUI:
-		if (rt_util_clamp_to_8BUI(val) == rt_util_clamp_to_8BUI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_8BUI(val) == rt_util_clamp_to_8BUI(refval)) *isequal = 1;
 		break;
 	case PT_16BSI:
-		if (rt_util_clamp_to_16BSI(val) == rt_util_clamp_to_16BSI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_16BSI(val) == rt_util_clamp_to_16BSI(refval)) *isequal = 1;
 		break;
 	case PT_16BUI:
-		if (rt_util_clamp_to_16BUI(val) == rt_util_clamp_to_16BUI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_16BUI(val) == rt_util_clamp_to_16BUI(refval)) *isequal = 1;
 		break;
 	case PT_32BSI:
-		if (rt_util_clamp_to_32BSI(val) == rt_util_clamp_to_32BSI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_32BSI(val) == rt_util_clamp_to_32BSI(refval)) *isequal = 1;
 		break;
 	case PT_32BUI:
-		if (rt_util_clamp_to_32BUI(val) == rt_util_clamp_to_32BUI(refval))
-			*isequal = 1;
+		if (rt_util_clamp_to_32BUI(val) == rt_util_clamp_to_32BUI(refval)) *isequal = 1;
 		break;
 	case PT_32BF:
-		if (FLT_EQ(rt_util_clamp_to_32F(val), rt_util_clamp_to_32F(refval)))
-			*isequal = 1;
+		if (FLT_EQ(rt_util_clamp_to_32F(val), rt_util_clamp_to_32F(refval))) *isequal = 1;
 		break;
 	case PT_64BF:
-		if (FLT_EQ(val, refval))
-			*isequal = 1;
+		if (FLT_EQ(val, refval)) *isequal = 1;
 		break;
 	default:
 		rterror("rt_pixtype_compare_clamped_values: Unknown pixeltype %d", pixtype);
@@ -281,8 +266,8 @@ rt_errorstate rt_pixtype_compare_clamped_values(
 }
 
 /******************************************************************************
-* rt_pixel
-******************************************************************************/
+ * rt_pixel
+ ******************************************************************************/
 
 /*
  * Convert an array of rt_pixel objects to two 2D arrays of value and NODATA.
@@ -305,20 +290,24 @@ rt_errorstate rt_pixtype_compare_clamped_values(
  *
  * @return ES_NONE on success, ES_ERROR on error
  */
-rt_errorstate rt_pixel_set_to_array(
-    rt_pixel npixel, uint32_t count, rt_mask mask,
-    int x, int y,
-    uint16_t distancex, uint16_t distancey,
-    double ***value,
-    int ***nodata,
-    int *dimx, int *dimy
-)
+rt_errorstate
+rt_pixel_set_to_array(rt_pixel npixel,
+		      uint32_t count,
+		      rt_mask mask,
+		      int x,
+		      int y,
+		      uint16_t distancex,
+		      uint16_t distancey,
+		      double*** value,
+		      int*** nodata,
+		      int* dimx,
+		      int* dimy)
 {
 	uint32_t i;
 	uint32_t j;
 	uint32_t dim[2] = {0};
-	double **values = NULL;
-	int **nodatas = NULL;
+	double** values = NULL;
+	int** nodatas = NULL;
 	int zero[2] = {0};
 	int _x;
 	int _y;
@@ -337,7 +326,11 @@ rt_errorstate rt_pixel_set_to_array(
 	{
 		if (dim[0] != mask->dimx || dim[1] != mask->dimy)
 		{
-			rterror("rt_pixel_set_array: mask dimensions %d x %d do not match given dims %d x %d", mask->dimx, mask->dimy,  dim[0],  dim[1]);
+			rterror("rt_pixel_set_array: mask dimensions %d x %d do not match given dims %d x %d",
+				mask->dimx,
+				mask->dimy,
+				dim[0],
+				dim[1]);
 			return ES_ERROR;
 		}
 
@@ -346,12 +339,11 @@ rt_errorstate rt_pixel_set_to_array(
 			rterror("rt_pixel_set_array: Invalid mask");
 			return ES_ERROR;
 		}
-
 	}
 
 	/* establish 2D arrays (Y axis) */
-	values = rtalloc(sizeof(double *) * dim[1]);
-	nodatas = rtalloc(sizeof(int *) * dim[1]);
+	values = rtalloc(sizeof(double*) * dim[1]);
+	nodatas = rtalloc(sizeof(int*) * dim[1]);
 
 	if (values == NULL || nodatas == NULL)
 	{
@@ -382,8 +374,7 @@ rt_errorstate rt_pixel_set_to_array(
 				for (j = 0; j <= i; j++)
 				{
 					rtdealloc(values[j]);
-					if (j < i)
-						rtdealloc(nodatas[j]);
+					if (j < i) rtdealloc(nodatas[j]);
 				}
 			}
 
@@ -408,8 +399,7 @@ rt_errorstate rt_pixel_set_to_array(
 	/* populate 2D arrays */
 	for (i = 0; i < count; i++)
 	{
-		if (npixel[i].nodata)
-			continue;
+		if (npixel[i].nodata) continue;
 
 		_x = npixel[i].x - zero[0];
 		_y = npixel[i].y - zero[1];
@@ -430,7 +420,7 @@ rt_errorstate rt_pixel_set_to_array(
 			if (mask->weighted == 0)
 			{
 				/* pixel is set to zero or nodata */
-				if (FLT_EQ(mask->values[_y][_x],0) || mask->nodata[_y][_x] == 1)
+				if (FLT_EQ(mask->values[_y][_x], 0) || mask->nodata[_y][_x] == 1)
 				{
 					values[_y][_x] = 0;
 					nodatas[_y][_x] = 1;
@@ -446,7 +436,7 @@ rt_errorstate rt_pixel_set_to_array(
 			else
 			{
 				/* nodata */
-				if(mask->nodata[_y][_x] == 1)
+				if (mask->nodata[_y][_x] == 1)
 				{
 					values[_y][_x] = 0;
 					nodatas[_y][_x] = 1;
@@ -465,10 +455,8 @@ rt_errorstate rt_pixel_set_to_array(
 
 	*value = &(*values);
 	*nodata = &(*nodatas);
-	if (dimx != NULL)
-		*dimx = dim[0];
-	if (dimy != NULL)
-		*dimy = dim[1];
+	if (dimx != NULL) *dimx = dim[0];
+	if (dimy != NULL) *dimy = dim[1];
 
 	return ES_NONE;
 }

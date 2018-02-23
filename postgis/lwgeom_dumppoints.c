@@ -36,7 +36,6 @@
 
 #include "access/htup_details.h"
 
-
 #include "liblwgeom.h"
 
 /* ST_DumpPoints for postgis.
@@ -48,9 +47,9 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS);
 
 struct dumpnode
 {
-	LWGEOM *geom;
+	LWGEOM* geom;
 	uint32_t idx; /* which member geom we're working on */
-} ;
+};
 
 /* 32 is the max depth for st_dump, so it seems reasonable
  * to use the same here
@@ -58,37 +57,37 @@ struct dumpnode
 #define MAXDEPTH 32
 struct dumpstate
 {
-	LWGEOM	*root;
-	int	stacklen; /* collections/geoms on stack */
-	int	pathlen; /* polygon rings and such need extra path info */
-	struct	dumpnode stack[MAXDEPTH];
-	Datum	path[34]; /* two more than max depth, for ring and point */
+	LWGEOM* root;
+	int stacklen; /* collections/geoms on stack */
+	int pathlen;  /* polygon rings and such need extra path info */
+	struct dumpnode stack[MAXDEPTH];
+	Datum path[34]; /* two more than max depth, for ring and point */
 
 	/* used to cache the type attributes for integer arrays */
-	int16	typlen;
-	bool	byval;
-	char	align;
+	int16 typlen;
+	bool byval;
+	char align;
 
 	uint32_t ring; /* ring of top polygon */
-	uint32_t pt; /* point of top geom or current ring */
+	uint32_t pt;   /* point of top geom or current ring */
 };
 
 PG_FUNCTION_INFO_V1(LWGEOM_dumppoints);
 Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 {
-	FuncCallContext *funcctx;
+	FuncCallContext* funcctx;
 	MemoryContext oldcontext, newcontext;
 
-	GSERIALIZED *pglwgeom;
-	LWCOLLECTION *lwcoll;
-	LWGEOM *lwgeom;
-	struct dumpstate *state;
-	struct dumpnode *node;
+	GSERIALIZED* pglwgeom;
+	LWCOLLECTION* lwcoll;
+	LWGEOM* lwgeom;
+	struct dumpstate* state;
+	struct dumpnode* node;
 
 	HeapTuple tuple;
-	Datum pathpt[2]; /* used to construct the composite return value */
-	bool isnull[2] = {0,0}; /* needed to say neither value is null */
-	Datum result; /* the actual composite return value */
+	Datum pathpt[2];         /* used to construct the composite return value */
+	bool isnull[2] = {0, 0}; /* needed to say neither value is null */
+	Datum result;            /* the actual composite return value */
 
 	if (SRF_IS_FIRSTCALL())
 	{
@@ -132,8 +131,9 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 		 */
 		if (get_call_result_type(fcinfo, 0, &funcctx->tuple_desc) != TYPEFUNC_COMPOSITE)
 		{
-			ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-			                errmsg("set-valued function called in context that cannot accept a set")));
+			ereport(ERROR,
+				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+				 errmsg("set-valued function called in context that cannot accept a set")));
 		}
 
 		BlessTupleDesc(funcctx->tuple_desc);
@@ -153,7 +153,7 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 
 	while (1)
 	{
-		node = &state->stack[state->stacklen-1];
+		node = &state->stack[state->stacklen - 1];
 		lwgeom = node->geom;
 
 		/* need to return a point from this geometry */
@@ -163,38 +163,32 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 			/* TODO use a union?  would save a tiny amount of stack space.
 			 * probably not worth the bother
 			 */
-			LWLINE	*line;
-			LWCIRCSTRING *circ;
-			LWPOLY	*poly;
-			LWTRIANGLE	*tri;
-			LWPOINT *lwpoint = NULL;
-			POINT4D	pt;
+			LWLINE* line;
+			LWCIRCSTRING* circ;
+			LWPOLY* poly;
+			LWTRIANGLE* tri;
+			LWPOINT* lwpoint = NULL;
+			POINT4D pt;
 
 			/*
 			 * net result of switch should be to set lwpoint to the
 			 * next point to return, or leave at NULL if there
 			 * are no more points in the geometry
 			 */
-			switch(lwgeom->type)
+			switch (lwgeom->type)
 			{
 			case TRIANGLETYPE:
 				tri = lwgeom_as_lwtriangle(lwgeom);
-				if (state->pt == 0)
-				{
-					state->path[state->pathlen++] = Int32GetDatum(state->ring+1);
-				}
+				if (state->pt == 0) { state->path[state->pathlen++] = Int32GetDatum(state->ring + 1); }
 				if (state->pt <= 3)
 				{
 					getPoint4d_p(tri->points, state->pt, &pt);
 					lwpoint = lwpoint_make(tri->srid,
-					                       FLAGS_GET_Z(tri->points->flags),
-					                       FLAGS_GET_M(tri->points->flags),
-					                       &pt);
+							       FLAGS_GET_Z(tri->points->flags),
+							       FLAGS_GET_M(tri->points->flags),
+							       &pt);
 				}
-				if (state->pt > 3)
-				{
-					state->pathlen--;
-				}
+				if (state->pt > 3) { state->pathlen--; }
 				break;
 			case POLYGONTYPE:
 				poly = lwgeom_as_lwpoly(lwgeom);
@@ -207,12 +201,10 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 				if (state->pt == 0 && state->ring < poly->nrings)
 				{
 					/* handle new ring */
-					state->path[state->pathlen] = Int32GetDatum(state->ring+1);
+					state->path[state->pathlen] = Int32GetDatum(state->ring + 1);
 					state->pathlen++;
 				}
-				if (state->ring == poly->nrings)
-				{
-				}
+				if (state->ring == poly->nrings) {}
 				else
 				{
 					/* TODO should be able to directly get the point
@@ -227,9 +219,9 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 					 */
 					getPoint4d_p(poly->rings[state->ring], state->pt, &pt);
 					lwpoint = lwpoint_make(poly->srid,
-					                       FLAGS_GET_Z(poly->rings[state->ring]->flags),
-					                       FLAGS_GET_M(poly->rings[state->ring]->flags),
-					                       &pt);
+							       FLAGS_GET_Z(poly->rings[state->ring]->flags),
+							       FLAGS_GET_M(poly->rings[state->ring]->flags),
+							       &pt);
 				}
 				break;
 			case POINTTYPE:
@@ -238,20 +230,17 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 			case LINETYPE:
 				line = lwgeom_as_lwline(lwgeom);
 				if (line->points && state->pt <= line->points->npoints)
-				{
-					lwpoint = lwline_get_lwpoint((LWLINE*)lwgeom, state->pt);
-				}
+				{ lwpoint = lwline_get_lwpoint((LWLINE*)lwgeom, state->pt); }
 				break;
 			case CIRCSTRINGTYPE:
 				circ = lwgeom_as_lwcircstring(lwgeom);
 				if (circ->points && state->pt <= circ->points->npoints)
-				{
-					lwpoint = lwcircstring_get_lwpoint((LWCIRCSTRING*)lwgeom, state->pt);
-				}
+				{ lwpoint = lwcircstring_get_lwpoint((LWCIRCSTRING*)lwgeom, state->pt); }
 				break;
 			default:
-				ereport(ERROR, (errcode(ERRCODE_DATA_EXCEPTION),
-				                errmsg("Invalid Geometry type %d passed to ST_DumpPoints()", lwgeom->type)));
+				ereport(ERROR,
+					(errcode(ERRCODE_DATA_EXCEPTION),
+					 errmsg("Invalid Geometry type %d passed to ST_DumpPoints()", lwgeom->type)));
 			}
 
 			/*
@@ -276,10 +265,14 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 				state->pt++;
 
 				state->path[state->pathlen] = Int32GetDatum(state->pt);
-				pathpt[0] = PointerGetDatum(construct_array(state->path, state->pathlen+1,
-				                            INT4OID, state->typlen, state->byval, state->align));
+				pathpt[0] = PointerGetDatum(construct_array(state->path,
+									    state->pathlen + 1,
+									    INT4OID,
+									    state->typlen,
+									    state->byval,
+									    state->align));
 
-				pathpt[1] = PointerGetDatum(gserialized_from_lwgeom((LWGEOM*)lwpoint,0));
+				pathpt[1] = PointerGetDatum(gserialized_from_lwgeom((LWGEOM*)lwpoint, 0));
 
 				tuple = heap_form_tuple(funcctx->tuple_desc, pathpt, isnull);
 				result = HeapTupleGetDatum(tuple);
@@ -310,7 +303,7 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 		/* no more geometries in the current collection */
 		if (--state->stacklen == 0) SRF_RETURN_DONE(funcctx);
 		state->pathlen--;
-		state->stack[state->stacklen-1].idx++;
+		state->stack[state->stacklen - 1].idx++;
 	}
 }
 
@@ -331,4 +324,3 @@ case POLYHEDRALSURFACETYPE:
 case TINTYPE:
 
 #endif
-

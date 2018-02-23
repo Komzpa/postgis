@@ -42,8 +42,7 @@ lwgeom_to_encoded_polyline(const LWGEOM* geom, int precision)
 	case MULTIPOINTTYPE:
 		return lwmmpoint_to_encoded_polyline((LWMPOINT*)geom, precision);
 	default:
-		lwerror("lwgeom_to_encoded_polyline: '%s' geometry type not supported",
-		        lwtype_name(type));
+		lwerror("lwgeom_to_encoded_polyline: '%s' geometry type not supported", lwtype_name(type));
 		return NULL;
 	}
 }
@@ -95,8 +94,7 @@ pointarray_to_encoded_polyline(const POINTARRAY* pa, int precision)
 	{
 		const POINT2D* point = getPoint2d_cp(pa, i);
 		delta[2 * i] = round(point->y * scale) - round(prevPoint->y * scale);
-		delta[(2 * i) + 1] =
-		    round(point->x * scale) - round(prevPoint->x * scale);
+		delta[(2 * i) + 1] = round(point->x * scale) - round(prevPoint->x * scale);
 		prevPoint = point;
 	}
 
@@ -107,10 +105,7 @@ pointarray_to_encoded_polyline(const POINTARRAY* pa, int precision)
 		/* Multiply by 2 for a signed left shift */
 		delta[i] *= 2;
 		/* if value is negative, invert this encoding */
-		if (delta[i] < 0)
-		{
-			delta[i] = ~(delta[i]);
-		}
+		if (delta[i] < 0) { delta[i] = ~(delta[i]); }
 	}
 
 	sb = stringbuffer_create();

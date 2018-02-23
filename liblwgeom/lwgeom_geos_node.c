@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 #include "lwgeom_geos.h"
 #include "liblwgeom_internal.h"
 
@@ -33,18 +32,21 @@ static int
 lwgeom_ngeoms(const LWGEOM* n)
 {
 	const LWCOLLECTION* c = lwgeom_as_lwcollection(n);
-	if ( c ) return c->ngeoms;
-	else return 1;
+	if (c)
+		return c->ngeoms;
+	else
+		return 1;
 }
 
 static const LWGEOM*
 lwgeom_subgeom(const LWGEOM* g, int n)
 {
 	const LWCOLLECTION* c = lwgeom_as_lwcollection(g);
-	if ( c ) return lwcollection_getsubgeom((LWCOLLECTION*)c, n);
-	else return g;
+	if (c)
+		return lwcollection_getsubgeom((LWCOLLECTION*)c, n);
+	else
+		return g;
 }
-
 
 static void
 lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
@@ -55,25 +57,18 @@ lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
 	switch (lwg->type)
 	{
 	case MULTILINETYPE:
-		for ( i = 0,
-		        n = lwgeom_ngeoms(lwg);
-		        i < n; ++i )
+		for (i = 0, n = lwgeom_ngeoms(lwg); i < n; ++i)
 		{
-			lwgeom_collect_endpoints(
-			    lwgeom_subgeom(lwg, i),
-			    col);
+			lwgeom_collect_endpoints(lwgeom_subgeom(lwg, i), col);
 		}
 		break;
 	case LINETYPE:
 		l = (LWLINE*)lwg;
-		col = lwmpoint_add_lwpoint(col,
-		                           lwline_get_lwpoint(l, 0));
-		col = lwmpoint_add_lwpoint(col,
-		                           lwline_get_lwpoint(l, l->points->npoints-1));
+		col = lwmpoint_add_lwpoint(col, lwline_get_lwpoint(l, 0));
+		col = lwmpoint_add_lwpoint(col, lwline_get_lwpoint(l, l->points->npoints - 1));
 		break;
 	default:
-		lwerror("lwgeom_collect_endpoints: invalid type %s",
-		        lwtype_name(lwg->type));
+		lwerror("lwgeom_collect_endpoints: invalid type %s", lwtype_name(lwg->type));
 		break;
 	}
 }
@@ -81,9 +76,7 @@ lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
 static LWMPOINT*
 lwgeom_extract_endpoints(const LWGEOM* lwg)
 {
-	LWMPOINT* col = lwmpoint_construct_empty(SRID_UNKNOWN,
-	                FLAGS_GET_Z(lwg->flags),
-	                FLAGS_GET_M(lwg->flags));
+	LWMPOINT* col = lwmpoint_construct_empty(SRID_UNKNOWN, FLAGS_GET_Z(lwg->flags), FLAGS_GET_M(lwg->flags));
 	lwgeom_collect_endpoints(lwg, col);
 
 	return col;
@@ -95,11 +88,11 @@ static LWGEOM*
 lwgeom_extract_unique_endpoints(const LWGEOM* lwg)
 {
 	LWGEOM* ret;
-	GEOSGeometry *gepu;
-	LWMPOINT *epall = lwgeom_extract_endpoints(lwg);
-	GEOSGeometry *gepall = LWGEOM2GEOS((LWGEOM*)epall, 1);
+	GEOSGeometry* gepu;
+	LWMPOINT* epall = lwgeom_extract_endpoints(lwg);
+	GEOSGeometry* gepall = LWGEOM2GEOS((LWGEOM*)epall, 1);
 	lwmpoint_free(epall);
-	if ( ! gepall )
+	if (!gepall)
 	{
 		lwerror("LWGEOM2GEOS: %s", lwgeom_geos_errmsg);
 		return NULL;
@@ -108,7 +101,7 @@ lwgeom_extract_unique_endpoints(const LWGEOM* lwg)
 	/* UnaryUnion to remove duplicates */
 	/* TODO: do it all within pgis using indices */
 	gepu = GEOSUnaryUnion(gepall);
-	if ( ! gepu )
+	if (!gepu)
 	{
 		GEOSGeom_destroy(gepall);
 		lwerror("GEOSUnaryUnion: %s", lwgeom_geos_errmsg);
@@ -118,7 +111,7 @@ lwgeom_extract_unique_endpoints(const LWGEOM* lwg)
 
 	ret = GEOS2LWGEOM(gepu, FLAGS_GET_Z(lwg->flags));
 	GEOSGeom_destroy(gepu);
-	if ( ! ret )
+	if (!ret)
 	{
 		lwerror("Error during GEOS2LWGEOM");
 		return NULL;
@@ -137,7 +130,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 	LWCOLLECTION *col, *tc;
 	int pn, ln, np, nl;
 
-	if ( lwgeom_dimension(lwgeom_in) != 1 )
+	if (lwgeom_dimension(lwgeom_in) != 1)
 	{
 		lwerror("Noding geometries of dimension != 1 is unsupported");
 		return NULL;
@@ -145,14 +138,14 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 
 	initGEOS(lwgeom_geos_error, lwgeom_geos_error);
 	g1 = LWGEOM2GEOS(lwgeom_in, 1);
-	if ( ! g1 )
+	if (!g1)
 	{
 		lwerror("LWGEOM2GEOS: %s", lwgeom_geos_errmsg);
 		return NULL;
 	}
 
 	ep = lwgeom_extract_unique_endpoints(lwgeom_in);
-	if ( ! ep )
+	if (!ep)
 	{
 		GEOSGeom_destroy(g1);
 		lwerror("Error extracting unique endpoints from input");
@@ -161,7 +154,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 
 	gn = GEOSNode(g1);
 	GEOSGeom_destroy(g1);
-	if ( ! gn )
+	if (!gn)
 	{
 		lwgeom_free(ep);
 		lwerror("GEOSNode: %s", lwgeom_geos_errmsg);
@@ -170,7 +163,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 
 	gm = GEOSLineMerge(gn);
 	GEOSGeom_destroy(gn);
-	if ( ! gm )
+	if (!gm)
 	{
 		lwgeom_free(ep);
 		lwerror("GEOSLineMerge: %s", lwgeom_geos_errmsg);
@@ -179,7 +172,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 
 	lines = GEOS2LWGEOM(gm, FLAGS_GET_Z(lwgeom_in->flags));
 	GEOSGeom_destroy(gm);
-	if ( ! lines )
+	if (!lines)
 	{
 		lwgeom_free(ep);
 		lwerror("Error during GEOS2LWGEOM");
@@ -195,27 +188,26 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 	 * We can use the above 2 assertions to early exit the loop.
 	 */
 
-	col = lwcollection_construct_empty(MULTILINETYPE, lwgeom_in->srid,
-	                                   FLAGS_GET_Z(lwgeom_in->flags),
-	                                   FLAGS_GET_M(lwgeom_in->flags));
+	col = lwcollection_construct_empty(
+	    MULTILINETYPE, lwgeom_in->srid, FLAGS_GET_Z(lwgeom_in->flags), FLAGS_GET_M(lwgeom_in->flags));
 
 	np = lwgeom_ngeoms(ep);
-	for (pn=0; pn<np; ++pn)   /* for each point */
+	for (pn = 0; pn < np; ++pn) /* for each point */
 	{
 
 		const LWPOINT* p = (LWPOINT*)lwgeom_subgeom(ep, pn);
 
 		nl = lwgeom_ngeoms(lines);
-		for (ln=0; ln<nl; ++ln)   /* for each line */
+		for (ln = 0; ln < nl; ++ln) /* for each line */
 		{
 
 			const LWLINE* l = (LWLINE*)lwgeom_subgeom(lines, ln);
 
 			int s = lwline_split_by_point_to(l, p, (LWMLINE*)col);
 
-			if ( ! s ) continue; /* not on this line */
+			if (!s) continue; /* not on this line */
 
-			if ( s == 1 )
+			if (s == 1)
 			{
 				/* found on this line, but not splitting it */
 				break;
@@ -224,18 +216,18 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 			/* splits this line */
 
 			/* replace this line with the two splits */
-			if ( lwgeom_is_collection(lines) )
+			if (lwgeom_is_collection(lines))
 			{
 				tc = (LWCOLLECTION*)lines;
 				lwcollection_reserve(tc, nl + 1);
-				while (nl > ln+1)
+				while (nl > ln + 1)
 				{
-					tc->geoms[nl] = tc->geoms[nl-1];
+					tc->geoms[nl] = tc->geoms[nl - 1];
 					--nl;
 				}
 				lwgeom_free(tc->geoms[ln]);
-				tc->geoms[ln]   = col->geoms[0];
-				tc->geoms[ln+1] = col->geoms[1];
+				tc->geoms[ln] = col->geoms[0];
+				tc->geoms[ln + 1] = col->geoms[1];
 				tc->ngeoms++;
 			}
 			else
@@ -254,7 +246,6 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 
 			break;
 		}
-
 	}
 
 	lwgeom_free(ep);
@@ -263,4 +254,3 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 	lines->srid = lwgeom_in->srid;
 	return (LWGEOM*)lines;
 }
-
