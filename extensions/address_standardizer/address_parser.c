@@ -14,17 +14,21 @@
 //#define DEBUG 1
 
 #ifdef DEBUG
-#define DBG(format, arg...)                     \
-    elog(NOTICE, format , ## arg)
+#define DBG(format, arg...) elog(NOTICE, format, ##arg)
 #else
-#define DBG(format, arg...) do { ; } while (0)
+#define DBG(format, arg...) \
+	do \
+	{ \
+		; \
+	} while (0)
 #endif
 
 Datum parse_address(PG_FUNCTION_ARGS);
 
-static char *text2char(text *in)
+static char*
+text2char(text* in)
 {
-	char *out = palloc(VARSIZE(in));
+	char* out = palloc(VARSIZE(in));
 	memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
 	out[VARSIZE(in) - VARHDRSZ] = '\0';
 	return out;
@@ -34,16 +38,15 @@ PG_FUNCTION_INFO_V1(parse_address);
 
 Datum parse_address(PG_FUNCTION_ARGS)
 {
-	TupleDesc            tupdesc;
-	AttInMetadata       *attinmeta;
-	Datum                result;
-	ADDRESS             *paddr;
-	HHash               *stH;
-	char                *str;
-	char               **values;
-	int                  err;
-	HeapTuple            tuple;
-
+	TupleDesc tupdesc;
+	AttInMetadata* attinmeta;
+	Datum result;
+	ADDRESS* paddr;
+	HHash* stH;
+	char* str;
+	char** values;
+	int err;
+	HeapTuple tuple;
 
 	DBG("Start standardize_address");
 
@@ -51,9 +54,10 @@ Datum parse_address(PG_FUNCTION_ARGS)
 
 	DBG("str='%s'", str);
 
-	if (get_call_result_type( fcinfo, NULL, &tupdesc ) != TYPEFUNC_COMPOSITE )
+	if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 	{
-		elog(ERROR, "function returning record called in context"
+		elog(ERROR,
+		     "function returning record called in context"
 		     " that cannot accept type record");
 		return -1;
 	}
@@ -62,7 +66,7 @@ Datum parse_address(PG_FUNCTION_ARGS)
 
 	DBG("Got tupdesc, allocating HHash");
 
-	stH = (HHash *) palloc0(sizeof(HHash));
+	stH = (HHash*)palloc0(sizeof(HHash));
 	if (!stH)
 	{
 		elog(ERROR, "parse_address: Failed to allocate memory for hash!");
@@ -92,7 +96,7 @@ Datum parse_address(PG_FUNCTION_ARGS)
 	}
 
 	DBG("setup values array for natts=%d", tupdesc->natts);
-	values = (char **) palloc(9 * sizeof(char *));
+	values = (char**)palloc(9 * sizeof(char*));
 	if (!values)
 	{
 		elog(ERROR, "parse_address: out of memory!");
@@ -122,4 +126,3 @@ Datum parse_address(PG_FUNCTION_ARGS)
 	DBG("returning parsed address result");
 	return result;
 }
-

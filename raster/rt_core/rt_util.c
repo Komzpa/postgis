@@ -98,7 +98,7 @@ rt_util_clamp_to_32F(double value)
  * @return valid GDAL resampling algorithm
  */
 GDALResampleAlg
-rt_util_gdal_resample_alg(const char *algname)
+rt_util_gdal_resample_alg(const char* algname)
 {
 	assert(algname != NULL && strlen(algname) > 0);
 
@@ -192,7 +192,7 @@ rt_util_gdal_datatype_to_pixtype(GDALDataType gdt)
 	get GDAL runtime version information
 */
 const char*
-rt_util_gdal_version(const char *request)
+rt_util_gdal_version(const char* request)
 {
 	if (NULL == request || !strlen(request))
 		return GDALVersionInfo("RELEASE_NAME");
@@ -204,7 +204,7 @@ rt_util_gdal_version(const char *request)
 	computed extent type
 */
 rt_extenttype
-rt_util_extent_type(const char *name)
+rt_util_extent_type(const char* name)
 {
 	assert(name != NULL && strlen(name) > 0);
 
@@ -226,10 +226,10 @@ rt_util_extent_type(const char *name)
 	convert the spatial reference string from a GDAL recognized format to either WKT or Proj4
 */
 char*
-rt_util_gdal_convert_sr(const char *srs, int proj4)
+rt_util_gdal_convert_sr(const char* srs, int proj4)
 {
 	OGRSpatialReferenceH hsrs;
-	char *rtn = NULL;
+	char* rtn = NULL;
 
 	assert(srs != NULL);
 
@@ -261,7 +261,7 @@ rt_util_gdal_convert_sr(const char *srs, int proj4)
 	is the spatial reference string supported by GDAL
 */
 int
-rt_util_gdal_supported_sr(const char *srs)
+rt_util_gdal_supported_sr(const char* srs)
 {
 	OGRSpatialReferenceH hsrs;
 	OGRErr rtn = OGRERR_NONE;
@@ -289,9 +289,9 @@ rt_util_gdal_supported_sr(const char *srs)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_util_gdal_sr_auth_info(GDALDatasetH hds, char **authname, char **authcode)
+rt_util_gdal_sr_auth_info(GDALDatasetH hds, char** authname, char** authcode)
 {
-	const char *srs = NULL;
+	const char* srs = NULL;
 
 	assert(authname != NULL);
 	assert(authcode != NULL);
@@ -316,7 +316,9 @@ rt_util_gdal_sr_auth_info(GDALDatasetH hds, char **authname, char **authcode)
 
 				if (*authname == NULL || *authcode == NULL)
 				{
-					rterror("rt_util_gdal_sr_auth_info: Could not allocate memory for auth name and code");
+					rterror(
+					    "rt_util_gdal_sr_auth_info: Could not allocate memory for auth name and "
+					    "code");
 					if (*authname != NULL) rtdealloc(*authname);
 					if (*authcode != NULL) rtdealloc(*authcode);
 					OSRDestroySpatialReference(hSRS);
@@ -337,20 +339,16 @@ rt_util_gdal_sr_auth_info(GDALDatasetH hds, char **authname, char **authcode)
 /*
 	is GDAL configured correctly?
 */
-int rt_util_gdal_configured(void)
+int
+rt_util_gdal_configured(void)
 {
 
 	/* set of EPSG codes */
-	if (!rt_util_gdal_supported_sr("EPSG:4326"))
-		return 0;
-	if (!rt_util_gdal_supported_sr("EPSG:4269"))
-		return 0;
-	if (!rt_util_gdal_supported_sr("EPSG:4267"))
-		return 0;
-	if (!rt_util_gdal_supported_sr("EPSG:3310"))
-		return 0;
-	if (!rt_util_gdal_supported_sr("EPSG:2163"))
-		return 0;
+	if (!rt_util_gdal_supported_sr("EPSG:4326")) return 0;
+	if (!rt_util_gdal_supported_sr("EPSG:4269")) return 0;
+	if (!rt_util_gdal_supported_sr("EPSG:4267")) return 0;
+	if (!rt_util_gdal_supported_sr("EPSG:3310")) return 0;
+	if (!rt_util_gdal_supported_sr("EPSG:2163")) return 0;
 
 	return 1;
 }
@@ -380,35 +378,33 @@ rt_util_gdal_register_all(int force_register_all)
 	is the driver registered?
 */
 int
-rt_util_gdal_driver_registered(const char *drv)
+rt_util_gdal_driver_registered(const char* drv)
 {
 	int count = GDALGetDriverCount();
 	int i = 0;
 	GDALDriverH hdrv = NULL;
 
-	if (drv == NULL || !strlen(drv) || count < 1)
-		return 0;
+	if (drv == NULL || !strlen(drv) || count < 1) return 0;
 
 	for (i = 0; i < count; i++)
 	{
 		hdrv = GDALGetDriver(i);
 		if (hdrv == NULL) continue;
 
-		if (strcmp(drv, GDALGetDriverShortName(hdrv)) == 0)
-			return 1;
+		if (strcmp(drv, GDALGetDriverShortName(hdrv)) == 0) return 1;
 	}
 
 	return 0;
 }
 
 /* variable for PostgreSQL GUC: postgis.gdal_enabled_drivers */
-char *gdal_enabled_drivers = NULL;
+char* gdal_enabled_drivers = NULL;
 
 /*
 	wrapper for GDALOpen and GDALOpenShared
 */
 GDALDatasetH
-rt_util_gdal_open(const char *fn, GDALAccess fn_access, int shared)
+rt_util_gdal_open(const char* fn, GDALAccess fn_access, int shared)
 {
 	assert(NULL != fn);
 
@@ -423,10 +419,7 @@ rt_util_gdal_open(const char *fn, GDALAccess fn_access, int shared)
 		{
 			/* do nothing */
 		}
-		else if (
-		    (strstr(fn, "/vsicurl") != NULL) &&
-		    (strstr(gdal_enabled_drivers, GDAL_VSICURL) == NULL)
-		)
+		else if ((strstr(fn, "/vsicurl") != NULL) && (strstr(gdal_enabled_drivers, GDAL_VSICURL) == NULL))
 		{
 			rterror("rt_util_gdal_open: Cannot open VSICURL file. VSICURL disabled");
 			return NULL;
@@ -440,10 +433,7 @@ rt_util_gdal_open(const char *fn, GDALAccess fn_access, int shared)
 }
 
 void
-rt_util_from_ogr_envelope(
-    OGREnvelope	env,
-    rt_envelope *ext
-)
+rt_util_from_ogr_envelope(OGREnvelope env, rt_envelope* ext)
 {
 	assert(ext != NULL);
 
@@ -457,10 +447,7 @@ rt_util_from_ogr_envelope(
 }
 
 void
-rt_util_to_ogr_envelope(
-    rt_envelope ext,
-    OGREnvelope	*env
-)
+rt_util_to_ogr_envelope(rt_envelope ext, OGREnvelope* env)
 {
 	assert(env != NULL);
 
@@ -470,17 +457,15 @@ rt_util_to_ogr_envelope(
 	env->MaxY = ext.MaxY;
 }
 
-LWPOLY *
-rt_util_envelope_to_lwpoly(
-    rt_envelope env
-)
+LWPOLY*
+rt_util_envelope_to_lwpoly(rt_envelope env)
 {
-	LWPOLY *npoly = NULL;
-	POINTARRAY **rings = NULL;
-	POINTARRAY *pts = NULL;
+	LWPOLY* npoly = NULL;
+	POINTARRAY** rings = NULL;
+	POINTARRAY* pts = NULL;
 	POINT4D p4d;
 
-	rings = (POINTARRAY **) rtalloc(sizeof (POINTARRAY*));
+	rings = (POINTARRAY**)rtalloc(sizeof(POINTARRAY*));
 	if (!rings)
 	{
 		rterror("rt_util_envelope_to_lwpoly: Out of memory building envelope's geometry");
@@ -527,17 +512,15 @@ rt_util_envelope_to_lwpoly(
 }
 
 int
-rt_util_same_geotransform_matrix(double *gt1, double *gt2)
+rt_util_same_geotransform_matrix(double* gt1, double* gt2)
 {
 	int k = 0;
 
-	if (gt1 == NULL || gt2 == NULL)
-		return FALSE;
+	if (gt1 == NULL || gt2 == NULL) return FALSE;
 
 	for (k = 0; k < 6; k++)
 	{
-		if (FLT_NEQ(gt1[k], gt2[k]))
-			return FALSE;
+		if (FLT_NEQ(gt1[k], gt2[k])) return FALSE;
 	}
 
 	return TRUE;
@@ -562,10 +545,8 @@ rt_util_rgb_to_hsv(double rgb[3], double hsv[3])
 	/* get min and max values from RGB */
 	for (i = 1; i < 3; i++)
 	{
-		if (rgb[i] > maxc)
-			maxc = rgb[i];
-		if (rgb[i] < minc)
-			minc = rgb[i];
+		if (rgb[i] > maxc) maxc = rgb[i];
+		if (rgb[i] < minc) minc = rgb[i];
 	}
 	v = maxc;
 
@@ -627,7 +608,7 @@ rt_util_hsv_to_rgb(double hsv[3], double rgb[3])
 		q = v * (1. - hsv[1] * f);
 		t = v * (1. - hsv[1] * (1. - f));
 
-		a = (int) i;
+		a = (int)i;
 		switch (a)
 		{
 		case 1:
@@ -673,12 +654,12 @@ rt_util_hsv_to_rgb(double hsv[3], double rgb[3])
 }
 
 int
-rt_util_dbl_trunc_warning(
-    double initialvalue,
-    int32_t checkvalint, uint32_t checkvaluint,
-    float checkvalfloat, double checkvaldouble,
-    rt_pixtype pixtype
-)
+rt_util_dbl_trunc_warning(double initialvalue,
+			  int32_t checkvalint,
+			  uint32_t checkvaluint,
+			  float checkvalfloat,
+			  double checkvaldouble,
+			  rt_pixtype pixtype)
 {
 	int result = 0;
 
@@ -698,8 +679,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got clamped from %f to %d",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvalint
-			      );
+			       initialvalue,
+			       checkvalint);
 #endif
 			result = 1;
 		}
@@ -708,8 +689,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got truncated from %f to %d",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvalint
-			      );
+			       initialvalue,
+			       checkvalint);
 #endif
 			result = 1;
 		}
@@ -722,8 +703,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got clamped from %f to %u",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvaluint
-			      );
+			       initialvalue,
+			       checkvaluint);
 #endif
 			result = 1;
 		}
@@ -732,8 +713,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got truncated from %f to %u",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvaluint
-			      );
+			       initialvalue,
+			       checkvaluint);
 #endif
 			result = 1;
 		}
@@ -750,8 +731,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got converted from %f to %f",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvalfloat
-			      );
+			       initialvalue,
+			       checkvalfloat);
 #endif
 			result = 1;
 		}
@@ -764,8 +745,8 @@ rt_util_dbl_trunc_warning(
 #if POSTGIS_RASTER_WARN_ON_TRUNCATION > 0
 			rtwarn("Value set for %s band got converted from %f to %f",
 			       rt_pixtype_name(pixtype),
-			       initialvalue, checkvaldouble
-			      );
+			       initialvalue,
+			       checkvaldouble);
 #endif
 			result = 1;
 		}
@@ -777,4 +758,3 @@ rt_util_dbl_trunc_warning(
 
 	return result;
 }
-

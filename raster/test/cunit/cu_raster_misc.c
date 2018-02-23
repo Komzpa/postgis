@@ -24,7 +24,8 @@
 #include "CUnit/Basic.h"
 #include "cu_tester.h"
 
-static void test_raster_cell_to_geopoint()
+static void
+test_raster_cell_to_geopoint()
 {
 	rt_raster raster;
 	int rtn;
@@ -44,7 +45,8 @@ static void test_raster_cell_to_geopoint()
 	cu_free_raster(raster);
 }
 
-static void test_raster_geopoint_to_cell()
+static void
+test_raster_geopoint_to_cell()
 {
 	rt_raster raster;
 	int rtn;
@@ -64,7 +66,8 @@ static void test_raster_geopoint_to_cell()
 	cu_free_raster(raster);
 }
 
-static void test_raster_from_two_rasters()
+static void
+test_raster_from_two_rasters()
 {
 	rt_raster rast1;
 	rt_raster rast2;
@@ -81,12 +84,7 @@ static void test_raster_from_two_rasters()
 	CU_ASSERT(rast2 != NULL);
 	rt_raster_set_scale(rast2, 1, 1);
 
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_FIRST,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_FIRST, &rast, offset);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT(rast != NULL);
 	CU_ASSERT_EQUAL(rt_raster_get_width(rast), 4);
@@ -97,12 +95,7 @@ static void test_raster_from_two_rasters()
 	CU_ASSERT_DOUBLE_EQUAL(offset[3], 2, DBL_EPSILON);
 	cu_free_raster(rast);
 
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_SECOND,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_SECOND, &rast, offset);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT(rast != NULL);
 	CU_ASSERT_EQUAL(rt_raster_get_width(rast), 2);
@@ -113,12 +106,7 @@ static void test_raster_from_two_rasters()
 	CU_ASSERT_DOUBLE_EQUAL(offset[3], 0, DBL_EPSILON);
 	cu_free_raster(rast);
 
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_INTERSECTION,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_INTERSECTION, &rast, offset);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT(rast != NULL);
 	CU_ASSERT_EQUAL(rt_raster_get_width(rast), 2);
@@ -129,12 +117,7 @@ static void test_raster_from_two_rasters()
 	CU_ASSERT_DOUBLE_EQUAL(offset[3], 0, DBL_EPSILON);
 	cu_free_raster(rast);
 
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_UNION,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_UNION, &rast, offset);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT(rast != NULL);
 	CU_ASSERT_EQUAL(rt_raster_get_width(rast), 4);
@@ -146,39 +129,25 @@ static void test_raster_from_two_rasters()
 	cu_free_raster(rast);
 
 	rt_raster_set_scale(rast2, 1, 0.1);
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_UNION,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_UNION, &rast, offset);
 	CU_ASSERT_NOT_EQUAL(err, ES_NONE);
 	rt_raster_set_scale(rast2, 1, 1);
 
 	rt_raster_set_srid(rast2, 9999);
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_UNION,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_UNION, &rast, offset);
 	CU_ASSERT_NOT_EQUAL(err, ES_NONE);
 	rt_raster_set_srid(rast2, 0);
 
 	rt_raster_set_skews(rast2, -1, 1);
-	err = rt_raster_from_two_rasters(
-	          rast1, rast2,
-	          ET_UNION,
-	          &rast,
-	          offset
-	      );
+	err = rt_raster_from_two_rasters(rast1, rast2, ET_UNION, &rast, offset);
 	CU_ASSERT_NOT_EQUAL(err, ES_NONE);
 
 	cu_free_raster(rast2);
 	cu_free_raster(rast1);
 }
 
-static void test_raster_compute_skewed_raster()
+static void
+test_raster_compute_skewed_raster()
 {
 	rt_envelope extent;
 	rt_raster rast;
@@ -192,12 +161,7 @@ static void test_raster_compute_skewed_raster()
 	extent.UpperLeftX = extent.MinX;
 	extent.UpperLeftY = extent.MaxY;
 
-	rast = rt_raster_compute_skewed_raster(
-	           extent,
-	           skew,
-	           scale,
-	           0
-	       );
+	rast = rt_raster_compute_skewed_raster(extent, skew, scale, 0);
 
 	CU_ASSERT(rast != NULL);
 	CU_ASSERT_EQUAL(rt_raster_get_width(rast), 2);
@@ -210,7 +174,8 @@ static void test_raster_compute_skewed_raster()
 
 /* register tests */
 void raster_misc_suite_setup(void);
-void raster_misc_suite_setup(void)
+void
+raster_misc_suite_setup(void)
 {
 	CU_pSuite suite = CU_add_suite("raster_misc", NULL, NULL);
 	PG_ADD_TEST(suite, test_raster_cell_to_geopoint);
@@ -218,4 +183,3 @@ void raster_misc_suite_setup(void)
 	PG_ADD_TEST(suite, test_raster_from_two_rasters);
 	PG_ADD_TEST(suite, test_raster_compute_skewed_raster);
 }
-

@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 #include "postgres.h"
 #include "fmgr.h"
 #include "utils/elog.h"
@@ -45,10 +44,10 @@ static pqsigfunc coreIntHandler = 0;
 static void handleInterrupt(int sig);
 
 #ifdef WIN32
-static void interruptCallback()
+static void
+interruptCallback()
 {
-	if (UNBLOCKED_SIGNAL_QUEUE())
-		pgwin32_dispatch_queued_signals();
+	if (UNBLOCKED_SIGNAL_QUEUE()) pgwin32_dispatch_queued_signals();
 }
 #endif
 
@@ -120,7 +119,6 @@ _PG_fini(void)
 	pqsignal(SIGINT, coreIntHandler);
 }
 
-
 static void
 handleInterrupt(int sig)
 {
@@ -138,8 +136,5 @@ handleInterrupt(int sig)
 	/* request interruption of liblwgeom as well */
 	lwgeom_request_interrupt();
 
-	if ( coreIntHandler )
-	{
-		(*coreIntHandler)(sig);
-	}
+	if (coreIntHandler) { (*coreIntHandler)(sig); }
 }
