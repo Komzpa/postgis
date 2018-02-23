@@ -33,7 +33,7 @@
 
 /* Read band from WKB as at start of band */
 static rt_band
-rt_band_from_wkb(uint16_t width, uint16_t height, const uint8_t** ptr, const uint8_t* end, uint8_t littleEndian)
+rt_band_from_wkb(uint16_t width, uint16_t height, const uint8_t **ptr, const uint8_t *end, uint8_t littleEndian)
 {
 	rt_band band = NULL;
 	int pixbytes = 0;
@@ -238,8 +238,8 @@ rt_band_from_wkb(uint16_t width, uint16_t height, const uint8_t** ptr, const uin
 	{
 		if (isMachineLittleEndian() != littleEndian)
 		{
-			void (*flipper)(uint8_t*) = 0;
-			uint8_t* flipme = NULL;
+			void (*flipper)(uint8_t *) = 0;
+			uint8_t *flipme = NULL;
 
 			if (pixbytes == 2)
 				flipper = flip_endian_16;
@@ -272,7 +272,7 @@ rt_band_from_wkb(uint16_t width, uint16_t height, const uint8_t** ptr, const uin
 		sz = width * height;
 		for (v = 0; v < sz; ++v)
 		{
-			val = ((uint8_t*)band->data.mem)[v];
+			val = ((uint8_t *)band->data.mem)[v];
 			if (val > maxVal)
 			{
 				rterror("rt_band_from_wkb: Invalid value %d for pixel of type %s",
@@ -295,10 +295,10 @@ rt_band_from_wkb(uint16_t width, uint16_t height, const uint8_t** ptr, const uin
 #define RT_WKB_HDR_SZ (sizeof(struct rt_raster_serialized_t) - 4 + 1)
 
 rt_raster
-rt_raster_from_wkb(const uint8_t* wkb, uint32_t wkbsize)
+rt_raster_from_wkb(const uint8_t *wkb, uint32_t wkbsize)
 {
-	const uint8_t* ptr = wkb;
-	const uint8_t* wkbend = NULL;
+	const uint8_t *ptr = wkb;
+	const uint8_t *wkbend = NULL;
 	rt_raster rast = NULL;
 	uint8_t endian = 0;
 	uint16_t version = 0;
@@ -381,7 +381,7 @@ rt_raster_from_wkb(const uint8_t* wkb, uint32_t wkbsize)
 	}
 
 	/* Now read the bands */
-	rast->bands = (rt_band*)rtalloc(sizeof(rt_band) * rast->numBands);
+	rast->bands = (rt_band *)rtalloc(sizeof(rt_band) * rast->numBands);
 	if (!rast->bands)
 	{
 		rterror("rt_raster_from_wkb: Out of memory allocating bands for WKB raster decoding");
@@ -423,10 +423,10 @@ rt_raster_from_wkb(const uint8_t* wkb, uint32_t wkbsize)
 }
 
 rt_raster
-rt_raster_from_hexwkb(const char* hexwkb, uint32_t hexwkbsize)
+rt_raster_from_hexwkb(const char *hexwkb, uint32_t hexwkbsize)
 {
 	rt_raster ret = NULL;
-	uint8_t* wkb = NULL;
+	uint8_t *wkb = NULL;
 	uint32_t wkbsize = 0;
 	uint32_t i = 0;
 
@@ -452,7 +452,7 @@ rt_raster_from_hexwkb(const char* hexwkb, uint32_t hexwkbsize)
 	/* parse full hex */
 	for (i = 0; i < wkbsize; ++i)
 	{
-		wkb[i] = parse_hex((char*)&(hexwkb[i * 2]));
+		wkb[i] = parse_hex((char *)&(hexwkb[i * 2]));
 	}
 
 	ret = rt_raster_from_wkb(wkb, wkbsize);
@@ -518,16 +518,16 @@ rt_raster_wkb_size(rt_raster raster, int outasin)
  *
  * @return WKB of raster or NULL on error
  */
-uint8_t*
-rt_raster_to_wkb(rt_raster raster, int outasin, uint32_t* wkbsize)
+uint8_t *
+rt_raster_to_wkb(rt_raster raster, int outasin, uint32_t *wkbsize)
 {
 
 #if POSTGIS_DEBUG_LEVEL > 0
-	const uint8_t* wkbend = NULL;
+	const uint8_t *wkbend = NULL;
 #endif
 
-	uint8_t* wkb = NULL;
-	uint8_t* ptr = NULL;
+	uint8_t *wkb = NULL;
+	uint8_t *ptr = NULL;
 	uint16_t i = 0;
 	uint8_t littleEndian = isMachineLittleEndian();
 
@@ -539,7 +539,7 @@ rt_raster_to_wkb(rt_raster raster, int outasin, uint32_t* wkbsize)
 	*wkbsize = rt_raster_wkb_size(raster, outasin);
 	RASTER_DEBUGF(3, "rt_raster_to_wkb: found size: %d", *wkbsize);
 
-	wkb = (uint8_t*)rtalloc(*wkbsize);
+	wkb = (uint8_t *)rtalloc(*wkbsize);
 	if (!wkb)
 	{
 		rterror("rt_raster_to_wkb: Out of memory allocating WKB for raster");
@@ -674,7 +674,7 @@ rt_raster_to_wkb(rt_raster raster, int outasin, uint32_t* wkbsize)
 			ptr += 1;
 
 			/* Write path */
-			strcpy((char*)ptr, band->data.offline.path);
+			strcpy((char *)ptr, band->data.offline.path);
 			ptr += strlen(band->data.offline.path) + 1;
 		}
 		else
@@ -704,11 +704,11 @@ rt_raster_to_wkb(rt_raster raster, int outasin, uint32_t* wkbsize)
 	return wkb;
 }
 
-char*
-rt_raster_to_hexwkb(rt_raster raster, int outasin, uint32_t* hexwkbsize)
+char *
+rt_raster_to_hexwkb(rt_raster raster, int outasin, uint32_t *hexwkbsize)
 {
-	uint8_t* wkb = NULL;
-	char* hexwkb = NULL;
+	uint8_t *wkb = NULL;
+	char *hexwkb = NULL;
 	uint32_t wkbsize = 0;
 
 	assert(NULL != raster);
@@ -721,7 +721,7 @@ rt_raster_to_hexwkb(rt_raster raster, int outasin, uint32_t* hexwkbsize)
 	RASTER_DEBUG(3, "rt_raster_to_hexwkb: rt_raster_to_wkb returned");
 
 	*hexwkbsize = wkbsize * 2; /* hex is 2 times bytes */
-	hexwkb = (char*)rtalloc((*hexwkbsize) + 1);
+	hexwkb = (char *)rtalloc((*hexwkbsize) + 1);
 	if (!hexwkb)
 	{
 		rterror("rt_raster_to_hexwkb: Out of memory hexifying raster WKB");
@@ -729,8 +729,8 @@ rt_raster_to_hexwkb(rt_raster raster, int outasin, uint32_t* hexwkbsize)
 		return NULL;
 	}
 
-	char* optr = hexwkb;
-	uint8_t* iptr = wkb;
+	char *optr = hexwkb;
+	uint8_t *iptr = wkb;
 	const char hexchar[] = "0123456789ABCDEF";
 	while (wkbsize--)
 	{

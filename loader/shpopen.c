@@ -299,7 +299,7 @@ static int bBigEndian;
 /************************************************************************/
 
 static void
-SwapWord(int length, void* wordP)
+SwapWord(int length, void *wordP)
 
 {
 	int i;
@@ -307,9 +307,9 @@ SwapWord(int length, void* wordP)
 
 	for (i = 0; i < length / 2; i++)
 	{
-		temp = ((uchar*)wordP)[i];
-		((uchar*)wordP)[i] = ((uchar*)wordP)[length - i - 1];
-		((uchar*)wordP)[length - i - 1] = temp;
+		temp = ((uchar *)wordP)[i];
+		((uchar *)wordP)[i] = ((uchar *)wordP)[length - i - 1];
+		((uchar *)wordP)[length - i - 1] = temp;
 	}
 }
 
@@ -320,14 +320,14 @@ SwapWord(int length, void* wordP)
 /*      a valid input.                                                  */
 /************************************************************************/
 
-static void*
-SfRealloc(void* pMem, int nNewSize)
+static void *
+SfRealloc(void *pMem, int nNewSize)
 
 {
 	if (pMem == NULL)
-		return ((void*)malloc(nNewSize));
+		return ((void *)malloc(nNewSize));
 	else
-		return ((void*)realloc(pMem, nNewSize));
+		return ((void *)realloc(pMem, nNewSize));
 }
 
 /************************************************************************/
@@ -345,7 +345,7 @@ SHPWriteHeader(SHPHandle psSHP)
 	int i;
 	int32 i32;
 	double dValue;
-	int32* panSHX;
+	int32 *panSHX;
 
 	if (psSHP->fpSHX == NULL)
 	{
@@ -431,7 +431,7 @@ SHPWriteHeader(SHPHandle psSHP)
 	/* -------------------------------------------------------------------- */
 	/*      Write out the .shx contents.                                    */
 	/* -------------------------------------------------------------------- */
-	panSHX = (int32*)malloc(sizeof(int32) * 2 * psSHP->nRecords);
+	panSHX = (int32 *)malloc(sizeof(int32) * 2 * psSHP->nRecords);
 
 	for (i = 0; i < psSHP->nRecords; i++)
 	{
@@ -458,7 +458,7 @@ SHPWriteHeader(SHPHandle psSHP)
 /************************************************************************/
 
 SHPHandle SHPAPI_CALL
-SHPOpen(const char* pszLayer, const char* pszAccess)
+SHPOpen(const char *pszLayer, const char *pszAccess)
 
 {
 	SAHooks sHooks;
@@ -476,13 +476,13 @@ SHPOpen(const char* pszLayer, const char* pszAccess)
 /************************************************************************/
 
 SHPHandle SHPAPI_CALL
-SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
+SHPOpenLL(const char *pszLayer, const char *pszAccess, SAHooks *psHooks)
 
 {
 	char *pszFullname, *pszBasename;
 	SHPHandle psSHP;
 
-	uchar* pabyBuf;
+	uchar *pabyBuf;
 	int i;
 	double dValue;
 
@@ -500,7 +500,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 	/*	Establish the byte order on this machine.			*/
 	/* -------------------------------------------------------------------- */
 	i = 1;
-	if (*((uchar*)&i) == 1)
+	if (*((uchar *)&i) == 1)
 		bBigEndian = FALSE;
 	else
 		bBigEndian = TRUE;
@@ -517,7 +517,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 	/*	Compute the base (layer) name.  If there is any extension	*/
 	/*	on the passed in filename we will strip it off.			*/
 	/* -------------------------------------------------------------------- */
-	pszBasename = (char*)malloc(strlen(pszLayer) + 5);
+	pszBasename = (char *)malloc(strlen(pszLayer) + 5);
 	strcpy(pszBasename, pszLayer);
 	for (i = strlen(pszBasename) - 1;
 	     i > 0 && pszBasename[i] != '.' && pszBasename[i] != '/' && pszBasename[i] != '\\';
@@ -530,7 +530,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 	/*	Open the .shp and .shx files.  Note that files pulled from	*/
 	/*	a PC to Unix with upper case filenames won't work!		*/
 	/* -------------------------------------------------------------------- */
-	pszFullname = (char*)malloc(strlen(pszBasename) + 5);
+	pszFullname = (char *)malloc(strlen(pszBasename) + 5);
 	sprintf(pszFullname, "%s.shp", pszBasename);
 	psSHP->fpSHP = psSHP->sHooks.FOpen(pszFullname, pszAccess);
 	if (psSHP->fpSHP == NULL)
@@ -541,7 +541,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 
 	if (psSHP->fpSHP == NULL)
 	{
-		char* pszMessage = (char*)malloc(strlen(pszBasename) * 2 + 256);
+		char *pszMessage = (char *)malloc(strlen(pszBasename) * 2 + 256);
 		sprintf(pszMessage, "Unable to open %s.shp or %s.SHP.", pszBasename, pszBasename);
 		psHooks->Error(pszMessage);
 		free(pszMessage);
@@ -561,7 +561,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 
 	if (psSHP->fpSHX == NULL)
 	{
-		char* pszMessage = (char*)malloc(strlen(pszBasename) * 2 + 256);
+		char *pszMessage = (char *)malloc(strlen(pszBasename) * 2 + 256);
 		sprintf(pszMessage, "Unable to open %s.shx or %s.SHX.", pszBasename, pszBasename);
 		psHooks->Error(pszMessage);
 		free(pszMessage);
@@ -579,7 +579,7 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 	/* -------------------------------------------------------------------- */
 	/*  Read the file size from the SHP file.				*/
 	/* -------------------------------------------------------------------- */
-	pabyBuf = (uchar*)malloc(100);
+	pabyBuf = (uchar *)malloc(100);
 	psSHP->sHooks.FRead(pabyBuf, 100, 1, psSHP->fpSHP);
 
 	psSHP->nFileSize = ((unsigned int)pabyBuf[24] * 256 * 256 * 256 + (unsigned int)pabyBuf[25] * 256 * 256 +
@@ -665,9 +665,9 @@ SHPOpenLL(const char* pszLayer, const char* pszAccess, SAHooks* psHooks)
 	/* -------------------------------------------------------------------- */
 	psSHP->nMaxRecords = psSHP->nRecords;
 
-	psSHP->panRecOffset = (unsigned int*)malloc(sizeof(unsigned int) * MAX(1, psSHP->nMaxRecords));
-	psSHP->panRecSize = (unsigned int*)malloc(sizeof(unsigned int) * MAX(1, psSHP->nMaxRecords));
-	pabyBuf = (uchar*)malloc(8 * MAX(1, psSHP->nRecords));
+	psSHP->panRecOffset = (unsigned int *)malloc(sizeof(unsigned int) * MAX(1, psSHP->nMaxRecords));
+	psSHP->panRecSize = (unsigned int *)malloc(sizeof(unsigned int) * MAX(1, psSHP->nMaxRecords));
+	pabyBuf = (uchar *)malloc(8 * MAX(1, psSHP->nRecords));
 
 	if (psSHP->panRecOffset == NULL || psSHP->panRecSize == NULL || pabyBuf == NULL)
 	{
@@ -768,7 +768,7 @@ SHPClose(SHPHandle psSHP)
 /************************************************************************/
 
 void SHPAPI_CALL
-SHPGetInfo(SHPHandle psSHP, int* pnEntities, int* pnShapeType, double* padfMinBound, double* padfMaxBound)
+SHPGetInfo(SHPHandle psSHP, int *pnEntities, int *pnShapeType, double *padfMinBound, double *padfMaxBound)
 
 {
 	int i;
@@ -794,7 +794,7 @@ SHPGetInfo(SHPHandle psSHP, int* pnEntities, int* pnShapeType, double* padfMinBo
 /************************************************************************/
 
 SHPHandle SHPAPI_CALL
-SHPCreate(const char* pszLayer, int nShapeType)
+SHPCreate(const char *pszLayer, int nShapeType)
 
 {
 	SAHooks sHooks;
@@ -812,7 +812,7 @@ SHPCreate(const char* pszLayer, int nShapeType)
 /************************************************************************/
 
 SHPHandle SHPAPI_CALL
-SHPCreateLL(const char* pszLayer, int nShapeType, SAHooks* psHooks)
+SHPCreateLL(const char *pszLayer, int nShapeType, SAHooks *psHooks)
 
 {
 	char *pszBasename = NULL, *pszFullname = NULL;
@@ -826,7 +826,7 @@ SHPCreateLL(const char* pszLayer, int nShapeType, SAHooks* psHooks)
 	/*      Establish the byte order on this system.                        */
 	/* -------------------------------------------------------------------- */
 	i = 1;
-	if (*((uchar*)&i) == 1)
+	if (*((uchar *)&i) == 1)
 		bBigEndian = FALSE;
 	else
 		bBigEndian = TRUE;
@@ -835,7 +835,7 @@ SHPCreateLL(const char* pszLayer, int nShapeType, SAHooks* psHooks)
 	/*	Compute the base (layer) name.  If there is any extension	*/
 	/*	on the passed in filename we will strip it off.			*/
 	/* -------------------------------------------------------------------- */
-	pszBasename = (char*)malloc(strlen(pszLayer) + 5);
+	pszBasename = (char *)malloc(strlen(pszLayer) + 5);
 	strcpy(pszBasename, pszLayer);
 	for (i = strlen(pszBasename) - 1;
 	     i > 0 && pszBasename[i] != '.' && pszBasename[i] != '/' && pszBasename[i] != '\\';
@@ -847,7 +847,7 @@ SHPCreateLL(const char* pszLayer, int nShapeType, SAHooks* psHooks)
 	/* -------------------------------------------------------------------- */
 	/*      Open the two files so we can write their headers.               */
 	/* -------------------------------------------------------------------- */
-	pszFullname = (char*)malloc(strlen(pszBasename) + 5);
+	pszFullname = (char *)malloc(strlen(pszBasename) + 5);
 	sprintf(pszFullname, "%s.shp", pszBasename);
 	fpSHP = psHooks->FOpen(pszFullname, "wb");
 	if (fpSHP == NULL)
@@ -942,7 +942,7 @@ error:
 /************************************************************************/
 
 static void
-_SHPSetBounds(uchar* pabyRec, SHPObject* psShape)
+_SHPSetBounds(uchar *pabyRec, SHPObject *psShape)
 
 {
 	ByteCopy(&(psShape->dfXMin), pabyRec + 0, 8);
@@ -967,7 +967,7 @@ _SHPSetBounds(uchar* pabyRec, SHPObject* psShape)
 /************************************************************************/
 
 void SHPAPI_CALL
-SHPComputeExtents(SHPObject* psObject)
+SHPComputeExtents(SHPObject *psObject)
 
 {
 	int i;
@@ -1008,19 +1008,19 @@ SHPObject
 SHPAPI_CALL1(*) SHPCreateObject(int nSHPType,
 				int nShapeId,
 				int nParts,
-				const int* panPartStart,
-				const int* panPartType,
+				const int *panPartStart,
+				const int *panPartType,
 				int nVertices,
-				const double* padfX,
-				const double* padfY,
-				const double* padfZ,
-				const double* padfM)
+				const double *padfX,
+				const double *padfY,
+				const double *padfZ,
+				const double *padfM)
 
 {
-	SHPObject* psObject;
+	SHPObject *psObject;
 	int i, bHasM, bHasZ;
 
-	psObject = (SHPObject*)calloc(1, sizeof(SHPObject));
+	psObject = (SHPObject *)calloc(1, sizeof(SHPObject));
 	psObject->nSHPType = nSHPType;
 	psObject->nShapeId = nShapeId;
 	psObject->bMeasureIsUsed = FALSE;
@@ -1055,8 +1055,8 @@ SHPAPI_CALL1(*) SHPCreateObject(int nSHPType,
 	{
 		psObject->nParts = MAX(1, nParts);
 
-		psObject->panPartStart = (int*)calloc(sizeof(int), psObject->nParts);
-		psObject->panPartType = (int*)malloc(sizeof(int) * psObject->nParts);
+		psObject->panPartStart = (int *)calloc(sizeof(int), psObject->nParts);
+		psObject->panPartType = (int *)malloc(sizeof(int) * psObject->nParts);
 
 		psObject->panPartStart[0] = 0;
 		psObject->panPartType[0] = SHPP_RING;
@@ -1079,10 +1079,10 @@ SHPAPI_CALL1(*) SHPCreateObject(int nSHPType,
 	/* -------------------------------------------------------------------- */
 	if (nVertices > 0)
 	{
-		psObject->padfX = (double*)calloc(sizeof(double), nVertices);
-		psObject->padfY = (double*)calloc(sizeof(double), nVertices);
-		psObject->padfZ = (double*)calloc(sizeof(double), nVertices);
-		psObject->padfM = (double*)calloc(sizeof(double), nVertices);
+		psObject->padfX = (double *)calloc(sizeof(double), nVertices);
+		psObject->padfY = (double *)calloc(sizeof(double), nVertices);
+		psObject->padfZ = (double *)calloc(sizeof(double), nVertices);
+		psObject->padfM = (double *)calloc(sizeof(double), nVertices);
 
 		for (i = 0; i < nVertices; i++)
 		{
@@ -1112,7 +1112,7 @@ SHPAPI_CALL1(*) SHPCreateObject(int nSHPType,
 
 SHPObject
 SHPAPI_CALL1(*)
-    SHPCreateSimpleObject(int nSHPType, int nVertices, const double* padfX, const double* padfY, const double* padfZ)
+    SHPCreateSimpleObject(int nSHPType, int nVertices, const double *padfX, const double *padfY, const double *padfZ)
 
 {
 	return (SHPCreateObject(nSHPType, -1, 0, NULL, NULL, nVertices, padfX, padfY, padfZ, NULL));
@@ -1126,12 +1126,12 @@ SHPAPI_CALL1(*)
 /************************************************************************/
 
 int SHPAPI_CALL
-SHPWriteObject(SHPHandle psSHP, int nShapeId, SHPObject* psObject)
+SHPWriteObject(SHPHandle psSHP, int nShapeId, SHPObject *psObject)
 
 {
 	unsigned int nRecordOffset, nRecordSize = 0;
 	int i;
-	uchar* pabyRec;
+	uchar *pabyRec;
 	int32 i32;
 
 	psSHP->bUpdated = TRUE;
@@ -1159,15 +1159,15 @@ SHPWriteObject(SHPHandle psSHP, int nShapeId, SHPObject* psObject)
 		psSHP->nMaxRecords = (int)(psSHP->nMaxRecords * 1.3 + 100);
 
 		psSHP->panRecOffset =
-		    (unsigned int*)SfRealloc(psSHP->panRecOffset, sizeof(unsigned int) * psSHP->nMaxRecords);
+		    (unsigned int *)SfRealloc(psSHP->panRecOffset, sizeof(unsigned int) * psSHP->nMaxRecords);
 		psSHP->panRecSize =
-		    (unsigned int*)SfRealloc(psSHP->panRecSize, sizeof(unsigned int) * psSHP->nMaxRecords);
+		    (unsigned int *)SfRealloc(psSHP->panRecSize, sizeof(unsigned int) * psSHP->nMaxRecords);
 	}
 
 	/* -------------------------------------------------------------------- */
 	/*      Initialize record.                                              */
 	/* -------------------------------------------------------------------- */
-	pabyRec = (uchar*)malloc(psObject->nVertices * 4 * sizeof(double) + psObject->nParts * 8 + 128);
+	pabyRec = (uchar *)malloc(psObject->nVertices * 4 * sizeof(double) + psObject->nParts * 8 + 128);
 
 	/* -------------------------------------------------------------------- */
 	/*  Extract vertices for a Polygon or Arc.				*/
@@ -1503,7 +1503,7 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 
 {
 	int32 nEntitySize, nRequiredSize;
-	SHPObject* psShape;
+	SHPObject *psShape;
 	char szErrorMsg[128];
 
 	/* -------------------------------------------------------------------- */
@@ -1517,7 +1517,7 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 	nEntitySize = psSHP->panRecSize[hEntity] + 8;
 	if (nEntitySize > (int32)psSHP->nBufSize)
 	{
-		psSHP->pabyRec = (uchar*)SfRealloc(psSHP->pabyRec, nEntitySize);
+		psSHP->pabyRec = (uchar *)SfRealloc(psSHP->pabyRec, nEntitySize);
 		if (psSHP->pabyRec == NULL)
 		{
 			char szError[200];
@@ -1576,7 +1576,7 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 	/* -------------------------------------------------------------------- */
 	/*	Allocate and minimally initialize the object.			*/
 	/* -------------------------------------------------------------------- */
-	psShape = (SHPObject*)calloc(1, sizeof(SHPObject));
+	psShape = (SHPObject *)calloc(1, sizeof(SHPObject));
 	psShape->nShapeId = hEntity;
 	psShape->bMeasureIsUsed = FALSE;
 
@@ -1675,14 +1675,14 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 		}
 
 		psShape->nVertices = nPoints;
-		psShape->padfX = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfY = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfZ = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfM = (double*)calloc(nPoints, sizeof(double));
+		psShape->padfX = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfY = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfZ = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfM = (double *)calloc(nPoints, sizeof(double));
 
 		psShape->nParts = nParts;
-		psShape->panPartStart = (int*)calloc(nParts, sizeof(int));
-		psShape->panPartType = (int*)calloc(nParts, sizeof(int));
+		psShape->panPartStart = (int *)calloc(nParts, sizeof(int));
+		psShape->panPartType = (int *)calloc(nParts, sizeof(int));
 
 		if (psShape->padfX == NULL || psShape->padfY == NULL || psShape->padfZ == NULL ||
 		    psShape->padfM == NULL || psShape->panPartStart == NULL || psShape->panPartType == NULL)
@@ -1869,10 +1869,10 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 		}
 
 		psShape->nVertices = nPoints;
-		psShape->padfX = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfY = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfZ = (double*)calloc(nPoints, sizeof(double));
-		psShape->padfM = (double*)calloc(nPoints, sizeof(double));
+		psShape->padfX = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfY = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfZ = (double *)calloc(nPoints, sizeof(double));
+		psShape->padfM = (double *)calloc(nPoints, sizeof(double));
 
 		if (psShape->padfX == NULL || psShape->padfY == NULL || psShape->padfZ == NULL ||
 		    psShape->padfM == NULL)
@@ -1964,10 +1964,10 @@ SHPAPI_CALL1(*) SHPReadObject(SHPHandle psSHP, int hEntity)
 		int32 nOffset;
 
 		psShape->nVertices = 1;
-		psShape->padfX = (double*)calloc(1, sizeof(double));
-		psShape->padfY = (double*)calloc(1, sizeof(double));
-		psShape->padfZ = (double*)calloc(1, sizeof(double));
-		psShape->padfM = (double*)calloc(1, sizeof(double));
+		psShape->padfX = (double *)calloc(1, sizeof(double));
+		psShape->padfY = (double *)calloc(1, sizeof(double));
+		psShape->padfZ = (double *)calloc(1, sizeof(double));
+		psShape->padfM = (double *)calloc(1, sizeof(double));
 
 		if (20 + 8 + ((psShape->nSHPType == SHPT_POINTZ) ? 8 : 0) > nEntitySize)
 		{
@@ -2122,7 +2122,7 @@ SHPAPI_CALL1(*) SHPPartTypeName(int nPartType)
 /************************************************************************/
 
 void SHPAPI_CALL
-SHPDestroyObject(SHPObject* psShape)
+SHPDestroyObject(SHPObject *psShape)
 
 {
 	if (psShape == NULL) return;
@@ -2146,7 +2146,7 @@ SHPDestroyObject(SHPObject* psShape)
 /************************************************************************/
 
 int SHPAPI_CALL
-SHPRewindObject(SHPHandle hSHP, SHPObject* psObject)
+SHPRewindObject(SHPHandle hSHP, SHPObject *psObject)
 
 {
 	int iOpRing, bAltered = 0;

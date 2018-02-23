@@ -31,7 +31,7 @@
 /* Ensures the given lat and lon are in the "normal" range:
  * -90 to +90 for lat, -180 to +180 for lon. */
 static void
-lwprint_normalize_latlon(double* lat, double* lon)
+lwprint_normalize_latlon(double *lat, double *lon)
 {
 	/* First remove all the truly excessive trips around the world via up or down. */
 	while (*lat > 270)
@@ -73,8 +73,8 @@ lwprint_normalize_latlon(double* lat, double* lon)
  * lat vs. lon.  They are only used if the "C" (compass dir) token appears in the
  * format string.
  * NOTE: Format string and symbols are required to be in UTF-8. */
-static char*
-lwdouble_to_dms(double val, const char* pos_dir_symbol, const char* neg_dir_symbol, const char* format)
+static char *
+lwdouble_to_dms(double val, const char *pos_dir_symbol, const char *neg_dir_symbol, const char *format)
 {
 	/* 3 numbers, 1 sign or compass dir, and 5 possible strings (degree signs, spaces, misc text, etc) between or
 	 * around them.*/
@@ -112,7 +112,7 @@ lwdouble_to_dms(double val, const char* pos_dir_symbol, const char* neg_dir_symb
 
 	int format_length = ((NULL == format) ? 0 : strlen(format));
 
-	char* result;
+	char *result;
 
 	int index, following_byte_index;
 	int multibyte_char_width = 1;
@@ -359,7 +359,7 @@ lwdouble_to_dms(double val, const char* pos_dir_symbol, const char* neg_dir_symb
 	}
 
 	/* Allocate space for the result.  Leave plenty of room for excess digits, negative sign, etc.*/
-	result = (char*)lwalloc(format_length + WORK_SIZE);
+	result = (char *)lwalloc(format_length + WORK_SIZE);
 	/* Append all the pieces together. There may be less than 9, but in that case the rest will be blank. */
 	strcpy(result, pieces[0]);
 	for (index = 1; index < NUM_PIECES; index++)
@@ -376,12 +376,12 @@ lwdouble_to_dms(double val, const char* pos_dir_symbol, const char* neg_dir_symb
  * NOTE: Format string is required to be in UTF-8.
  * NOTE2: returned string is lwalloc'ed, caller is responsible to lwfree it up
  */
-static char*
-lwdoubles_to_latlon(double lat, double lon, const char* format)
+static char *
+lwdoubles_to_latlon(double lat, double lon, const char *format)
 {
-	char* lat_text;
-	char* lon_text;
-	char* result;
+	char *lat_text;
+	char *lon_text;
+	char *result;
 
 	/* Normalize lat/lon to the normal (-90 to 90, -180 to 180) range. */
 	lwprint_normalize_latlon(&lat, &lon);
@@ -390,7 +390,7 @@ lwdoubles_to_latlon(double lat, double lon, const char* format)
 	lon_text = lwdouble_to_dms(lon, "E", "W", format);
 
 	/* lat + lon + a space between + the null terminator. */
-	result = (char*)lwalloc(strlen(lat_text) + strlen(lon_text) + 2);
+	result = (char *)lwalloc(strlen(lat_text) + strlen(lon_text) + 2);
 	sprintf(result, "%s %s", lat_text, lon_text);
 	lwfree(lat_text);
 	lwfree(lon_text);
@@ -404,12 +404,12 @@ lwdoubles_to_latlon(double lat, double lon, const char* format)
  * NOTE: Format string is required to be in UTF-8.
  * NOTE2: returned string is lwalloc'ed, caller is responsible to lwfree it up
  */
-char*
-lwpoint_to_latlon(const LWPOINT* pt, const char* format)
+char *
+lwpoint_to_latlon(const LWPOINT *pt, const char *format)
 {
-	const POINT2D* p;
+	const POINT2D *p;
 	if (NULL == pt) { lwerror("Cannot convert a null point into formatted text."); }
-	if (lwgeom_is_empty((LWGEOM*)pt)) { lwerror("Cannot convert an empty point into formatted text."); }
+	if (lwgeom_is_empty((LWGEOM *)pt)) { lwerror("Cannot convert an empty point into formatted text."); }
 	p = getPoint2d_cp(pt->point, 0);
 	return lwdoubles_to_latlon(p->y, p->x, format);
 }
@@ -419,7 +419,7 @@ lwpoint_to_latlon(const LWPOINT* pt, const char* format)
  * Modifies input.
  */
 static void
-trim_trailing_zeros(char* str)
+trim_trailing_zeros(char *str)
 {
 	char *ptr, *totrim = NULL;
 	int len;
@@ -463,7 +463,7 @@ trim_trailing_zeros(char* str)
  *
  */
 int
-lwprint_double(double d, int maxdd, char* buf, size_t bufsize)
+lwprint_double(double d, int maxdd, char *buf, size_t bufsize)
 {
 	double ad = fabs(d);
 	int ndd;

@@ -29,30 +29,30 @@
 #include <assert.h>
 
 static int
-lwgeom_ngeoms(const LWGEOM* n)
+lwgeom_ngeoms(const LWGEOM *n)
 {
-	const LWCOLLECTION* c = lwgeom_as_lwcollection(n);
+	const LWCOLLECTION *c = lwgeom_as_lwcollection(n);
 	if (c)
 		return c->ngeoms;
 	else
 		return 1;
 }
 
-static const LWGEOM*
-lwgeom_subgeom(const LWGEOM* g, int n)
+static const LWGEOM *
+lwgeom_subgeom(const LWGEOM *g, int n)
 {
-	const LWCOLLECTION* c = lwgeom_as_lwcollection(g);
+	const LWCOLLECTION *c = lwgeom_as_lwcollection(g);
 	if (c)
-		return lwcollection_getsubgeom((LWCOLLECTION*)c, n);
+		return lwcollection_getsubgeom((LWCOLLECTION *)c, n);
 	else
 		return g;
 }
 
 static void
-lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
+lwgeom_collect_endpoints(const LWGEOM *lwg, LWMPOINT *col)
 {
 	int i, n;
-	LWLINE* l;
+	LWLINE *l;
 
 	switch (lwg->type)
 	{
@@ -63,7 +63,7 @@ lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
 		}
 		break;
 	case LINETYPE:
-		l = (LWLINE*)lwg;
+		l = (LWLINE *)lwg;
 		col = lwmpoint_add_lwpoint(col, lwline_get_lwpoint(l, 0));
 		col = lwmpoint_add_lwpoint(col, lwline_get_lwpoint(l, l->points->npoints - 1));
 		break;
@@ -73,10 +73,10 @@ lwgeom_collect_endpoints(const LWGEOM* lwg, LWMPOINT* col)
 	}
 }
 
-static LWMPOINT*
-lwgeom_extract_endpoints(const LWGEOM* lwg)
+static LWMPOINT *
+lwgeom_extract_endpoints(const LWGEOM *lwg)
 {
-	LWMPOINT* col = lwmpoint_construct_empty(SRID_UNKNOWN, FLAGS_GET_Z(lwg->flags), FLAGS_GET_M(lwg->flags));
+	LWMPOINT *col = lwmpoint_construct_empty(SRID_UNKNOWN, FLAGS_GET_Z(lwg->flags), FLAGS_GET_M(lwg->flags));
 	lwgeom_collect_endpoints(lwg, col);
 
 	return col;
@@ -84,13 +84,13 @@ lwgeom_extract_endpoints(const LWGEOM* lwg)
 
 /* Assumes initGEOS was called already */
 /* May return LWPOINT or LWMPOINT */
-static LWGEOM*
-lwgeom_extract_unique_endpoints(const LWGEOM* lwg)
+static LWGEOM *
+lwgeom_extract_unique_endpoints(const LWGEOM *lwg)
 {
-	LWGEOM* ret;
-	GEOSGeometry* gepu;
-	LWMPOINT* epall = lwgeom_extract_endpoints(lwg);
-	GEOSGeometry* gepall = LWGEOM2GEOS((LWGEOM*)epall, 1);
+	LWGEOM *ret;
+	GEOSGeometry *gepu;
+	LWMPOINT *epall = lwgeom_extract_endpoints(lwg);
+	GEOSGeometry *gepall = LWGEOM2GEOS((LWGEOM *)epall, 1);
 	lwmpoint_free(epall);
 	if (!gepall)
 	{
@@ -121,9 +121,9 @@ lwgeom_extract_unique_endpoints(const LWGEOM* lwg)
 }
 
 /* exported */
-extern LWGEOM* lwgeom_node(const LWGEOM* lwgeom_in);
-LWGEOM*
-lwgeom_node(const LWGEOM* lwgeom_in)
+extern LWGEOM *lwgeom_node(const LWGEOM *lwgeom_in);
+LWGEOM *
+lwgeom_node(const LWGEOM *lwgeom_in)
 {
 	GEOSGeometry *g1, *gn, *gm;
 	LWGEOM *ep, *lines;
@@ -195,15 +195,15 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 	for (pn = 0; pn < np; ++pn)
 	{ /* for each point */
 
-		const LWPOINT* p = (LWPOINT*)lwgeom_subgeom(ep, pn);
+		const LWPOINT *p = (LWPOINT *)lwgeom_subgeom(ep, pn);
 
 		nl = lwgeom_ngeoms(lines);
 		for (ln = 0; ln < nl; ++ln)
 		{ /* for each line */
 
-			const LWLINE* l = (LWLINE*)lwgeom_subgeom(lines, ln);
+			const LWLINE *l = (LWLINE *)lwgeom_subgeom(lines, ln);
 
-			int s = lwline_split_by_point_to(l, p, (LWMLINE*)col);
+			int s = lwline_split_by_point_to(l, p, (LWMLINE *)col);
 
 			if (!s) continue; /* not on this line */
 
@@ -218,7 +218,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 			/* replace this line with the two splits */
 			if (lwgeom_is_collection(lines))
 			{
-				tc = (LWCOLLECTION*)lines;
+				tc = (LWCOLLECTION *)lines;
 				lwcollection_reserve(tc, nl + 1);
 				while (nl > ln + 1)
 				{
@@ -234,7 +234,7 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 			{
 				lwgeom_free(lines);
 				/* transfer ownership rather than cloning */
-				lines = (LWGEOM*)lwcollection_clone_deep(col);
+				lines = (LWGEOM *)lwcollection_clone_deep(col);
 				assert(col->ngeoms == 2);
 				lwgeom_free(col->geoms[0]);
 				lwgeom_free(col->geoms[1]);
@@ -252,5 +252,5 @@ lwgeom_node(const LWGEOM* lwgeom_in)
 	lwcollection_free(col);
 
 	lines->srid = lwgeom_in->srid;
-	return (LWGEOM*)lines;
+	return (LWGEOM *)lines;
 }

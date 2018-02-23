@@ -43,31 +43,31 @@
  * along with stdout/stderr since this is the most common use case
  *
  */
-void*
+void *
 default_rt_allocator(size_t size)
 {
-	void* mem = malloc(size);
+	void *mem = malloc(size);
 	return mem;
 }
 
-void*
-default_rt_reallocator(void* mem, size_t size)
+void *
+default_rt_reallocator(void *mem, size_t size)
 {
-	void* ret = realloc(mem, size);
+	void *ret = realloc(mem, size);
 	return ret;
 }
 
 void
-default_rt_deallocator(void* mem)
+default_rt_deallocator(void *mem)
 {
 	free(mem);
 }
 
 void
-default_rt_error_handler(const char* fmt, va_list ap)
+default_rt_error_handler(const char *fmt, va_list ap)
 {
 
-	static const char* label = "ERROR: ";
+	static const char *label = "ERROR: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -78,10 +78,10 @@ default_rt_error_handler(const char* fmt, va_list ap)
 }
 
 void
-default_rt_warning_handler(const char* fmt, va_list ap)
+default_rt_warning_handler(const char *fmt, va_list ap)
 {
 
-	static const char* label = "WARNING: ";
+	static const char *label = "WARNING: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -92,10 +92,10 @@ default_rt_warning_handler(const char* fmt, va_list ap)
 }
 
 void
-default_rt_info_handler(const char* fmt, va_list ap)
+default_rt_info_handler(const char *fmt, va_list ap)
 {
 
-	static const char* label = "INFO: ";
+	static const char *label = "INFO: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -170,24 +170,24 @@ rt_set_handlers(rt_allocator allocator,
  *
  * They use the functions defined by the caller.
  */
-void*
+void *
 rtalloc(size_t size)
 {
-	void* mem = ctx_t.alloc(size);
+	void *mem = ctx_t.alloc(size);
 	RASTER_DEBUGF(5, "rtalloc called: %d@%p", size, mem);
 	return mem;
 }
 
-void*
-rtrealloc(void* mem, size_t size)
+void *
+rtrealloc(void *mem, size_t size)
 {
-	void* result = ctx_t.realloc(mem, size);
+	void *result = ctx_t.realloc(mem, size);
 	RASTER_DEBUGF(5, "rtrealloc called: %d@%p", size, result);
 	return result;
 }
 
 void
-rtdealloc(void* mem)
+rtdealloc(void *mem)
 {
 	ctx_t.dealloc(mem);
 	RASTER_DEBUG(5, "rtdealloc called");
@@ -201,7 +201,7 @@ rtdealloc(void* mem)
  * structure.
  */
 void
-rterror(const char* fmt, ...)
+rterror(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -214,7 +214,7 @@ rterror(const char* fmt, ...)
 }
 
 void
-rtinfo(const char* fmt, ...)
+rtinfo(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -227,7 +227,7 @@ rtinfo(const char* fmt, ...)
 }
 
 void
-rtwarn(const char* fmt, ...)
+rtwarn(const char *fmt, ...)
 {
 	va_list ap;
 

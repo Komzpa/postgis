@@ -80,10 +80,10 @@ usage()
 }
 
 int
-main(int argc, char** argv)
+main(int argc, char **argv)
 {
-	SHPLOADERCONFIG* config;
-	SHPLOADERSTATE* state;
+	SHPLOADERCONFIG *config;
+	SHPLOADERSTATE *state;
 	char *header, *footer, *record;
 	int c;
 	int ret, i;
@@ -135,7 +135,7 @@ main(int argc, char** argv)
 		case 's':
 			if (pgis_optarg)
 			{
-				char* ptr = strchr(pgis_optarg, ':');
+				char *ptr = strchr(pgis_optarg, ':');
 				if (ptr)
 				{
 					*ptr++ = '\0';
@@ -279,8 +279,8 @@ main(int argc, char** argv)
 	/* Determine the table and schema names from the next argument */
 	if (pgis_optind < argc)
 	{
-		char* strptr = argv[pgis_optind];
-		char* chrptr = strchr(strptr, '.');
+		char *strptr = argv[pgis_optind];
+		char *chrptr = strchr(strptr, '.');
 
 		/* OK, this is a schema-qualified table name... */
 		if (chrptr)
@@ -307,8 +307,8 @@ main(int argc, char** argv)
 	   Strip out the .shp and the leading path information first. */
 	if (config->shp_file && config->table == NULL)
 	{
-		char* shp_file = strdup(config->shp_file);
-		char* ptr;
+		char *shp_file = strdup(config->shp_file);
+		char *ptr;
 
 		/* Remove the extension, if present */
 		for (ptr = shp_file + strlen(shp_file); ptr > shp_file; ptr--)

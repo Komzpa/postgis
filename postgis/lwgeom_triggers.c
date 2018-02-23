@@ -44,8 +44,8 @@ Datum cache_bbox(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(cache_bbox);
 Datum cache_bbox(PG_FUNCTION_ARGS)
 {
-	TriggerData* trigdata = (TriggerData*)fcinfo->context;
-	Trigger* trigger;
+	TriggerData *trigdata = (TriggerData *)fcinfo->context;
+	Trigger *trigger;
 	TupleDesc tupdesc;
 	HeapTuple rettuple;
 	bool isnull;

@@ -76,22 +76,22 @@ SHP_CVSID("$Id$")
 #endif
 
 /* Local prototypes */
-SAFile SADFOpen(const char* pszFilename, const char* pszAccess);
-SAOffset SADFRead(void* p, SAOffset size, SAOffset nmemb, SAFile file);
-SAOffset SADFWrite(void* p, SAOffset size, SAOffset nmemb, SAFile file);
+SAFile SADFOpen(const char *pszFilename, const char *pszAccess);
+SAOffset SADFRead(void *p, SAOffset size, SAOffset nmemb, SAFile file);
+SAOffset SADFWrite(void *p, SAOffset size, SAOffset nmemb, SAFile file);
 SAOffset SADFSeek(SAFile file, SAOffset offset, int whence);
 SAOffset SADFTell(SAFile file);
 int SADFFlush(SAFile file);
 int SADFClose(SAFile file);
-int SADRemove(const char* filename);
-void SADError(const char* message);
+int SADRemove(const char *filename);
+void SADError(const char *message);
 
 /************************************************************************/
 /*                              SADFOpen()                              */
 /************************************************************************/
 
 SAFile
-SADFOpen(const char* pszFilename, const char* pszAccess)
+SADFOpen(const char *pszFilename, const char *pszAccess)
 
 {
 	return (SAFile)fopen(pszFilename, pszAccess);
@@ -102,10 +102,10 @@ SADFOpen(const char* pszFilename, const char* pszAccess)
 /************************************************************************/
 
 SAOffset
-SADFRead(void* p, SAOffset size, SAOffset nmemb, SAFile file)
+SADFRead(void *p, SAOffset size, SAOffset nmemb, SAFile file)
 
 {
-	return (SAOffset)fread(p, (size_t)size, (size_t)nmemb, (FILE*)file);
+	return (SAOffset)fread(p, (size_t)size, (size_t)nmemb, (FILE *)file);
 }
 
 /************************************************************************/
@@ -113,10 +113,10 @@ SADFRead(void* p, SAOffset size, SAOffset nmemb, SAFile file)
 /************************************************************************/
 
 SAOffset
-SADFWrite(void* p, SAOffset size, SAOffset nmemb, SAFile file)
+SADFWrite(void *p, SAOffset size, SAOffset nmemb, SAFile file)
 
 {
-	return (SAOffset)fwrite(p, (size_t)size, (size_t)nmemb, (FILE*)file);
+	return (SAOffset)fwrite(p, (size_t)size, (size_t)nmemb, (FILE *)file);
 }
 
 /************************************************************************/
@@ -128,9 +128,9 @@ SADFSeek(SAFile file, SAOffset offset, int whence)
 
 {
 #ifdef HAVE_FSEEKO
-	return (SAOffset)fseeko((FILE*)file, (off_t)offset, whence);
+	return (SAOffset)fseeko((FILE *)file, (off_t)offset, whence);
 #else
-	return (SAOffset)fseek((FILE*)file, (long)offset, whence);
+	return (SAOffset)fseek((FILE *)file, (long)offset, whence);
 #endif
 }
 
@@ -143,9 +143,9 @@ SADFTell(SAFile file)
 
 {
 #ifdef HAVE_FSEEKO
-	return (SAOffset)ftello((FILE*)file);
+	return (SAOffset)ftello((FILE *)file);
 #else
-	return (SAOffset)ftell((FILE*)file);
+	return (SAOffset)ftell((FILE *)file);
 #endif
 }
 
@@ -157,7 +157,7 @@ int
 SADFFlush(SAFile file)
 
 {
-	return fflush((FILE*)file);
+	return fflush((FILE *)file);
 }
 
 /************************************************************************/
@@ -168,7 +168,7 @@ int
 SADFClose(SAFile file)
 
 {
-	return fclose((FILE*)file);
+	return fclose((FILE *)file);
 }
 
 /************************************************************************/
@@ -176,7 +176,7 @@ SADFClose(SAFile file)
 /************************************************************************/
 
 int
-SADRemove(const char* filename)
+SADRemove(const char *filename)
 
 {
 	return remove(filename);
@@ -187,7 +187,7 @@ SADRemove(const char* filename)
 /************************************************************************/
 
 void
-SADError(const char* message)
+SADError(const char *message)
 
 {
 	fprintf(stderr, "%s\n", message);
@@ -198,7 +198,7 @@ SADError(const char* message)
 /************************************************************************/
 
 void
-SASetupDefaultHooks(SAHooks* psHooks)
+SASetupDefaultHooks(SAHooks *psHooks)
 
 {
 	psHooks->FOpen = SADFOpen;
@@ -220,16 +220,16 @@ SASetupDefaultHooks(SAHooks* psHooks)
 /*                          Utf8ToWideChar                              */
 /************************************************************************/
 
-const wchar_t*
-Utf8ToWideChar(const char* pszFilename)
+const wchar_t *
+Utf8ToWideChar(const char *pszFilename)
 {
 	int nMulti, nWide;
-	wchar_t* pwszFileName;
+	wchar_t *pwszFileName;
 
 	nMulti = strlen(pszFilename) + 1;
 	nWide = MultiByteToWideChar(CP_UTF8, 0, pszFilename, nMulti, 0, 0);
 	if (nWide == 0) { return NULL; }
-	pwszFileName = (wchar_t*)malloc(nWide * sizeof(wchar_t));
+	pwszFileName = (wchar_t *)malloc(nWide * sizeof(wchar_t));
 	if (pwszFileName == NULL) { return NULL; }
 	if (MultiByteToWideChar(CP_UTF8, 0, pszFilename, nMulti, pwszFileName, nWide) == 0)
 	{
@@ -244,15 +244,15 @@ Utf8ToWideChar(const char* pszFilename)
 /************************************************************************/
 
 SAFile
-SAUtf8WFOpen(const char* pszFilename, const char* pszAccess)
+SAUtf8WFOpen(const char *pszFilename, const char *pszAccess)
 {
 	SAFile file = NULL;
 	const wchar_t *pwszFileName, *pwszAccess;
 	pwszFileName = Utf8ToWideChar(pszFilename);
 	pwszAccess = Utf8ToWideChar(pszAccess);
 	if (pwszFileName != NULL && pwszFileName != NULL) { file = (SAFile)_wfopen(pwszFileName, pwszAccess); }
-	free((wchar_t*)pwszFileName);
-	free((wchar_t*)pwszAccess);
+	free((wchar_t *)pwszFileName);
+	free((wchar_t *)pwszAccess);
 	return file;
 }
 
@@ -261,12 +261,12 @@ SAUtf8WFOpen(const char* pszFilename, const char* pszAccess)
 /************************************************************************/
 
 int
-SAUtf8WRemove(const char* pszFilename)
+SAUtf8WRemove(const char *pszFilename)
 {
-	const wchar_t* pwszFileName = Utf8ToWideChar(pszFilename);
+	const wchar_t *pwszFileName = Utf8ToWideChar(pszFilename);
 	int rc = -1;
 	if (pwszFileName != NULL) { rc = _wremove(pwszFileName); }
-	free((wchar_t*)pwszFileName);
+	free((wchar_t *)pwszFileName);
 	return rc;
 }
 
@@ -279,7 +279,7 @@ SAUtf8WRemove(const char* pszFilename)
 /************************************************************************/
 
 void
-SASetupUtf8Hooks(SAHooks* psHooks)
+SASetupUtf8Hooks(SAHooks *psHooks)
 {
 #ifdef SHPAPI_WINDOWS
 	psHooks->FOpen = SAUtf8WFOpen;

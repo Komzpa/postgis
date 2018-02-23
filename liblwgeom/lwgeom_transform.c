@@ -29,7 +29,7 @@
 
 /** convert decimal degress to radians */
 static void
-to_rad(POINT4D* pt)
+to_rad(POINT4D *pt)
 {
 	pt->x *= M_PI / 180.0;
 	pt->y *= M_PI / 180.0;
@@ -37,7 +37,7 @@ to_rad(POINT4D* pt)
 
 /** convert radians to decimal degress */
 static void
-to_dec(POINT4D* pt)
+to_dec(POINT4D *pt)
 {
 	pt->x *= 180.0 / M_PI;
 	pt->y *= 180.0 / M_PI;
@@ -48,7 +48,7 @@ to_dec(POINT4D* pt)
  * from inpj projection to outpj projection
  */
 int
-ptarray_transform(POINTARRAY* pa, projPJ inpj, projPJ outpj)
+ptarray_transform(POINTARRAY *pa, projPJ inpj, projPJ outpj)
 {
 	uint32_t i;
 	POINT4D p;
@@ -68,7 +68,7 @@ ptarray_transform(POINTARRAY* pa, projPJ inpj, projPJ outpj)
  * from inpj projection to outpj projection
  */
 int
-lwgeom_transform(LWGEOM* geom, projPJ inpj, projPJ outpj)
+lwgeom_transform(LWGEOM *geom, projPJ inpj, projPJ outpj)
 {
 	uint32_t i;
 
@@ -82,13 +82,13 @@ lwgeom_transform(LWGEOM* geom, projPJ inpj, projPJ outpj)
 	case CIRCSTRINGTYPE:
 	case TRIANGLETYPE:
 	{
-		LWLINE* g = (LWLINE*)geom;
+		LWLINE *g = (LWLINE *)geom;
 		if (!ptarray_transform(g->points, inpj, outpj)) return LW_FAILURE;
 		break;
 	}
 	case POLYGONTYPE:
 	{
-		LWPOLY* g = (LWPOLY*)geom;
+		LWPOLY *g = (LWPOLY *)geom;
 		for (i = 0; i < g->nrings; i++)
 		{
 			if (!ptarray_transform(g->rings[i], inpj, outpj)) return LW_FAILURE;
@@ -106,7 +106,7 @@ lwgeom_transform(LWGEOM* geom, projPJ inpj, projPJ outpj)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	{
-		LWCOLLECTION* g = (LWCOLLECTION*)geom;
+		LWCOLLECTION *g = (LWCOLLECTION *)geom;
 		for (i = 0; i < g->ngeoms; i++)
 		{
 			if (!lwgeom_transform(g->geoms[i], inpj, outpj)) return LW_FAILURE;
@@ -123,7 +123,7 @@ lwgeom_transform(LWGEOM* geom, projPJ inpj, projPJ outpj)
 }
 
 int
-point4d_transform(POINT4D* pt, projPJ srcpj, projPJ dstpj)
+point4d_transform(POINT4D *pt, projPJ srcpj, projPJ dstpj)
 {
 	POINT3D orig_pt = {pt->x, pt->y, pt->z}; /* Copy for error report*/
 
@@ -171,7 +171,7 @@ point4d_transform(POINT4D* pt, projPJ srcpj, projPJ dstpj)
 }
 
 projPJ
-lwproj_from_string(const char* str1)
+lwproj_from_string(const char *str1)
 {
 	if (!str1 || str1[0] == '\0') { return NULL; }
 	return pj_init_plus(str1);

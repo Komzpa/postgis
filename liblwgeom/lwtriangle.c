@@ -33,12 +33,12 @@
 /* construct a new LWTRIANGLE.
  * use SRID=SRID_UNKNOWN for unknown SRID (will have 8bit type's S = 0)
  */
-LWTRIANGLE*
-lwtriangle_construct(int srid, GBOX* bbox, POINTARRAY* points)
+LWTRIANGLE *
+lwtriangle_construct(int srid, GBOX *bbox, POINTARRAY *points)
 {
-	LWTRIANGLE* result;
+	LWTRIANGLE *result;
 
-	result = (LWTRIANGLE*)lwalloc(sizeof(LWTRIANGLE));
+	result = (LWTRIANGLE *)lwalloc(sizeof(LWTRIANGLE));
 	result->type = TRIANGLETYPE;
 
 	result->flags = points->flags;
@@ -51,10 +51,10 @@ lwtriangle_construct(int srid, GBOX* bbox, POINTARRAY* points)
 	return result;
 }
 
-LWTRIANGLE*
+LWTRIANGLE *
 lwtriangle_construct_empty(int srid, char hasz, char hasm)
 {
-	LWTRIANGLE* result = lwalloc(sizeof(LWTRIANGLE));
+	LWTRIANGLE *result = lwalloc(sizeof(LWTRIANGLE));
 	result->type = TRIANGLETYPE;
 	result->flags = gflags(hasz, hasm, 0);
 	result->srid = srid;
@@ -64,7 +64,7 @@ lwtriangle_construct_empty(int srid, char hasz, char hasm)
 }
 
 void
-lwtriangle_free(LWTRIANGLE* triangle)
+lwtriangle_free(LWTRIANGLE *triangle)
 {
 	if (!triangle) return;
 
@@ -76,7 +76,7 @@ lwtriangle_free(LWTRIANGLE* triangle)
 }
 
 void
-printLWTRIANGLE(LWTRIANGLE* triangle)
+printLWTRIANGLE(LWTRIANGLE *triangle)
 {
 	if (triangle->type != TRIANGLETYPE) lwerror("printLWTRIANGLE called with something else than a Triangle");
 
@@ -91,34 +91,34 @@ printLWTRIANGLE(LWTRIANGLE* triangle)
  *
  * @see ptarray_clone
  */
-LWTRIANGLE*
-lwtriangle_clone(const LWTRIANGLE* g)
+LWTRIANGLE *
+lwtriangle_clone(const LWTRIANGLE *g)
 {
 	LWDEBUGF(2, "lwtriangle_clone called with %p", g);
-	return (LWTRIANGLE*)lwline_clone((const LWLINE*)g);
+	return (LWTRIANGLE *)lwline_clone((const LWLINE *)g);
 }
 
 void
-lwtriangle_force_clockwise(LWTRIANGLE* triangle)
+lwtriangle_force_clockwise(LWTRIANGLE *triangle)
 {
 	if (ptarray_isccw(triangle->points)) ptarray_reverse_in_place(triangle->points);
 }
 
 int
-lwtriangle_is_clockwise(LWTRIANGLE* triangle)
+lwtriangle_is_clockwise(LWTRIANGLE *triangle)
 {
 	return !ptarray_isccw(triangle->points);
 }
 
 void
-lwtriangle_release(LWTRIANGLE* lwtriangle)
+lwtriangle_release(LWTRIANGLE *lwtriangle)
 {
 	lwgeom_release(lwtriangle_as_lwgeom(lwtriangle));
 }
 
 /* check coordinate equality  */
 char
-lwtriangle_same(const LWTRIANGLE* t1, const LWTRIANGLE* t2)
+lwtriangle_same(const LWTRIANGLE *t1, const LWTRIANGLE *t2)
 {
 	char r = ptarray_same(t1->points, t2->points);
 	LWDEBUGF(5, "returning %d", r);
@@ -126,10 +126,10 @@ lwtriangle_same(const LWTRIANGLE* t1, const LWTRIANGLE* t2)
 }
 
 static char
-lwtriangle_is_repeated_points(LWTRIANGLE* triangle)
+lwtriangle_is_repeated_points(LWTRIANGLE *triangle)
 {
 	char ret;
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	pa = ptarray_remove_repeated_points(triangle->points, 0.0);
 	ret = ptarray_same(pa, triangle->points);
@@ -144,11 +144,11 @@ lwtriangle_is_repeated_points(LWTRIANGLE* triangle)
  * Pointarray from intput geom are cloned.
  * Input line must have 4 points, and be closed.
  */
-LWTRIANGLE*
-lwtriangle_from_lwline(const LWLINE* shell)
+LWTRIANGLE *
+lwtriangle_from_lwline(const LWLINE *shell)
 {
-	LWTRIANGLE* ret;
-	POINTARRAY* pa;
+	LWTRIANGLE *ret;
+	POINTARRAY *pa;
 
 	if (shell->points->npoints != 4) lwerror("lwtriangle_from_lwline: shell must have exactly 4 points");
 
@@ -165,7 +165,7 @@ lwtriangle_from_lwline(const LWLINE* shell)
 }
 
 int
-lwtriangle_is_empty(const LWTRIANGLE* triangle)
+lwtriangle_is_empty(const LWTRIANGLE *triangle)
 {
 	if (!triangle->points || triangle->points->npoints < 1) return LW_TRUE;
 	return LW_FALSE;
@@ -175,7 +175,7 @@ lwtriangle_is_empty(const LWTRIANGLE* triangle)
  * Find the area of the outer ring
  */
 double
-lwtriangle_area(const LWTRIANGLE* triangle)
+lwtriangle_area(const LWTRIANGLE *triangle)
 {
 	double area = 0.0;
 	uint32_t i;
@@ -197,7 +197,7 @@ lwtriangle_area(const LWTRIANGLE* triangle)
 }
 
 double
-lwtriangle_perimeter(const LWTRIANGLE* triangle)
+lwtriangle_perimeter(const LWTRIANGLE *triangle)
 {
 	if (triangle->points)
 		return ptarray_length(triangle->points);
@@ -206,7 +206,7 @@ lwtriangle_perimeter(const LWTRIANGLE* triangle)
 }
 
 double
-lwtriangle_perimeter_2d(const LWTRIANGLE* triangle)
+lwtriangle_perimeter_2d(const LWTRIANGLE *triangle)
 {
 	if (triangle->points)
 		return ptarray_length_2d(triangle->points);

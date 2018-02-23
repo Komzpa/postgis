@@ -46,7 +46,7 @@ typedef struct
  */
 typedef struct
 {
-	GenericCache* entry[NUM_CACHE_ENTRIES];
+	GenericCache *entry[NUM_CACHE_ENTRIES];
 } GenericCacheCollection;
 
 /**
@@ -54,7 +54,7 @@ typedef struct
  * info data.
  */
 static MemoryContext
-FIContext(FunctionCallInfoData* fcinfo)
+FIContext(FunctionCallInfoData *fcinfo)
 {
 	return fcinfo->flinfo->fn_mcxt;
 }
@@ -63,10 +63,10 @@ FIContext(FunctionCallInfoData* fcinfo)
  * Get the generic collection off the statement, allocate a
  * new one if we don't have one already.
  */
-static GenericCacheCollection*
-GetGenericCacheCollection(FunctionCallInfoData* fcinfo)
+static GenericCacheCollection *
+GetGenericCacheCollection(FunctionCallInfoData *fcinfo)
 {
-	GenericCacheCollection* cache = fcinfo->flinfo->fn_extra;
+	GenericCacheCollection *cache = fcinfo->flinfo->fn_extra;
 
 	if (!cache)
 	{
@@ -81,11 +81,11 @@ GetGenericCacheCollection(FunctionCallInfoData* fcinfo)
  * Get the Proj4 entry from the generic cache if one exists.
  * If it doesn't exist, make a new empty one and return it.
  */
-PROJ4PortalCache*
-GetPROJ4SRSCache(FunctionCallInfoData* fcinfo)
+PROJ4PortalCache *
+GetPROJ4SRSCache(FunctionCallInfoData *fcinfo)
 {
-	GenericCacheCollection* generic_cache = GetGenericCacheCollection(fcinfo);
-	PROJ4PortalCache* cache = (PROJ4PortalCache*)(generic_cache->entry[PROJ_CACHE_ENTRY]);
+	GenericCacheCollection *generic_cache = GetGenericCacheCollection(fcinfo);
+	PROJ4PortalCache *cache = (PROJ4PortalCache *)(generic_cache->entry[PROJ_CACHE_ENTRY]);
 
 	if (!cache)
 	{
@@ -110,7 +110,7 @@ GetPROJ4SRSCache(FunctionCallInfoData* fcinfo)
 			cache->PROJ4SRSCacheContext = FIContext(fcinfo);
 
 			/* Store the pointer in GenericCache */
-			generic_cache->entry[PROJ_CACHE_ENTRY] = (GenericCache*)cache;
+			generic_cache->entry[PROJ_CACHE_ENTRY] = (GenericCache *)cache;
 		}
 	}
 	return cache;
@@ -122,23 +122,23 @@ GetPROJ4SRSCache(FunctionCallInfoData* fcinfo)
  * Returns a cache pointer if there is a cache hit and we have an
  * index built and ready to use. Returns NULL otherwise.
  */
-GeomCache*
-GetGeomCache(FunctionCallInfoData* fcinfo,
-	     const GeomCacheMethods* cache_methods,
-	     const GSERIALIZED* g1,
-	     const GSERIALIZED* g2)
+GeomCache *
+GetGeomCache(FunctionCallInfoData *fcinfo,
+	     const GeomCacheMethods *cache_methods,
+	     const GSERIALIZED *g1,
+	     const GSERIALIZED *g2)
 {
-	GeomCache* cache;
+	GeomCache *cache;
 	int cache_hit = 0;
 	MemoryContext old_context;
-	const GSERIALIZED* geom;
-	GenericCacheCollection* generic_cache = GetGenericCacheCollection(fcinfo);
+	const GSERIALIZED *geom;
+	GenericCacheCollection *generic_cache = GetGenericCacheCollection(fcinfo);
 	int entry_number = cache_methods->entry_number;
 
 	Assert(entry_number >= 0);
 	Assert(entry_number < NUM_CACHE_ENTRIES);
 
-	cache = (GeomCache*)(generic_cache->entry[entry_number]);
+	cache = (GeomCache *)(generic_cache->entry[entry_number]);
 
 	if (!cache)
 	{
@@ -148,7 +148,7 @@ GetGeomCache(FunctionCallInfoData* fcinfo,
 		MemoryContextSwitchTo(old_context);
 		/* Store the pointer in GenericCache */
 		cache->type = entry_number;
-		generic_cache->entry[entry_number] = (GenericCache*)cache;
+		generic_cache->entry[entry_number] = (GenericCache *)cache;
 	}
 
 	/* Cache hit on the first argument */
@@ -190,7 +190,7 @@ GetGeomCache(FunctionCallInfoData* fcinfo,
 	if (cache_hit && !cache->argnum)
 	{
 		int rv;
-		LWGEOM* lwgeom;
+		LWGEOM *lwgeom;
 
 		/* Save the tree and supporting geometry in the cache */
 		/* memory context */

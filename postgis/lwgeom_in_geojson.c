@@ -39,22 +39,22 @@
 #endif
 
 /* We don't include <utils/builtins.h> to avoid collisions with json-c/json.h */
-static text*
-cstring2text(const char* cstring)
+static text *
+cstring2text(const char *cstring)
 {
 	size_t len = strlen(cstring);
-	text* result = (text*)palloc(len + VARHDRSZ);
+	text *result = (text *)palloc(len + VARHDRSZ);
 	SET_VARSIZE(result, len + VARHDRSZ);
 	memcpy(VARDATA(result), cstring, len);
 
 	return result;
 }
 
-static char*
-text2cstring(const text* textptr)
+static char *
+text2cstring(const text *textptr)
 {
 	size_t size = VARSIZE(textptr) - VARHDRSZ;
-	char* str = lwalloc(size + 1);
+	char *str = lwalloc(size + 1);
 	memcpy(str, VARDATA(textptr), size);
 	str[size] = '\0';
 	return str;
@@ -71,11 +71,11 @@ Datum postgis_libjson_version(PG_FUNCTION_ARGS)
 	PG_RETURN_NULL();
 #else /* HAVE_LIBJSON  */
 #ifdef JSON_C_VERSION
-	const char* ver = json_c_version();
+	const char *ver = json_c_version();
 #else
-	const char* ver = "UNKNOWN";
+	const char *ver = "UNKNOWN";
 #endif
-	text* result = cstring2text(ver);
+	text *result = cstring2text(ver);
 	PG_RETURN_POINTER(result);
 #endif
 }
@@ -88,11 +88,11 @@ Datum geom_from_geojson(PG_FUNCTION_ARGS)
 	PG_RETURN_NULL();
 #else /* HAVE_LIBJSON  */
 
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	text* geojson_input;
-	char* geojson;
-	char* srs = NULL;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	text *geojson_input;
+	char *geojson;
+	char *srs = NULL;
 
 	/* Get the geojson stream */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();

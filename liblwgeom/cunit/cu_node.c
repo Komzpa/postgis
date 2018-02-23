@@ -20,8 +20,8 @@ static void
 test_lwgeom_node(void)
 {
 	LWGEOM *in, *out;
-	const char* wkt;
-	char* tmp;
+	const char *wkt;
+	char *tmp;
 
 	/* Because i don't trust that much prior tests...  ;) */
 	cu_error_msg_reset();

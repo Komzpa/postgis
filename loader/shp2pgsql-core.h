@@ -85,16 +85,16 @@ typedef struct shp_loader_config
 	char opt;
 
 	/* table to load into */
-	char* table;
+	char *table;
 
 	/* schema to load into */
-	char* schema;
+	char *schema;
 
 	/* geometry/geography column name specified by the user, may be null. */
-	char* geo_col;
+	char *geo_col;
 
 	/* the shape file (without the .shp extension) */
-	char* shp_file;
+	char *shp_file;
 
 	/* 0 = SQL inserts, 1 = dump */
 	int dump_format;
@@ -121,13 +121,13 @@ typedef struct shp_loader_config
 	int force_output;
 
 	/* iconv encoding name */
-	char* encoding;
+	char *encoding;
 
 	/* tablespace name for the table */
-	char* tablespace;
+	char *tablespace;
 
 	/* tablespace name for the indexes */
-	char* idxtablespace;
+	char *idxtablespace;
 
 	/* how to handle nulls */
 	int null_policy;
@@ -145,7 +145,7 @@ typedef struct shp_loader_config
 	int usetransaction;
 
 	/* Name of the column map file if specified */
-	char* column_map_filename;
+	char *column_map_filename;
 
 } SHPLOADERCONFIG;
 
@@ -155,7 +155,7 @@ typedef struct shp_loader_config
 typedef struct shp_loader_state
 {
 	/* Configuration for this state */
-	SHPLOADERCONFIG* config;
+	SHPLOADERCONFIG *config;
 
 	/* Shapefile handle */
 	SHPHandle hSHPHandle;
@@ -176,23 +176,23 @@ typedef struct shp_loader_state
 	int num_records;
 
 	/* Pointer to an array of field names */
-	char** field_names;
+	char **field_names;
 
 	/* Field type */
-	DBFFieldType* types;
+	DBFFieldType *types;
 
 	/* Arrays of field widths and precisions */
-	int* widths;
-	int* precisions;
+	int *widths;
+	int *precisions;
 
 	/* Pointer to an array of PostgreSQL field types */
-	char** pgfieldtypes;
+	char **pgfieldtypes;
 
 	/* String containing colume name list in the form "(col1, col2, col3 ... , colN)" */
-	char* col_names;
+	char *col_names;
 
 	/* String containing the PostGIS geometry type, e.g. POINT, POLYGON etc. */
-	char* pgtype;
+	char *pgtype;
 
 	/* Flag for whether the output geometry has Z coordinates or not. */
 	int has_z;
@@ -214,7 +214,7 @@ typedef struct shp_loader_state
 
 	/* geometry/geography column name to use.  Will be set to the default if the config did
 	   not specify a column name. */
-	char* geo_col;
+	char *geo_col;
 
 	/* Column map */
 	colmap column_map;
@@ -222,14 +222,14 @@ typedef struct shp_loader_state
 } SHPLOADERSTATE;
 
 /* Externally accessible functions */
-void strtolower(char* s);
-void set_loader_config_defaults(SHPLOADERCONFIG* config);
+void strtolower(char *s);
+void set_loader_config_defaults(SHPLOADERCONFIG *config);
 
-SHPLOADERSTATE* ShpLoaderCreate(SHPLOADERCONFIG* config);
-int ShpLoaderOpenShape(SHPLOADERSTATE* state);
-int ShpLoaderGetSQLHeader(SHPLOADERSTATE* state, char** strheader);
-int ShpLoaderGetSQLCopyStatement(SHPLOADERSTATE* state, char** strheader);
-int ShpLoaderGetRecordCount(SHPLOADERSTATE* state);
-int ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strrecord);
-int ShpLoaderGetSQLFooter(SHPLOADERSTATE* state, char** strfooter);
-void ShpLoaderDestroy(SHPLOADERSTATE* state);
+SHPLOADERSTATE *ShpLoaderCreate(SHPLOADERCONFIG *config);
+int ShpLoaderOpenShape(SHPLOADERSTATE *state);
+int ShpLoaderGetSQLHeader(SHPLOADERSTATE *state, char **strheader);
+int ShpLoaderGetSQLCopyStatement(SHPLOADERSTATE *state, char **strheader);
+int ShpLoaderGetRecordCount(SHPLOADERSTATE *state);
+int ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE *state, int item, char **strrecord);
+int ShpLoaderGetSQLFooter(SHPLOADERSTATE *state, char **strfooter);
+void ShpLoaderDestroy(SHPLOADERSTATE *state);

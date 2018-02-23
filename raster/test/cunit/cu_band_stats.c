@@ -45,7 +45,7 @@ test_band_stats()
 	double nodata;
 
 	uint32_t values[] = {0, 91, 55, 86, 76, 41, 36, 97, 25, 63, 68, 2, 78, 15, 82, 47};
-	struct quantile_llist* qlls = NULL;
+	struct quantile_llist *qlls = NULL;
 	uint32_t qlls_count;
 
 	raster = rt_raster_new(xmax, ymax);

@@ -17,8 +17,8 @@
 void test_ShpLoaderCreate(void);
 void test_ShpLoaderDestroy(void);
 
-SHPLOADERCONFIG* loader_config;
-SHPLOADERSTATE* loader_state;
+SHPLOADERCONFIG *loader_config;
+SHPLOADERSTATE *loader_state;
 
 /*
 ** Called from test harness to register the tests in this file.
@@ -66,7 +66,7 @@ clean_shp2pgsql_suite(void)
 void
 test_ShpLoaderCreate(void)
 {
-	loader_config = (SHPLOADERCONFIG*)calloc(1, sizeof(SHPLOADERCONFIG));
+	loader_config = (SHPLOADERCONFIG *)calloc(1, sizeof(SHPLOADERCONFIG));
 	set_loader_config_defaults(loader_config);
 	loader_state = ShpLoaderCreate(loader_config);
 	CU_ASSERT_PTR_NOT_NULL(loader_state);

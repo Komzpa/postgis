@@ -43,9 +43,9 @@ Datum postgis_proj_version(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(transform);
 Datum transform(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	GSERIALIZED* result = NULL;
-	LWGEOM* lwgeom;
+	GSERIALIZED *geom;
+	GSERIALIZED *result = NULL;
+	LWGEOM *lwgeom;
 	projPJ input_pj, output_pj;
 	int32 output_srid, input_srid;
 
@@ -102,15 +102,15 @@ Datum transform(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(transform_geom);
 Datum transform_geom(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	GSERIALIZED* result = NULL;
-	LWGEOM* lwgeom;
+	GSERIALIZED *geom;
+	GSERIALIZED *result = NULL;
+	LWGEOM *lwgeom;
 	projPJ input_pj, output_pj;
 	char *input_proj4, *output_proj4;
-	text* input_proj4_text;
-	text* output_proj4_text;
+	text *input_proj4_text;
+	text *output_proj4_text;
 	int32 result_srid;
-	char* pj_errstr;
+	char *pj_errstr;
 
 	result_srid = PG_GETARG_INT32(3);
 	geom = PG_GETARG_GSERIALIZED_P_COPY(0);
@@ -183,7 +183,7 @@ Datum transform_geom(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(postgis_proj_version);
 Datum postgis_proj_version(PG_FUNCTION_ARGS)
 {
-	const char* ver = pj_get_release();
-	text* result = cstring_to_text(ver);
+	const char *ver = pj_get_release();
+	text *result = cstring_to_text(ver);
 	PG_RETURN_POINTER(result);
 }

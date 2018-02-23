@@ -20,10 +20,10 @@
 #include "cu_tester.h"
 
 static void
-do_encoded_polyline_test(char* in, int precision, char* out)
+do_encoded_polyline_test(char *in, int precision, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_encoded_polyline(g, precision);

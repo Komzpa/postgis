@@ -55,7 +55,7 @@ Datum BOX2D_construct(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(BOX2D_in);
 Datum BOX2D_in(PG_FUNCTION_ARGS)
 {
-	char* str = PG_GETARG_CSTRING(0);
+	char *str = PG_GETARG_CSTRING(0);
 	int nitems;
 	double tmp;
 	GBOX box;
@@ -94,9 +94,9 @@ Datum BOX2D_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_out);
 Datum BOX2D_out(PG_FUNCTION_ARGS)
 {
-	GBOX* box = (GBOX*)PG_GETARG_POINTER(0);
+	GBOX *box = (GBOX *)PG_GETARG_POINTER(0);
 	char tmp[500]; /* big enough */
-	char* result;
+	char *result;
 	int size;
 
 	size = sprintf(tmp, "BOX(%.15g %.15g,%.15g %.15g)", box->xmin, box->ymin, box->xmax, box->ymax);
@@ -112,8 +112,8 @@ Datum BOX2D_out(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_to_BOX2D);
 Datum LWGEOM_to_BOX2D(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
-	LWGEOM* lwgeom = lwgeom_from_gserialized(geom);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
+	LWGEOM *lwgeom = lwgeom_from_gserialized(geom);
 	GBOX gbox;
 
 	/* Cannot box empty! */
@@ -134,7 +134,7 @@ Datum LWGEOM_to_BOX2D(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_to_BOX2DF);
 Datum LWGEOM_to_BOX2DF(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
 	GBOX gbox;
 
 	if (gserialized_get_gbox_p(geom, &gbox) == LW_FAILURE) PG_RETURN_NULL();
@@ -158,8 +158,8 @@ Datum LWGEOM_to_BOX2DF(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_same);
 Datum BOX2D_same(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPeq(box1->xmax, box2->xmax) && FPeq(box1->xmin, box2->xmin) && FPeq(box1->ymax, box2->ymax) &&
 		       FPeq(box1->ymin, box2->ymin));
@@ -171,8 +171,8 @@ Datum BOX2D_same(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_overlap);
 Datum BOX2D_overlap(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 	bool result;
 
 	result = ((FPge(box1->xmax, box2->xmax) && FPle(box1->xmin, box2->xmax)) ||
@@ -190,8 +190,8 @@ Datum BOX2D_overlap(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_overleft);
 Datum BOX2D_overleft(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPle(box1->xmax, box2->xmax));
 }
@@ -202,8 +202,8 @@ Datum BOX2D_overleft(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_left);
 Datum BOX2D_left(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPlt(box1->xmax, box2->xmin));
 }
@@ -214,8 +214,8 @@ Datum BOX2D_left(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_right);
 Datum BOX2D_right(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPgt(box1->xmin, box2->xmax));
 }
@@ -227,8 +227,8 @@ Datum BOX2D_right(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_overright);
 Datum BOX2D_overright(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPge(box1->xmin, box2->xmin));
 }
@@ -240,8 +240,8 @@ Datum BOX2D_overright(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_overbelow);
 Datum BOX2D_overbelow(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPle(box1->ymax, box2->ymax));
 }
@@ -252,8 +252,8 @@ Datum BOX2D_overbelow(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_below);
 Datum BOX2D_below(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPlt(box1->ymax, box2->ymin));
 }
@@ -264,8 +264,8 @@ Datum BOX2D_below(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_above);
 Datum BOX2D_above(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPgt(box1->ymin, box2->ymax));
 }
@@ -277,8 +277,8 @@ Datum BOX2D_above(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_overabove);
 Datum BOX2D_overabove(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPge(box1->ymin, box2->ymin));
 }
@@ -289,8 +289,8 @@ Datum BOX2D_overabove(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_contained);
 Datum BOX2D_contained(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPle(box1->xmax, box2->xmax) && FPge(box1->xmin, box2->xmin) && FPle(box1->ymax, box2->ymax) &&
 		       FPge(box1->ymin, box2->ymin));
@@ -302,8 +302,8 @@ Datum BOX2D_contained(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_contain);
 Datum BOX2D_contain(PG_FUNCTION_ARGS)
 {
-	GBOX* box1 = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* box2 = (GBOX*)PG_GETARG_POINTER(1);
+	GBOX *box1 = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *box2 = (GBOX *)PG_GETARG_POINTER(1);
 
 	PG_RETURN_BOOL(FPge(box1->xmax, box2->xmax) && FPle(box1->xmin, box2->xmin) && FPge(box1->ymax, box2->ymax) &&
 		       FPle(box1->ymin, box2->ymin));
@@ -312,11 +312,11 @@ Datum BOX2D_contain(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_intersects);
 Datum BOX2D_intersects(PG_FUNCTION_ARGS)
 {
-	GBOX* a = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* b = (GBOX*)PG_GETARG_POINTER(1);
-	GBOX* n;
+	GBOX *a = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *b = (GBOX *)PG_GETARG_POINTER(1);
+	GBOX *n;
 
-	n = (GBOX*)palloc(sizeof(GBOX));
+	n = (GBOX *)palloc(sizeof(GBOX));
 
 	n->xmax = Min(a->xmax, b->xmax);
 	n->ymax = Min(a->ymax, b->ymax);
@@ -339,11 +339,11 @@ Datum BOX2D_intersects(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_union);
 Datum BOX2D_union(PG_FUNCTION_ARGS)
 {
-	GBOX* a = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* b = (GBOX*)PG_GETARG_POINTER(1);
-	GBOX* n;
+	GBOX *a = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *b = (GBOX *)PG_GETARG_POINTER(1);
+	GBOX *n;
 
-	n = (GBOX*)lwalloc(sizeof(GBOX));
+	n = (GBOX *)lwalloc(sizeof(GBOX));
 	if (!gbox_union(a, b, n)) PG_RETURN_NULL();
 	PG_RETURN_POINTER(n);
 }
@@ -351,8 +351,8 @@ Datum BOX2D_union(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_expand);
 Datum BOX2D_expand(PG_FUNCTION_ARGS)
 {
-	GBOX* box = (GBOX*)PG_GETARG_POINTER(0);
-	GBOX* result = (GBOX*)palloc(sizeof(GBOX));
+	GBOX *box = (GBOX *)PG_GETARG_POINTER(0);
+	GBOX *result = (GBOX *)palloc(sizeof(GBOX));
 	memcpy(result, box, sizeof(GBOX));
 
 	if (PG_NARGS() == 2)
@@ -374,8 +374,8 @@ Datum BOX2D_expand(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_to_BOX3D);
 Datum BOX2D_to_BOX3D(PG_FUNCTION_ARGS)
 {
-	GBOX* box = (GBOX*)PG_GETARG_POINTER(0);
-	BOX3D* result = box3d_from_gbox(box);
+	GBOX *box = (GBOX *)PG_GETARG_POINTER(0);
+	BOX3D *result = box3d_from_gbox(box);
 	PG_RETURN_POINTER(result);
 }
 
@@ -385,12 +385,12 @@ Datum BOX2D_combine(PG_FUNCTION_ARGS)
 	Pointer box2d_ptr = PG_GETARG_POINTER(0);
 	Pointer geom_ptr = PG_GETARG_POINTER(1);
 	GBOX *a, *b;
-	GSERIALIZED* lwgeom;
+	GSERIALIZED *lwgeom;
 	GBOX box, *result;
 
 	if ((box2d_ptr == NULL) && (geom_ptr == NULL)) { PG_RETURN_NULL(); /* combine_box2d(null,null) => null */ }
 
-	result = (GBOX*)palloc(sizeof(GBOX));
+	result = (GBOX *)palloc(sizeof(GBOX));
 
 	if (box2d_ptr == NULL)
 	{
@@ -404,7 +404,7 @@ Datum BOX2D_combine(PG_FUNCTION_ARGS)
 	/* combine_bbox(BOX3D, null) => BOX3D */
 	if (geom_ptr == NULL)
 	{
-		memcpy(result, (char*)PG_GETARG_DATUM(0), sizeof(GBOX));
+		memcpy(result, (char *)PG_GETARG_DATUM(0), sizeof(GBOX));
 		PG_RETURN_POINTER(result);
 	}
 
@@ -414,11 +414,11 @@ Datum BOX2D_combine(PG_FUNCTION_ARGS)
 	if (!gserialized_get_gbox_p(lwgeom, &box))
 	{
 		/* must be the empty geom */
-		memcpy(result, (char*)PG_GETARG_DATUM(0), sizeof(GBOX));
+		memcpy(result, (char *)PG_GETARG_DATUM(0), sizeof(GBOX));
 		PG_RETURN_POINTER(result);
 	}
 
-	a = (GBOX*)PG_GETARG_DATUM(0);
+	a = (GBOX *)PG_GETARG_DATUM(0);
 	b = &box;
 
 	result->xmax = Max(a->xmax, b->xmax);
@@ -432,10 +432,10 @@ Datum BOX2D_combine(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_to_LWGEOM);
 Datum BOX2D_to_LWGEOM(PG_FUNCTION_ARGS)
 {
-	GBOX* box = (GBOX*)PG_GETARG_POINTER(0);
-	POINTARRAY* pa = ptarray_construct_empty(0, 0, 5);
+	GBOX *box = (GBOX *)PG_GETARG_POINTER(0);
+	POINTARRAY *pa = ptarray_construct_empty(0, 0, 5);
 	POINT4D pt;
-	GSERIALIZED* result;
+	GSERIALIZED *result;
 
 	/*
 	 * Alter BOX2D cast so that a valid geometry is always
@@ -451,13 +451,13 @@ Datum BOX2D_to_LWGEOM(PG_FUNCTION_ARGS)
 	if ((box->xmin == box->xmax) && (box->ymin == box->ymax))
 	{
 		/* Construct and serialize point */
-		LWPOINT* point = lwpoint_make2d(SRID_UNKNOWN, box->xmin, box->ymin);
+		LWPOINT *point = lwpoint_make2d(SRID_UNKNOWN, box->xmin, box->ymin);
 		result = geometry_serialize(lwpoint_as_lwgeom(point));
 		lwpoint_free(point);
 	}
 	else if ((box->xmin == box->xmax) || (box->ymin == box->ymax))
 	{
-		LWLINE* line;
+		LWLINE *line;
 
 		/* Assign coordinates to point array */
 		pt.x = box->xmin;
@@ -475,7 +475,7 @@ Datum BOX2D_to_LWGEOM(PG_FUNCTION_ARGS)
 	else
 	{
 		POINT4D points[4];
-		LWPOLY* poly;
+		LWPOLY *poly;
 
 		/* Initialize the 4 vertices of the polygon */
 		points[0] = (POINT4D){box->xmin, box->ymin, 0.0, 0.0};
@@ -495,14 +495,14 @@ Datum BOX2D_to_LWGEOM(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(BOX2D_construct);
 Datum BOX2D_construct(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* pgmin = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* pgmax = PG_GETARG_GSERIALIZED_P(1);
-	GBOX* result;
+	GSERIALIZED *pgmin = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *pgmax = PG_GETARG_GSERIALIZED_P(1);
+	GBOX *result;
 	LWPOINT *minpoint, *maxpoint;
 	double min, max, tmp;
 
-	minpoint = (LWPOINT*)lwgeom_from_gserialized(pgmin);
-	maxpoint = (LWPOINT*)lwgeom_from_gserialized(pgmax);
+	minpoint = (LWPOINT *)lwgeom_from_gserialized(pgmin);
+	maxpoint = (LWPOINT *)lwgeom_from_gserialized(pgmax);
 
 	if ((minpoint->type != POINTTYPE) || (maxpoint->type != POINTTYPE))
 	{

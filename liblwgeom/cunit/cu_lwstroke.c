@@ -22,20 +22,20 @@
 
 /* #define SKIP_TEST_RETAIN_ANGLE 1 */
 
-static LWGEOM*
-lwgeom_from_text(const char* str)
+static LWGEOM *
+lwgeom_from_text(const char *str)
 {
 	LWGEOM_PARSER_RESULT r;
-	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char*)str, LW_PARSER_CHECK_NONE)) return NULL;
+	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char *)str, LW_PARSER_CHECK_NONE)) return NULL;
 	return r.geom;
 }
 
-static char*
-lwgeom_to_text(const LWGEOM* geom, int prec)
+static char *
+lwgeom_to_text(const LWGEOM *geom, int prec)
 {
 	gridspec grid;
-	LWGEOM* gridded;
-	char* wkt;
+	LWGEOM *gridded;
+	char *wkt;
 
 	memset(&grid, 0, sizeof(gridspec));
 	grid.xsize = prec;
@@ -50,9 +50,9 @@ lwgeom_to_text(const LWGEOM* geom, int prec)
 static void
 test_lwcurve_linearize(void)
 {
-	LWGEOM* in;
+	LWGEOM *in;
 	LWGEOM *out, *out2;
-	char* str;
+	char *str;
 	int toltype;
 
 	/***********************************************************
@@ -310,7 +310,7 @@ static void
 test_unstroke()
 {
 	LWGEOM *in, *out;
-	char* str;
+	char *str;
 
 	/* It would be nice if this example returned two arcs (it's the intersection of two circles)
 	   but it looks like the intersection itself is too sloppy in generating the derived point

@@ -27,7 +27,7 @@
 #include <ctype.h> /* for tolower */
 
 int
-p4d_same(const POINT4D* p1, const POINT4D* p2)
+p4d_same(const POINT4D *p1, const POINT4D *p2)
 {
 	if (FP_EQUALS(p1->x, p2->x) && FP_EQUALS(p1->y, p2->y) && FP_EQUALS(p1->z, p2->z) && FP_EQUALS(p1->m, p2->m))
 		return LW_TRUE;
@@ -36,7 +36,7 @@ p4d_same(const POINT4D* p1, const POINT4D* p2)
 }
 
 int
-p3d_same(const POINT3D* p1, const POINT3D* p2)
+p3d_same(const POINT3D *p1, const POINT3D *p2)
 {
 	if (FP_EQUALS(p1->x, p2->x) && FP_EQUALS(p1->y, p2->y) && FP_EQUALS(p1->z, p2->z))
 		return LW_TRUE;
@@ -45,7 +45,7 @@ p3d_same(const POINT3D* p1, const POINT3D* p2)
 }
 
 int
-p2d_same(const POINT2D* p1, const POINT2D* p2)
+p2d_same(const POINT2D *p1, const POINT2D *p2)
 {
 	if (FP_EQUALS(p1->x, p2->x) && FP_EQUALS(p1->y, p2->y))
 		return LW_TRUE;
@@ -61,7 +61,7 @@ p2d_same(const POINT2D* p1, const POINT2D* p2)
  * Return  0  if point Q in on segment P
  */
 int
-lw_segment_side(const POINT2D* p1, const POINT2D* p2, const POINT2D* q)
+lw_segment_side(const POINT2D *p1, const POINT2D *p2, const POINT2D *q)
 {
 	double side = ((q->x - p1->x) * (p2->y - p1->y) - (p2->x - p1->x) * (q->y - p1->y));
 	return SIGNUM(side);
@@ -71,7 +71,7 @@ lw_segment_side(const POINT2D* p1, const POINT2D* p2, const POINT2D* q)
  * Returns the length of a linear segment
  */
 double
-lw_seg_length(const POINT2D* A1, const POINT2D* A2)
+lw_seg_length(const POINT2D *A1, const POINT2D *A2)
 {
 	return sqrt((A1->x - A2->x) * (A1->x - A2->x) + (A1->y - A2->y) * (A1->y - A2->y));
 }
@@ -82,7 +82,7 @@ lw_seg_length(const POINT2D* A1, const POINT2D* A2)
  * determined to be on the circle defined by A1/A2/A3.
  */
 int
-lw_pt_in_arc(const POINT2D* P, const POINT2D* A1, const POINT2D* A2, const POINT2D* A3)
+lw_pt_in_arc(const POINT2D *P, const POINT2D *A1, const POINT2D *A2, const POINT2D *A3)
 {
 	return lw_segment_side(A1, A3, A2) == lw_segment_side(A1, A3, P);
 }
@@ -92,7 +92,7 @@ lw_pt_in_arc(const POINT2D* P, const POINT2D* A1, const POINT2D* A2, const POINT
  * deterined to be on the line defined by A1/A2.
  */
 int
-lw_pt_in_seg(const POINT2D* P, const POINT2D* A1, const POINT2D* A2)
+lw_pt_in_seg(const POINT2D *P, const POINT2D *A1, const POINT2D *A2)
 {
 	return ((A1->x <= P->x && P->x < A2->x) || (A1->x >= P->x && P->x > A2->x)) ||
 	       ((A1->y <= P->y && P->y < A2->y) || (A1->y >= P->y && P->y > A2->y));
@@ -102,7 +102,7 @@ lw_pt_in_seg(const POINT2D* P, const POINT2D* A1, const POINT2D* A2)
  * Returns true if arc A is actually a point (all vertices are the same) .
  */
 int
-lw_arc_is_pt(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3)
+lw_arc_is_pt(const POINT2D *A1, const POINT2D *A2, const POINT2D *A3)
 {
 	if (A1->x == A2->x && A2->x == A3->x && A1->y == A2->y && A2->y == A3->y)
 		return LW_TRUE;
@@ -114,7 +114,7 @@ lw_arc_is_pt(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3)
  * Returns the length of a circular arc segment
  */
 double
-lw_arc_length(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3)
+lw_arc_length(const POINT2D *A1, const POINT2D *A2, const POINT2D *A3)
 {
 	POINT2D C;
 	double radius_A, circumference_A;
@@ -173,7 +173,7 @@ lw_arc_length(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3)
 }
 
 int
-lw_arc_side(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3, const POINT2D* Q)
+lw_arc_side(const POINT2D *A1, const POINT2D *A2, const POINT2D *A3, const POINT2D *Q)
 {
 	POINT2D C;
 	double radius_A;
@@ -212,7 +212,7 @@ lw_arc_side(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3, const POINT
  * point is coincident with either end point, they are taken as colinear.
  */
 double
-lw_arc_center(const POINT2D* p1, const POINT2D* p2, const POINT2D* p3, POINT2D* result)
+lw_arc_center(const POINT2D *p1, const POINT2D *p2, const POINT2D *p3, POINT2D *result)
 {
 	POINT2D c;
 	double cx, cy, cr;
@@ -270,7 +270,7 @@ lw_arc_center(const POINT2D* p1, const POINT2D* p2, const POINT2D* p3, POINT2D* 
 }
 
 int
-pt_in_ring_2d(const POINT2D* p, const POINTARRAY* ring)
+pt_in_ring_2d(const POINT2D *p, const POINTARRAY *ring)
 {
 	int cn = 0; /* the crossing number counter */
 	uint32_t i;
@@ -321,7 +321,7 @@ pt_in_ring_2d(const POINT2D* p, const POINTARRAY* ring)
 }
 
 static int
-lw_seg_interact(const POINT2D* p1, const POINT2D* p2, const POINT2D* q1, const POINT2D* q2)
+lw_seg_interact(const POINT2D *p1, const POINT2D *p2, const POINT2D *q1, const POINT2D *q2)
 {
 	double minq = FP_MIN(q1->x, q2->x);
 	double maxq = FP_MAX(q1->x, q2->x);
@@ -353,7 +353,7 @@ lw_seg_interact(const POINT2D* p1, const POINT2D* p2, const POINT2D* q1, const P
 **		SEG_CROSS_RIGHT = 3,
 */
 int
-lw_segment_intersects(const POINT2D* p1, const POINT2D* p2, const POINT2D* q1, const POINT2D* q2)
+lw_segment_intersects(const POINT2D *p1, const POINT2D *p2, const POINT2D *q1, const POINT2D *q2)
 {
 
 	int pq1, pq2, qp1, qp2;
@@ -428,7 +428,7 @@ lw_segment_intersects(const POINT2D* p1, const POINT2D* p2, const POINT2D* q1, c
 **
 */
 int
-lwline_crossing_direction(const LWLINE* l1, const LWLINE* l2)
+lwline_crossing_direction(const LWLINE *l1, const LWLINE *l2)
 {
 	uint32_t i = 0, j = 0;
 	const POINT2D *p1, *p2, *q1, *q2;
@@ -438,14 +438,14 @@ lwline_crossing_direction(const LWLINE* l1, const LWLINE* l2)
 	int first_cross = 0;
 	int this_cross = 0;
 
-	pa1 = (POINTARRAY*)l1->points;
-	pa2 = (POINTARRAY*)l2->points;
+	pa1 = (POINTARRAY *)l1->points;
+	pa2 = (POINTARRAY *)l2->points;
 
 	/* One-point lines can't intersect (and shouldn't exist). */
 	if (pa1->npoints < 2 || pa2->npoints < 2) return LINE_NO_CROSS;
 
-	LWDEBUGF(4, "l1 = %s", lwgeom_to_ewkt((LWGEOM*)l1));
-	LWDEBUGF(4, "l2 = %s", lwgeom_to_ewkt((LWGEOM*)l2));
+	LWDEBUGF(4, "l1 = %s", lwgeom_to_ewkt((LWGEOM *)l1));
+	LWDEBUGF(4, "l2 = %s", lwgeom_to_ewkt((LWGEOM *)l2));
 
 	/* Initialize first point of q */
 	q1 = getPoint2d_cp(pa2, 0);
@@ -526,21 +526,21 @@ lwline_crossing_direction(const LWLINE* l1, const LWLINE* l2)
 	return LINE_NO_CROSS;
 }
 
-static char* base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+static char *base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
 /*
 ** Calculate the geohash, iterating downwards and gaining precision.
 ** From geohash-native.c, (c) 2008 David Troy <dave@roundhousetech.com>
 ** Released under the MIT License.
 */
-char*
+char *
 geohash_point(double longitude, double latitude, int precision)
 {
 	int is_even = 1, i = 0;
 	double lat[2], lon[2], mid;
 	char bits[] = {16, 8, 4, 2, 1};
 	int bit = 0, ch = 0;
-	char* geohash = NULL;
+	char *geohash = NULL;
 
 	geohash = lwalloc(precision + 1);
 
@@ -597,7 +597,7 @@ geohash_point(double longitude, double latitude, int precision)
 ** Released under the MIT License.
 */
 unsigned int
-geohash_point_as_int(POINT2D* pt)
+geohash_point_as_int(POINT2D *pt)
 {
 	int is_even = 1;
 	double lat[2], lon[2], mid;
@@ -654,7 +654,7 @@ geohash_point_as_int(POINT2D* pt)
 ** of the GeoHash should be used.
 */
 void
-decode_geohash_bbox(char* geohash, double* lat, double* lon, int precision)
+decode_geohash_bbox(char *geohash, double *lat, double *lon, int precision)
 {
 	int i, j, hashlen;
 	char c, cd, mask, is_even = 1;
@@ -688,7 +688,7 @@ decode_geohash_bbox(char* geohash, double* lat, double* lon, int precision)
 }
 
 int
-lwgeom_geohash_precision(GBOX bbox, GBOX* bounds)
+lwgeom_geohash_precision(GBOX bbox, GBOX *bounds)
 {
 	double minx, miny, maxx, maxy;
 	double latmax, latmin, lonmax, lonmin;
@@ -777,8 +777,8 @@ lwgeom_geohash_precision(GBOX bbox, GBOX* bounds)
 ** bounds of the feature. Big features have loose precision.
 ** Small features have tight precision.
 */
-char*
-lwgeom_geohash(const LWGEOM* lwgeom, int precision)
+char *
+lwgeom_geohash(const LWGEOM *lwgeom, int precision)
 {
 	GBOX gbox;
 	GBOX gbox_bounds;

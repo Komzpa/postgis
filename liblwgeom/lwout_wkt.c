@@ -26,7 +26,7 @@
 #include "lwgeom_log.h"
 #include "stringbuffer.h"
 
-static void lwgeom_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, int precision, uint8_t variant);
+static void lwgeom_to_wkt_sb(const LWGEOM *geom, stringbuffer_t *sb, int precision, uint8_t variant);
 
 /*
  * ISO format uses both Z and M qualifiers.
@@ -35,7 +35,7 @@ static void lwgeom_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, int precisi
  * SFSQL format never has more than two dimensions, so no qualifiers.
  */
 static void
-dimension_qualifiers_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, uint8_t variant)
+dimension_qualifiers_to_wkt_sb(const LWGEOM *geom, stringbuffer_t *sb, uint8_t variant)
 {
 
 	/* Extended WKT: POINTM(0 0 0) */
@@ -64,7 +64,7 @@ dimension_qualifiers_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, uint8_t v
  * necessary.
  */
 static void
-empty_to_wkt_sb(stringbuffer_t* sb)
+empty_to_wkt_sb(stringbuffer_t *sb)
 {
 	if (!strchr(" ,(", stringbuffer_lastchar(sb))) /* "EMPTY" */ { stringbuffer_append(sb, " "); }
 	stringbuffer_append(sb, "EMPTY");
@@ -76,7 +76,7 @@ empty_to_wkt_sb(stringbuffer_t* sb)
  * all dimensions. Standard OGC output only includes X/Y coordinates.
  */
 static void
-ptarray_to_wkt_sb(const POINTARRAY* ptarray, stringbuffer_t* sb, int precision, uint8_t variant)
+ptarray_to_wkt_sb(const POINTARRAY *ptarray, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	/* OGC only includes X/Y */
 	uint32_t dimensions = 2;
@@ -92,7 +92,7 @@ ptarray_to_wkt_sb(const POINTARRAY* ptarray, stringbuffer_t* sb, int precision, 
 	/* Digits and commas */
 	for (i = 0; i < ptarray->npoints; i++)
 	{
-		double* dbl_ptr = (double*)getPoint_internal(ptarray, i);
+		double *dbl_ptr = (double *)getPoint_internal(ptarray, i);
 
 		/* Commas before ever coord but the first */
 		if (i > 0) stringbuffer_append(sb, ",");
@@ -121,12 +121,12 @@ ptarray_to_wkt_sb(const POINTARRAY* ptarray, stringbuffer_t* sb, int precision, 
  *   OGC: POINT(0 0)
  */
 static void
-lwpoint_to_wkt_sb(const LWPOINT* pt, stringbuffer_t* sb, int precision, uint8_t variant)
+lwpoint_to_wkt_sb(const LWPOINT *pt, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "POINT"); /* "POINT" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)pt, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)pt, sb, variant);
 	}
 
 	if (lwpoint_is_empty(pt))
@@ -142,12 +142,12 @@ lwpoint_to_wkt_sb(const LWPOINT* pt, stringbuffer_t* sb, int precision, uint8_t 
  * LINESTRING(0 0 0, 1 1 1)
  */
 static void
-lwline_to_wkt_sb(const LWLINE* line, stringbuffer_t* sb, int precision, uint8_t variant)
+lwline_to_wkt_sb(const LWLINE *line, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "LINESTRING"); /* "LINESTRING" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)line, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)line, sb, variant);
 	}
 	if (lwline_is_empty(line))
 	{
@@ -162,13 +162,13 @@ lwline_to_wkt_sb(const LWLINE* line, stringbuffer_t* sb, int precision, uint8_t 
  * POLYGON(0 0 1, 1 0 1, 1 1 1, 0 1 1, 0 0 1)
  */
 static void
-lwpoly_to_wkt_sb(const LWPOLY* poly, stringbuffer_t* sb, int precision, uint8_t variant)
+lwpoly_to_wkt_sb(const LWPOLY *poly, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "POLYGON"); /* "POLYGON" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)poly, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)poly, sb, variant);
 	}
 	if (lwpoly_is_empty(poly))
 	{
@@ -189,12 +189,12 @@ lwpoly_to_wkt_sb(const LWPOLY* poly, stringbuffer_t* sb, int precision, uint8_t 
  * CIRCULARSTRING
  */
 static void
-lwcircstring_to_wkt_sb(const LWCIRCSTRING* circ, stringbuffer_t* sb, int precision, uint8_t variant)
+lwcircstring_to_wkt_sb(const LWCIRCSTRING *circ, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "CIRCULARSTRING"); /* "CIRCULARSTRING" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)circ, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)circ, sb, variant);
 	}
 	if (lwcircstring_is_empty(circ))
 	{
@@ -209,13 +209,13 @@ lwcircstring_to_wkt_sb(const LWCIRCSTRING* circ, stringbuffer_t* sb, int precisi
  *   MULTPOINT(0 0, 1 1) instead of MULTIPOINT((0 0),(1 1))
  */
 static void
-lwmpoint_to_wkt_sb(const LWMPOINT* mpoint, stringbuffer_t* sb, int precision, uint8_t variant)
+lwmpoint_to_wkt_sb(const LWMPOINT *mpoint, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "MULTIPOINT"); /* "MULTIPOINT" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)mpoint, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)mpoint, sb, variant);
 	}
 	if (mpoint->ngeoms < 1)
 	{
@@ -237,14 +237,14 @@ lwmpoint_to_wkt_sb(const LWMPOINT* mpoint, stringbuffer_t* sb, int precision, ui
  * MULTILINESTRING
  */
 static void
-lwmline_to_wkt_sb(const LWMLINE* mline, stringbuffer_t* sb, int precision, uint8_t variant)
+lwmline_to_wkt_sb(const LWMLINE *mline, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "MULTILINESTRING"); /* "MULTILINESTRING" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)mline, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)mline, sb, variant);
 	}
 	if (mline->ngeoms < 1)
 	{
@@ -267,14 +267,14 @@ lwmline_to_wkt_sb(const LWMLINE* mline, stringbuffer_t* sb, int precision, uint8
  * MULTIPOLYGON
  */
 static void
-lwmpoly_to_wkt_sb(const LWMPOLY* mpoly, stringbuffer_t* sb, int precision, uint8_t variant)
+lwmpoly_to_wkt_sb(const LWMPOLY *mpoly, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "MULTIPOLYGON"); /* "MULTIPOLYGON" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)mpoly, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)mpoly, sb, variant);
 	}
 	if (mpoly->ngeoms < 1)
 	{
@@ -299,14 +299,14 @@ lwmpoly_to_wkt_sb(const LWMPOLY* mpoly, stringbuffer_t* sb, int precision, uint8
  *   COMPOUNDCURVE((0 0, 1 1), CURVESTRING(1 1, 2 2, 3 3))
  */
 static void
-lwcompound_to_wkt_sb(const LWCOMPOUND* comp, stringbuffer_t* sb, int precision, uint8_t variant)
+lwcompound_to_wkt_sb(const LWCOMPOUND *comp, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "COMPOUNDCURVE"); /* "COMPOUNDCURVE" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)comp, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)comp, sb, variant);
 	}
 	if (comp->ngeoms < 1)
 	{
@@ -322,11 +322,11 @@ lwcompound_to_wkt_sb(const LWCOMPOUND* comp, stringbuffer_t* sb, int precision, 
 		if (i > 0) stringbuffer_append(sb, ",");
 		/* Linestring subgeoms don't get type identifiers */
 		if (type == LINETYPE)
-		{ lwline_to_wkt_sb((LWLINE*)comp->geoms[i], sb, precision, variant | WKT_NO_TYPE); }
+		{ lwline_to_wkt_sb((LWLINE *)comp->geoms[i], sb, precision, variant | WKT_NO_TYPE); }
 		/* But circstring subgeoms *do* get type identifiers */
 		else if (type == CIRCSTRINGTYPE)
 		{
-			lwcircstring_to_wkt_sb((LWCIRCSTRING*)comp->geoms[i], sb, precision, variant);
+			lwcircstring_to_wkt_sb((LWCIRCSTRING *)comp->geoms[i], sb, precision, variant);
 		}
 		else
 		{
@@ -342,14 +342,14 @@ lwcompound_to_wkt_sb(const LWCOMPOUND* comp, stringbuffer_t* sb, int precision, 
  *   CURVEPOLYGON((0 0, 1 1, 0 1, 0 0), CURVESTRING(0 0, 1 1, 0 1, 0.5 1, 0 0))
  */
 static void
-lwcurvepoly_to_wkt_sb(const LWCURVEPOLY* cpoly, stringbuffer_t* sb, int precision, uint8_t variant)
+lwcurvepoly_to_wkt_sb(const LWCURVEPOLY *cpoly, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "CURVEPOLYGON"); /* "CURVEPOLYGON" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)cpoly, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)cpoly, sb, variant);
 	}
 	if (cpoly->nrings < 1)
 	{
@@ -366,15 +366,15 @@ lwcurvepoly_to_wkt_sb(const LWCURVEPOLY* cpoly, stringbuffer_t* sb, int precisio
 		{
 		case LINETYPE:
 			/* Linestring subgeoms don't get type identifiers */
-			lwline_to_wkt_sb((LWLINE*)cpoly->rings[i], sb, precision, variant | WKT_NO_TYPE);
+			lwline_to_wkt_sb((LWLINE *)cpoly->rings[i], sb, precision, variant | WKT_NO_TYPE);
 			break;
 		case CIRCSTRINGTYPE:
 			/* But circstring subgeoms *do* get type identifiers */
-			lwcircstring_to_wkt_sb((LWCIRCSTRING*)cpoly->rings[i], sb, precision, variant);
+			lwcircstring_to_wkt_sb((LWCIRCSTRING *)cpoly->rings[i], sb, precision, variant);
 			break;
 		case COMPOUNDTYPE:
 			/* And compoundcurve subgeoms *do* get type identifiers */
-			lwcompound_to_wkt_sb((LWCOMPOUND*)cpoly->rings[i], sb, precision, variant);
+			lwcompound_to_wkt_sb((LWCOMPOUND *)cpoly->rings[i], sb, precision, variant);
 			break;
 		default:
 			lwerror("lwcurvepoly_to_wkt_sb: Unknown type received %d - %s", type, lwtype_name(type));
@@ -389,14 +389,14 @@ lwcurvepoly_to_wkt_sb(const LWCURVEPOLY* cpoly, stringbuffer_t* sb, int precisio
  *   MULTICURVE((0 0, 1 1), CURVESTRING(0 0, 1 1, 2 2))
  */
 static void
-lwmcurve_to_wkt_sb(const LWMCURVE* mcurv, stringbuffer_t* sb, int precision, uint8_t variant)
+lwmcurve_to_wkt_sb(const LWMCURVE *mcurv, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "MULTICURVE"); /* "MULTICURVE" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)mcurv, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)mcurv, sb, variant);
 	}
 	if (mcurv->ngeoms < 1)
 	{
@@ -413,15 +413,15 @@ lwmcurve_to_wkt_sb(const LWMCURVE* mcurv, stringbuffer_t* sb, int precision, uin
 		{
 		case LINETYPE:
 			/* Linestring subgeoms don't get type identifiers */
-			lwline_to_wkt_sb((LWLINE*)mcurv->geoms[i], sb, precision, variant | WKT_NO_TYPE);
+			lwline_to_wkt_sb((LWLINE *)mcurv->geoms[i], sb, precision, variant | WKT_NO_TYPE);
 			break;
 		case CIRCSTRINGTYPE:
 			/* But circstring subgeoms *do* get type identifiers */
-			lwcircstring_to_wkt_sb((LWCIRCSTRING*)mcurv->geoms[i], sb, precision, variant);
+			lwcircstring_to_wkt_sb((LWCIRCSTRING *)mcurv->geoms[i], sb, precision, variant);
 			break;
 		case COMPOUNDTYPE:
 			/* And compoundcurve subgeoms *do* get type identifiers */
-			lwcompound_to_wkt_sb((LWCOMPOUND*)mcurv->geoms[i], sb, precision, variant);
+			lwcompound_to_wkt_sb((LWCOMPOUND *)mcurv->geoms[i], sb, precision, variant);
 			break;
 		default:
 			lwerror("lwmcurve_to_wkt_sb: Unknown type received %d - %s", type, lwtype_name(type));
@@ -436,14 +436,14 @@ lwmcurve_to_wkt_sb(const LWMCURVE* mcurv, stringbuffer_t* sb, int precision, uin
  *   MULTISURFACE(((0 0, 1 1, 1 0, 0 0)), CURVEPOLYGON(CURVESTRING(0 0, 1 1, 2 2, 0 1, 0 0)))
  */
 static void
-lwmsurface_to_wkt_sb(const LWMSURFACE* msurf, stringbuffer_t* sb, int precision, uint8_t variant)
+lwmsurface_to_wkt_sb(const LWMSURFACE *msurf, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "MULTISURFACE"); /* "MULTISURFACE" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)msurf, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)msurf, sb, variant);
 	}
 	if (msurf->ngeoms < 1)
 	{
@@ -460,11 +460,11 @@ lwmsurface_to_wkt_sb(const LWMSURFACE* msurf, stringbuffer_t* sb, int precision,
 		{
 		case POLYGONTYPE:
 			/* Linestring subgeoms don't get type identifiers */
-			lwpoly_to_wkt_sb((LWPOLY*)msurf->geoms[i], sb, precision, variant | WKT_NO_TYPE);
+			lwpoly_to_wkt_sb((LWPOLY *)msurf->geoms[i], sb, precision, variant | WKT_NO_TYPE);
 			break;
 		case CURVEPOLYTYPE:
 			/* But circstring subgeoms *do* get type identifiers */
-			lwcurvepoly_to_wkt_sb((LWCURVEPOLY*)msurf->geoms[i], sb, precision, variant);
+			lwcurvepoly_to_wkt_sb((LWCURVEPOLY *)msurf->geoms[i], sb, precision, variant);
 			break;
 		default:
 			lwerror("lwmsurface_to_wkt_sb: Unknown type received %d - %s", type, lwtype_name(type));
@@ -479,14 +479,14 @@ lwmsurface_to_wkt_sb(const LWMSURFACE* msurf, stringbuffer_t* sb, int precision,
  *   GEOMETRYCOLLECTION(POLYGON((0 0, 1 1, 1 0, 0 0)), CURVEPOLYGON(CURVESTRING(0 0, 1 1, 2 2, 0 1, 0 0)))
  */
 static void
-lwcollection_to_wkt_sb(const LWCOLLECTION* collection, stringbuffer_t* sb, int precision, uint8_t variant)
+lwcollection_to_wkt_sb(const LWCOLLECTION *collection, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "GEOMETRYCOLLECTION"); /* "GEOMETRYCOLLECTION" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)collection, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)collection, sb, variant);
 	}
 	if (collection->ngeoms < 1)
 	{
@@ -498,7 +498,7 @@ lwcollection_to_wkt_sb(const LWCOLLECTION* collection, stringbuffer_t* sb, int p
 	for (i = 0; i < collection->ngeoms; i++)
 	{
 		if (i > 0) stringbuffer_append(sb, ",");
-		lwgeom_to_wkt_sb((LWGEOM*)collection->geoms[i], sb, precision, variant);
+		lwgeom_to_wkt_sb((LWGEOM *)collection->geoms[i], sb, precision, variant);
 	}
 	stringbuffer_append(sb, ")");
 }
@@ -507,12 +507,12 @@ lwcollection_to_wkt_sb(const LWCOLLECTION* collection, stringbuffer_t* sb, int p
  * TRIANGLE
  */
 static void
-lwtriangle_to_wkt_sb(const LWTRIANGLE* tri, stringbuffer_t* sb, int precision, uint8_t variant)
+lwtriangle_to_wkt_sb(const LWTRIANGLE *tri, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "TRIANGLE"); /* "TRIANGLE" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)tri, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)tri, sb, variant);
 	}
 	if (lwtriangle_is_empty(tri))
 	{
@@ -529,14 +529,14 @@ lwtriangle_to_wkt_sb(const LWTRIANGLE* tri, stringbuffer_t* sb, int precision, u
  * TIN
  */
 static void
-lwtin_to_wkt_sb(const LWTIN* tin, stringbuffer_t* sb, int precision, uint8_t variant)
+lwtin_to_wkt_sb(const LWTIN *tin, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "TIN"); /* "TIN" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)tin, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)tin, sb, variant);
 	}
 	if (tin->ngeoms < 1)
 	{
@@ -558,14 +558,14 @@ lwtin_to_wkt_sb(const LWTIN* tin, stringbuffer_t* sb, int precision, uint8_t var
  * POLYHEDRALSURFACE
  */
 static void
-lwpsurface_to_wkt_sb(const LWPSURFACE* psurf, stringbuffer_t* sb, int precision, uint8_t variant)
+lwpsurface_to_wkt_sb(const LWPSURFACE *psurf, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	uint32_t i = 0;
 
 	if (!(variant & WKT_NO_TYPE))
 	{
 		stringbuffer_append(sb, "POLYHEDRALSURFACE"); /* "POLYHEDRALSURFACE" */
-		dimension_qualifiers_to_wkt_sb((LWGEOM*)psurf, sb, variant);
+		dimension_qualifiers_to_wkt_sb((LWGEOM *)psurf, sb, variant);
 	}
 	if (psurf->ngeoms < 1)
 	{
@@ -589,7 +589,7 @@ lwpsurface_to_wkt_sb(const LWPSURFACE* psurf, stringbuffer_t* sb, int precision,
  * Generic GEOMETRY
  */
 static void
-lwgeom_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, int precision, uint8_t variant)
+lwgeom_to_wkt_sb(const LWGEOM *geom, stringbuffer_t *sb, int precision, uint8_t variant)
 {
 	LWDEBUGF(4,
 		 "lwgeom_to_wkt_sb: type %s, hasz %d, hasm %d",
@@ -601,49 +601,49 @@ lwgeom_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, int precision, uint8_t 
 	switch (geom->type)
 	{
 	case POINTTYPE:
-		lwpoint_to_wkt_sb((LWPOINT*)geom, sb, precision, variant);
+		lwpoint_to_wkt_sb((LWPOINT *)geom, sb, precision, variant);
 		break;
 	case LINETYPE:
-		lwline_to_wkt_sb((LWLINE*)geom, sb, precision, variant);
+		lwline_to_wkt_sb((LWLINE *)geom, sb, precision, variant);
 		break;
 	case POLYGONTYPE:
-		lwpoly_to_wkt_sb((LWPOLY*)geom, sb, precision, variant);
+		lwpoly_to_wkt_sb((LWPOLY *)geom, sb, precision, variant);
 		break;
 	case MULTIPOINTTYPE:
-		lwmpoint_to_wkt_sb((LWMPOINT*)geom, sb, precision, variant);
+		lwmpoint_to_wkt_sb((LWMPOINT *)geom, sb, precision, variant);
 		break;
 	case MULTILINETYPE:
-		lwmline_to_wkt_sb((LWMLINE*)geom, sb, precision, variant);
+		lwmline_to_wkt_sb((LWMLINE *)geom, sb, precision, variant);
 		break;
 	case MULTIPOLYGONTYPE:
-		lwmpoly_to_wkt_sb((LWMPOLY*)geom, sb, precision, variant);
+		lwmpoly_to_wkt_sb((LWMPOLY *)geom, sb, precision, variant);
 		break;
 	case COLLECTIONTYPE:
-		lwcollection_to_wkt_sb((LWCOLLECTION*)geom, sb, precision, variant);
+		lwcollection_to_wkt_sb((LWCOLLECTION *)geom, sb, precision, variant);
 		break;
 	case CIRCSTRINGTYPE:
-		lwcircstring_to_wkt_sb((LWCIRCSTRING*)geom, sb, precision, variant);
+		lwcircstring_to_wkt_sb((LWCIRCSTRING *)geom, sb, precision, variant);
 		break;
 	case COMPOUNDTYPE:
-		lwcompound_to_wkt_sb((LWCOMPOUND*)geom, sb, precision, variant);
+		lwcompound_to_wkt_sb((LWCOMPOUND *)geom, sb, precision, variant);
 		break;
 	case CURVEPOLYTYPE:
-		lwcurvepoly_to_wkt_sb((LWCURVEPOLY*)geom, sb, precision, variant);
+		lwcurvepoly_to_wkt_sb((LWCURVEPOLY *)geom, sb, precision, variant);
 		break;
 	case MULTICURVETYPE:
-		lwmcurve_to_wkt_sb((LWMCURVE*)geom, sb, precision, variant);
+		lwmcurve_to_wkt_sb((LWMCURVE *)geom, sb, precision, variant);
 		break;
 	case MULTISURFACETYPE:
-		lwmsurface_to_wkt_sb((LWMSURFACE*)geom, sb, precision, variant);
+		lwmsurface_to_wkt_sb((LWMSURFACE *)geom, sb, precision, variant);
 		break;
 	case TRIANGLETYPE:
-		lwtriangle_to_wkt_sb((LWTRIANGLE*)geom, sb, precision, variant);
+		lwtriangle_to_wkt_sb((LWTRIANGLE *)geom, sb, precision, variant);
 		break;
 	case TINTYPE:
-		lwtin_to_wkt_sb((LWTIN*)geom, sb, precision, variant);
+		lwtin_to_wkt_sb((LWTIN *)geom, sb, precision, variant);
 		break;
 	case POLYHEDRALSURFACETYPE:
-		lwpsurface_to_wkt_sb((LWPSURFACE*)geom, sb, precision, variant);
+		lwpsurface_to_wkt_sb((LWPSURFACE *)geom, sb, precision, variant);
 		break;
 	default:
 		lwerror("lwgeom_to_wkt_sb: Type %d - %s unsupported.", geom->type, lwtype_name(geom->type));
@@ -661,11 +661,11 @@ lwgeom_to_wkt_sb(const LWGEOM* geom, stringbuffer_t* sb, int precision, uint8_t 
  * @param size_out If supplied, will return the size of the returned string,
  * including the null terminator.
  */
-char*
-lwgeom_to_wkt(const LWGEOM* geom, uint8_t variant, int precision, size_t* size_out)
+char *
+lwgeom_to_wkt(const LWGEOM *geom, uint8_t variant, int precision, size_t *size_out)
 {
-	stringbuffer_t* sb;
-	char* str = NULL;
+	stringbuffer_t *sb;
+	char *str = NULL;
 	if (geom == NULL) return NULL;
 	sb = stringbuffer_create();
 	/* Extended mode starts with an "SRID=" section for geoms that have one */

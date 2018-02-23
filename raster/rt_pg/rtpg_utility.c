@@ -45,7 +45,7 @@ PG_FUNCTION_INFO_V1(RASTER_lib_version);
 Datum RASTER_lib_version(PG_FUNCTION_ARGS)
 {
 	char ver[64];
-	text* result;
+	text *result;
 
 	snprintf(ver, 64, "%s r%d", POSTGIS_LIB_VERSION, POSTGIS_SVN_REVISION);
 	ver[63] = '\0';
@@ -57,8 +57,8 @@ Datum RASTER_lib_version(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_lib_build_date);
 Datum RASTER_lib_build_date(PG_FUNCTION_ARGS)
 {
-	char* ver = POSTGIS_BUILD_DATE;
-	text* result;
+	char *ver = POSTGIS_BUILD_DATE;
+	text *result;
 	result = palloc(VARHDRSZ + strlen(ver));
 	SET_VARSIZE(result, VARHDRSZ + strlen(ver));
 	memcpy(VARDATA(result), ver, strlen(ver));
@@ -68,13 +68,13 @@ Datum RASTER_lib_build_date(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_gdal_version);
 Datum RASTER_gdal_version(PG_FUNCTION_ARGS)
 {
-	const char* ver = rt_util_gdal_version("--version");
-	text* result;
+	const char *ver = rt_util_gdal_version("--version");
+	text *result;
 
 	/* add indicator if GDAL isn't configured right */
 	if (!rt_util_gdal_configured())
 	{
-		char* rtn = NULL;
+		char *rtn = NULL;
 		rtn = palloc(strlen(ver) + strlen(" GDAL_DATA not found") + 1);
 		if (!rtn)
 			result = cstring_to_text(ver);
@@ -94,8 +94,8 @@ Datum RASTER_gdal_version(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_minPossibleValue);
 Datum RASTER_minPossibleValue(PG_FUNCTION_ARGS)
 {
-	text* pixeltypetext = NULL;
-	char* pixeltypechar = NULL;
+	text *pixeltypetext = NULL;
+	char *pixeltypechar = NULL;
 	rt_pixtype pixtype = PT_END;
 	double pixsize = 0;
 
@@ -140,7 +140,7 @@ Datum RASTER_memsize(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_memsize);
 Datum RASTER_memsize(PG_FUNCTION_ARGS)
 {
-	void* detoasted = PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	void *detoasted = PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	size_t size = VARSIZE(detoasted);
 	PG_FREE_IF_COPY(detoasted, 0);
 	PG_RETURN_INT32(size);

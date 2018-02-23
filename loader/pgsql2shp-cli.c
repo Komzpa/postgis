@@ -55,10 +55,10 @@ usage(int status)
 }
 
 int
-main(int argc, char** argv)
+main(int argc, char **argv)
 {
-	SHPDUMPERCONFIG* config;
-	SHPDUMPERSTATE* state;
+	SHPDUMPERCONFIG *config;
+	SHPDUMPERSTATE *state;
 
 	int ret, c, i;
 
@@ -133,8 +133,8 @@ main(int argc, char** argv)
 		else
 		{
 			/* Schema qualified table name */
-			char* strptr = argv[pgis_optind];
-			char* chrptr = strchr(strptr, '.');
+			char *strptr = argv[pgis_optind];
+			char *chrptr = strchr(strptr, '.');
 
 			/* OK, this is a schema-qualified table name... */
 			if (chrptr)

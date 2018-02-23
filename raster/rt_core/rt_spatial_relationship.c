@@ -42,7 +42,7 @@
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_same_alignment(rt_raster rast1, rt_raster rast2, int* aligned, char** reason)
+rt_raster_same_alignment(rt_raster rast1, rt_raster rast2, int *aligned, char **reason)
 {
 	double xr;
 	double yr;
@@ -139,12 +139,12 @@ rt_raster_geos_spatial_relationship(rt_raster rast1,
 				    rt_raster rast2,
 				    int nband2,
 				    rt_geos_spatial_test testtype,
-				    int* testresult)
+				    int *testresult)
 {
-	LWMPOLY* surface1 = NULL;
-	LWMPOLY* surface2 = NULL;
-	GEOSGeometry* geom1 = NULL;
-	GEOSGeometry* geom2 = NULL;
+	LWMPOLY *surface1 = NULL;
+	LWMPOLY *surface2 = NULL;
+	GEOSGeometry *geom1 = NULL;
+	GEOSGeometry *geom2 = NULL;
 	int rtn = 0;
 	int flag = 0;
 
@@ -291,7 +291,7 @@ rt_raster_geos_spatial_relationship(rt_raster rast1,
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_overlaps(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* overlaps)
+rt_raster_overlaps(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *overlaps)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -315,7 +315,7 @@ rt_raster_overlaps(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_touches(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* touches)
+rt_raster_touches(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *touches)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -339,7 +339,7 @@ rt_raster_touches(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int*
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_contains(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* contains)
+rt_raster_contains(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *contains)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -363,7 +363,7 @@ rt_raster_contains(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_contains_properly(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* contains)
+rt_raster_contains_properly(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *contains)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -387,7 +387,7 @@ rt_raster_contains_properly(rt_raster rast1, int nband1, rt_raster rast2, int nb
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_covers(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* covers)
+rt_raster_covers(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *covers)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -411,7 +411,7 @@ rt_raster_covers(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* 
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_coveredby(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* coveredby)
+rt_raster_coveredby(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *coveredby)
 {
 	RASTER_DEBUG(3, "Starting");
 
@@ -437,11 +437,11 @@ rt_raster_coveredby(rt_raster rast1, int nband1, rt_raster rast2, int nband2, in
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_within_distance(rt_raster rast1, int nband1, rt_raster rast2, int nband2, double distance, int* dwithin)
+rt_raster_within_distance(rt_raster rast1, int nband1, rt_raster rast2, int nband2, double distance, int *dwithin)
 {
-	LWMPOLY* surface = NULL;
-	LWGEOM* surface1 = NULL;
-	LWGEOM* surface2 = NULL;
+	LWMPOLY *surface = NULL;
+	LWGEOM *surface1 = NULL;
+	LWGEOM *surface2 = NULL;
 	double mindist = 0;
 
 	RASTER_DEBUG(3, "Starting");
@@ -541,11 +541,11 @@ rt_raster_fully_within_distance(rt_raster rast1,
 				rt_raster rast2,
 				int nband2,
 				double distance,
-				int* dfwithin)
+				int *dfwithin)
 {
-	LWMPOLY* surface = NULL;
-	LWGEOM* surface1 = NULL;
-	LWGEOM* surface2 = NULL;
+	LWMPOLY *surface = NULL;
+	LWGEOM *surface1 = NULL;
+	LWGEOM *surface2 = NULL;
 	double maxdist = 0;
 
 	RASTER_DEBUG(3, "Starting");
@@ -967,14 +967,14 @@ rt_raster_intersects_algorithm(rt_raster rast1,
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_intersects(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int* intersects)
+rt_raster_intersects(rt_raster rast1, int nband1, rt_raster rast2, int nband2, int *intersects)
 {
 	int i;
 	int j;
 	int within = 0;
 
-	LWGEOM* hull[2] = {NULL};
-	GEOSGeometry* ghull[2] = {NULL};
+	LWGEOM *hull[2] = {NULL};
+	GEOSGeometry *ghull[2] = {NULL};
 
 	uint16_t width1;
 	uint16_t height1;
@@ -986,10 +986,10 @@ rt_raster_intersects(rt_raster rast1, int nband1, rt_raster rast2, int nband2, i
 	double pixarea2;
 	rt_raster rastS = NULL;
 	rt_raster rastL = NULL;
-	uint16_t* widthS = NULL;
-	uint16_t* heightS = NULL;
-	uint16_t* widthL = NULL;
-	uint16_t* heightL = NULL;
+	uint16_t *widthS = NULL;
+	uint16_t *heightS = NULL;
+	uint16_t *widthL = NULL;
+	uint16_t *heightL = NULL;
 	int nbandS;
 	int nbandL;
 	rt_band bandS = NULL;
@@ -1071,7 +1071,7 @@ rt_raster_intersects(rt_raster rast1, int nband1, rt_raster rast2, int nband2, i
 				rtn = 0;
 				break;
 			}
-			ghull[i] = (GEOSGeometry*)LWGEOM2GEOS(hull[i], 0);
+			ghull[i] = (GEOSGeometry *)LWGEOM2GEOS(hull[i], 0);
 			if (NULL == ghull[i])
 			{
 				for (j = 0; j < i; j++)

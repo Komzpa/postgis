@@ -36,7 +36,7 @@
  * Initialize spheroid object based on major and minor axis
  */
 void
-spheroid_init(SPHEROID* s, double a, double b)
+spheroid_init(SPHEROID *s, double a, double b)
 {
 	s->a = a;
 	s->b = b;
@@ -47,7 +47,7 @@ spheroid_init(SPHEROID* s, double a, double b)
 
 #if !PROJ_GEODESIC
 static double
-spheroid_mu2(double alpha, const SPHEROID* s)
+spheroid_mu2(double alpha, const SPHEROID *s)
 {
 	double b2 = POW2(s->b);
 	return POW2(cos(alpha)) * (POW2(s->a) - b2) / b2;
@@ -79,7 +79,7 @@ spheroid_big_b(double u2)
  * @return spheroidal distance between a and b in spheroid units
  */
 double
-spheroid_distance(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const SPHEROID* spheroid)
+spheroid_distance(const GEOGRAPHIC_POINT *a, const GEOGRAPHIC_POINT *b, const SPHEROID *spheroid)
 {
 	struct geod_geodesic gd;
 	geod_init(&gd, spheroid->a, spheroid->f);
@@ -101,7 +101,7 @@ spheroid_distance(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const SP
  * @return azimuth of line joining r to s (but not reverse)
  */
 double
-spheroid_direction(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const SPHEROID* spheroid)
+spheroid_direction(const GEOGRAPHIC_POINT *a, const GEOGRAPHIC_POINT *b, const SPHEROID *spheroid)
 {
 	struct geod_geodesic gd;
 	geod_init(&gd, spheroid->a, spheroid->f);
@@ -125,11 +125,11 @@ spheroid_direction(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const S
  * @return g - location of projected point
  */
 int
-spheroid_project(const GEOGRAPHIC_POINT* r,
-		 const SPHEROID* spheroid,
+spheroid_project(const GEOGRAPHIC_POINT *r,
+		 const SPHEROID *spheroid,
 		 double distance,
 		 double azimuth,
-		 GEOGRAPHIC_POINT* g)
+		 GEOGRAPHIC_POINT *g)
 {
 	struct geod_geodesic gd;
 	geod_init(&gd, spheroid->a, spheroid->f);
@@ -143,7 +143,7 @@ spheroid_project(const GEOGRAPHIC_POINT* r,
 }
 
 static double
-ptarray_area_spheroid(const POINTARRAY* pa, const SPHEROID* spheroid)
+ptarray_area_spheroid(const POINTARRAY *pa, const SPHEROID *spheroid)
 {
 	/* Return zero on non-sensical inputs */
 	if (!pa || pa->npoints < 4) return 0.0;
@@ -189,7 +189,7 @@ ptarray_area_spheroid(const POINTARRAY* pa, const SPHEROID* spheroid)
  * @return spheroidal distance between a and b in spheroid units.
  */
 double
-spheroid_distance(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const SPHEROID* spheroid)
+spheroid_distance(const GEOGRAPHIC_POINT *a, const GEOGRAPHIC_POINT *b, const SPHEROID *spheroid)
 {
 	double lambda = (b->lon - a->lon);
 	double f = spheroid->f;
@@ -288,7 +288,7 @@ spheroid_distance(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, const SP
  * @return azimuth of line joining r and s
  */
 double
-spheroid_direction(const GEOGRAPHIC_POINT* r, const GEOGRAPHIC_POINT* s, const SPHEROID* spheroid)
+spheroid_direction(const GEOGRAPHIC_POINT *r, const GEOGRAPHIC_POINT *s, const SPHEROID *spheroid)
 {
 	int i = 0;
 	double lambda = s->lon - r->lon;
@@ -355,11 +355,11 @@ spheroid_direction(const GEOGRAPHIC_POINT* r, const GEOGRAPHIC_POINT* s, const S
  * @return s - location of projected point.
  */
 int
-spheroid_project(const GEOGRAPHIC_POINT* r,
-		 const SPHEROID* spheroid,
+spheroid_project(const GEOGRAPHIC_POINT *r,
+		 const SPHEROID *spheroid,
 		 double distance,
 		 double azimuth,
-		 GEOGRAPHIC_POINT* g)
+		 GEOGRAPHIC_POINT *g)
 {
 	double omf = 1 - spheroid->f;
 	double tan_u1 = omf * tan(r->lat);
@@ -411,13 +411,13 @@ spheroid_project(const GEOGRAPHIC_POINT* r,
 }
 
 static inline double
-spheroid_prime_vertical_radius_of_curvature(double latitude, const SPHEROID* spheroid)
+spheroid_prime_vertical_radius_of_curvature(double latitude, const SPHEROID *spheroid)
 {
 	return spheroid->a / (sqrt(1.0 - spheroid->e_sq * POW2(sin(latitude))));
 }
 
 static inline double
-spheroid_parallel_arc_length(double latitude, double deltaLongitude, const SPHEROID* spheroid)
+spheroid_parallel_arc_length(double latitude, double deltaLongitude, const SPHEROID *spheroid)
 {
 	return spheroid_prime_vertical_radius_of_curvature(latitude, spheroid) * cos(latitude) * deltaLongitude;
 }
@@ -432,9 +432,9 @@ spheroid_parallel_arc_length(double latitude, double deltaLongitude, const SPHER
  * @return area in square meters.
  */
 static double
-spheroid_boundingbox_area(const GEOGRAPHIC_POINT* southWestCorner,
-			  const GEOGRAPHIC_POINT* northEastCorner,
-			  const SPHEROID* spheroid)
+spheroid_boundingbox_area(const GEOGRAPHIC_POINT *southWestCorner,
+			  const GEOGRAPHIC_POINT *northEastCorner,
+			  const SPHEROID *spheroid)
 {
 	double z0 = (northEastCorner->lon - southWestCorner->lon) * POW2(spheroid->b) / 2.0;
 	double e = sqrt(spheroid->e_sq);
@@ -453,7 +453,7 @@ spheroid_boundingbox_area(const GEOGRAPHIC_POINT* southWestCorner,
  * hemisphere. Points are pre-conditioned in ptarray_area_spheroid.
  */
 static double
-spheroid_striparea(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, double latitude_min, const SPHEROID* spheroid)
+spheroid_striparea(const GEOGRAPHIC_POINT *a, const GEOGRAPHIC_POINT *b, double latitude_min, const SPHEROID *spheroid)
 {
 	GEOGRAPHIC_POINT A, B, mL, nR;
 	double deltaLng, baseArea, topArea;
@@ -493,7 +493,7 @@ spheroid_striparea(const GEOGRAPHIC_POINT* a, const GEOGRAPHIC_POINT* b, double 
 }
 
 static double
-ptarray_area_spheroid(const POINTARRAY* pa, const SPHEROID* spheroid)
+ptarray_area_spheroid(const POINTARRAY *pa, const SPHEROID *spheroid)
 {
 	GEOGRAPHIC_POINT a, b;
 	POINT2D p;
@@ -638,7 +638,7 @@ ptarray_area_spheroid(const POINTARRAY* pa, const SPHEROID* spheroid)
  * WARNING: Does NOT WORK for polygons over equator or pole.
  */
 double
-lwgeom_area_spheroid(const LWGEOM* lwgeom, const SPHEROID* spheroid)
+lwgeom_area_spheroid(const LWGEOM *lwgeom, const SPHEROID *spheroid)
 {
 	int type;
 
@@ -656,7 +656,7 @@ lwgeom_area_spheroid(const LWGEOM* lwgeom, const SPHEROID* spheroid)
 	/* Actually calculate area */
 	if (type == POLYGONTYPE)
 	{
-		LWPOLY* poly = (LWPOLY*)lwgeom;
+		LWPOLY *poly = (LWPOLY *)lwgeom;
 		uint32_t i;
 		double area = 0.0;
 
@@ -677,7 +677,7 @@ lwgeom_area_spheroid(const LWGEOM* lwgeom, const SPHEROID* spheroid)
 	/* Recurse into sub-geometries to get area */
 	if (type == MULTIPOLYGONTYPE || type == COLLECTIONTYPE)
 	{
-		LWCOLLECTION* col = (LWCOLLECTION*)lwgeom;
+		LWCOLLECTION *col = (LWCOLLECTION *)lwgeom;
 		uint32_t i;
 		double area = 0.0;
 

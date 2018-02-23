@@ -227,7 +227,7 @@ rt_raster_get_y_offset(rt_raster raster)
 }
 
 void
-rt_raster_get_phys_params(rt_raster rast, double* i_mag, double* j_mag, double* theta_i, double* theta_ij)
+rt_raster_get_phys_params(rt_raster rast, double *i_mag, double *j_mag, double *theta_i, double *theta_ij)
 {
 	double o11, o12, o21, o22; /* geotransform coefficients */
 
@@ -248,10 +248,10 @@ rt_raster_calc_phys_params(double xscale,
 			   double xskew,
 			   double yskew,
 			   double yscale,
-			   double* i_mag,
-			   double* j_mag,
-			   double* theta_i,
-			   double* theta_ij)
+			   double *i_mag,
+			   double *j_mag,
+			   double *theta_i,
+			   double *theta_ij)
 
 {
 	double theta_test;
@@ -311,10 +311,10 @@ rt_raster_calc_gt_coeff(double i_mag,
 			double j_mag,
 			double theta_i,
 			double theta_ij,
-			double* xscale,
-			double* xskew,
-			double* yskew,
-			double* yscale)
+			double *xscale,
+			double *xskew,
+			double *yskew,
+			double *yscale)
 {
 	double f;        /* reflection flag 1.0 or -1.0 */
 	double k_i;      /* shearing coefficient */
@@ -402,7 +402,7 @@ rt_raster_get_band(rt_raster raster, int n)
 int
 rt_raster_add_band(rt_raster raster, rt_band band, int index)
 {
-	rt_band* oldbands = NULL;
+	rt_band *oldbands = NULL;
 	rt_band oldband = NULL;
 	rt_band tmpband = NULL;
 	uint16_t i = 0;
@@ -430,7 +430,7 @@ rt_raster_add_band(rt_raster raster, rt_band band, int index)
 
 	RASTER_DEBUGF(3, "Oldbands at %p", oldbands);
 
-	raster->bands = (rt_band*)rtrealloc(raster->bands, sizeof(rt_band) * (raster->numBands + 1));
+	raster->bands = (rt_band *)rtrealloc(raster->bands, sizeof(rt_band) * (raster->numBands + 1));
 
 	RASTER_DEBUG(3, "Checking bands");
 
@@ -501,7 +501,7 @@ rt_raster_generate_new_band(rt_raster raster,
 	int datasize = 0;
 	int oldnumbands = 0;
 	int numbands = 0;
-	void* mem = NULL;
+	void *mem = NULL;
 	int32_t checkvalint = 0;
 	uint32_t checkvaluint = 0;
 	double checkvaldouble = 0;
@@ -523,7 +523,7 @@ rt_raster_generate_new_band(rt_raster raster,
 	numval = width * height;
 	datasize = rt_pixtype_size(pixtype) * numval;
 
-	mem = (int*)rtalloc(datasize);
+	mem = (int *)rtalloc(datasize);
 	if (!mem)
 	{
 		rterror("rt_raster_generate_new_band: Could not allocate memory for band");
@@ -538,7 +538,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		{
 		case PT_1BB:
 		{
-			uint8_t* ptr = mem;
+			uint8_t *ptr = mem;
 			uint8_t clamped_initval = rt_util_clamp_to_1BB(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -547,7 +547,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_2BUI:
 		{
-			uint8_t* ptr = mem;
+			uint8_t *ptr = mem;
 			uint8_t clamped_initval = rt_util_clamp_to_2BUI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -556,7 +556,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_4BUI:
 		{
-			uint8_t* ptr = mem;
+			uint8_t *ptr = mem;
 			uint8_t clamped_initval = rt_util_clamp_to_4BUI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -565,7 +565,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_8BSI:
 		{
-			int8_t* ptr = mem;
+			int8_t *ptr = mem;
 			int8_t clamped_initval = rt_util_clamp_to_8BSI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -574,7 +574,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_8BUI:
 		{
-			uint8_t* ptr = mem;
+			uint8_t *ptr = mem;
 			uint8_t clamped_initval = rt_util_clamp_to_8BUI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -583,7 +583,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_16BSI:
 		{
-			int16_t* ptr = mem;
+			int16_t *ptr = mem;
 			int16_t clamped_initval = rt_util_clamp_to_16BSI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -592,7 +592,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_16BUI:
 		{
-			uint16_t* ptr = mem;
+			uint16_t *ptr = mem;
 			uint16_t clamped_initval = rt_util_clamp_to_16BUI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -601,7 +601,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_32BSI:
 		{
-			int32_t* ptr = mem;
+			int32_t *ptr = mem;
 			int32_t clamped_initval = rt_util_clamp_to_32BSI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -610,7 +610,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_32BUI:
 		{
-			uint32_t* ptr = mem;
+			uint32_t *ptr = mem;
 			uint32_t clamped_initval = rt_util_clamp_to_32BUI(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -619,7 +619,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_32BF:
 		{
-			float* ptr = mem;
+			float *ptr = mem;
 			float clamped_initval = rt_util_clamp_to_32F(initialvalue);
 			for (i = 0; i < numval; i++)
 				ptr[i] = clamped_initval;
@@ -628,7 +628,7 @@ rt_raster_generate_new_band(rt_raster raster,
 		}
 		case PT_64BF:
 		{
-			double* ptr = mem;
+			double *ptr = mem;
 			for (i = 0; i < numval; i++)
 				ptr[i] = initialvalue;
 			checkvaldouble = ptr[0];
@@ -678,7 +678,7 @@ rt_raster_generate_new_band(rt_raster raster,
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_get_inverse_geotransform_matrix(rt_raster raster, double* gt, double* igt)
+rt_raster_get_inverse_geotransform_matrix(rt_raster raster, double *gt, double *igt)
 {
 	double _gt[6] = {0};
 
@@ -707,7 +707,7 @@ rt_raster_get_inverse_geotransform_matrix(rt_raster raster, double* gt, double* 
  *
  */
 void
-rt_raster_get_geotransform_matrix(rt_raster raster, double* gt)
+rt_raster_get_geotransform_matrix(rt_raster raster, double *gt)
 {
 	assert(NULL != raster);
 	assert(NULL != gt);
@@ -728,7 +728,7 @@ rt_raster_get_geotransform_matrix(rt_raster raster, double* gt)
  *
  */
 void
-rt_raster_set_geotransform_matrix(rt_raster raster, double* gt)
+rt_raster_set_geotransform_matrix(rt_raster raster, double *gt)
 {
 	assert(NULL != raster);
 	assert(NULL != gt);
@@ -756,7 +756,7 @@ rt_raster_set_geotransform_matrix(rt_raster raster, double* gt)
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_cell_to_geopoint(rt_raster raster, double xr, double yr, double* xw, double* yw, double* gt)
+rt_raster_cell_to_geopoint(rt_raster raster, double xr, double yr, double *xw, double *yw, double *gt)
 {
 	double _gt[6] = {0};
 
@@ -789,7 +789,7 @@ rt_raster_cell_to_geopoint(rt_raster raster, double xr, double yr, double* xw, d
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_geopoint_to_cell(rt_raster raster, double xw, double yw, double* xr, double* yr, double* igt)
+rt_raster_geopoint_to_cell(rt_raster raster, double xw, double yw, double *xr, double *yr, double *igt)
 {
 	double _igt[6] = {0};
 	double rnd = 0;
@@ -845,7 +845,7 @@ rt_raster_geopoint_to_cell(rt_raster raster, double xw, double yw, double* xr, d
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_raster_get_envelope(rt_raster raster, rt_envelope* env)
+rt_raster_get_envelope(rt_raster raster, rt_envelope *env)
 {
 	int i;
 	int rtn;
@@ -930,7 +930,7 @@ rt_raster_get_envelope(rt_raster raster, rt_envelope* env)
  * @return skewed raster who's extent covers unskewed extent, NULL on error
  */
 rt_raster
-rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale, double tolerance)
+rt_raster_compute_skewed_raster(rt_envelope extent, double *skew, double *scale, double tolerance)
 {
 	uint32_t run = 0;
 	uint32_t max_run = 1;
@@ -952,9 +952,9 @@ rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale,
 	int x;
 	int y;
 
-	LWGEOM* geom = NULL;
-	GEOSGeometry* sgeom = NULL;
-	GEOSGeometry* ngeom = NULL;
+	LWGEOM *geom = NULL;
+	GEOSGeometry *sgeom = NULL;
+	GEOSGeometry *ngeom = NULL;
 
 	if ((tolerance < 0.) || FLT_EQ(tolerance, 0.)) { tolerance = 0.1; }
 	else if (tolerance > 1.)
@@ -1202,7 +1202,7 @@ rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale,
 
 	/* create reference LWPOLY */
 	{
-		LWPOLY* npoly = rt_util_envelope_to_lwpoly(extent);
+		LWPOLY *npoly = rt_util_envelope_to_lwpoly(extent);
 		if (npoly == NULL)
 		{
 			rterror("rt_raster_compute_skewed_raster: Could not build extent's geometry for covers test");
@@ -1210,7 +1210,7 @@ rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale,
 			return NULL;
 		}
 
-		ngeom = (GEOSGeometry*)LWGEOM2GEOS(lwpoly_as_lwgeom(npoly), 0);
+		ngeom = (GEOSGeometry *)LWGEOM2GEOS(lwpoly_as_lwgeom(npoly), 0);
 		lwpoly_free(npoly);
 	}
 
@@ -1229,7 +1229,7 @@ rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale,
 			return NULL;
 		}
 
-		sgeom = (GEOSGeometry*)LWGEOM2GEOS(geom, 0);
+		sgeom = (GEOSGeometry *)LWGEOM2GEOS(geom, 0);
 		lwgeom_free(geom);
 
 		covers = GEOSRelatePattern(sgeom, ngeom, "******FF*");
@@ -1282,7 +1282,7 @@ rt_raster_compute_skewed_raster(rt_envelope extent, double* skew, double* scale,
 				return NULL;
 			}
 
-			sgeom = (GEOSGeometry*)LWGEOM2GEOS(geom, 0);
+			sgeom = (GEOSGeometry *)LWGEOM2GEOS(geom, 0);
 			lwgeom_free(geom);
 
 			covers = GEOSRelatePattern(sgeom, ngeom, "******FF*");
@@ -1434,7 +1434,7 @@ rt_raster_copy_band(rt_raster torast, rt_raster fromrast, int fromindex, int toi
  * @return a new rt_raster or NULL on error
  */
 rt_raster
-rt_raster_from_band(rt_raster raster, uint32_t* bandNums, int count)
+rt_raster_from_band(rt_raster raster, uint32_t *bandNums, int count)
 {
 	rt_raster rast = NULL;
 	int i = 0;
@@ -1557,7 +1557,7 @@ rt_raster_clone(rt_raster raster, uint8_t deep)
 	if (deep)
 	{
 		int numband = rt_raster_get_num_bands(raster);
-		uint32_t* nband = NULL;
+		uint32_t *nband = NULL;
 		int i = 0;
 
 		nband = rtalloc(sizeof(uint32_t) * numband);
@@ -1605,11 +1605,11 @@ rt_raster_clone(rt_raster raster, uint8_t deep)
  * @return formatted GDAL raster.  the calling function is responsible
  *   for freeing the returned data using CPLFree()
  */
-uint8_t*
-rt_raster_to_gdal(rt_raster raster, const char* srs, char* format, char** options, uint64_t* gdalsize)
+uint8_t *
+rt_raster_to_gdal(rt_raster raster, const char *srs, char *format, char **options, uint64_t *gdalsize)
 {
-	const char* cc;
-	const char* vio;
+	const char *cc;
+	const char *vio;
 
 	GDALDriverH src_drv = NULL;
 	int destroy_src_drv = 0;
@@ -1620,7 +1620,7 @@ rt_raster_to_gdal(rt_raster raster, const char* srs, char* format, char** option
 
 	GDALDriverH rtn_drv = NULL;
 	GDALDatasetH rtn_ds = NULL;
-	uint8_t* rtn = NULL;
+	uint8_t *rtn = NULL;
 
 	assert(NULL != raster);
 	assert(NULL != gdalsize);
@@ -1725,13 +1725,13 @@ rt_raster_to_gdal(rt_raster raster, const char* srs, char* format, char** option
  * @return set of "gdaldriver" values of available GDAL drivers
  */
 rt_gdaldriver
-rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
+rt_raster_gdal_drivers(uint32_t *drv_count, uint8_t can_write)
 {
-	const char* cc;
-	const char* vio;
-	const char* txt;
+	const char *cc;
+	const char *vio;
+	const char *txt;
 	int txt_len;
-	GDALDriverH* drv = NULL;
+	GDALDriverH *drv = NULL;
 	rt_gdaldriver rtn = NULL;
 	int count;
 	int i;
@@ -1757,7 +1757,7 @@ rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
 #ifdef GDAL_DCAP_RASTER
 		/* Starting with GDAL 2.0, vector drivers can also be returned */
 		/* Only keep raster drivers */
-		const char* is_raster;
+		const char *is_raster;
 		is_raster = GDALGetMetadataItem(drv, GDAL_DCAP_RASTER, NULL);
 		if (is_raster == NULL || !EQUAL(is_raster, "YES")) continue;
 #endif
@@ -1786,7 +1786,7 @@ rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
 		txt_len = strlen(txt);
 
 		txt_len = (txt_len + 1) * sizeof(char);
-		rtn[j].short_name = (char*)rtalloc(txt_len);
+		rtn[j].short_name = (char *)rtalloc(txt_len);
 		memcpy(rtn[j].short_name, txt, txt_len);
 
 		/* long name */
@@ -1794,7 +1794,7 @@ rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
 		txt_len = strlen(txt);
 
 		txt_len = (txt_len + 1) * sizeof(char);
-		rtn[j].long_name = (char*)rtalloc(txt_len);
+		rtn[j].long_name = (char *)rtalloc(txt_len);
 		memcpy(rtn[j].long_name, txt, txt_len);
 
 		/* creation options */
@@ -1802,7 +1802,7 @@ rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
 		txt_len = strlen(txt);
 
 		txt_len = (txt_len + 1) * sizeof(char);
-		rtn[j].create_options = (char*)rtalloc(txt_len);
+		rtn[j].create_options = (char *)rtalloc(txt_len);
 		memcpy(rtn[j].create_options, txt, txt_len);
 
 		j++;
@@ -1836,12 +1836,12 @@ rt_raster_gdal_drivers(uint32_t* drv_count, uint8_t can_write)
  */
 GDALDatasetH
 rt_raster_to_gdal_mem(rt_raster raster,
-		      const char* srs,
-		      uint32_t* bandNums,
-		      int* excludeNodataValues,
+		      const char *srs,
+		      uint32_t *bandNums,
+		      int *excludeNodataValues,
 		      int count,
-		      GDALDriverH* rtn_drv,
-		      int* destroy_rtn_drv)
+		      GDALDriverH *rtn_drv,
+		      int *destroy_rtn_drv)
 {
 	GDALDriverH drv = NULL;
 	GDALDatasetH ds = NULL;
@@ -1849,10 +1849,10 @@ rt_raster_to_gdal_mem(rt_raster raster,
 	CPLErr cplerr;
 	GDALDataType gdal_pt = GDT_Unknown;
 	GDALRasterBandH band;
-	void* pVoid;
-	char* pszDataPointer;
+	void *pVoid;
+	char *pszDataPointer;
 	char szGDALOption[50];
-	char* apszOptions[4];
+	char *apszOptions[4];
 	double nodata = 0.0;
 	int allocBandNums = 0;
 	int allocNodataValues = 0;
@@ -1914,7 +1914,7 @@ rt_raster_to_gdal_mem(rt_raster raster,
 	/* set spatial reference */
 	if (NULL != srs && strlen(srs))
 	{
-		char* _srs = rt_util_gdal_convert_sr(srs, 0);
+		char *_srs = rt_util_gdal_convert_sr(srs, 0);
 		if (_srs == NULL)
 		{
 			rterror("rt_raster_to_gdal_mem: Could not convert srs to GDAL accepted format");
@@ -1950,7 +1950,7 @@ rt_raster_to_gdal_mem(rt_raster raster,
 	else
 	{
 		count = numBands;
-		bandNums = (uint32_t*)rtalloc(sizeof(uint32_t) * count);
+		bandNums = (uint32_t *)rtalloc(sizeof(uint32_t) * count);
 		if (NULL == bandNums)
 		{
 			rterror("rt_raster_to_gdal_mem: Could not allocate memory for band indices");
@@ -1965,7 +1965,7 @@ rt_raster_to_gdal_mem(rt_raster raster,
 	/* process exclude_nodata_values */
 	if (NULL == excludeNodataValues)
 	{
-		excludeNodataValues = (int*)rtalloc(sizeof(int) * count);
+		excludeNodataValues = (int *)rtalloc(sizeof(int) * count);
 		if (NULL == excludeNodataValues)
 		{
 			rterror("rt_raster_to_gdal_mem: Could not allocate memory for NODATA flags");
@@ -2002,7 +2002,7 @@ rt_raster_to_gdal_mem(rt_raster raster,
 			pVoid = rt_band_get_data(rtband);
 			RASTER_DEBUGF(4, "Band data is at pos %p", pVoid);
 
-			pszDataPointer = (char*)rtalloc(20 * sizeof(char));
+			pszDataPointer = (char *)rtalloc(20 * sizeof(char));
 			sprintf(pszDataPointer, "%p", pVoid);
 			RASTER_DEBUGF(4, "rt_raster_to_gdal_mem: szDatapointer is %p", pszDataPointer);
 
@@ -2081,7 +2081,7 @@ rt_raster_to_gdal_mem(rt_raster raster,
 
 			int x, y, z;
 			uint32_t valueslen = 0;
-			int16_t* values = NULL;
+			int16_t *values = NULL;
 			double value = 0.;
 
 			/* this makes use of GDAL's "natural" blocks */
@@ -2235,8 +2235,8 @@ rt_raster_from_gdal_dataset(GDALDatasetH ds)
 	uint32_t height = 0;
 	uint32_t numBands = 0;
 	uint32_t i = 0;
-	char* authname = NULL;
-	char* authcode = NULL;
+	char *authname = NULL;
+	char *authcode = NULL;
 
 	GDALRasterBandH gdband = NULL;
 	GDALDataType gdpixtype = GDT_Unknown;
@@ -2256,9 +2256,9 @@ rt_raster_from_gdal_dataset(GDALDatasetH ds)
 	uint32_t nXValid, nYValid;
 	uint32_t iY;
 
-	uint8_t* values = NULL;
+	uint8_t *values = NULL;
 	uint32_t valueslen = 0;
-	uint8_t* ptr = NULL;
+	uint8_t *ptr = NULL;
 
 	assert(NULL != ds);
 
@@ -2467,7 +2467,7 @@ rt_raster_from_gdal_dataset(GDALDatasetH ds)
  * rt_raster_gdal_rasterize()
  ******************************************************************************/
 
-typedef struct _rti_rasterize_arg_t* _rti_rasterize_arg;
+typedef struct _rti_rasterize_arg_t *_rti_rasterize_arg;
 struct _rti_rasterize_arg_t
 {
 	uint8_t noband;
@@ -2476,12 +2476,12 @@ struct _rti_rasterize_arg_t
 
 	OGRSpatialReferenceH src_sr;
 
-	rt_pixtype* pixtype;
-	double* init;
-	double* nodata;
-	uint8_t* hasnodata;
-	double* value;
-	int* bandlist;
+	rt_pixtype *pixtype;
+	double *init;
+	double *nodata;
+	uint8_t *hasnodata;
+	double *value;
+	int *bandlist;
 };
 
 static _rti_rasterize_arg
@@ -2558,26 +2558,26 @@ _rti_rasterize_arg_destroy(_rti_rasterize_arg arg)
  * @return the raster of the provided geometry or NULL
  */
 rt_raster
-rt_raster_gdal_rasterize(const unsigned char* wkb,
+rt_raster_gdal_rasterize(const unsigned char *wkb,
 			 uint32_t wkb_len,
-			 const char* srs,
+			 const char *srs,
 			 uint32_t num_bands,
-			 rt_pixtype* pixtype,
-			 double* init,
-			 double* value,
-			 double* nodata,
-			 uint8_t* hasnodata,
-			 int* width,
-			 int* height,
-			 double* scale_x,
-			 double* scale_y,
-			 double* ul_xw,
-			 double* ul_yw,
-			 double* grid_xw,
-			 double* grid_yw,
-			 double* skew_x,
-			 double* skew_y,
-			 char** options)
+			 rt_pixtype *pixtype,
+			 double *init,
+			 double *value,
+			 double *nodata,
+			 uint8_t *hasnodata,
+			 int *width,
+			 int *height,
+			 double *scale_x,
+			 double *scale_y,
+			 double *ul_xw,
+			 double *ul_yw,
+			 double *grid_xw,
+			 double *grid_yw,
+			 double *skew_x,
+			 double *skew_y,
+			 char **options)
 {
 	rt_raster rast = NULL;
 	uint32_t i = 0;
@@ -2626,19 +2626,19 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 		arg->noband = 1;
 		arg->numbands = 1;
 
-		arg->pixtype = (rt_pixtype*)rtalloc(sizeof(rt_pixtype));
+		arg->pixtype = (rt_pixtype *)rtalloc(sizeof(rt_pixtype));
 		arg->pixtype[0] = PT_8BUI;
 
-		arg->init = (double*)rtalloc(sizeof(double));
+		arg->init = (double *)rtalloc(sizeof(double));
 		arg->init[0] = 0;
 
-		arg->nodata = (double*)rtalloc(sizeof(double));
+		arg->nodata = (double *)rtalloc(sizeof(double));
 		arg->nodata[0] = 0;
 
-		arg->hasnodata = (uint8_t*)rtalloc(sizeof(uint8_t));
+		arg->hasnodata = (uint8_t *)rtalloc(sizeof(uint8_t));
 		arg->hasnodata[0] = 1;
 
-		arg->value = (double*)rtalloc(sizeof(double));
+		arg->value = (double *)rtalloc(sizeof(double));
 		arg->value[0] = 1;
 	}
 	else
@@ -2669,7 +2669,7 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 	}
 
 	/* convert WKB to OGR Geometry */
-	ogrerr = OGR_G_CreateFromWkb((unsigned char*)wkb, arg->src_sr, &src_geom, wkb_len);
+	ogrerr = OGR_G_CreateFromWkb((unsigned char *)wkb, arg->src_sr, &src_geom, wkb_len);
 	if (ogrerr != OGRERR_NONE)
 	{
 		rterror("rt_raster_gdal_rasterize: Could not create OGR Geometry from WKB");
@@ -2770,10 +2770,10 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 	    _dim[0] == 0 && _dim[1] == 0)
 	{
 		int result;
-		LWPOLY* epoly = NULL;
-		LWGEOM* lwgeom = NULL;
-		GEOSGeometry* egeom = NULL;
-		GEOSGeometry* geom = NULL;
+		LWPOLY *epoly = NULL;
+		LWGEOM *lwgeom = NULL;
+		GEOSGeometry *egeom = NULL;
+		GEOSGeometry *geom = NULL;
 
 		RASTER_DEBUG(3, "Testing geometry is properly contained by extent");
 
@@ -2801,13 +2801,13 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 			return NULL;
 		}
 
-		egeom = (GEOSGeometry*)LWGEOM2GEOS(lwpoly_as_lwgeom(epoly), 0);
+		egeom = (GEOSGeometry *)LWGEOM2GEOS(lwpoly_as_lwgeom(epoly), 0);
 		lwpoly_free(epoly);
 
 		/* convert WKB to geometry */
 		RASTER_DEBUG(4, "Converting WKB to geometry");
 		lwgeom = lwgeom_from_wkb(wkb, wkb_len, LW_PARSER_CHECK_NONE);
-		geom = (GEOSGeometry*)LWGEOM2GEOS(lwgeom, 0);
+		geom = (GEOSGeometry *)LWGEOM2GEOS(lwgeom, 0);
 		lwgeom_free(lwgeom);
 
 		result = GEOSRelatePattern(egeom, geom, "T**FF*FF*");
@@ -3234,7 +3234,7 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 	/* set SRS */
 	if (NULL != arg->src_sr)
 	{
-		char* _srs = NULL;
+		char *_srs = NULL;
 		OSRExportToWkt(arg->src_sr, &_srs);
 
 		cplerr = GDALSetProjection(_ds, _srs);
@@ -3317,7 +3317,7 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 		}
 	}
 
-	arg->bandlist = (int*)rtalloc(sizeof(int) * arg->numbands);
+	arg->bandlist = (int *)rtalloc(sizeof(int) * arg->numbands);
 	for (i = 0; i < arg->numbands; i++)
 		arg->bandlist[i] = i + 1;
 
@@ -3362,7 +3362,7 @@ rt_raster_gdal_rasterize(const unsigned char* wkb,
 	/* check each band for pixtype */
 	for (i = 0; i < arg->numbands; i++)
 	{
-		uint8_t* data = NULL;
+		uint8_t *data = NULL;
 		rt_band band = NULL;
 		rt_band oldband = NULL;
 
@@ -3487,8 +3487,8 @@ rt_errorstate
 rt_raster_from_two_rasters(rt_raster rast1,
 			   rt_raster rast2,
 			   rt_extenttype extenttype,
-			   rt_raster* rtnraster,
-			   double* offset)
+			   rt_raster *rtnraster,
+			   double *offset)
 {
 	int i;
 

@@ -48,26 +48,26 @@ typedef hash_t HHash;
 
 typedef struct address_struct
 {
-	char* num;
-	char* street;
-	char* street2;
-	char* address1;
-	char* city;
-	char* st;
-	char* zip;
-	char* zipplus;
-	char* cc;
+	char *num;
+	char *street;
+	char *street2;
+	char *address1;
+	char *city;
+	char *st;
+	char *zip;
+	char *zipplus;
+	char *cc;
 	double lat;
 	double lon;
 } ADDRESS;
 
-int clean_trailing_punct(char* s);
-void strtoupper(char* s);
-int match(char* pattern, char* s, int* ovect, int options);
-ADDRESS* parseaddress(HHash* stH, char* s, int* err);
-int load_state_hash(HHash* stH);
-void free_state_hash(HHash* stH);
-void free_address(ADDRESS* a);
+int clean_trailing_punct(char *s);
+void strtoupper(char *s);
+int match(char *pattern, char *s, int *ovect, int options);
+ADDRESS *parseaddress(HHash *stH, char *s, int *err);
+int load_state_hash(HHash *stH);
+void free_state_hash(HHash *stH);
+void free_address(ADDRESS *a);
 
 /*
  *  ERRORS

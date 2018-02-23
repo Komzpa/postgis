@@ -38,7 +38,7 @@
  * rt_raster_gdal_warp()
  ******************************************************************************/
 
-typedef struct _rti_warp_arg_t* _rti_warp_arg;
+typedef struct _rti_warp_arg_t *_rti_warp_arg;
 struct _rti_warp_arg_t
 {
 
@@ -46,25 +46,25 @@ struct _rti_warp_arg_t
 	{
 		GDALDriverH drv;
 		GDALDatasetH ds;
-		char* srs;
+		char *srs;
 		int destroy_drv;
 	} src, dst;
 
-	GDALWarpOptions* wopts;
+	GDALWarpOptions *wopts;
 
 	struct
 	{
 		struct
 		{
-			char** item;
+			char **item;
 			int len;
 		} option;
 
 		struct
 		{
-			void* transform;
-			void* imgproj;
-			void* approx;
+			void *transform;
+			void *imgproj;
+			void *approx;
 		} arg;
 
 		GDALTransformerFunc func;
@@ -182,23 +182,23 @@ _rti_warp_arg_destroy(_rti_warp_arg arg)
  */
 rt_raster
 rt_raster_gdal_warp(rt_raster raster,
-		    const char* src_srs,
-		    const char* dst_srs,
-		    double* scale_x,
-		    double* scale_y,
-		    int* width,
-		    int* height,
-		    double* ul_xw,
-		    double* ul_yw,
-		    double* grid_xw,
-		    double* grid_yw,
-		    double* skew_x,
-		    double* skew_y,
+		    const char *src_srs,
+		    const char *dst_srs,
+		    double *scale_x,
+		    double *scale_y,
+		    int *width,
+		    int *height,
+		    double *ul_xw,
+		    double *ul_yw,
+		    double *grid_xw,
+		    double *grid_yw,
+		    double *skew_x,
+		    double *skew_y,
 		    GDALResampleAlg resample_alg,
 		    double max_err)
 {
 	CPLErr cplerr;
-	char* dst_options[] = {"SUBCLASS=VRTWarpedDataset", NULL};
+	char *dst_options[] = {"SUBCLASS=VRTWarpedDataset", NULL};
 	_rti_warp_arg arg = NULL;
 
 	int hasnodata = 0;
@@ -338,22 +338,22 @@ rt_raster_gdal_warp(rt_raster raster,
 	if (arg->src.srs != NULL || arg->dst.srs != NULL)
 	{
 		arg->transform.option.len = 2;
-		arg->transform.option.item = rtalloc(sizeof(char*) * (arg->transform.option.len + 1));
+		arg->transform.option.item = rtalloc(sizeof(char *) * (arg->transform.option.len + 1));
 		if (NULL == arg->transform.option.item)
 		{
 			rterror("rt_raster_gdal_warp: Could not allocation memory for transform options");
 			_rti_warp_arg_destroy(arg);
 			return NULL;
 		}
-		memset(arg->transform.option.item, 0, sizeof(char*) * (arg->transform.option.len + 1));
+		memset(arg->transform.option.item, 0, sizeof(char *) * (arg->transform.option.len + 1));
 
 		for (i = 0; i < arg->transform.option.len; i++)
 		{
-			const char* srs = i ? arg->dst.srs : arg->src.srs;
-			const char* lbl = i ? "DST_SRS=" : "SRC_SRS=";
+			const char *srs = i ? arg->dst.srs : arg->src.srs;
+			const char *lbl = i ? "DST_SRS=" : "SRC_SRS=";
 			size_t sz = sizeof(char) * (strlen(lbl) + 1);
 			if (srs) sz += strlen(srs);
-			arg->transform.option.item[i] = (char*)rtalloc(sz);
+			arg->transform.option.item[i] = (char *)rtalloc(sz);
 			if (NULL == arg->transform.option.item[i])
 			{
 				rterror("rt_raster_gdal_warp: Could not allocation memory for transform options");
@@ -865,15 +865,15 @@ rt_raster_gdal_warp(rt_raster raster,
 	arg->wopts->hDstDS = arg->dst.ds;
 	arg->wopts->pfnTransformer = arg->transform.func;
 	arg->wopts->pTransformerArg = arg->transform.arg.transform;
-	arg->wopts->papszWarpOptions = (char**)CPLMalloc(sizeof(char*) * 2);
-	arg->wopts->papszWarpOptions[0] = (char*)CPLMalloc(sizeof(char) * (strlen("INIT_DEST=NO_DATA") + 1));
+	arg->wopts->papszWarpOptions = (char **)CPLMalloc(sizeof(char *) * 2);
+	arg->wopts->papszWarpOptions[0] = (char *)CPLMalloc(sizeof(char) * (strlen("INIT_DEST=NO_DATA") + 1));
 	strcpy(arg->wopts->papszWarpOptions[0], "INIT_DEST=NO_DATA");
 	arg->wopts->papszWarpOptions[1] = NULL;
 
 	/* set band mapping */
 	arg->wopts->nBandCount = numBands;
-	arg->wopts->panSrcBands = (int*)CPLMalloc(sizeof(int) * arg->wopts->nBandCount);
-	arg->wopts->panDstBands = (int*)CPLMalloc(sizeof(int) * arg->wopts->nBandCount);
+	arg->wopts->panSrcBands = (int *)CPLMalloc(sizeof(int) * arg->wopts->nBandCount);
+	arg->wopts->panDstBands = (int *)CPLMalloc(sizeof(int) * arg->wopts->nBandCount);
 	for (i = 0; i < arg->wopts->nBandCount; i++)
 		arg->wopts->panDstBands[i] = arg->wopts->panSrcBands[i] = i + 1;
 
@@ -881,10 +881,10 @@ rt_raster_gdal_warp(rt_raster raster,
 	if (hasnodata)
 	{
 		RASTER_DEBUG(3, "Setting nodata mapping");
-		arg->wopts->padfSrcNoDataReal = (double*)CPLMalloc(numBands * sizeof(double));
-		arg->wopts->padfDstNoDataReal = (double*)CPLMalloc(numBands * sizeof(double));
-		arg->wopts->padfSrcNoDataImag = (double*)CPLMalloc(numBands * sizeof(double));
-		arg->wopts->padfDstNoDataImag = (double*)CPLMalloc(numBands * sizeof(double));
+		arg->wopts->padfSrcNoDataReal = (double *)CPLMalloc(numBands * sizeof(double));
+		arg->wopts->padfDstNoDataReal = (double *)CPLMalloc(numBands * sizeof(double));
+		arg->wopts->padfSrcNoDataImag = (double *)CPLMalloc(numBands * sizeof(double));
+		arg->wopts->padfDstNoDataImag = (double *)CPLMalloc(numBands * sizeof(double));
 		if (NULL == arg->wopts->padfSrcNoDataReal || NULL == arg->wopts->padfDstNoDataReal ||
 		    NULL == arg->wopts->padfSrcNoDataImag || NULL == arg->wopts->padfDstNoDataImag)
 		{

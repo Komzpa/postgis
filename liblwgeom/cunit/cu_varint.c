@@ -30,10 +30,10 @@
 //
 
 static void
-do_test_u32_varint(uint32_t nr, int expected_size, char* expected_res)
+do_test_u32_varint(uint32_t nr, int expected_size, char *expected_res)
 {
 	int size;
-	char* hex;
+	char *hex;
 	uint8_t buf[16];
 
 	size = varint_u32_encode_buf(nr, buf);
@@ -47,11 +47,11 @@ do_test_u32_varint(uint32_t nr, int expected_size, char* expected_res)
 }
 
 static void
-do_test_s32_varint(int32_t nr, int expected_size, char* expected_res)
+do_test_s32_varint(int32_t nr, int expected_size, char *expected_res)
 {
 	uint8_t buf[16];
 	int size;
-	char* hex;
+	char *hex;
 
 	size = varint_s32_encode_buf(nr, buf);
 	if (size != expected_size) { printf("Expected: %d\nObtained: %d\n", expected_size, size); }
@@ -63,11 +63,11 @@ do_test_s32_varint(int32_t nr, int expected_size, char* expected_res)
 }
 
 static void
-do_test_u64_varint(uint64_t nr, int expected_size, char* expected_res)
+do_test_u64_varint(uint64_t nr, int expected_size, char *expected_res)
 {
 	uint8_t buf[16];
 	int size;
-	char* hex;
+	char *hex;
 
 	size = varint_u64_encode_buf(nr, buf);
 	if (size != expected_size) { printf("Expected: %d\nObtained: %d\n", expected_size, size); }
@@ -79,11 +79,11 @@ do_test_u64_varint(uint64_t nr, int expected_size, char* expected_res)
 }
 
 static void
-do_test_s64_varint(int64_t nr, int expected_size, char* expected_res)
+do_test_s64_varint(int64_t nr, int expected_size, char *expected_res)
 {
 	uint8_t buf[16];
 	int size;
-	char* hex;
+	char *hex;
 
 	size = varint_s64_encode_buf(nr, buf);
 	if (size != expected_size) { printf("Expected: %d\nObtained: %d\n", expected_size, size); }

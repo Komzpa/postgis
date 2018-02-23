@@ -19,11 +19,11 @@
 #include "styles.h"
 
 void
-getStyles(LAYERSTYLE** headRef)
+getStyles(LAYERSTYLE **headRef)
 {
 	char line[128];
-	FILE* pFile;
-	char* getResults;
+	FILE *pFile;
+	char *getResults;
 
 	*headRef = NULL;
 
@@ -40,19 +40,19 @@ getStyles(LAYERSTYLE** headRef)
 		// process defined styles
 		while ((getResults != NULL) && strncmp(line, "[Style]", 7) == 0)
 		{
-			char* styleName = "DefaultStyle";
+			char *styleName = "DefaultStyle";
 			int pointSize = 5;
-			char* pointColor = "Grey";
+			char *pointColor = "Grey";
 			int lineWidth = 5;
-			char* lineColor = "Grey";
-			char* polygonFillColor = "Grey";
-			char* polygonStrokeColor = "Grey";
+			char *lineColor = "Grey";
+			char *polygonFillColor = "Grey";
+			char *polygonStrokeColor = "Grey";
 			int polygonStrokeWidth = 0;
 
 			getResults = fgets(line, sizeof line, pFile);
 			while ((getResults != NULL) && (strncmp(line, "[Style]", 7) != 0))
 			{
-				char* ptr;
+				char *ptr;
 
 				// loop over all lines until [Style] is reached again
 				if ((*line != '#') && (ptr = strchr(line, '=')))
@@ -106,10 +106,10 @@ getStyles(LAYERSTYLE** headRef)
 }
 
 void
-freeStyles(LAYERSTYLE** headRef)
+freeStyles(LAYERSTYLE **headRef)
 {
-	LAYERSTYLE* curr = *headRef;
-	LAYERSTYLE* next;
+	LAYERSTYLE *curr = *headRef;
+	LAYERSTYLE *next;
 
 	while (curr != NULL)
 	{
@@ -127,17 +127,17 @@ freeStyles(LAYERSTYLE** headRef)
 }
 
 void
-addStyle(LAYERSTYLE** headRef,
-	 char* styleName,
+addStyle(LAYERSTYLE **headRef,
+	 char *styleName,
 	 int pointSize,
-	 char* pointColor,
+	 char *pointColor,
 	 int lineWidth,
-	 char* lineColor,
-	 char* polygonFillColor,
-	 char* polygonStrokeColor,
+	 char *lineColor,
+	 char *polygonFillColor,
+	 char *polygonStrokeColor,
 	 int polygonStrokeWidth)
 {
-	LAYERSTYLE* style = malloc(sizeof(LAYERSTYLE));
+	LAYERSTYLE *style = malloc(sizeof(LAYERSTYLE));
 
 	style->styleName = styleName;
 	style->pointSize = pointSize;
@@ -152,10 +152,10 @@ addStyle(LAYERSTYLE** headRef,
 }
 
 int
-length(LAYERSTYLE* head)
+length(LAYERSTYLE *head)
 {
 	int count = 0;
-	LAYERSTYLE* curr = head;
+	LAYERSTYLE *curr = head;
 
 	while (curr != NULL)
 	{
@@ -166,10 +166,10 @@ length(LAYERSTYLE* head)
 	return (count);
 }
 
-LAYERSTYLE*
-getStyle(LAYERSTYLE* headRef, char* styleName)
+LAYERSTYLE *
+getStyle(LAYERSTYLE *headRef, char *styleName)
 {
-	LAYERSTYLE* curr = headRef;
+	LAYERSTYLE *curr = headRef;
 
 	while (curr != NULL && (strcmp(curr->styleName, styleName) != 0))
 		curr = curr->next;
@@ -177,13 +177,13 @@ getStyle(LAYERSTYLE* headRef, char* styleName)
 	return (curr);
 }
 
-char*
-trim(char* str)
+char *
+trim(char *str)
 {
 	int len;
-	char* result;
-	char* start = str;
-	char* end = strchr(start, '\0');
+	char *result;
+	char *start = str;
+	char *end = strchr(start, '\0');
 	while (start < end && isspace(*start))
 		start++;
 	while (start < end && isspace(*(end - 1)))

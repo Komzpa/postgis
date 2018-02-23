@@ -21,8 +21,8 @@
 static void
 test_stringbuffer_append(void)
 {
-	stringbuffer_t* sb;
-	const char* str;
+	stringbuffer_t *sb;
+	const char *str;
 
 	sb = stringbuffer_create_with_size(2);
 	stringbuffer_append(sb, "hello world");
@@ -36,8 +36,8 @@ test_stringbuffer_append(void)
 static void
 test_stringbuffer_aprintf(void)
 {
-	stringbuffer_t* sb;
-	const char* str;
+	stringbuffer_t *sb;
+	const char *str;
 
 	sb = stringbuffer_create_with_size(2);
 	stringbuffer_aprintf(sb, "hello %dth world", 14);

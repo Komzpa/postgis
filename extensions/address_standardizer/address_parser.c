@@ -25,10 +25,10 @@
 
 Datum parse_address(PG_FUNCTION_ARGS);
 
-static char*
-text2char(text* in)
+static char *
+text2char(text *in)
 {
-	char* out = palloc(VARSIZE(in));
+	char *out = palloc(VARSIZE(in));
 	memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
 	out[VARSIZE(in) - VARHDRSZ] = '\0';
 	return out;
@@ -39,12 +39,12 @@ PG_FUNCTION_INFO_V1(parse_address);
 Datum parse_address(PG_FUNCTION_ARGS)
 {
 	TupleDesc tupdesc;
-	AttInMetadata* attinmeta;
+	AttInMetadata *attinmeta;
 	Datum result;
-	ADDRESS* paddr;
-	HHash* stH;
-	char* str;
-	char** values;
+	ADDRESS *paddr;
+	HHash *stH;
+	char *str;
+	char **values;
 	int err;
 	HeapTuple tuple;
 
@@ -66,7 +66,7 @@ Datum parse_address(PG_FUNCTION_ARGS)
 
 	DBG("Got tupdesc, allocating HHash");
 
-	stH = (HHash*)palloc0(sizeof(HHash));
+	stH = (HHash *)palloc0(sizeof(HHash));
 	if (!stH)
 	{
 		elog(ERROR, "parse_address: Failed to allocate memory for hash!");
@@ -96,7 +96,7 @@ Datum parse_address(PG_FUNCTION_ARGS)
 	}
 
 	DBG("setup values array for natts=%d", tupdesc->natts);
-	values = (char**)palloc(9 * sizeof(char*));
+	values = (char **)palloc(9 * sizeof(char *));
 	if (!values)
 	{
 		elog(ERROR, "parse_address: out of memory!");

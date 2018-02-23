@@ -14,12 +14,12 @@
 #include "../liblwgeom_internal.h"
 
 static void
-mbc_test(LWGEOM* g)
+mbc_test(LWGEOM *g)
 {
-	LWBOUNDINGCIRCLE* result = lwgeom_calculate_mbc(g);
+	LWBOUNDINGCIRCLE *result = lwgeom_calculate_mbc(g);
 	CU_ASSERT_TRUE(result != NULL);
 
-	LWPOINTITERATOR* it = lwpointiterator_create(g);
+	LWPOINTITERATOR *it = lwpointiterator_create(g);
 
 	POINT2D p;
 	POINT4D p4;
@@ -45,7 +45,7 @@ basic_test(void)
 {
 	uint32_t i;
 
-	char* inputs[] = {"POLYGON((26426 65078,26531 65242,26075 65136,26096 65427,26426 65078))",
+	char *inputs[] = {"POLYGON((26426 65078,26531 65242,26075 65136,26096 65427,26426 65078))",
 			  "POINT (17 253)",
 			  "TRIANGLE ((0 0, 10 0, 10 10, 0 0))",
 			  "LINESTRING (17 253, -44 28, 33 11, 26 44)",
@@ -53,9 +53,9 @@ basic_test(void)
 			  "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			  "LINESTRING (-48546889 37039202, -37039202 -48546889)"};
 
-	for (i = 0; i < sizeof(inputs) / sizeof(LWGEOM*); i++)
+	for (i = 0; i < sizeof(inputs) / sizeof(LWGEOM *); i++)
 	{
-		LWGEOM* input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
+		LWGEOM *input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
 		mbc_test(input);
 		lwgeom_free(input);
 	}
@@ -64,9 +64,9 @@ basic_test(void)
 static void
 test_empty(void)
 {
-	LWGEOM* input = lwgeom_from_wkt("POINT EMPTY", LW_PARSER_CHECK_NONE);
+	LWGEOM *input = lwgeom_from_wkt("POINT EMPTY", LW_PARSER_CHECK_NONE);
 
-	LWBOUNDINGCIRCLE* result = lwgeom_calculate_mbc(input);
+	LWBOUNDINGCIRCLE *result = lwgeom_calculate_mbc(input);
 	CU_ASSERT_TRUE(result == NULL);
 
 	lwgeom_free(input);

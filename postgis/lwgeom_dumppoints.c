@@ -47,7 +47,7 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS);
 
 struct dumpnode
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 	uint32_t idx; /* which member geom we're working on */
 };
 
@@ -57,7 +57,7 @@ struct dumpnode
 #define MAXDEPTH 32
 struct dumpstate
 {
-	LWGEOM* root;
+	LWGEOM *root;
 	int stacklen; /* collections/geoms on stack */
 	int pathlen;  /* polygon rings and such need extra path info */
 	struct dumpnode stack[MAXDEPTH];
@@ -75,14 +75,14 @@ struct dumpstate
 PG_FUNCTION_INFO_V1(LWGEOM_dumppoints);
 Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	MemoryContext oldcontext, newcontext;
 
-	GSERIALIZED* pglwgeom;
-	LWCOLLECTION* lwcoll;
-	LWGEOM* lwgeom;
-	struct dumpstate* state;
-	struct dumpnode* node;
+	GSERIALIZED *pglwgeom;
+	LWCOLLECTION *lwcoll;
+	LWGEOM *lwgeom;
+	struct dumpstate *state;
+	struct dumpnode *node;
 
 	HeapTuple tuple;
 	Datum pathpt[2];         /* used to construct the composite return value */
@@ -163,11 +163,11 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 			/* TODO use a union?  would save a tiny amount of stack space.
 			 * probably not worth the bother
 			 */
-			LWLINE* line;
-			LWCIRCSTRING* circ;
-			LWPOLY* poly;
-			LWTRIANGLE* tri;
-			LWPOINT* lwpoint = NULL;
+			LWLINE *line;
+			LWCIRCSTRING *circ;
+			LWPOLY *poly;
+			LWTRIANGLE *tri;
+			LWPOINT *lwpoint = NULL;
 			POINT4D pt;
 
 			/*
@@ -230,12 +230,12 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 			case LINETYPE:
 				line = lwgeom_as_lwline(lwgeom);
 				if (line->points && state->pt <= line->points->npoints)
-				{ lwpoint = lwline_get_lwpoint((LWLINE*)lwgeom, state->pt); }
+				{ lwpoint = lwline_get_lwpoint((LWLINE *)lwgeom, state->pt); }
 				break;
 			case CIRCSTRINGTYPE:
 				circ = lwgeom_as_lwcircstring(lwgeom);
 				if (circ->points && state->pt <= circ->points->npoints)
-				{ lwpoint = lwcircstring_get_lwpoint((LWCIRCSTRING*)lwgeom, state->pt); }
+				{ lwpoint = lwcircstring_get_lwpoint((LWCIRCSTRING *)lwgeom, state->pt); }
 				break;
 			default:
 				ereport(ERROR,
@@ -272,7 +272,7 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 									    state->byval,
 									    state->align));
 
-				pathpt[1] = PointerGetDatum(gserialized_from_lwgeom((LWGEOM*)lwpoint, 0));
+				pathpt[1] = PointerGetDatum(gserialized_from_lwgeom((LWGEOM *)lwpoint, 0));
 
 				tuple = heap_form_tuple(funcctx->tuple_desc, pathpt, isnull);
 				result = HeapTupleGetDatum(tuple);
@@ -280,7 +280,7 @@ Datum LWGEOM_dumppoints(PG_FUNCTION_ARGS)
 			}
 		}
 
-		lwcoll = (LWCOLLECTION*)node->geom;
+		lwcoll = (LWCOLLECTION *)node->geom;
 
 		/* if a collection and we have more geoms */
 		if (node->idx < lwcoll->ngeoms)

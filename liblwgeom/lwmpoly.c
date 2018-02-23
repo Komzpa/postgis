@@ -29,26 +29,26 @@
 #include "lwgeom_log.h"
 
 void
-lwmpoly_release(LWMPOLY* lwmpoly)
+lwmpoly_release(LWMPOLY *lwmpoly)
 {
 	lwgeom_release(lwmpoly_as_lwgeom(lwmpoly));
 }
 
-LWMPOLY*
+LWMPOLY *
 lwmpoly_construct_empty(int srid, char hasz, char hasm)
 {
-	LWMPOLY* ret = (LWMPOLY*)lwcollection_construct_empty(MULTIPOLYGONTYPE, srid, hasz, hasm);
+	LWMPOLY *ret = (LWMPOLY *)lwcollection_construct_empty(MULTIPOLYGONTYPE, srid, hasz, hasm);
 	return ret;
 }
 
-LWMPOLY*
-lwmpoly_add_lwpoly(LWMPOLY* mobj, const LWPOLY* obj)
+LWMPOLY *
+lwmpoly_add_lwpoly(LWMPOLY *mobj, const LWPOLY *obj)
 {
-	return (LWMPOLY*)lwcollection_add_lwgeom((LWCOLLECTION*)mobj, (LWGEOM*)obj);
+	return (LWMPOLY *)lwcollection_add_lwgeom((LWCOLLECTION *)mobj, (LWGEOM *)obj);
 }
 
 void
-lwmpoly_free(LWMPOLY* mpoly)
+lwmpoly_free(LWMPOLY *mpoly)
 {
 	uint32_t i;
 	if (!mpoly) return;

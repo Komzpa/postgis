@@ -36,34 +36,34 @@
 #endif
 #endif
 
-GBOX*
+GBOX *
 gbox_new(uint8_t flags)
 {
-	GBOX* g = (GBOX*)lwalloc(sizeof(GBOX));
+	GBOX *g = (GBOX *)lwalloc(sizeof(GBOX));
 	gbox_init(g);
 	g->flags = flags;
 	return g;
 }
 
 void
-gbox_init(GBOX* gbox)
+gbox_init(GBOX *gbox)
 {
 	memset(gbox, 0, sizeof(GBOX));
 }
 
-GBOX*
-gbox_clone(const GBOX* gbox)
+GBOX *
+gbox_clone(const GBOX *gbox)
 {
-	GBOX* g = lwalloc(sizeof(GBOX));
+	GBOX *g = lwalloc(sizeof(GBOX));
 	memcpy(g, gbox, sizeof(GBOX));
 	return g;
 }
 
 /* TODO to be removed */
-BOX3D*
-box3d_from_gbox(const GBOX* gbox)
+BOX3D *
+box3d_from_gbox(const GBOX *gbox)
 {
-	BOX3D* b;
+	BOX3D *b;
 	assert(gbox);
 
 	b = lwalloc(sizeof(BOX3D));
@@ -88,10 +88,10 @@ box3d_from_gbox(const GBOX* gbox)
 }
 
 /* TODO to be removed */
-GBOX*
-box3d_to_gbox(const BOX3D* b3d)
+GBOX *
+box3d_to_gbox(const BOX3D *b3d)
 {
-	GBOX* b;
+	GBOX *b;
 	assert(b3d);
 
 	b = lwalloc(sizeof(GBOX));
@@ -107,7 +107,7 @@ box3d_to_gbox(const BOX3D* b3d)
 }
 
 void
-gbox_expand(GBOX* g, double d)
+gbox_expand(GBOX *g, double d)
 {
 	g->xmin -= d;
 	g->xmax += d;
@@ -126,7 +126,7 @@ gbox_expand(GBOX* g, double d)
 }
 
 void
-gbox_expand_xyzm(GBOX* g, double dx, double dy, double dz, double dm)
+gbox_expand_xyzm(GBOX *g, double dx, double dy, double dz, double dm)
 {
 	g->xmin -= dx;
 	g->xmax += dx;
@@ -147,7 +147,7 @@ gbox_expand_xyzm(GBOX* g, double dx, double dy, double dz, double dm)
 }
 
 int
-gbox_union(const GBOX* g1, const GBOX* g2, GBOX* gout)
+gbox_union(const GBOX *g1, const GBOX *g2, GBOX *gout)
 {
 	if ((!g1) && (!g2))
 		return LW_FALSE;
@@ -177,7 +177,7 @@ gbox_union(const GBOX* g1, const GBOX* g2, GBOX* gout)
 }
 
 int
-gbox_same(const GBOX* g1, const GBOX* g2)
+gbox_same(const GBOX *g1, const GBOX *g2)
 {
 	if (FLAGS_GET_ZM(g1->flags) != FLAGS_GET_ZM(g2->flags)) return LW_FALSE;
 
@@ -190,7 +190,7 @@ gbox_same(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_same_2d(const GBOX* g1, const GBOX* g2)
+gbox_same_2d(const GBOX *g1, const GBOX *g2)
 {
 	if (g1->xmin == g2->xmin && g1->ymin == g2->ymin && g1->xmax == g2->xmax && g1->ymax == g2->ymax)
 		return LW_TRUE;
@@ -198,7 +198,7 @@ gbox_same_2d(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_same_2d_float(const GBOX* g1, const GBOX* g2)
+gbox_same_2d_float(const GBOX *g1, const GBOX *g2)
 {
 	if ((g1->xmax == g2->xmax || next_float_up(g1->xmax) == next_float_up(g2->xmax)) &&
 	    (g1->ymax == g2->ymax || next_float_up(g1->ymax) == next_float_up(g2->ymax)) &&
@@ -209,7 +209,7 @@ gbox_same_2d_float(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_is_valid(const GBOX* gbox)
+gbox_is_valid(const GBOX *gbox)
 {
 	/* X */
 	if (!isfinite(gbox->xmin) || isnan(gbox->xmin) || !isfinite(gbox->xmax) || isnan(gbox->xmax)) return LW_FALSE;
@@ -235,7 +235,7 @@ gbox_is_valid(const GBOX* gbox)
 }
 
 int
-gbox_merge_point3d(const POINT3D* p, GBOX* gbox)
+gbox_merge_point3d(const POINT3D *p, GBOX *gbox)
 {
 	if (gbox->xmin > p->x) gbox->xmin = p->x;
 	if (gbox->ymin > p->y) gbox->ymin = p->y;
@@ -247,7 +247,7 @@ gbox_merge_point3d(const POINT3D* p, GBOX* gbox)
 }
 
 int
-gbox_init_point3d(const POINT3D* p, GBOX* gbox)
+gbox_init_point3d(const POINT3D *p, GBOX *gbox)
 {
 	gbox->xmin = gbox->xmax = p->x;
 	gbox->ymin = gbox->ymax = p->y;
@@ -256,7 +256,7 @@ gbox_init_point3d(const POINT3D* p, GBOX* gbox)
 }
 
 int
-gbox_contains_point3d(const GBOX* gbox, const POINT3D* pt)
+gbox_contains_point3d(const GBOX *gbox, const POINT3D *pt)
 {
 	if (gbox->xmin > pt->x || gbox->ymin > pt->y || gbox->zmin > pt->z || gbox->xmax < pt->x ||
 	    gbox->ymax < pt->y || gbox->zmax < pt->z)
@@ -265,7 +265,7 @@ gbox_contains_point3d(const GBOX* gbox, const POINT3D* pt)
 }
 
 int
-gbox_merge(const GBOX* new_box, GBOX* merge_box)
+gbox_merge(const GBOX *new_box, GBOX *merge_box)
 {
 	assert(merge_box);
 
@@ -291,7 +291,7 @@ gbox_merge(const GBOX* new_box, GBOX* merge_box)
 }
 
 int
-gbox_overlaps(const GBOX* g1, const GBOX* g2)
+gbox_overlaps(const GBOX *g1, const GBOX *g2)
 {
 
 	/* Make sure our boxes are consistent */
@@ -327,7 +327,7 @@ gbox_overlaps(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_overlaps_2d(const GBOX* g1, const GBOX* g2)
+gbox_overlaps_2d(const GBOX *g1, const GBOX *g2)
 {
 
 	/* Make sure our boxes are consistent */
@@ -341,7 +341,7 @@ gbox_overlaps_2d(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_contains_2d(const GBOX* g1, const GBOX* g2)
+gbox_contains_2d(const GBOX *g1, const GBOX *g2)
 {
 	if ((g2->xmin < g1->xmin) || (g2->xmax > g1->xmax) || (g2->ymin < g1->ymin) || (g2->ymax > g1->ymax))
 	{ return LW_FALSE; }
@@ -349,7 +349,7 @@ gbox_contains_2d(const GBOX* g1, const GBOX* g2)
 }
 
 int
-gbox_contains_point2d(const GBOX* g, const POINT2D* p)
+gbox_contains_point2d(const GBOX *g, const POINT2D *p)
 {
 	if ((g->xmin <= p->x) && (g->xmax >= p->x) && (g->ymin <= p->y) && (g->ymax >= p->y)) { return LW_TRUE; }
 	return LW_FALSE;
@@ -359,13 +359,13 @@ gbox_contains_point2d(const GBOX* g, const POINT2D* p)
  * Warning, this function is only good for x/y/z boxes, used
  * in unit testing of geodetic box generation.
  */
-GBOX*
-gbox_from_string(const char* str)
+GBOX *
+gbox_from_string(const char *str)
 {
-	const char* ptr = str;
-	char* nextptr;
-	char* gbox_start = strstr(str, "GBOX((");
-	GBOX* gbox = gbox_new(gflags(0, 0, 1));
+	const char *ptr = str;
+	char *nextptr;
+	char *gbox_start = strstr(str, "GBOX((");
+	GBOX *gbox = gbox_new(gflags(0, 0, 1));
 	if (!gbox_start) return NULL; /* No header found */
 	ptr += 6;
 	gbox->xmin = strtod(ptr, &nextptr);
@@ -388,15 +388,15 @@ gbox_from_string(const char* str)
 	return gbox;
 }
 
-char*
-gbox_to_string(const GBOX* gbox)
+char *
+gbox_to_string(const GBOX *gbox)
 {
 	static int sz = 138;
-	char* str = NULL;
+	char *str = NULL;
 
 	if (!gbox) return strdup("NULL POINTER");
 
-	str = (char*)lwalloc(sz);
+	str = (char *)lwalloc(sz);
 
 	if (FLAGS_GET_GEODETIC(gbox->flags))
 	{
@@ -456,16 +456,16 @@ gbox_to_string(const GBOX* gbox)
 	return str;
 }
 
-GBOX*
-gbox_copy(const GBOX* box)
+GBOX *
+gbox_copy(const GBOX *box)
 {
-	GBOX* copy = (GBOX*)lwalloc(sizeof(GBOX));
+	GBOX *copy = (GBOX *)lwalloc(sizeof(GBOX));
 	memcpy(copy, box, sizeof(GBOX));
 	return copy;
 }
 
 void
-gbox_duplicate(const GBOX* original, GBOX* duplicate)
+gbox_duplicate(const GBOX *original, GBOX *duplicate)
 {
 	assert(duplicate);
 	memcpy(duplicate, original, sizeof(GBOX));
@@ -485,7 +485,7 @@ gbox_serialized_size(uint8_t flags)
 */
 
 int
-lw_arc_calculate_gbox_cartesian_2d(const POINT2D* A1, const POINT2D* A2, const POINT2D* A3, GBOX* gbox)
+lw_arc_calculate_gbox_cartesian_2d(const POINT2D *A1, const POINT2D *A2, const POINT2D *A3, GBOX *gbox)
 {
 	POINT2D xmin, ymin, xmax, ymax;
 	POINT2D C;
@@ -550,13 +550,13 @@ lw_arc_calculate_gbox_cartesian_2d(const POINT2D* A1, const POINT2D* A2, const P
 }
 
 static int
-lw_arc_calculate_gbox_cartesian(const POINT4D* p1, const POINT4D* p2, const POINT4D* p3, GBOX* gbox)
+lw_arc_calculate_gbox_cartesian(const POINT4D *p1, const POINT4D *p2, const POINT4D *p3, GBOX *gbox)
 {
 	int rv;
 
 	LWDEBUG(2, "lw_arc_calculate_gbox_cartesian called.");
 
-	rv = lw_arc_calculate_gbox_cartesian_2d((POINT2D*)p1, (POINT2D*)p2, (POINT2D*)p3, gbox);
+	rv = lw_arc_calculate_gbox_cartesian_2d((POINT2D *)p1, (POINT2D *)p2, (POINT2D *)p3, gbox);
 	gbox->zmin = FP_MIN(p1->z, p3->z);
 	gbox->mmin = FP_MIN(p1->m, p3->m);
 	gbox->zmax = FP_MAX(p1->z, p3->z);
@@ -565,7 +565,7 @@ lw_arc_calculate_gbox_cartesian(const POINT4D* p1, const POINT4D* p2, const POIN
 }
 
 int
-ptarray_calculate_gbox_cartesian(const POINTARRAY* pa, GBOX* gbox)
+ptarray_calculate_gbox_cartesian(const POINTARRAY *pa, GBOX *gbox)
 {
 	uint32_t i;
 	POINT4D p;
@@ -608,7 +608,7 @@ ptarray_calculate_gbox_cartesian(const POINTARRAY* pa, GBOX* gbox)
 }
 
 static int
-lwcircstring_calculate_gbox_cartesian(LWCIRCSTRING* curve, GBOX* gbox)
+lwcircstring_calculate_gbox_cartesian(LWCIRCSTRING *curve, GBOX *gbox)
 {
 	GBOX tmp;
 	POINT4D p1, p2, p3;
@@ -638,28 +638,28 @@ lwcircstring_calculate_gbox_cartesian(LWCIRCSTRING* curve, GBOX* gbox)
 }
 
 static int
-lwpoint_calculate_gbox_cartesian(LWPOINT* point, GBOX* gbox)
+lwpoint_calculate_gbox_cartesian(LWPOINT *point, GBOX *gbox)
 {
 	if (!point) return LW_FAILURE;
 	return ptarray_calculate_gbox_cartesian(point->point, gbox);
 }
 
 static int
-lwline_calculate_gbox_cartesian(LWLINE* line, GBOX* gbox)
+lwline_calculate_gbox_cartesian(LWLINE *line, GBOX *gbox)
 {
 	if (!line) return LW_FAILURE;
 	return ptarray_calculate_gbox_cartesian(line->points, gbox);
 }
 
 static int
-lwtriangle_calculate_gbox_cartesian(LWTRIANGLE* triangle, GBOX* gbox)
+lwtriangle_calculate_gbox_cartesian(LWTRIANGLE *triangle, GBOX *gbox)
 {
 	if (!triangle) return LW_FAILURE;
 	return ptarray_calculate_gbox_cartesian(triangle->points, gbox);
 }
 
 static int
-lwpoly_calculate_gbox_cartesian(LWPOLY* poly, GBOX* gbox)
+lwpoly_calculate_gbox_cartesian(LWPOLY *poly, GBOX *gbox)
 {
 	if (!poly) return LW_FAILURE;
 	if (poly->nrings == 0) return LW_FAILURE;
@@ -668,7 +668,7 @@ lwpoly_calculate_gbox_cartesian(LWPOLY* poly, GBOX* gbox)
 }
 
 static int
-lwcollection_calculate_gbox_cartesian(LWCOLLECTION* coll, GBOX* gbox)
+lwcollection_calculate_gbox_cartesian(LWCOLLECTION *coll, GBOX *gbox)
 {
 	GBOX subbox;
 	uint32_t i;
@@ -681,7 +681,7 @@ lwcollection_calculate_gbox_cartesian(LWCOLLECTION* coll, GBOX* gbox)
 
 	for (i = 0; i < coll->ngeoms; i++)
 	{
-		if (lwgeom_calculate_gbox_cartesian((LWGEOM*)(coll->geoms[i]), &subbox) == LW_SUCCESS)
+		if (lwgeom_calculate_gbox_cartesian((LWGEOM *)(coll->geoms[i]), &subbox) == LW_SUCCESS)
 		{
 			/* Keep a copy of the sub-bounding box for later
 			if ( coll->geoms[i]->bbox )
@@ -703,7 +703,7 @@ lwcollection_calculate_gbox_cartesian(LWCOLLECTION* coll, GBOX* gbox)
 }
 
 int
-lwgeom_calculate_gbox_cartesian(const LWGEOM* lwgeom, GBOX* gbox)
+lwgeom_calculate_gbox_cartesian(const LWGEOM *lwgeom, GBOX *gbox)
 {
 	if (!lwgeom) return LW_FAILURE;
 	LWDEBUGF(4, "lwgeom_calculate_gbox got type (%d) - %s", lwgeom->type, lwtype_name(lwgeom->type));
@@ -711,15 +711,15 @@ lwgeom_calculate_gbox_cartesian(const LWGEOM* lwgeom, GBOX* gbox)
 	switch (lwgeom->type)
 	{
 	case POINTTYPE:
-		return lwpoint_calculate_gbox_cartesian((LWPOINT*)lwgeom, gbox);
+		return lwpoint_calculate_gbox_cartesian((LWPOINT *)lwgeom, gbox);
 	case LINETYPE:
-		return lwline_calculate_gbox_cartesian((LWLINE*)lwgeom, gbox);
+		return lwline_calculate_gbox_cartesian((LWLINE *)lwgeom, gbox);
 	case CIRCSTRINGTYPE:
-		return lwcircstring_calculate_gbox_cartesian((LWCIRCSTRING*)lwgeom, gbox);
+		return lwcircstring_calculate_gbox_cartesian((LWCIRCSTRING *)lwgeom, gbox);
 	case POLYGONTYPE:
-		return lwpoly_calculate_gbox_cartesian((LWPOLY*)lwgeom, gbox);
+		return lwpoly_calculate_gbox_cartesian((LWPOLY *)lwgeom, gbox);
 	case TRIANGLETYPE:
-		return lwtriangle_calculate_gbox_cartesian((LWTRIANGLE*)lwgeom, gbox);
+		return lwtriangle_calculate_gbox_cartesian((LWTRIANGLE *)lwgeom, gbox);
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
 	case MULTIPOINTTYPE:
@@ -730,7 +730,7 @@ lwgeom_calculate_gbox_cartesian(const LWGEOM* lwgeom, GBOX* gbox)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_calculate_gbox_cartesian((LWCOLLECTION*)lwgeom, gbox);
+		return lwcollection_calculate_gbox_cartesian((LWCOLLECTION *)lwgeom, gbox);
 	}
 	/* Never get here, please. */
 	lwerror("unsupported type (%d) - %s", lwgeom->type, lwtype_name(lwgeom->type));
@@ -738,7 +738,7 @@ lwgeom_calculate_gbox_cartesian(const LWGEOM* lwgeom, GBOX* gbox)
 }
 
 void
-gbox_float_round(GBOX* gbox)
+gbox_float_round(GBOX *gbox)
 {
 	gbox->xmin = next_float_down(gbox->xmin);
 	gbox->xmax = next_float_up(gbox->xmax);

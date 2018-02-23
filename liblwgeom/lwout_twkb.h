@@ -82,20 +82,20 @@ typedef struct
 typedef struct
 {
 	uint8_t variant; /*options that change at runtime*/
-	bytebuffer_t* header_buf;
-	bytebuffer_t* geom_buf;
+	bytebuffer_t *header_buf;
+	bytebuffer_t *geom_buf;
 	int hasz;
 	int hasm;
-	const int64_t* idlist;
+	const int64_t *idlist;
 	int64_t bbox_min[MAX_N_DIMS];
 	int64_t bbox_max[MAX_N_DIMS];
 	int64_t accum_rels[MAX_N_DIMS]; /*Holds the acculmulated relative values*/
 } TWKB_STATE;
 
-static int lwgeom_to_twkb_buf(const LWGEOM* geom, TWKB_GLOBALS* global_values, TWKB_STATE* ts);
+static int lwgeom_to_twkb_buf(const LWGEOM *geom, TWKB_GLOBALS *global_values, TWKB_STATE *ts);
 
-static int lwpoint_to_twkb_buf(const LWPOINT* line, TWKB_GLOBALS* global_values, TWKB_STATE* ts);
-static int lwline_to_twkb_buf(const LWLINE* line, TWKB_GLOBALS* global_values, TWKB_STATE* ts);
-static int lwpoly_to_twkb_buf(const LWPOLY* poly, TWKB_GLOBALS* global_values, TWKB_STATE* ts);
-static int lwcollection_to_twkb_buf(const LWCOLLECTION* col, TWKB_GLOBALS* global_values, TWKB_STATE* ts);
-static int lwgeom_write_to_buffer(const LWGEOM* geom, TWKB_GLOBALS* global_values, TWKB_STATE* parent_state);
+static int lwpoint_to_twkb_buf(const LWPOINT *line, TWKB_GLOBALS *global_values, TWKB_STATE *ts);
+static int lwline_to_twkb_buf(const LWLINE *line, TWKB_GLOBALS *global_values, TWKB_STATE *ts);
+static int lwpoly_to_twkb_buf(const LWPOLY *poly, TWKB_GLOBALS *global_values, TWKB_STATE *ts);
+static int lwcollection_to_twkb_buf(const LWCOLLECTION *col, TWKB_GLOBALS *global_values, TWKB_STATE *ts);
+static int lwgeom_write_to_buffer(const LWGEOM *geom, TWKB_GLOBALS *global_values, TWKB_STATE *parent_state);

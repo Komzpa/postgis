@@ -47,15 +47,15 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS);
 typedef struct GEOMDUMPNODE_T
 {
 	uint32_t idx;
-	LWGEOM* geom;
+	LWGEOM *geom;
 } GEOMDUMPNODE;
 
 #define MAXDEPTH 32
 typedef struct GEOMDUMPSTATE
 {
 	int stacklen;
-	GEOMDUMPNODE* stack[MAXDEPTH];
-	LWGEOM* root;
+	GEOMDUMPNODE *stack[MAXDEPTH];
+	LWGEOM *root;
 } GEOMDUMPSTATE;
 
 #define PUSH(x, y) ((x)->stack[(x)->stacklen++] = (y))
@@ -65,21 +65,21 @@ typedef struct GEOMDUMPSTATE
 PG_FUNCTION_INFO_V1(LWGEOM_dump);
 Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* pglwgeom;
-	LWCOLLECTION* lwcoll;
-	LWGEOM* lwgeom;
-	FuncCallContext* funcctx;
-	GEOMDUMPSTATE* state;
-	GEOMDUMPNODE* node;
+	GSERIALIZED *pglwgeom;
+	LWCOLLECTION *lwcoll;
+	LWGEOM *lwgeom;
+	FuncCallContext *funcctx;
+	GEOMDUMPSTATE *state;
+	GEOMDUMPNODE *node;
 	TupleDesc tupdesc;
 	HeapTuple tuple;
-	AttInMetadata* attinmeta;
+	AttInMetadata *attinmeta;
 	MemoryContext oldcontext, newcontext;
 	Datum result;
 	char address[256];
-	char* ptr;
+	char *ptr;
 	int i;
-	char* values[2];
+	char *values[2];
 
 	if (SRF_IS_FIRSTCALL())
 	{
@@ -150,7 +150,7 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 	while (1)
 	{
 		node = LAST(state);
-		lwcoll = (LWCOLLECTION*)node->geom;
+		lwcoll = (LWCOLLECTION *)node->geom;
 
 		if (node->idx < lwcoll->ngeoms)
 		{
@@ -206,23 +206,23 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 struct POLYDUMPSTATE
 {
 	uint32_t ringnum;
-	LWPOLY* poly;
+	LWPOLY *poly;
 };
 
 PG_FUNCTION_INFO_V1(LWGEOM_dump_rings);
 Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* pglwgeom;
-	LWGEOM* lwgeom;
-	FuncCallContext* funcctx;
-	struct POLYDUMPSTATE* state;
+	GSERIALIZED *pglwgeom;
+	LWGEOM *lwgeom;
+	FuncCallContext *funcctx;
+	struct POLYDUMPSTATE *state;
 	TupleDesc tupdesc;
 	HeapTuple tuple;
-	AttInMetadata* attinmeta;
+	AttInMetadata *attinmeta;
 	MemoryContext oldcontext, newcontext;
 	Datum result;
 	char address[256];
-	char* values[2];
+	char *values[2];
 
 	if (SRF_IS_FIRSTCALL())
 	{
@@ -270,9 +270,9 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 	/* Loop trough polygon rings */
 	while (state->ringnum < state->poly->nrings)
 	{
-		LWPOLY* poly = state->poly;
-		POINTARRAY* ring;
-		LWGEOM* ringgeom;
+		LWPOLY *poly = state->poly;
+		POINTARRAY *ring;
+		LWGEOM *ringgeom;
 
 		/* Switch to an appropriate memory context for POINTARRAY
 		 * cloning and hexwkb allocation */
@@ -282,10 +282,10 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 		ring = ptarray_clone_deep(poly->rings[state->ringnum]);
 
 		/* Construct another polygon with shell only */
-		ringgeom = (LWGEOM*)lwpoly_construct(poly->srid,
-						     NULL, /* TODO: could use input bounding box here */
-						     1,    /* one ring */
-						     &ring);
+		ringgeom = (LWGEOM *)lwpoly_construct(poly->srid,
+						      NULL, /* TODO: could use input bounding box here */
+						      1,    /* one ring */
+						      &ring);
 
 		/* Write path as ``{ <ringnum> }'' */
 		sprintf(address, "{%d}", state->ringnum);
@@ -307,7 +307,7 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 struct FLATCOLLECTIONDUMPSTATE
 {
 	int geomnum;
-	LWCOLLECTION* col;
+	LWCOLLECTION *col;
 };
 
 /*
@@ -332,19 +332,19 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS)
 	{
 		int nextgeom;
 		int numgeoms;
-		LWCOLLECTION* col;
+		LWCOLLECTION *col;
 	} collection_fctx;
 
-	FuncCallContext* funcctx;
-	collection_fctx* fctx;
+	FuncCallContext *funcctx;
+	collection_fctx *fctx;
 	MemoryContext oldcontext;
 
 	/* stuff done only on the first call of the function */
 	if (SRF_IS_FIRSTCALL())
 	{
-		GSERIALIZED* gser;
-		LWGEOM* geom;
-		LWCOLLECTION* col;
+		GSERIALIZED *gser;
+		LWGEOM *geom;
+		LWCOLLECTION *col;
 		int maxvertices = 256;
 
 		/* create a function context for cross-call persistence */
@@ -374,7 +374,7 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS)
 		if (!col) SRF_RETURN_DONE(funcctx);
 
 		/* allocate memory for user context */
-		fctx = (collection_fctx*)palloc(sizeof(collection_fctx));
+		fctx = (collection_fctx *)palloc(sizeof(collection_fctx));
 
 		/* initialize state */
 		fctx->nextgeom = 0;
@@ -392,7 +392,7 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS)
 
 	if (fctx->nextgeom < fctx->numgeoms)
 	{
-		GSERIALIZED* gpart = geometry_serialize(fctx->col->geoms[fctx->nextgeom]);
+		GSERIALIZED *gpart = geometry_serialize(fctx->col->geoms[fctx->nextgeom]);
 		fctx->nextgeom++;
 		SRF_RETURN_NEXT(funcctx, PointerGetDatum(gpart));
 	}

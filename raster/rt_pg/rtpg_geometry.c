@@ -65,16 +65,16 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_envelope);
 Datum RASTER_envelope(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster;
+	rt_pgraster *pgraster;
 	rt_raster raster;
-	LWGEOM* geom = NULL;
-	GSERIALIZED* gser = NULL;
+	LWGEOM *geom = NULL;
+	GSERIALIZED *gser = NULL;
 	size_t gser_size;
 	int err = ES_NONE;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 	raster = rt_raster_deserialize(pgraster, TRUE);
 
 	if (!raster)
@@ -116,10 +116,10 @@ Datum RASTER_envelope(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_convex_hull);
 Datum RASTER_convex_hull(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster;
+	rt_pgraster *pgraster;
 	rt_raster raster;
-	LWGEOM* geom = NULL;
-	GSERIALIZED* gser = NULL;
+	LWGEOM *geom = NULL;
+	GSERIALIZED *gser = NULL;
 	size_t gser_size;
 	int err = ES_NONE;
 
@@ -133,12 +133,12 @@ Datum RASTER_convex_hull(PG_FUNCTION_ARGS)
 	if (!minhull)
 	{
 		pgraster =
-		    (rt_pgraster*)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+		    (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 		raster = rt_raster_deserialize(pgraster, TRUE);
 	}
 	else
 	{
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 		raster = rt_raster_deserialize(pgraster, FALSE);
 	}
 
@@ -196,7 +196,7 @@ Datum RASTER_convex_hull(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_dumpAsPolygons);
 Datum RASTER_dumpAsPolygons(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 	rt_geomval geomval;
 	rt_geomval geomval2;
@@ -208,7 +208,7 @@ Datum RASTER_dumpAsPolygons(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 		int numbands;
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		int nband;
 		bool exclude_nodata_value = TRUE;
@@ -228,7 +228,7 @@ Datum RASTER_dumpAsPolygons(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
 		{
@@ -321,7 +321,7 @@ Datum RASTER_dumpAsPolygons(PG_FUNCTION_ARGS)
 		HeapTuple tuple;
 		Datum result;
 
-		GSERIALIZED* gser = NULL;
+		GSERIALIZED *gser = NULL;
 		size_t gser_size = 0;
 
 		POSTGIS_RT_DEBUGF(3, "call number %d", call_cntr);
@@ -357,7 +357,7 @@ Datum RASTER_dumpAsPolygons(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getPixelPolygons);
 Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 	rt_pixel pix = NULL;
 	rt_pixel pix2;
@@ -369,7 +369,7 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 	if (SRF_IS_FIRSTCALL())
 	{
 		MemoryContext oldcontext;
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int nband = 1;
@@ -385,7 +385,7 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 		double value = 0;
 		int isnodata = 0;
 
-		LWPOLY* poly;
+		LWPOLY *poly;
 
 		POSTGIS_RT_DEBUG(3, "RASTER_getPixelPolygons first call");
 
@@ -400,7 +400,7 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		/* band */
 		if (PG_ARGISNULL(1))
@@ -571,7 +571,7 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 					     "polygons");
 					SRF_RETURN_DONE(funcctx);
 				}
-				pix[pixcount].geom = (LWGEOM*)poly;
+				pix[pixcount].geom = (LWGEOM *)poly;
 				POSTGIS_RT_DEBUGF(5, "poly @ %p", poly);
 				POSTGIS_RT_DEBUGF(5, "geom @ %p", pix[pixcount].geom);
 
@@ -649,7 +649,7 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 		HeapTuple tuple;
 		Datum result;
 
-		GSERIALIZED* gser = NULL;
+		GSERIALIZED *gser = NULL;
 		size_t gser_size = 0;
 
 		POSTGIS_RT_DEBUGF(3, "call number %d", call_cntr);
@@ -690,17 +690,17 @@ Datum RASTER_getPixelPolygons(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getPolygon);
 Datum RASTER_getPolygon(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	int num_bands = 0;
 	int nband = 1;
 	int err;
-	LWMPOLY* surface = NULL;
-	GSERIALIZED* rtn = NULL;
+	LWMPOLY *surface = NULL;
+	GSERIALIZED *rtn = NULL;
 
 	/* raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -758,28 +758,28 @@ Datum RASTER_getPolygon(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_asRaster);
 Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* gser = NULL;
+	GSERIALIZED *gser = NULL;
 
-	LWGEOM* geom = NULL;
+	LWGEOM *geom = NULL;
 	rt_raster rast = NULL;
-	rt_pgraster* pgrast = NULL;
+	rt_pgraster *pgrast = NULL;
 
-	unsigned char* wkb;
+	unsigned char *wkb;
 	size_t wkb_len = 0;
 	unsigned char variant = WKB_SFSQL;
 
 	double scale[2] = {0};
-	double* scale_x = NULL;
-	double* scale_y = NULL;
+	double *scale_x = NULL;
+	double *scale_y = NULL;
 
 	int dim[2] = {0};
-	int* dim_x = NULL;
-	int* dim_y = NULL;
+	int *dim_x = NULL;
+	int *dim_y = NULL;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -788,38 +788,38 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 	int j = 0;
 	int haserr = 0;
 
-	text* pixeltypetext = NULL;
-	char* pixeltype = NULL;
+	text *pixeltypetext = NULL;
+	char *pixeltype = NULL;
 	rt_pixtype pixtype = PT_END;
-	rt_pixtype* pixtypes = NULL;
+	rt_pixtype *pixtypes = NULL;
 	int pixtypes_len = 0;
 
-	double* values = NULL;
+	double *values = NULL;
 	int values_len = 0;
 
-	uint8_t* hasnodatas = NULL;
-	double* nodatavals = NULL;
+	uint8_t *hasnodatas = NULL;
+	double *nodatavals = NULL;
 	int nodatavals_len = 0;
 
 	double ulw[2] = {0};
-	double* ul_xw = NULL;
-	double* ul_yw = NULL;
+	double *ul_xw = NULL;
+	double *ul_yw = NULL;
 
 	double gridw[2] = {0};
-	double* grid_xw = NULL;
-	double* grid_yw = NULL;
+	double *grid_xw = NULL;
+	double *grid_yw = NULL;
 
 	double skew[2] = {0};
-	double* skew_x = NULL;
-	double* skew_y = NULL;
+	double *skew_x = NULL;
+	double *skew_y = NULL;
 
-	char** options = NULL;
+	char **options = NULL;
 	int options_len = 0;
 
 	uint32_t num_bands = 0;
 
 	int srid = SRID_UNKNOWN;
-	char* srs = NULL;
+	char *srs = NULL;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_asRaster: Starting");
 
@@ -834,7 +834,7 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 	/* Get a 2D version of the geometry if necessary */
 	if (lwgeom_ndims(geom) > 2)
 	{
-		LWGEOM* geom2d = lwgeom_force_2d(geom);
+		LWGEOM *geom2d = lwgeom_force_2d(geom);
 		lwgeom_free(geom);
 		geom = geom2d;
 	}
@@ -915,7 +915,7 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 
 		if (n)
 		{
-			pixtypes = (rt_pixtype*)palloc(sizeof(rt_pixtype) * n);
+			pixtypes = (rt_pixtype *)palloc(sizeof(rt_pixtype) * n);
 			/* clean each pixeltype */
 			for (i = 0, j = 0; i < n; i++)
 			{
@@ -929,7 +929,7 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 				switch (etype)
 				{
 				case TEXTOID:
-					pixeltypetext = (text*)DatumGetPointer(e[i]);
+					pixeltypetext = (text *)DatumGetPointer(e[i]);
 					if (NULL == pixeltypetext) break;
 					pixeltype = text_to_cstring(pixeltypetext);
 
@@ -1008,7 +1008,7 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 
 		if (n)
 		{
-			values = (double*)palloc(sizeof(double) * n);
+			values = (double *)palloc(sizeof(double) * n);
 			for (i = 0, j = 0; i < n; i++)
 			{
 				if (nulls[i])
@@ -1079,8 +1079,8 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 
 		if (n)
 		{
-			nodatavals = (double*)palloc(sizeof(double) * n);
-			hasnodatas = (uint8_t*)palloc(sizeof(uint8_t) * n);
+			nodatavals = (double *)palloc(sizeof(double) * n);
+			hasnodatas = (uint8_t *)palloc(sizeof(uint8_t) * n);
 			for (i = 0, j = 0; i < n; i++)
 			{
 				if (nulls[i])
@@ -1265,22 +1265,22 @@ Datum RASTER_asRaster(PG_FUNCTION_ARGS)
 		if (options_len < 1)
 		{
 			options_len = 1;
-			options = (char**)palloc(sizeof(char*) * options_len);
+			options = (char **)palloc(sizeof(char *) * options_len);
 		}
 		else
 		{
 			options_len++;
-			options = (char**)repalloc(options, sizeof(char*) * options_len);
+			options = (char **)repalloc(options, sizeof(char *) * options_len);
 		}
 
-		options[options_len - 1] = palloc(sizeof(char*) * (strlen("ALL_TOUCHED=TRUE") + 1));
+		options[options_len - 1] = palloc(sizeof(char *) * (strlen("ALL_TOUCHED=TRUE") + 1));
 		options[options_len - 1] = "ALL_TOUCHED=TRUE";
 	}
 
 	if (options_len)
 	{
 		options_len++;
-		options = (char**)repalloc(options, sizeof(char*) * options_len);
+		options = (char **)repalloc(options, sizeof(char *) * options_len);
 		options[options_len - 1] = NULL;
 	}
 

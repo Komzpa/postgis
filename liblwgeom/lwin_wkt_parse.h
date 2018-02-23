@@ -125,10 +125,10 @@ union YYSTYPE {
 
 	int integervalue;
 	double doublevalue;
-	char* stringvalue;
-	LWGEOM* geometryvalue;
+	char *stringvalue;
+	LWGEOM *geometryvalue;
 	POINT coordinatevalue;
-	POINTARRAY* ptarrayvalue;
+	POINTARRAY *ptarrayvalue;
 
 #line 113 "lwin_wkt_parse.h" /* yacc.c:1909  */
 };

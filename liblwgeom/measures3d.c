@@ -40,7 +40,7 @@
 #include "lwgeom_log.h"
 
 static inline int
-get_3dvector_from_points(POINT3DZ* p1, POINT3DZ* p2, VECTOR3D* v)
+get_3dvector_from_points(POINT3DZ *p1, POINT3DZ *p2, VECTOR3D *v)
 {
 	v->x = p2->x - p1->x;
 	v->y = p2->y - p1->y;
@@ -50,7 +50,7 @@ get_3dvector_from_points(POINT3DZ* p1, POINT3DZ* p2, VECTOR3D* v)
 }
 
 static inline int
-get_3dcross_product(VECTOR3D* v1, VECTOR3D* v2, VECTOR3D* v)
+get_3dcross_product(VECTOR3D *v1, VECTOR3D *v2, VECTOR3D *v)
 {
 	v->x = (v1->y * v2->z) - (v1->z * v2->y);
 	v->y = (v1->z * v2->x) - (v1->x * v2->z);
@@ -64,11 +64,11 @@ This function is used to create a vertical line used for cases where one if the
 geometries lacks z-values. The vertical line crosses the 2d point that is closest
 and the z-range is from maxz to minz in the geoemtrie that has z values.
 */
-static LWGEOM*
-create_v_line(const LWGEOM* lwgeom, double x, double y, int srid)
+static LWGEOM *
+create_v_line(const LWGEOM *lwgeom, double x, double y, int srid)
 {
 
-	LWPOINT* lwpoints[2];
+	LWPOINT *lwpoints[2];
 	GBOX gbox;
 	int rv = lwgeom_calculate_gbox(lwgeom, &gbox);
 
@@ -77,23 +77,23 @@ create_v_line(const LWGEOM* lwgeom, double x, double y, int srid)
 	lwpoints[0] = lwpoint_make3dz(srid, x, y, gbox.zmin);
 	lwpoints[1] = lwpoint_make3dz(srid, x, y, gbox.zmax);
 
-	return (LWGEOM*)lwline_from_ptarray(srid, 2, lwpoints);
+	return (LWGEOM *)lwline_from_ptarray(srid, 2, lwpoints);
 }
 
-LWGEOM*
-lwgeom_closest_line_3d(const LWGEOM* lw1, const LWGEOM* lw2)
+LWGEOM *
+lwgeom_closest_line_3d(const LWGEOM *lw1, const LWGEOM *lw2)
 {
 	return lw_dist3d_distanceline(lw1, lw2, lw1->srid, DIST_MIN);
 }
 
-LWGEOM*
-lwgeom_furthest_line_3d(LWGEOM* lw1, LWGEOM* lw2)
+LWGEOM *
+lwgeom_furthest_line_3d(LWGEOM *lw1, LWGEOM *lw2)
 {
 	return lw_dist3d_distanceline(lw1, lw2, lw1->srid, DIST_MAX);
 }
 
-LWGEOM*
-lwgeom_closest_point_3d(const LWGEOM* lw1, const LWGEOM* lw2)
+LWGEOM *
+lwgeom_closest_point_3d(const LWGEOM *lw1, const LWGEOM *lw2)
 {
 	return lw_dist3d_distancepoint(lw1, lw2, lw1->srid, DIST_MIN);
 }
@@ -101,15 +101,15 @@ lwgeom_closest_point_3d(const LWGEOM* lw1, const LWGEOM* lw2)
 /**
 Function initializing 3dshortestline and 3dlongestline calculations.
 */
-LWGEOM*
-lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
+LWGEOM *
+lw_dist3d_distanceline(const LWGEOM *lw1, const LWGEOM *lw2, int srid, int mode)
 {
 	LWDEBUG(2, "lw_dist3d_distanceline is called");
 	double x1, x2, y1, y2, z1, z2, x, y;
 	double initdistance = (mode == DIST_MIN ? FLT_MAX : -1.0);
 	DISTPTS3D thedl;
-	LWPOINT* lwpoints[2];
-	LWGEOM* result;
+	LWPOINT *lwpoints[2];
+	LWGEOM *result;
 
 	thedl.mode = mode;
 	thedl.distance = initdistance;
@@ -135,9 +135,9 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 		{
 			/*should never get here. all cases ought to be error handled earlier*/
 			lwerror("Some unspecified error.");
-			result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+			result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 		}
-		LWGEOM* vertical_line;
+		LWGEOM *vertical_line;
 		if (!lwgeom_has_z(lw1))
 		{
 			x = thedl2d.p1.x;
@@ -149,7 +149,7 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 				/*should never get here. all cases ought to be error handled earlier*/
 				lwfree(vertical_line);
 				lwerror("Some unspecified error.");
-				result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+				result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 			}
 			lwfree(vertical_line);
 		}
@@ -164,7 +164,7 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 				/*should never get here. all cases ought to be error handled earlier*/
 				lwfree(vertical_line);
 				lwerror("Some unspecified error.");
-				return (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+				return (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 			}
 			lwfree(vertical_line);
 		}
@@ -175,14 +175,14 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 		{
 			/*should never get here. all cases ought to be error handled earlier*/
 			lwerror("Some unspecified error.");
-			result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+			result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 		}
 	}
 	/*if thedl.distance is unchanged there where only empty geometries input*/
 	if (thedl.distance == initdistance)
 	{
 		LWDEBUG(3, "didn't find geometries to measure between, returning null");
-		result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+		result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 	}
 	else
 	{
@@ -196,7 +196,7 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 		lwpoints[0] = lwpoint_make3dz(srid, x1, y1, z1);
 		lwpoints[1] = lwpoint_make3dz(srid, x2, y2, z2);
 
-		result = (LWGEOM*)lwline_from_ptarray(srid, 2, lwpoints);
+		result = (LWGEOM *)lwline_from_ptarray(srid, 2, lwpoints);
 	}
 
 	return result;
@@ -205,14 +205,14 @@ lw_dist3d_distanceline(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
 /**
 Function initializing 3dclosestpoint calculations.
 */
-LWGEOM*
-lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode)
+LWGEOM *
+lw_dist3d_distancepoint(const LWGEOM *lw1, const LWGEOM *lw2, int srid, int mode)
 {
 
 	double x, y, z;
 	DISTPTS3D thedl;
 	double initdistance = FLT_MAX;
-	LWGEOM* result;
+	LWGEOM *result;
 
 	thedl.mode = mode;
 	thedl.distance = initdistance;
@@ -239,10 +239,10 @@ lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode
 		{
 			/*should never get here. all cases ought to be error handled earlier*/
 			lwerror("Some unspecified error.");
-			return (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+			return (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 		}
 
-		LWGEOM* vertical_line;
+		LWGEOM *vertical_line;
 		if (!lwgeom_has_z(lw1))
 		{
 			x = thedl2d.p1.x;
@@ -254,7 +254,7 @@ lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode
 				/*should never get here. all cases ought to be error handled earlier*/
 				lwfree(vertical_line);
 				lwerror("Some unspecified error.");
-				return (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+				return (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 			}
 			lwfree(vertical_line);
 		}
@@ -270,7 +270,7 @@ lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode
 				/*should never get here. all cases ought to be error handled earlier*/
 				lwfree(vertical_line);
 				lwerror("Some unspecified error.");
-				result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+				result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 			}
 			lwfree(vertical_line);
 		}
@@ -281,20 +281,20 @@ lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode
 		{
 			/*should never get here. all cases ought to be error handled earlier*/
 			lwerror("Some unspecified error.");
-			result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+			result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 		}
 	}
 	if (thedl.distance == initdistance)
 	{
 		LWDEBUG(3, "didn't find geometries to measure between, returning null");
-		result = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+		result = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 	}
 	else
 	{
 		x = thedl.p1.x;
 		y = thedl.p1.y;
 		z = thedl.p1.z;
-		result = (LWGEOM*)lwpoint_make3dz(srid, x, y, z);
+		result = (LWGEOM *)lwpoint_make3dz(srid, x, y, z);
 	}
 
 	return result;
@@ -304,7 +304,7 @@ lw_dist3d_distancepoint(const LWGEOM* lw1, const LWGEOM* lw2, int srid, int mode
 Function initializing 3d max distance calculation
 */
 double
-lwgeom_maxdistance3d(const LWGEOM* lw1, const LWGEOM* lw2)
+lwgeom_maxdistance3d(const LWGEOM *lw1, const LWGEOM *lw2)
 {
 	LWDEBUG(2, "lwgeom_maxdistance3d is called");
 
@@ -316,7 +316,7 @@ Function handling 3d max distance calculations and dfullywithin calculations.
 The difference is just the tolerance.
 */
 double
-lwgeom_maxdistance3d_tolerance(const LWGEOM* lw1, const LWGEOM* lw2, double tolerance)
+lwgeom_maxdistance3d_tolerance(const LWGEOM *lw1, const LWGEOM *lw2, double tolerance)
 {
 	if (!lwgeom_has_z(lw1) || !lwgeom_has_z(lw2))
 	{
@@ -341,7 +341,7 @@ lwgeom_maxdistance3d_tolerance(const LWGEOM* lw1, const LWGEOM* lw2, double tole
 	Function initializing 3d min distance calculation
 */
 double
-lwgeom_mindistance3d(const LWGEOM* lw1, const LWGEOM* lw2)
+lwgeom_mindistance3d(const LWGEOM *lw1, const LWGEOM *lw2)
 {
 	LWDEBUG(2, "lwgeom_mindistance3d is called");
 	return lwgeom_mindistance3d_tolerance(lw1, lw2, 0.0);
@@ -352,7 +352,7 @@ lwgeom_mindistance3d(const LWGEOM* lw1, const LWGEOM* lw2)
 	The difference is just the tolerance.
 */
 double
-lwgeom_mindistance3d_tolerance(const LWGEOM* lw1, const LWGEOM* lw2, double tolerance)
+lwgeom_mindistance3d_tolerance(const LWGEOM *lw1, const LWGEOM *lw2, double tolerance)
 {
 	if (!lwgeom_has_z(lw1) || !lwgeom_has_z(lw2))
 	{
@@ -386,15 +386,15 @@ Functions preparing geometries for distance-calculations
 This is a recursive function delivering every possible combination of subgeometries
 */
 int
-lw_dist3d_recursive(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3D* dl)
+lw_dist3d_recursive(const LWGEOM *lwg1, const LWGEOM *lwg2, DISTPTS3D *dl)
 {
 	int i, j;
 	int n1 = 1;
 	int n2 = 1;
-	LWGEOM* g1 = NULL;
-	LWGEOM* g2 = NULL;
-	LWCOLLECTION* c1 = NULL;
-	LWCOLLECTION* c2 = NULL;
+	LWGEOM *g1 = NULL;
+	LWGEOM *g2 = NULL;
+	LWCOLLECTION *c1 = NULL;
+	LWCOLLECTION *c2 = NULL;
 
 	LWDEBUGF(2, "lw_dist3d_recursive is called with type1=%d, type2=%d", lwg1->type, lwg2->type);
 
@@ -417,7 +417,7 @@ lw_dist3d_recursive(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3D* dl)
 		if (lwgeom_is_collection(lwg1)) { g1 = c1->geoms[i]; }
 		else
 		{
-			g1 = (LWGEOM*)lwg1;
+			g1 = (LWGEOM *)lwg1;
 		}
 
 		if (lwgeom_is_empty(g1)) return LW_TRUE;
@@ -433,7 +433,7 @@ lw_dist3d_recursive(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3D* dl)
 			if (lwgeom_is_collection(lwg2)) { g2 = c2->geoms[j]; }
 			else
 			{
-				g2 = (LWGEOM*)lwg2;
+				g2 = (LWGEOM *)lwg2;
 			}
 			if (lwgeom_is_collection(g2))
 			{
@@ -459,7 +459,7 @@ lw_dist3d_recursive(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3D* dl)
 This function distributes the brute-force for 3D so far the only type, tasks depending on type
 */
 int
-lw_dist3d_distribute_bruteforce(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3D* dl)
+lw_dist3d_distribute_bruteforce(const LWGEOM *lwg1, const LWGEOM *lwg2, DISTPTS3D *dl)
 {
 
 	int t1 = lwg1->type;
@@ -472,17 +472,17 @@ lw_dist3d_distribute_bruteforce(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3
 		if (t2 == POINTTYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_point_point((LWPOINT*)lwg1, (LWPOINT*)lwg2, dl);
+			return lw_dist3d_point_point((LWPOINT *)lwg1, (LWPOINT *)lwg2, dl);
 		}
 		else if (t2 == LINETYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_point_line((LWPOINT*)lwg1, (LWLINE*)lwg2, dl);
+			return lw_dist3d_point_line((LWPOINT *)lwg1, (LWLINE *)lwg2, dl);
 		}
 		else if (t2 == POLYGONTYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_point_poly((LWPOINT*)lwg1, (LWPOLY*)lwg2, dl);
+			return lw_dist3d_point_poly((LWPOINT *)lwg1, (LWPOLY *)lwg2, dl);
 		}
 		else
 		{
@@ -495,17 +495,17 @@ lw_dist3d_distribute_bruteforce(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3
 		if (t2 == POINTTYPE)
 		{
 			dl->twisted = (-1);
-			return lw_dist3d_point_line((LWPOINT*)lwg2, (LWLINE*)lwg1, dl);
+			return lw_dist3d_point_line((LWPOINT *)lwg2, (LWLINE *)lwg1, dl);
 		}
 		else if (t2 == LINETYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_line_line((LWLINE*)lwg1, (LWLINE*)lwg2, dl);
+			return lw_dist3d_line_line((LWLINE *)lwg1, (LWLINE *)lwg2, dl);
 		}
 		else if (t2 == POLYGONTYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_line_poly((LWLINE*)lwg1, (LWPOLY*)lwg2, dl);
+			return lw_dist3d_line_poly((LWLINE *)lwg1, (LWPOLY *)lwg2, dl);
 		}
 		else
 		{
@@ -518,17 +518,17 @@ lw_dist3d_distribute_bruteforce(const LWGEOM* lwg1, const LWGEOM* lwg2, DISTPTS3
 		if (t2 == POLYGONTYPE)
 		{
 			dl->twisted = 1;
-			return lw_dist3d_poly_poly((LWPOLY*)lwg1, (LWPOLY*)lwg2, dl);
+			return lw_dist3d_poly_poly((LWPOLY *)lwg1, (LWPOLY *)lwg2, dl);
 		}
 		else if (t2 == POINTTYPE)
 		{
 			dl->twisted = -1;
-			return lw_dist3d_point_poly((LWPOINT*)lwg2, (LWPOLY*)lwg1, dl);
+			return lw_dist3d_point_poly((LWPOINT *)lwg2, (LWPOLY *)lwg1, dl);
 		}
 		else if (t2 == LINETYPE)
 		{
 			dl->twisted = -1;
-			return lw_dist3d_line_poly((LWLINE*)lwg2, (LWPOLY*)lwg1, dl);
+			return lw_dist3d_line_poly((LWLINE *)lwg2, (LWPOLY *)lwg1, dl);
 		}
 		else
 		{
@@ -557,7 +557,7 @@ So far the only way to do 3D-calculations
 point to point calculation
 */
 int
-lw_dist3d_point_point(LWPOINT* point1, LWPOINT* point2, DISTPTS3D* dl)
+lw_dist3d_point_point(LWPOINT *point1, LWPOINT *point2, DISTPTS3D *dl)
 {
 	POINT3DZ p1;
 	POINT3DZ p2;
@@ -573,10 +573,10 @@ lw_dist3d_point_point(LWPOINT* point1, LWPOINT* point2, DISTPTS3D* dl)
 point to line calculation
 */
 int
-lw_dist3d_point_line(LWPOINT* point, LWLINE* line, DISTPTS3D* dl)
+lw_dist3d_point_line(LWPOINT *point, LWLINE *line, DISTPTS3D *dl)
 {
 	POINT3DZ p;
-	POINTARRAY* pa = line->points;
+	POINTARRAY *pa = line->points;
 	LWDEBUG(2, "lw_dist3d_point_line is called");
 
 	getPoint3dz_p(point->point, 0, &p);
@@ -595,7 +595,7 @@ for max distance it is always point against boundary
 
 */
 int
-lw_dist3d_point_poly(LWPOINT* point, LWPOLY* poly, DISTPTS3D* dl)
+lw_dist3d_point_poly(LWPOINT *point, LWPOLY *poly, DISTPTS3D *dl)
 {
 	POINT3DZ p, projp; /*projp is "point projected on plane"*/
 	PLANE3D plane;
@@ -623,10 +623,10 @@ lw_dist3d_point_poly(LWPOINT* point, LWPOLY* poly, DISTPTS3D* dl)
 line to line calculation
 */
 int
-lw_dist3d_line_line(LWLINE* line1, LWLINE* line2, DISTPTS3D* dl)
+lw_dist3d_line_line(LWLINE *line1, LWLINE *line2, DISTPTS3D *dl)
 {
-	POINTARRAY* pa1 = line1->points;
-	POINTARRAY* pa2 = line2->points;
+	POINTARRAY *pa1 = line1->points;
+	POINTARRAY *pa2 = line2->points;
 	LWDEBUG(2, "lw_dist3d_line_line is called");
 
 	return lw_dist3d_ptarray_ptarray(pa1, pa2, dl);
@@ -637,7 +637,7 @@ lw_dist3d_line_line(LWLINE* line1, LWLINE* line2, DISTPTS3D* dl)
 line to polygon calculation
 */
 int
-lw_dist3d_line_poly(LWLINE* line, LWPOLY* poly, DISTPTS3D* dl)
+lw_dist3d_line_poly(LWLINE *line, LWPOLY *poly, DISTPTS3D *dl)
 {
 	PLANE3D plane;
 	LWDEBUG(2, "lw_dist3d_line_poly is called");
@@ -654,7 +654,7 @@ lw_dist3d_line_poly(LWLINE* line, LWPOLY* poly, DISTPTS3D* dl)
 polygon to polygon calculation
 */
 int
-lw_dist3d_poly_poly(LWPOLY* poly1, LWPOLY* poly2, DISTPTS3D* dl)
+lw_dist3d_poly_poly(LWPOLY *poly1, LWPOLY *poly2, DISTPTS3D *dl)
 {
 	PLANE3D plane;
 	LWDEBUG(2, "lw_dist3d_poly_poly is called");
@@ -681,7 +681,7 @@ lw_dist3d_poly_poly(LWPOLY* poly1, LWPOLY* poly2, DISTPTS3D* dl)
  * Returns distance between point and pointarray
  */
 int
-lw_dist3d_pt_ptarray(POINT3DZ* p, POINTARRAY* pa, DISTPTS3D* dl)
+lw_dist3d_pt_ptarray(POINT3DZ *p, POINTARRAY *pa, DISTPTS3D *dl)
 {
 	uint32_t t;
 	POINT3DZ start, end;
@@ -711,7 +711,7 @@ If searching for min distance, this one finds the closest point on segment A-B f
 if searching for max distance it just sends p-A and p-B to pt-pt calculation
 */
 int
-lw_dist3d_pt_seg(POINT3DZ* p, POINT3DZ* A, POINT3DZ* B, DISTPTS3D* dl)
+lw_dist3d_pt_seg(POINT3DZ *p, POINT3DZ *A, POINT3DZ *B, DISTPTS3D *dl)
 {
 	POINT3DZ c;
 	double r;
@@ -744,7 +744,7 @@ lw_dist3d_pt_seg(POINT3DZ* p, POINT3DZ* A, POINT3DZ* B, DISTPTS3D* dl)
 }
 
 double
-distance3d_pt_pt(const POINT3D* p1, const POINT3D* p2)
+distance3d_pt_pt(const POINT3D *p1, const POINT3D *p2)
 {
 	double dx = p2->x - p1->x;
 	double dy = p2->y - p1->y;
@@ -760,7 +760,7 @@ or most far away from each other
 depending on dl->mode (max or min)
 */
 int
-lw_dist3d_pt_pt(POINT3DZ* thep1, POINT3DZ* thep2, DISTPTS3D* dl)
+lw_dist3d_pt_pt(POINT3DZ *thep1, POINT3DZ *thep2, DISTPTS3D *dl)
 {
 	double dx = thep2->x - thep1->x;
 	double dy = thep2->y - thep1->y;
@@ -800,7 +800,7 @@ lw_dist3d_pt_pt(POINT3DZ* thep1, POINT3DZ* thep2, DISTPTS3D* dl)
 Finds all combinationes of segments between two pointarrays
 */
 int
-lw_dist3d_ptarray_ptarray(POINTARRAY* l1, POINTARRAY* l2, DISTPTS3D* dl)
+lw_dist3d_ptarray_ptarray(POINTARRAY *l1, POINTARRAY *l2, DISTPTS3D *dl)
 {
 	uint32_t t, u;
 	POINT3DZ start, end;
@@ -854,7 +854,7 @@ lw_dist3d_ptarray_ptarray(POINTARRAY* l1, POINTARRAY* l2, DISTPTS3D* dl)
 Finds the two closest points on two linesegments
 */
 int
-lw_dist3d_seg_seg(POINT3DZ* s1p1, POINT3DZ* s1p2, POINT3DZ* s2p1, POINT3DZ* s2p2, DISTPTS3D* dl)
+lw_dist3d_seg_seg(POINT3DZ *s1p1, POINT3DZ *s1p2, POINT3DZ *s2p1, POINT3DZ *s2p2, DISTPTS3D *dl)
 {
 	VECTOR3D v1, v2, vl;
 	double s1k, s2k; /*two variables representing where on Line 1 (s1k) and where on Line 2 (s2k) a connecting line
@@ -957,7 +957,7 @@ If not we check from original point to the bounadary.
 If the projected point is inside a hole of the polygon we check the distance to the boudary of that hole.
 */
 int
-lw_dist3d_pt_poly(POINT3DZ* p, LWPOLY* poly, PLANE3D* plane, POINT3DZ* projp, DISTPTS3D* dl)
+lw_dist3d_pt_poly(POINT3DZ *p, LWPOLY *poly, PLANE3D *plane, POINT3DZ *projp, DISTPTS3D *dl)
 {
 	uint32_t i;
 
@@ -993,7 +993,7 @@ lw_dist3d_pt_poly(POINT3DZ* p, LWPOLY* poly, PLANE3D* plane, POINT3DZ* projp, DI
 Computes pointarray to polygon distance
 */
 int
-lw_dist3d_ptarray_poly(POINTARRAY* pa, LWPOLY* poly, PLANE3D* plane, DISTPTS3D* dl)
+lw_dist3d_ptarray_poly(POINTARRAY *pa, LWPOLY *poly, PLANE3D *plane, DISTPTS3D *dl)
 {
 
 	uint32_t i, j, k;
@@ -1076,7 +1076,7 @@ Here we define the plane of a polygon (boundary pointarray of a polygon)
 the plane is stored as a pont in plane (plane.pop) and a normal vector (plane.pv)
 */
 int
-define_plane(POINTARRAY* pa, PLANE3D* pl)
+define_plane(POINTARRAY *pa, PLANE3D *pl)
 {
 	uint32_t i, j, numberofvectors, pointsinslice;
 	POINT3DZ p, p1, p2;
@@ -1138,7 +1138,7 @@ define_plane(POINTARRAY* pa, PLANE3D* pl)
 Finds a point on a plane from where the original point is perpendicular to the plane
 */
 double
-project_point_on_plane(POINT3DZ* p, PLANE3D* pl, POINT3DZ* p0)
+project_point_on_plane(POINT3DZ *p, PLANE3D *pl, POINT3DZ *p0)
 {
 	/*In our plane definition we have a point on the plane and a normal vektor (pl.pv), perpendicular to the plane
 	this vector will be paralell to the line between our inputted point above the plane and the point we are
@@ -1172,7 +1172,7 @@ project_point_on_plane(POINT3DZ* p, PLANE3D* pl, POINT3DZ* p0)
  *	That is the dimension with the highest number in pv
  */
 int
-pt_in_ring_3d(const POINT3DZ* p, const POINTARRAY* ring, PLANE3D* plane)
+pt_in_ring_3d(const POINT3DZ *p, const POINTARRAY *ring, PLANE3D *plane)
 {
 
 	uint32_t cn = 0; /* the crossing number counter */

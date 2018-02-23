@@ -29,36 +29,36 @@
 #include "lwgeom_log.h"
 
 void
-lwmpoint_release(LWMPOINT* lwmpoint)
+lwmpoint_release(LWMPOINT *lwmpoint)
 {
 	lwgeom_release(lwmpoint_as_lwgeom(lwmpoint));
 }
 
-LWMPOINT*
+LWMPOINT *
 lwmpoint_construct_empty(int srid, char hasz, char hasm)
 {
-	LWMPOINT* ret = (LWMPOINT*)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
+	LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
 	return ret;
 }
 
-LWMPOINT*
-lwmpoint_add_lwpoint(LWMPOINT* mobj, const LWPOINT* obj)
+LWMPOINT *
+lwmpoint_add_lwpoint(LWMPOINT *mobj, const LWPOINT *obj)
 {
 	LWDEBUG(4, "Called");
-	return (LWMPOINT*)lwcollection_add_lwgeom((LWCOLLECTION*)mobj, (LWGEOM*)obj);
+	return (LWMPOINT *)lwcollection_add_lwgeom((LWCOLLECTION *)mobj, (LWGEOM *)obj);
 }
 
-LWMPOINT*
-lwmpoint_construct(int srid, const POINTARRAY* pa)
+LWMPOINT *
+lwmpoint_construct(int srid, const POINTARRAY *pa)
 {
 	uint32_t i;
 	int hasz = ptarray_has_z(pa);
 	int hasm = ptarray_has_m(pa);
-	LWMPOINT* ret = (LWMPOINT*)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
+	LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
 
 	for (i = 0; i < pa->npoints; i++)
 	{
-		LWPOINT* lwp;
+		LWPOINT *lwp;
 		POINT4D p;
 		getPoint4d_p(pa, i, &p);
 		lwp = lwpoint_make(srid, hasz, hasm, &p);
@@ -69,7 +69,7 @@ lwmpoint_construct(int srid, const POINTARRAY* pa)
 }
 
 void
-lwmpoint_free(LWMPOINT* mpt)
+lwmpoint_free(LWMPOINT *mpt)
 {
 	uint32_t i;
 
@@ -85,18 +85,18 @@ lwmpoint_free(LWMPOINT* mpt)
 	lwfree(mpt);
 }
 
-LWMPOINT*
-lwmpoint_from_lwgeom(const LWGEOM* g)
+LWMPOINT *
+lwmpoint_from_lwgeom(const LWGEOM *g)
 {
-	LWPOINTITERATOR* it = lwpointiterator_create(g);
+	LWPOINTITERATOR *it = lwpointiterator_create(g);
 	int has_z = lwgeom_has_z(g);
 	int has_m = lwgeom_has_m(g);
-	LWMPOINT* result = lwmpoint_construct_empty(g->srid, has_z, has_m);
+	LWMPOINT *result = lwmpoint_construct_empty(g->srid, has_z, has_m);
 	POINT4D p;
 
 	while (lwpointiterator_next(it, &p))
 	{
-		LWPOINT* lwp = lwpoint_make(g->srid, has_z, has_m, &p);
+		LWPOINT *lwp = lwpoint_make(g->srid, has_z, has_m, &p);
 		lwmpoint_add_lwpoint(result, lwp);
 	}
 

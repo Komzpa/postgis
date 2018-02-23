@@ -37,17 +37,17 @@
 
 #if POSTGIS_DEBUG_LEVEL > 2
 
-char*
-d_binary_to_hex(const uint8_t* const raw, uint32_t size, uint32_t* hexsize)
+char *
+d_binary_to_hex(const uint8_t *const raw, uint32_t size, uint32_t *hexsize)
 {
-	char* hex = NULL;
+	char *hex = NULL;
 	uint32_t i = 0;
 
 	assert(NULL != raw);
 	assert(NULL != hexsize);
 
 	*hexsize = size * 2; /* hex is 2 times bytes */
-	hex = (char*)rtalloc((*hexsize) + 1);
+	hex = (char *)rtalloc((*hexsize) + 1);
 	if (!hex)
 	{
 		rterror("d_binary_to_hex: Out of memory hexifying raw binary");
@@ -66,9 +66,9 @@ d_binary_to_hex(const uint8_t* const raw, uint32_t size, uint32_t* hexsize)
 }
 
 void
-d_print_binary_hex(const char* msg, const uint8_t* const raw, uint32_t size)
+d_print_binary_hex(const char *msg, const uint8_t *const raw, uint32_t size)
 {
-	char* hex = NULL;
+	char *hex = NULL;
 	uint32_t hexsize = 0;
 
 	assert(NULL != msg);
@@ -83,7 +83,7 @@ d_print_binary_hex(const char* msg, const uint8_t* const raw, uint32_t size)
 }
 
 size_t
-d_binptr_to_pos(const uint8_t* const ptr, const uint8_t* const end, size_t size)
+d_binptr_to_pos(const uint8_t *const ptr, const uint8_t *const end, size_t size)
 {
 	assert(NULL != ptr && NULL != end);
 
@@ -108,7 +108,7 @@ d_binptr_to_pos(const uint8_t* const ptr, const uint8_t* const end, size_t size)
  *
  */
 void
-setBits(char* ch, double val, int bits, int bitOffset)
+setBits(char *ch, double val, int bits, int bitOffset)
 {
 	char mask = 0xFF >> (8 - bits);
 	char ival = val;
@@ -154,7 +154,7 @@ setBits(char* ch, double val, int bits, int bitOffset)
 #endif /* OPTIMIZE_SPACE */
 
 void
-swap_char(uint8_t* a, uint8_t* b)
+swap_char(uint8_t *a, uint8_t *b)
 {
 	uint8_t c = 0;
 
@@ -166,7 +166,7 @@ swap_char(uint8_t* a, uint8_t* b)
 }
 
 void
-flip_endian_16(uint8_t* d)
+flip_endian_16(uint8_t *d)
 {
 	assert(NULL != d);
 
@@ -174,7 +174,7 @@ flip_endian_16(uint8_t* d)
 }
 
 void
-flip_endian_32(uint8_t* d)
+flip_endian_32(uint8_t *d)
 {
 	assert(NULL != d);
 
@@ -183,7 +183,7 @@ flip_endian_32(uint8_t* d)
 }
 
 void
-flip_endian_64(uint8_t* d)
+flip_endian_64(uint8_t *d)
 {
 	assert(NULL != d);
 
@@ -198,11 +198,11 @@ isMachineLittleEndian(void)
 {
 	static int endian_check_int = 1; /* dont modify this!!! */
 	/* 0=big endian|xdr --  1=little endian|ndr */
-	return *((uint8_t*)&endian_check_int);
+	return *((uint8_t *)&endian_check_int);
 }
 
 uint8_t
-read_uint8(const uint8_t** from)
+read_uint8(const uint8_t **from)
 {
 	assert(NULL != from);
 
@@ -219,7 +219,7 @@ write_uint8(uint8_t** from, uint8_t v) {
 */
 
 int8_t
-read_int8(const uint8_t** from)
+read_int8(const uint8_t **from)
 {
 	assert(NULL != from);
 
@@ -236,7 +236,7 @@ write_int8(uint8_t** from, int8_t v) {
 */
 
 uint16_t
-read_uint16(const uint8_t** from, uint8_t littleEndian)
+read_uint16(const uint8_t **from, uint8_t littleEndian)
 {
 	uint16_t ret = 0;
 
@@ -253,7 +253,7 @@ read_uint16(const uint8_t** from, uint8_t littleEndian)
 }
 
 void
-write_uint16(uint8_t** to, uint8_t littleEndian, uint16_t v)
+write_uint16(uint8_t **to, uint8_t littleEndian, uint16_t v)
 {
 	assert(NULL != to);
 
@@ -271,7 +271,7 @@ write_uint16(uint8_t** to, uint8_t littleEndian, uint16_t v)
 }
 
 int16_t
-read_int16(const uint8_t** from, uint8_t littleEndian)
+read_int16(const uint8_t **from, uint8_t littleEndian)
 {
 	assert(NULL != from);
 
@@ -298,7 +298,7 @@ write_int16(uint8_t** to, uint8_t littleEndian, int16_t v) {
 */
 
 uint32_t
-read_uint32(const uint8_t** from, uint8_t littleEndian)
+read_uint32(const uint8_t **from, uint8_t littleEndian)
 {
 	uint32_t ret = 0;
 
@@ -344,7 +344,7 @@ write_uint32(uint8_t** to, uint8_t littleEndian, uint32_t v) {
 */
 
 int32_t
-read_int32(const uint8_t** from, uint8_t littleEndian)
+read_int32(const uint8_t **from, uint8_t littleEndian)
 {
 	assert(NULL != from);
 
@@ -375,7 +375,7 @@ write_int32(uint8_t** to, uint8_t littleEndian, int32_t v) {
 */
 
 float
-read_float32(const uint8_t** from, uint8_t littleEndian)
+read_float32(const uint8_t **from, uint8_t littleEndian)
 {
 
 	union {
@@ -402,7 +402,7 @@ write_float32(uint8_t** from, uint8_t littleEndian, float f) {
 */
 
 double
-read_float64(const uint8_t** from, uint8_t littleEndian)
+read_float64(const uint8_t **from, uint8_t littleEndian)
 {
 
 	union {
@@ -532,18 +532,18 @@ rt_raster_serialized_size(rt_raster raster)
  *
  * Serialized form is documented in doc/RFC1-SerializedFormat.
  */
-void*
+void *
 rt_raster_serialize(rt_raster raster)
 {
 	uint32_t size = 0;
-	uint8_t* ret = NULL;
-	uint8_t* ptr = NULL;
+	uint8_t *ret = NULL;
+	uint8_t *ptr = NULL;
 	uint16_t i = 0;
 
 	assert(NULL != raster);
 
 	size = rt_raster_serialized_size(raster);
-	ret = (uint8_t*)rtalloc(size);
+	ret = (uint8_t *)rtalloc(size);
 	if (!ret)
 	{
 		rterror("rt_raster_serialize: Out of memory allocating %d bytes for serializing a raster", size);
@@ -572,7 +572,7 @@ rt_raster_serialize(rt_raster raster)
 	RASTER_DEBUG(3, "Start hex dump of raster being serialized using 0x2D to mark non-written bytes");
 
 #if POSTGIS_DEBUG_LEVEL > 2
-	uint8_t* dbg_ptr = ptr;
+	uint8_t *dbg_ptr = ptr;
 	d_print_binary_hex("HEADER", dbg_ptr, size);
 #endif
 
@@ -696,7 +696,7 @@ rt_raster_serialize(rt_raster raster)
 			ptr += 1;
 
 			/* Write path */
-			strcpy((char*)ptr, band->data.offline.path);
+			strcpy((char *)ptr, band->data.offline.path);
 			ptr += strlen(band->data.offline.path) + 1;
 		}
 		else
@@ -739,11 +739,11 @@ rt_raster_serialize(rt_raster raster)
  * form (including band data), which must be kept alive.
  */
 rt_raster
-rt_raster_deserialize(void* serialized, int header_only)
+rt_raster_deserialize(void *serialized, int header_only)
 {
 	rt_raster rast = NULL;
-	const uint8_t* ptr = NULL;
-	const uint8_t* beg = NULL;
+	const uint8_t *ptr = NULL;
+	const uint8_t *beg = NULL;
 	uint16_t i = 0;
 	uint16_t j = 0;
 	uint8_t littleEndian = isMachineLittleEndian();
@@ -776,7 +776,7 @@ rt_raster_deserialize(void* serialized, int header_only)
 		return rast;
 	}
 
-	beg = (const uint8_t*)serialized;
+	beg = (const uint8_t *)serialized;
 
 	/* Allocate registry of raster bands */
 	RASTER_DEBUG(3, "rt_raster_deserialize: Allocating memory for bands");
@@ -915,7 +915,7 @@ rt_raster_deserialize(void* serialized, int header_only)
 			ptr += 1;
 
 			/* Register path */
-			pathlen = strlen((char*)ptr);
+			pathlen = strlen((char *)ptr);
 			band->data.offline.path = rtalloc(sizeof(char) * (pathlen + 1));
 			if (band->data.offline.path == NULL)
 			{
@@ -936,13 +936,13 @@ rt_raster_deserialize(void* serialized, int header_only)
 		{
 			/* Register data */
 			const uint32_t datasize = rast->width * rast->height * pixbytes;
-			band->data.mem = (uint8_t*)ptr;
+			band->data.mem = (uint8_t *)ptr;
 			ptr += datasize;
 		}
 
 		/* Skip bytes of padding up to 8-bytes boundary */
 #if POSTGIS_DEBUG_LEVEL > 0
-		const uint8_t* padbeg = ptr;
+		const uint8_t *padbeg = ptr;
 #endif
 		while (0 != ((ptr - beg) % 8))
 		{

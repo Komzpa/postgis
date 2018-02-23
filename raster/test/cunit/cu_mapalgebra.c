@@ -24,7 +24,7 @@
 #include "CUnit/Basic.h"
 #include "cu_tester.h"
 
-typedef struct _callback_userargs_t* _callback_userargs;
+typedef struct _callback_userargs_t *_callback_userargs;
 struct _callback_userargs_t
 {
 	uint16_t rasters;
@@ -34,7 +34,7 @@ struct _callback_userargs_t
 
 /* callback for 1 raster, 0 distance, FIRST or SECOND or LAST or UNION or INTERSECTION */
 static int
-testRasterIterator1_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator1_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -84,7 +84,7 @@ testRasterIterator1_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 0 distance, UNION */
 static int
-testRasterIterator2_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator2_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -165,7 +165,7 @@ testRasterIterator2_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 0 distance, INTERSECTION */
 static int
-testRasterIterator3_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator3_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -223,7 +223,7 @@ testRasterIterator3_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 0 distance, FIRST */
 static int
-testRasterIterator4_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator4_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -272,7 +272,7 @@ testRasterIterator4_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 0 distance, SECOND or LAST */
 static int
-testRasterIterator5_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator5_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -319,7 +319,7 @@ testRasterIterator5_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 0 distance, CUSTOM */
 static int
-testRasterIterator6_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator6_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -369,7 +369,7 @@ testRasterIterator6_callback(rt_iterator_arg arg, void* userarg, double* value, 
 
 /* callback for 2 raster, 1 distance, CUSTOM */
 static int
-testRasterIterator7_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+testRasterIterator7_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	_callback_userargs _userarg = (_callback_userargs)userarg;
 
@@ -675,7 +675,7 @@ test_raster_iterator()
 static void
 test_band_reclass()
 {
-	rt_reclassexpr* exprset;
+	rt_reclassexpr *exprset;
 
 	rt_raster raster;
 	rt_band band;

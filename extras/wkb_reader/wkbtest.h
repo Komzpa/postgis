@@ -16,7 +16,7 @@ typedef char bool;
 
 // This is modified from the postgres documentation for client programs (example programs)
 
-void decode_wkb(char* wkb, int* size);
+void decode_wkb(char *wkb, int *size);
 
 /*
 //we need to know the endian of the client machine.  This is

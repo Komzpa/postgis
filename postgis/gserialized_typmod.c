@@ -59,8 +59,8 @@ Datum geometry_enforce_typmod(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(postgis_typmod_out);
 Datum postgis_typmod_out(PG_FUNCTION_ARGS)
 {
-	char* s = (char*)palloc(64);
-	char* str = s;
+	char *s = (char *)palloc(64);
+	char *str = s;
 	int32 typmod = PG_GETARG_INT32(0);
 	int32 srid = TYPMOD_GET_SRID(typmod);
 	int32 type = TYPMOD_GET_TYPE(typmod);
@@ -104,8 +104,8 @@ Datum postgis_typmod_out(PG_FUNCTION_ARGS)
  * Check the consistency of the metadata we want to enforce in the typmod:
  * srid, type and dimensionality. If things are inconsistent, shut down the query.
  */
-GSERIALIZED*
-postgis_valid_typmod(GSERIALIZED* gser, int32_t typmod)
+GSERIALIZED *
+postgis_valid_typmod(GSERIALIZED *gser, int32_t typmod)
 {
 	int32 geom_srid = gserialized_get_srid(gser);
 	int32 geom_type = gserialized_get_type(gser);
@@ -136,7 +136,7 @@ postgis_valid_typmod(GSERIALIZED* gser, int32_t typmod)
 	 */
 	if (typmod_type == POINTTYPE && geom_type == MULTIPOINTTYPE && gserialized_is_empty(gser))
 	{
-		LWPOINT* empty_point = lwpoint_construct_empty(geom_srid, geom_z, geom_m);
+		LWPOINT *empty_point = lwpoint_construct_empty(geom_srid, geom_z, geom_m);
 		geom_type = POINTTYPE;
 		pfree(gser);
 		if (gserialized_is_geodetic(gser))
@@ -204,10 +204,10 @@ postgis_valid_typmod(GSERIALIZED* gser, int32_t typmod)
 }
 
 static uint32
-gserialized_typmod_in(ArrayType* arr, int is_geography)
+gserialized_typmod_in(ArrayType *arr, int is_geography)
 {
 	int32 typmod = 0;
-	Datum* elem_values;
+	Datum *elem_values;
 	int n = 0;
 	int i = 0;
 
@@ -241,7 +241,7 @@ gserialized_typmod_in(ArrayType* arr, int is_geography)
 	{
 		if (i == 0) /* TYPE */
 		{
-			char* s = DatumGetCString(elem_values[i]);
+			char *s = DatumGetCString(elem_values[i]);
 			uint8_t type = 0;
 			int z = 0;
 			int m = 0;
@@ -281,7 +281,7 @@ gserialized_typmod_in(ArrayType* arr, int is_geography)
 PG_FUNCTION_INFO_V1(geography_typmod_in);
 Datum geography_typmod_in(PG_FUNCTION_ARGS)
 {
-	ArrayType* arr = (ArrayType*)DatumGetPointer(PG_GETARG_DATUM(0));
+	ArrayType *arr = (ArrayType *)DatumGetPointer(PG_GETARG_DATUM(0));
 	int32 typmod = gserialized_typmod_in(arr, LW_TRUE);
 	int srid = TYPMOD_GET_SRID(typmod);
 	/* Check the SRID is legal (geographic coordinates) */
@@ -298,7 +298,7 @@ Datum geography_typmod_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geometry_typmod_in);
 Datum geometry_typmod_in(PG_FUNCTION_ARGS)
 {
-	ArrayType* arr = (ArrayType*)DatumGetPointer(PG_GETARG_DATUM(0));
+	ArrayType *arr = (ArrayType *)DatumGetPointer(PG_GETARG_DATUM(0));
 	uint32 typmod = gserialized_typmod_in(arr, LW_FALSE); /* Not a geography */
 	;
 	PG_RETURN_INT32(typmod);
@@ -312,7 +312,7 @@ Datum geometry_typmod_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_enforce_typmod);
 Datum geography_enforce_typmod(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* arg = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *arg = PG_GETARG_GSERIALIZED_P(0);
 	int32 typmod = PG_GETARG_INT32(1);
 	/* We don't need to have different behavior based on explicitness. */
 	/* bool isExplicit = PG_GETARG_BOOL(2); */
@@ -331,7 +331,7 @@ Datum geography_enforce_typmod(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geometry_enforce_typmod);
 Datum geometry_enforce_typmod(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* arg = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *arg = PG_GETARG_GSERIALIZED_P(0);
 	int32 typmod = PG_GETARG_INT32(1);
 	/* We don't need to have different behavior based on explicitness. */
 	/* bool isExplicit = PG_GETARG_BOOL(2); */
@@ -351,9 +351,9 @@ Datum postgis_typmod_type(PG_FUNCTION_ARGS)
 {
 	int32 typmod = PG_GETARG_INT32(0);
 	int32 type = TYPMOD_GET_TYPE(typmod);
-	char* s = (char*)palloc(64);
-	char* ptr = s;
-	text* stext;
+	char *s = (char *)palloc(64);
+	char *ptr = s;
+	text *stext;
 
 	/* Has type? */
 	if (typmod < 0 || type == 0)

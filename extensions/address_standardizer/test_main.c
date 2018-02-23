@@ -14,9 +14,9 @@
 #define GAZIN "gazeteer.csv"
 #define RULESIN "rules.txt"
 
-static int standardize_command_line(STANDARDIZER* std, char* input_str, int option);
+static int standardize_command_line(STANDARDIZER *std, char *input_str, int option);
 
-void print_lexicon(ENTRY** hash_table);
+void print_lexicon(ENTRY **hash_table);
 
 /*
 parse_csv() parses the following file format into fields
@@ -36,12 +36,12 @@ called by lexicon.c (read_lexicon)
 ctype.h (isspace)
 uses macro BLANK_STRING
 -------------------------------------------------------*/
-static char*
-convert_field(char* buf, char* inp)
+static char *
+convert_field(char *buf, char *inp)
 {
 	char c;
-	char* d = buf;
-	char* s = inp;
+	char *d = buf;
+	char *s = inp;
 
 	*d = '\0';
 	/* -- space at the beginning of a line will stop the read -- */
@@ -61,9 +61,9 @@ convert_field(char* buf, char* inp)
 }
 
 static int
-parse_csv(char* buf, int* seq, char* word, char* stdword, int* token)
+parse_csv(char *buf, int *seq, char *word, char *stdword, int *token)
 {
-	char* next_str;
+	char *next_str;
 	char num_str[512];
 
 	if ((next_str = convert_field(num_str, buf)) == NULL) return 0;
@@ -88,12 +88,12 @@ returns the number of items read.
 */
 
 int
-parse_rule(char* buf, int* rule)
+parse_rule(char *buf, int *rule)
 {
 	int nr = 0;
-	int* r = rule;
-	char* p = buf;
-	char* q;
+	int *r = rule;
+	char *p = buf;
+	char *q;
 
 	while (1)
 	{
@@ -121,12 +121,12 @@ Usage()
 }
 
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
-	STANDARDIZER* std;
-	LEXICON* lex;
-	LEXICON* gaz;
-	RULES* rules;
+	STANDARDIZER *std;
+	LEXICON *lex;
+	LEXICON *gaz;
+	RULES *rules;
 
 	char buf[1024];
 
@@ -140,11 +140,11 @@ main(int argc, char* argv[])
 	int err;
 	int cnt;
 	int option = 0;
-	char* flex;
-	char* fgaz;
-	char* frules;
+	char *flex;
+	char *fgaz;
+	char *frules;
 
-	FILE* in;
+	FILE *in;
 
 	if (argc > 3 && !strcmp(argv[1], "-o"))
 	{
@@ -273,9 +273,9 @@ main(int argc, char* argv[])
 }
 
 static int
-standardize_command_line(STANDARDIZER* std, char* input_str, int option)
+standardize_command_line(STANDARDIZER *std, char *input_str, int option)
 {
-	STDADDR* result;
+	STDADDR *result;
 	int fld_num, have_user_macros, num_prompts;
 	char unstandard_mic[MAXSTRLEN];
 	char unstandard_mac_left[MAXSTRLEN];

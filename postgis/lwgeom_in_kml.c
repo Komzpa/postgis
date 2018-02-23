@@ -58,9 +58,9 @@ TODO:
 */
 
 Datum geom_from_kml(PG_FUNCTION_ARGS);
-static LWGEOM* parse_kml(xmlNodePtr xnode, bool* hasz);
+static LWGEOM *parse_kml(xmlNodePtr xnode, bool *hasz);
 
-#define KML_NS ((char*)"http://www.opengis.net/kml/2.2")
+#define KML_NS ((char *)"http://www.opengis.net/kml/2.2")
 
 /**
  * Ability to parse KML geometry fragment and to return an LWGEOM
@@ -69,12 +69,12 @@ static LWGEOM* parse_kml(xmlNodePtr xnode, bool* hasz);
 PG_FUNCTION_INFO_V1(geom_from_kml);
 Datum geom_from_kml(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
+	GSERIALIZED *geom;
 	LWGEOM *lwgeom, *hlwgeom;
 	xmlDocPtr xmldoc;
-	text* xml_input;
+	text *xml_input;
 	int xml_size;
-	char* xml;
+	char *xml;
 	bool hasz = true;
 	xmlNodePtr xmlroot = NULL;
 
@@ -114,7 +114,7 @@ Datum geom_from_kml(PG_FUNCTION_ARGS)
 	 */
 	if (!hasz)
 	{
-		LWGEOM* tmp = lwgeom_force_2d(lwgeom);
+		LWGEOM *tmp = lwgeom_force_2d(lwgeom);
 		lwgeom_free(lwgeom);
 		lwgeom = tmp;
 	}
@@ -152,7 +152,7 @@ is_kml_namespace(xmlNodePtr xnode, bool is_strict)
 
 		if (!xmlStrcmp(xnode->ns->prefix, (*p)->prefix))
 		{
-			if (!strcmp((char*)(*p)->href, KML_NS))
+			if (!strcmp((char *)(*p)->href, KML_NS))
 			{
 				xmlFree(ns);
 				return true;
@@ -271,12 +271,12 @@ lwpgnotice("State: %d, *p=%c", st, *p);
 /**
  * Parse kml:coordinates
  */
-static POINTARRAY*
-parse_kml_coordinates(xmlNodePtr xnode, bool* hasz)
+static POINTARRAY *
+parse_kml_coordinates(xmlNodePtr xnode, bool *hasz)
 {
-	xmlChar* kml_coord;
+	xmlChar *kml_coord;
 	bool found;
-	POINTARRAY* dpa;
+	POINTARRAY *dpa;
 	int seen_kml_dims = 0;
 	int kml_dims;
 	char *p, *q;
@@ -289,7 +289,7 @@ parse_kml_coordinates(xmlNodePtr xnode, bool* hasz)
 	{
 		if (xnode->type != XML_ELEMENT_NODE) continue;
 		if (!is_kml_namespace(xnode, false)) continue;
-		if (strcmp((char*)xnode->name, "coordinates")) continue;
+		if (strcmp((char *)xnode->name, "coordinates")) continue;
 
 		found = true;
 		break;
@@ -298,7 +298,7 @@ parse_kml_coordinates(xmlNodePtr xnode, bool* hasz)
 
 	/* We begin to retrieve coordinates string */
 	kml_coord = xmlNodeGetContent(xnode);
-	p = (char*)kml_coord;
+	p = (char *)kml_coord;
 
 	/* KML coordinates pattern:     x1,y1 x2,y2
 	 *                              x1,y1,z1 x2,y2,z2
@@ -379,42 +379,42 @@ parse_kml_coordinates(xmlNodePtr xnode, bool* hasz)
 /**
  * Parse KML point
  */
-static LWGEOM*
-parse_kml_point(xmlNodePtr xnode, bool* hasz)
+static LWGEOM *
+parse_kml_point(xmlNodePtr xnode, bool *hasz)
 {
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	if (xnode->children == NULL) lwpgerror("invalid KML representation");
 	pa = parse_kml_coordinates(xnode->children, hasz);
 	if (pa->npoints != 1) lwpgerror("invalid KML representation");
 
-	return (LWGEOM*)lwpoint_construct(4326, NULL, pa);
+	return (LWGEOM *)lwpoint_construct(4326, NULL, pa);
 }
 
 /**
  * Parse KML lineString
  */
-static LWGEOM*
-parse_kml_line(xmlNodePtr xnode, bool* hasz)
+static LWGEOM *
+parse_kml_line(xmlNodePtr xnode, bool *hasz)
 {
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	if (xnode->children == NULL) lwpgerror("invalid KML representation");
 	pa = parse_kml_coordinates(xnode->children, hasz);
 	if (pa->npoints < 2) lwpgerror("invalid KML representation");
 
-	return (LWGEOM*)lwline_construct(4326, NULL, pa);
+	return (LWGEOM *)lwline_construct(4326, NULL, pa);
 }
 
 /**
  * Parse KML Polygon
  */
-static LWGEOM*
-parse_kml_polygon(xmlNodePtr xnode, bool* hasz)
+static LWGEOM *
+parse_kml_polygon(xmlNodePtr xnode, bool *hasz)
 {
 	int ring;
 	xmlNodePtr xa, xb;
-	POINTARRAY** ppa = NULL;
+	POINTARRAY **ppa = NULL;
 	int outer_rings = 0;
 
 	for (xa = xnode->children; xa != NULL; xa = xa->next)
@@ -423,16 +423,16 @@ parse_kml_polygon(xmlNodePtr xnode, bool* hasz)
 		/* Polygon/outerBoundaryIs */
 		if (xa->type != XML_ELEMENT_NODE) continue;
 		if (!is_kml_namespace(xa, false)) continue;
-		if (strcmp((char*)xa->name, "outerBoundaryIs")) continue;
+		if (strcmp((char *)xa->name, "outerBoundaryIs")) continue;
 
 		for (xb = xa->children; xb != NULL; xb = xb->next)
 		{
 
 			if (xb->type != XML_ELEMENT_NODE) continue;
 			if (!is_kml_namespace(xb, false)) continue;
-			if (strcmp((char*)xb->name, "LinearRing")) continue;
+			if (strcmp((char *)xb->name, "LinearRing")) continue;
 
-			ppa = (POINTARRAY**)lwalloc(sizeof(POINTARRAY*));
+			ppa = (POINTARRAY **)lwalloc(sizeof(POINTARRAY *));
 			ppa[0] = parse_kml_coordinates(xb->children, hasz);
 
 			if (ppa[0]->npoints < 4) lwpgerror("invalid KML representation");
@@ -456,16 +456,16 @@ parse_kml_polygon(xmlNodePtr xnode, bool* hasz)
 		/* Polygon/innerBoundaryIs */
 		if (xa->type != XML_ELEMENT_NODE) continue;
 		if (!is_kml_namespace(xa, false)) continue;
-		if (strcmp((char*)xa->name, "innerBoundaryIs")) continue;
+		if (strcmp((char *)xa->name, "innerBoundaryIs")) continue;
 
 		for (xb = xa->children; xb != NULL; xb = xb->next)
 		{
 
 			if (xb->type != XML_ELEMENT_NODE) continue;
 			if (!is_kml_namespace(xb, false)) continue;
-			if (strcmp((char*)xb->name, "LinearRing")) continue;
+			if (strcmp((char *)xb->name, "LinearRing")) continue;
 
-			ppa = (POINTARRAY**)lwrealloc(ppa, sizeof(POINTARRAY*) * (ring + 1));
+			ppa = (POINTARRAY **)lwrealloc(ppa, sizeof(POINTARRAY *) * (ring + 1));
 			ppa[ring] = parse_kml_coordinates(xb->children, hasz);
 
 			if (ppa[ring]->npoints < 4) lwpgerror("invalid KML representation");
@@ -485,19 +485,19 @@ parse_kml_polygon(xmlNodePtr xnode, bool* hasz)
 	/* Exterior Ring is mandatory */
 	if (ppa == NULL || ppa[0] == NULL) lwpgerror("invalid KML representation");
 
-	return (LWGEOM*)lwpoly_construct(4326, NULL, ring, ppa);
+	return (LWGEOM *)lwpoly_construct(4326, NULL, ring, ppa);
 }
 
 /**
  * Parse KML MultiGeometry
  */
-static LWGEOM*
-parse_kml_multi(xmlNodePtr xnode, bool* hasz)
+static LWGEOM *
+parse_kml_multi(xmlNodePtr xnode, bool *hasz)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 	xmlNodePtr xa;
 
-	geom = (LWGEOM*)lwcollection_construct_empty(COLLECTIONTYPE, 4326, 1, 0);
+	geom = (LWGEOM *)lwcollection_construct_empty(COLLECTIONTYPE, 4326, 1, 0);
 
 	for (xa = xnode->children; xa != NULL; xa = xa->next)
 	{
@@ -505,12 +505,12 @@ parse_kml_multi(xmlNodePtr xnode, bool* hasz)
 		if (xa->type != XML_ELEMENT_NODE) continue;
 		if (!is_kml_namespace(xa, false)) continue;
 
-		if (!strcmp((char*)xa->name, "Point") || !strcmp((char*)xa->name, "LineString") ||
-		    !strcmp((char*)xa->name, "Polygon") || !strcmp((char*)xa->name, "MultiGeometry"))
+		if (!strcmp((char *)xa->name, "Point") || !strcmp((char *)xa->name, "LineString") ||
+		    !strcmp((char *)xa->name, "Polygon") || !strcmp((char *)xa->name, "MultiGeometry"))
 		{
 
 			if (xa->children == NULL) break;
-			geom = (LWGEOM*)lwcollection_add_lwgeom((LWCOLLECTION*)geom, parse_kml(xa, hasz));
+			geom = (LWGEOM *)lwcollection_add_lwgeom((LWCOLLECTION *)geom, parse_kml(xa, hasz));
 		}
 	}
 
@@ -520,8 +520,8 @@ parse_kml_multi(xmlNodePtr xnode, bool* hasz)
 /**
  * Parse KML
  */
-static LWGEOM*
-parse_kml(xmlNodePtr xnode, bool* hasz)
+static LWGEOM *
+parse_kml(xmlNodePtr xnode, bool *hasz)
 {
 	xmlNodePtr xa = xnode;
 
@@ -530,13 +530,13 @@ parse_kml(xmlNodePtr xnode, bool* hasz)
 
 	if (xa == NULL) lwpgerror("invalid KML representation");
 
-	if (!strcmp((char*)xa->name, "Point")) return parse_kml_point(xa, hasz);
+	if (!strcmp((char *)xa->name, "Point")) return parse_kml_point(xa, hasz);
 
-	if (!strcmp((char*)xa->name, "LineString")) return parse_kml_line(xa, hasz);
+	if (!strcmp((char *)xa->name, "LineString")) return parse_kml_line(xa, hasz);
 
-	if (!strcmp((char*)xa->name, "Polygon")) return parse_kml_polygon(xa, hasz);
+	if (!strcmp((char *)xa->name, "Polygon")) return parse_kml_polygon(xa, hasz);
 
-	if (!strcmp((char*)xa->name, "MultiGeometry")) return parse_kml_multi(xa, hasz);
+	if (!strcmp((char *)xa->name, "MultiGeometry")) return parse_kml_multi(xa, hasz);
 
 	lwpgerror("invalid KML representation");
 	return NULL; /* Never reach */

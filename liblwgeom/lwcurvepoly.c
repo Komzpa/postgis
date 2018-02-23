@@ -30,10 +30,10 @@
 #include "liblwgeom_internal.h"
 #include "lwgeom_log.h"
 
-LWCURVEPOLY*
+LWCURVEPOLY *
 lwcurvepoly_construct_empty(int srid, char hasz, char hasm)
 {
-	LWCURVEPOLY* ret;
+	LWCURVEPOLY *ret;
 
 	ret = lwalloc(sizeof(LWCURVEPOLY));
 	ret->type = CURVEPOLYTYPE;
@@ -41,16 +41,16 @@ lwcurvepoly_construct_empty(int srid, char hasz, char hasm)
 	ret->srid = srid;
 	ret->nrings = 0;
 	ret->maxrings = 1; /* Allocate room for sub-members, just in case. */
-	ret->rings = lwalloc(ret->maxrings * sizeof(LWGEOM*));
+	ret->rings = lwalloc(ret->maxrings * sizeof(LWGEOM *));
 	ret->bbox = NULL;
 
 	return ret;
 }
 
-LWCURVEPOLY*
-lwcurvepoly_construct_from_lwpoly(LWPOLY* lwpoly)
+LWCURVEPOLY *
+lwcurvepoly_construct_from_lwpoly(LWPOLY *lwpoly)
 {
-	LWCURVEPOLY* ret;
+	LWCURVEPOLY *ret;
 	uint32_t i;
 	ret = lwalloc(sizeof(LWCURVEPOLY));
 	ret->type = CURVEPOLYTYPE;
@@ -58,7 +58,7 @@ lwcurvepoly_construct_from_lwpoly(LWPOLY* lwpoly)
 	ret->srid = lwpoly->srid;
 	ret->nrings = lwpoly->nrings;
 	ret->maxrings = lwpoly->nrings; /* Allocate room for sub-members, just in case. */
-	ret->rings = lwalloc(ret->maxrings * sizeof(LWGEOM*));
+	ret->rings = lwalloc(ret->maxrings * sizeof(LWGEOM *));
 	ret->bbox = lwpoly->bbox ? gbox_clone(lwpoly->bbox) : NULL;
 	for (i = 0; i < ret->nrings; i++)
 	{
@@ -69,7 +69,7 @@ lwcurvepoly_construct_from_lwpoly(LWPOLY* lwpoly)
 }
 
 int
-lwcurvepoly_add_ring(LWCURVEPOLY* poly, LWGEOM* ring)
+lwcurvepoly_add_ring(LWCURVEPOLY *poly, LWGEOM *ring)
 {
 	uint32_t i;
 
@@ -99,14 +99,14 @@ lwcurvepoly_add_ring(LWCURVEPOLY* poly, LWGEOM* ring)
 	{
 		poly->maxrings = 2;
 		poly->nrings = 0;
-		poly->rings = lwalloc(poly->maxrings * sizeof(LWGEOM*));
+		poly->rings = lwalloc(poly->maxrings * sizeof(LWGEOM *));
 	}
 
 	/* Allocate more space if we need it */
 	if (poly->nrings == poly->maxrings)
 	{
 		poly->maxrings *= 2;
-		poly->rings = lwrealloc(poly->rings, sizeof(LWGEOM*) * poly->maxrings);
+		poly->rings = lwrealloc(poly->rings, sizeof(LWGEOM *) * poly->maxrings);
 	}
 
 	/* Make sure we don't already have a reference to this geom */
@@ -120,7 +120,7 @@ lwcurvepoly_add_ring(LWCURVEPOLY* poly, LWGEOM* ring)
 	}
 
 	/* Add the ring and increment the ring count */
-	poly->rings[poly->nrings] = (LWGEOM*)ring;
+	poly->rings[poly->nrings] = (LWGEOM *)ring;
 	poly->nrings++;
 	return LW_SUCCESS;
 }
@@ -129,11 +129,11 @@ lwcurvepoly_add_ring(LWCURVEPOLY* poly, LWGEOM* ring)
  * This should be rewritten to make use of the curve itself.
  */
 double
-lwcurvepoly_area(const LWCURVEPOLY* curvepoly)
+lwcurvepoly_area(const LWCURVEPOLY *curvepoly)
 {
 	double area = 0.0;
-	LWPOLY* poly;
-	if (lwgeom_is_empty((LWGEOM*)curvepoly)) return 0.0;
+	LWPOLY *poly;
+	if (lwgeom_is_empty((LWGEOM *)curvepoly)) return 0.0;
 	poly = lwcurvepoly_stroke(curvepoly, 32);
 	area = lwpoly_area(poly);
 	lwpoly_free(poly);
@@ -141,7 +141,7 @@ lwcurvepoly_area(const LWCURVEPOLY* curvepoly)
 }
 
 double
-lwcurvepoly_perimeter(const LWCURVEPOLY* poly)
+lwcurvepoly_perimeter(const LWCURVEPOLY *poly)
 {
 	double result = 0.0;
 	uint32_t i;
@@ -153,7 +153,7 @@ lwcurvepoly_perimeter(const LWCURVEPOLY* poly)
 }
 
 double
-lwcurvepoly_perimeter_2d(const LWCURVEPOLY* poly)
+lwcurvepoly_perimeter_2d(const LWCURVEPOLY *poly)
 {
 	double result = 0.0;
 	uint32_t i;

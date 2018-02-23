@@ -48,10 +48,10 @@ static void
 test_lwgeom_voronoi_diagram(void)
 {
 #if POSTGIS_GEOS_VERSION >= 35
-	LWGEOM* in = lwgeom_from_wkt("MULTIPOINT(4 4, 5 5, 6 6)", LW_PARSER_CHECK_NONE);
+	LWGEOM *in = lwgeom_from_wkt("MULTIPOINT(4 4, 5 5, 6 6)", LW_PARSER_CHECK_NONE);
 
-	LWGEOM* out_boundaries = lwgeom_voronoi_diagram(in, NULL, 0, 0);
-	LWGEOM* out_lines = lwgeom_voronoi_diagram(in, NULL, 0, 1);
+	LWGEOM *out_boundaries = lwgeom_voronoi_diagram(in, NULL, 0, 0);
+	LWGEOM *out_lines = lwgeom_voronoi_diagram(in, NULL, 0, 1);
 
 	/* For boundaries we get a generic LWCOLLECTION */
 	CU_ASSERT_EQUAL(COLLECTIONTYPE, lwgeom_get_type(out_boundaries));
@@ -68,12 +68,12 @@ static void
 test_lwgeom_voronoi_diagram_custom_envelope(void)
 {
 #if POSTGIS_GEOS_VERSION >= 35
-	LWGEOM* in = lwgeom_from_wkt("MULTIPOINT(4 4, 5 5, 6 6)", LW_PARSER_CHECK_NONE);
-	LWGEOM* for_extent = lwgeom_from_wkt("LINESTRING (-10 -10, 10 10)", LW_PARSER_CHECK_NONE);
-	const GBOX* clipping_extent = lwgeom_get_bbox(for_extent);
+	LWGEOM *in = lwgeom_from_wkt("MULTIPOINT(4 4, 5 5, 6 6)", LW_PARSER_CHECK_NONE);
+	LWGEOM *for_extent = lwgeom_from_wkt("LINESTRING (-10 -10, 10 10)", LW_PARSER_CHECK_NONE);
+	const GBOX *clipping_extent = lwgeom_get_bbox(for_extent);
 
-	LWGEOM* out = lwgeom_voronoi_diagram(in, clipping_extent, 0, 0);
-	const GBOX* output_extent = lwgeom_get_bbox(out);
+	LWGEOM *out = lwgeom_voronoi_diagram(in, clipping_extent, 0, 0);
+	const GBOX *output_extent = lwgeom_get_bbox(out);
 
 	CU_ASSERT_TRUE(gbox_same(clipping_extent, output_extent));
 
@@ -85,10 +85,10 @@ test_lwgeom_voronoi_diagram_custom_envelope(void)
 
 #if POSTGIS_GEOS_VERSION >= 35
 static void
-assert_empty_diagram(char* wkt, double tolerance)
+assert_empty_diagram(char *wkt, double tolerance)
 {
-	LWGEOM* in = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
-	LWGEOM* out = lwgeom_voronoi_diagram(in, NULL, tolerance, 0);
+	LWGEOM *in = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *out = lwgeom_voronoi_diagram(in, NULL, tolerance, 0);
 
 	CU_ASSERT_TRUE(lwgeom_is_collection(out));
 	CU_ASSERT_EQUAL(COLLECTIONTYPE, lwgeom_get_type(out));

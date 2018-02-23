@@ -21,24 +21,24 @@
 #include "measures.h"
 #include "lwtree.h"
 
-static LWGEOM*
-lwgeom_from_text(const char* str)
+static LWGEOM *
+lwgeom_from_text(const char *str)
 {
 	LWGEOM_PARSER_RESULT r;
-	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char*)str, LW_PARSER_CHECK_NONE)) return NULL;
+	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char *)str, LW_PARSER_CHECK_NONE)) return NULL;
 	return r.geom;
 }
 
 #define DIST2DTEST(str1, str2, res) do_test_mindistance2d_tolerance(str1, str2, res, __LINE__)
 
 static void
-do_test_mindistance2d_tolerance(char* in1, char* in2, double expected_res, int line)
+do_test_mindistance2d_tolerance(char *in1, char *in2, double expected_res, int line)
 {
-	LWGEOM* lw1;
-	LWGEOM* lw2;
+	LWGEOM *lw1;
+	LWGEOM *lw2;
 	double distance;
-	char* msg1 = "test_mindistance2d_tolerance failed (got %g expected %g) at line %d\n";
-	char* msg2 = "\n\ndo_test_mindistance2d_tolerance: NULL lwgeom generated from WKT\n  %s\n\n";
+	char *msg1 = "test_mindistance2d_tolerance failed (got %g expected %g) at line %d\n";
+	char *msg2 = "\n\ndo_test_mindistance2d_tolerance: NULL lwgeom generated from WKT\n  %s\n\n";
 
 	lw1 = lwgeom_from_wkt(in1, LW_PARSER_CHECK_NONE);
 	lw2 = lwgeom_from_wkt(in2, LW_PARSER_CHECK_NONE);
@@ -150,7 +150,7 @@ test_mindistance2d_tolerance(void)
 	/*
 	 * CurvePolygon and Point
 	 */
-	static char* cs1 =
+	static char *cs1 =
 	    "CURVEPOLYGON(COMPOUNDCURVE(CIRCULARSTRING(1 6, 6 1, 9 7),(9 7, 3 13, 1 6)),COMPOUNDCURVE((3 6, 5 4, 7 4, "
 	    "7 6),CIRCULARSTRING(7 6,5 8,3 6)))";
 	DIST2DTEST(cs1, "POINT(3 14)", 1);
@@ -183,7 +183,7 @@ test_mindistance2d_tolerance(void)
 	/*
 	 * MultiSurface and CurvePolygon
 	 */
-	static char* cs2 =
+	static char *cs2 =
 	    "MULTISURFACE(POLYGON((0 0,0 4,4 4,4 0,0 0)),CURVEPOLYGON(CIRCULARSTRING(8 2,10 4,12 2,10 0,8 2)))";
 	DIST2DTEST(cs2, "CURVEPOLYGON(CIRCULARSTRING(5 2,6 3,7 2,6 1,5 2))", 1);
 	DIST2DTEST(cs2, "CURVEPOLYGON(CIRCULARSTRING(4 2,5 3,6 2,5 1,4 2))", 0);
@@ -201,7 +201,7 @@ test_mindistance2d_tolerance(void)
 }
 
 static int
-tree_pt(RECT_NODE* tree, double x, double y)
+tree_pt(RECT_NODE *tree, double x, double y)
 {
 	POINT2D pt;
 	pt.x = x;
@@ -212,8 +212,8 @@ tree_pt(RECT_NODE* tree, double x, double y)
 static void
 test_rect_tree_contains_point(void)
 {
-	LWGEOM* poly;
-	RECT_NODE* tree;
+	LWGEOM *poly;
+	RECT_NODE *tree;
 
 	/**********************************************************************
 	 * curvepolygon
@@ -355,12 +355,12 @@ test_rect_tree_contains_point(void)
 }
 
 static int
-tree_inter(const char* wkt1, const char* wkt2)
+tree_inter(const char *wkt1, const char *wkt2)
 {
-	LWGEOM* g1 = lwgeom_from_wkt(wkt1, LW_PARSER_CHECK_NONE);
-	LWGEOM* g2 = lwgeom_from_wkt(wkt2, LW_PARSER_CHECK_NONE);
-	RECT_NODE* t1 = rect_tree_from_lwgeom(g1);
-	RECT_NODE* t2 = rect_tree_from_lwgeom(g2);
+	LWGEOM *g1 = lwgeom_from_wkt(wkt1, LW_PARSER_CHECK_NONE);
+	LWGEOM *g2 = lwgeom_from_wkt(wkt2, LW_PARSER_CHECK_NONE);
+	RECT_NODE *t1 = rect_tree_from_lwgeom(g1);
+	RECT_NODE *t2 = rect_tree_from_lwgeom(g2);
 	int result = rect_tree_intersects_tree(t1, t2);
 	rect_tree_free(t1);
 	rect_tree_free(t2);
@@ -414,12 +414,12 @@ test_rect_tree_intersects_tree(void)
 }
 
 static double
-test_rect_tree_distance_tree_case(const char* wkt1, const char* wkt2)
+test_rect_tree_distance_tree_case(const char *wkt1, const char *wkt2)
 {
-	LWGEOM* lw1 = lwgeom_from_wkt(wkt1, LW_PARSER_CHECK_NONE);
-	LWGEOM* lw2 = lwgeom_from_wkt(wkt2, LW_PARSER_CHECK_NONE);
-	RECT_NODE* n1 = rect_tree_from_lwgeom(lw1);
-	RECT_NODE* n2 = rect_tree_from_lwgeom(lw2);
+	LWGEOM *lw1 = lwgeom_from_wkt(wkt1, LW_PARSER_CHECK_NONE);
+	LWGEOM *lw2 = lwgeom_from_wkt(wkt2, LW_PARSER_CHECK_NONE);
+	RECT_NODE *n1 = rect_tree_from_lwgeom(lw1);
+	RECT_NODE *n2 = rect_tree_from_lwgeom(lw2);
 
 	// rect_tree_printf(n1, 0);
 	// rect_tree_printf(n2, 0);
@@ -441,7 +441,7 @@ test_rect_tree_distance_tree_case(const char* wkt1, const char* wkt2)
 static void
 test_rect_tree_distance_tree(void)
 {
-	const char* wkt;
+	const char *wkt;
 
 	wkt =
 	    "MULTIPOLYGON(((-123.35702791281 48.4232302445918,-123.35689654493 48.4237265810249,-123.354053908057 "
@@ -510,9 +510,9 @@ test_rect_tree_distance_tree(void)
 static void
 test_lwgeom_segmentize2d(void)
 {
-	LWGEOM* linein = lwgeom_from_wkt("LINESTRING(0 0,10 0)", LW_PARSER_CHECK_NONE);
-	LWGEOM* lineout = lwgeom_segmentize2d(linein, 5);
-	char* strout = lwgeom_to_ewkt(lineout);
+	LWGEOM *linein = lwgeom_from_wkt("LINESTRING(0 0,10 0)", LW_PARSER_CHECK_NONE);
+	LWGEOM *lineout = lwgeom_segmentize2d(linein, 5);
+	char *strout = lwgeom_to_ewkt(lineout);
 	ASSERT_STRING_EQUAL(strout, "LINESTRING(0 0,5 0,10 0)");
 	lwfree(strout);
 	lwgeom_free(linein);
@@ -565,10 +565,10 @@ test_lwgeom_segmentize2d(void)
 static void
 test_lwgeom_locate_along(void)
 {
-	LWGEOM* geom = NULL;
-	LWGEOM* out = NULL;
+	LWGEOM *geom = NULL;
+	LWGEOM *out = NULL;
 	double measure = 105.0;
-	char* str;
+	char *str;
 
 	/* ST_Locatealong(ST_GeomFromText('MULTILINESTRING M ((1 2 3, 5 4 5), (50 50 1, 60 60 200))'), 105) */
 	geom = lwgeom_from_wkt("MULTILINESTRING M ((1 2 3, 5 4 5), (50 50 1, 60 60 200))", LW_PARSER_CHECK_NONE);
@@ -1066,7 +1066,7 @@ test_lw_dist2d_pt_ptarrayarc(void)
 	/* lw_dist2d_pt_ptarrayarc(const POINT2D *p, const POINTARRAY *pa, DISTPTS *dl) */
 	DISTPTS dl;
 	int rv;
-	LWLINE* lwline;
+	LWLINE *lwline;
 	POINT2D P;
 
 	/* Unit semi-circle above X axis */
@@ -1154,8 +1154,8 @@ test_lw_dist2d_ptarray_ptarrayarc(void)
 	/* int lw_dist2d_ptarray_ptarrayarc(const POINTARRAY *pa, const POINTARRAY *pb, DISTPTS *dl) */
 	DISTPTS dl;
 	int rv;
-	LWLINE* lwline1;
-	LWLINE* lwline2;
+	LWLINE *lwline1;
+	LWLINE *lwline2;
 
 	/* Unit semi-circle above X axis */
 	lwline1 = lwgeom_as_lwline(lwgeom_from_text("LINESTRING(-1 0, 0 1, 1 0)"));
@@ -1433,7 +1433,7 @@ test_lwgeom_tcpa(void)
 static void
 test_lwgeom_is_trajectory(void)
 {
-	LWGEOM* g;
+	LWGEOM *g;
 	int ret;
 
 	g = lwgeom_from_wkt("POINT M(0 0 1)", LW_PARSER_CHECK_NONE);

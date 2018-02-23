@@ -18,10 +18,10 @@
 #include "cu_tester.h"
 
 static void
-do_svg_test(char* in, char* out, int precision, int relative)
+do_svg_test(char *in, char *out, int precision, int relative)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_svg(g, precision, relative);
@@ -35,10 +35,10 @@ do_svg_test(char* in, char* out, int precision, int relative)
 }
 
 static void
-do_svg_unsupported(char* in, char* out)
+do_svg_unsupported(char *in, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_svg(g, 0, 0);

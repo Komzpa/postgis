@@ -91,9 +91,9 @@ static void
 test_raster_envelope_geom()
 {
 	rt_raster raster = NULL;
-	LWGEOM* env = NULL;
-	LWPOLY* poly = NULL;
-	POINTARRAY* ring = NULL;
+	LWGEOM *env = NULL;
+	LWPOLY *poly = NULL;
+	POINTARRAY *ring = NULL;
 	POINT4D pt;
 
 	/* NULL raster */
@@ -171,9 +171,9 @@ static void
 test_raster_convex_hull()
 {
 	rt_raster raster = NULL;
-	LWGEOM* hull = NULL;
-	LWPOLY* poly = NULL;
-	POINTARRAY* ring = NULL;
+	LWGEOM *hull = NULL;
+	LWPOLY *poly = NULL;
+	POINTARRAY *ring = NULL;
 	POINT4D pt;
 
 	/* NULL raster */
@@ -248,10 +248,10 @@ test_raster_convex_hull()
 	cu_free_raster(raster);
 }
 
-static char*
-lwgeom_to_text(const LWGEOM* lwgeom)
+static char *
+lwgeom_to_text(const LWGEOM *lwgeom)
 {
-	char* wkt;
+	char *wkt;
 	size_t wkt_size;
 
 	wkt = lwgeom_to_wkt(lwgeom, WKT_ISO, DBL_DIG, &wkt_size);
@@ -267,8 +267,8 @@ test_raster_surface()
 	const int maxX = 5;
 	const int maxY = 5;
 	int x, y;
-	char* wkt = NULL;
-	LWMPOLY* mpoly = NULL;
+	char *wkt = NULL;
+	LWMPOLY *mpoly = NULL;
 	int err;
 
 	rast = rt_raster_new(maxX, maxY);
@@ -397,8 +397,8 @@ test_raster_perimeter()
 	const int maxX = 5;
 	const int maxY = 5;
 	int x, y;
-	char* wkt = NULL;
-	LWGEOM* geom = NULL;
+	char *wkt = NULL;
+	LWGEOM *geom = NULL;
 	int err;
 
 	rast = rt_raster_new(maxX, maxY);
@@ -557,7 +557,7 @@ test_raster_pixel_as_polygon()
 	uint32_t x, y;
 	const int maxX = 10;
 	const int maxY = 10;
-	LWPOLY* poly = NULL;
+	LWPOLY *poly = NULL;
 
 	rast = rt_raster_new(maxX, maxY);
 	CU_ASSERT(rast != NULL);

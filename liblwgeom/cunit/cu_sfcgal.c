@@ -17,14 +17,14 @@
 #include "cu_tester.h"
 #include "liblwgeom.h"
 
-extern LWGEOM* lwgeom_sfcgal_noop(const LWGEOM* geom_in);
+extern LWGEOM *lwgeom_sfcgal_noop(const LWGEOM *geom_in);
 
 static void
 test_sfcgal_noop(void)
 {
 	int i;
 
-	char* ewkt[] = {
+	char *ewkt[] = {
 	    "POINT(0 0.2)",
 	    "LINESTRING(-1 -1,-1 2.5,2 2,2 -1)",
 	    "TRIANGLE((0 0,-1 1,0 -1,0 0))",
@@ -55,7 +55,7 @@ test_sfcgal_noop(void)
 	    "TIN(((0 0,0 -1,-1 1,0 0)),((0 0,1 0,0 -1,0 0)))",
 	};
 
-	char* expected_ewkt[] = {
+	char *expected_ewkt[] = {
 	    "POINT(0 0.2)",
 	    "LINESTRING(-1 -1,-1 2.5,2 2,2 -1)",
 	    "TRIANGLE((0 0,-1 1,0 -1,0 0))",
@@ -86,11 +86,11 @@ test_sfcgal_noop(void)
 	    "TIN(((0 0,0 -1,-1 1,0 0)),((0 0,1 0,0 -1,0 0)))",
 	};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
 		LWGEOM *geom_in, *geom_out;
-		char* in_ewkt;
-		char* out_ewkt;
+		char *in_ewkt;
+		char *out_ewkt;
 
 		in_ewkt = ewkt[i];
 		geom_in = lwgeom_from_wkt(in_ewkt, LW_PARSER_CHECK_NONE);

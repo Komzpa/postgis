@@ -59,11 +59,11 @@ Datum LWGEOM_distance_sphere(PG_FUNCTION_ARGS);
 Datum geometry_distance_spheroid(PG_FUNCTION_ARGS);
 
 /* internal */
-double distance_sphere_method(double lat1, double long1, double lat2, double long2, SPHEROID* sphere);
-double distance_ellipse_calculation(double lat1, double long1, double lat2, double long2, SPHEROID* sphere);
-double distance_ellipse(double lat1, double long1, double lat2, double long2, SPHEROID* sphere);
-double deltaLongitude(double azimuth, double sigma, double tsm, SPHEROID* sphere);
-double mu2(double azimuth, SPHEROID* sphere);
+double distance_sphere_method(double lat1, double long1, double lat2, double long2, SPHEROID *sphere);
+double distance_ellipse_calculation(double lat1, double long1, double lat2, double long2, SPHEROID *sphere);
+double distance_ellipse(double lat1, double long1, double lat2, double long2, SPHEROID *sphere);
+double deltaLongitude(double azimuth, double sigma, double tsm, SPHEROID *sphere);
+double mu2(double azimuth, SPHEROID *sphere);
 double bigA(double u2);
 double bigB(double u2);
 
@@ -76,8 +76,8 @@ double bigB(double u2);
 PG_FUNCTION_INFO_V1(ellipsoid_in);
 Datum ellipsoid_in(PG_FUNCTION_ARGS)
 {
-	char* str = PG_GETARG_CSTRING(0);
-	SPHEROID* sphere = (SPHEROID*)palloc(sizeof(SPHEROID));
+	char *str = PG_GETARG_CSTRING(0);
+	SPHEROID *sphere = (SPHEROID *)palloc(sizeof(SPHEROID));
 	int nitems;
 	double rf;
 
@@ -112,8 +112,8 @@ Datum ellipsoid_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(ellipsoid_out);
 Datum ellipsoid_out(PG_FUNCTION_ARGS)
 {
-	SPHEROID* sphere = (SPHEROID*)PG_GETARG_POINTER(0);
-	char* result;
+	SPHEROID *sphere = (SPHEROID *)PG_GETARG_POINTER(0);
+	char *result;
 
 	result = palloc(MAX_DIGS_DOUBLE + MAX_DIGS_DOUBLE + 20 + 9 + 2);
 
@@ -130,7 +130,7 @@ Datum ellipsoid_out(PG_FUNCTION_ARGS)
  * put in PostGIS.
  */
 double
-deltaLongitude(double azimuth, double sigma, double tsm, SPHEROID* sphere)
+deltaLongitude(double azimuth, double sigma, double tsm, SPHEROID *sphere)
 {
 	/* compute the expansion C */
 	double das, C;
@@ -154,7 +154,7 @@ deltaLongitude(double azimuth, double sigma, double tsm, SPHEROID* sphere)
  *  put in PostGIS.
  */
 double
-mu2(double azimuth, SPHEROID* sphere)
+mu2(double azimuth, SPHEROID *sphere)
 {
 	double e2;
 
@@ -189,7 +189,7 @@ bigB(double u2)
 }
 
 double
-distance_ellipse(double lat1, double long1, double lat2, double long2, SPHEROID* sphere)
+distance_ellipse(double lat1, double long1, double lat2, double long2, SPHEROID *sphere)
 {
 	double result = 0;
 #if POSTGIS_DEBUG_LEVEL >= 4
@@ -220,7 +220,7 @@ distance_ellipse(double lat1, double long1, double lat2, double long2, SPHEROID*
  * note original r = 1st, s=2nd location
  */
 double
-distance_ellipse_calculation(double lat1, double long1, double lat2, double long2, SPHEROID* sphere)
+distance_ellipse_calculation(double lat1, double long1, double lat2, double long2, SPHEROID *sphere)
 {
 	/*
 	 * Code is taken from David Skea
@@ -303,9 +303,9 @@ distance_ellipse_calculation(double lat1, double long1, double lat2, double long
 PG_FUNCTION_INFO_V1(LWGEOM_length2d_ellipsoid);
 Datum LWGEOM_length2d_ellipsoid(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
-	SPHEROID* sphere = (SPHEROID*)PG_GETARG_POINTER(1);
-	LWGEOM* lwgeom = lwgeom_from_gserialized(geom);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
+	SPHEROID *sphere = (SPHEROID *)PG_GETARG_POINTER(1);
+	LWGEOM *lwgeom = lwgeom_from_gserialized(geom);
 	double dist = lwgeom_length_spheroid(lwgeom, sphere);
 	lwgeom_free(lwgeom);
 	PG_FREE_IF_COPY(geom, 0);
@@ -325,9 +325,9 @@ Datum LWGEOM_length2d_ellipsoid(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_length_ellipsoid_linestring);
 Datum LWGEOM_length_ellipsoid_linestring(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
-	LWGEOM* lwgeom = lwgeom_from_gserialized(geom);
-	SPHEROID* sphere = (SPHEROID*)PG_GETARG_POINTER(1);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
+	LWGEOM *lwgeom = lwgeom_from_gserialized(geom);
+	SPHEROID *sphere = (SPHEROID *)PG_GETARG_POINTER(1);
 	double length = 0.0;
 
 	/* EMPTY things have no length */
@@ -416,7 +416,7 @@ Datum LWGEOM_length_ellipsoid_linestring(PG_FUNCTION_ARGS)
  */
 
 double
-distance_sphere_method(double lat1, double long1, double lat2, double long2, SPHEROID* sphere)
+distance_sphere_method(double lat1, double long1, double lat2, double long2, SPHEROID *sphere)
 {
 	double R, S, X, Y, deltaX, deltaY;
 
@@ -449,9 +449,9 @@ distance_sphere_method(double lat1, double long1, double lat2, double long2, SPH
 PG_FUNCTION_INFO_V1(geometry_distance_spheroid);
 Datum geometry_distance_spheroid(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* geom2 = PG_GETARG_GSERIALIZED_P(1);
-	SPHEROID* sphere = (SPHEROID*)PG_GETARG_POINTER(2);
+	GSERIALIZED *geom1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom2 = PG_GETARG_GSERIALIZED_P(1);
+	SPHEROID *sphere = (SPHEROID *)PG_GETARG_POINTER(2);
 	int type1 = gserialized_get_type(geom1);
 	int type2 = gserialized_get_type(geom2);
 	bool use_spheroid = PG_GETARG_BOOL(3);

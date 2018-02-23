@@ -61,7 +61,7 @@ rt_band_new_inline(uint16_t width,
 		   rt_pixtype pixtype,
 		   uint32_t hasnodata,
 		   double nodataval,
-		   uint8_t* data)
+		   uint8_t *data)
 {
 	rt_band band = NULL;
 
@@ -126,7 +126,7 @@ rt_band_new_offline(uint16_t width,
 		    uint32_t hasnodata,
 		    double nodataval,
 		    uint8_t bandNum,
-		    const char* path)
+		    const char *path)
 {
 	rt_band band = NULL;
 	int pathlen = 0;
@@ -203,7 +203,7 @@ rt_band_new_offline_from_path(uint16_t width,
 			      int hasnodata,
 			      double nodataval,
 			      uint8_t bandNum,
-			      const char* path,
+			      const char *path,
 			      int force)
 {
 	GDALDatasetH hdsSrc = NULL;
@@ -291,12 +291,12 @@ rt_band_duplicate(rt_band band)
 					  band->hasnodata,
 					  band->nodataval,
 					  band->data.offline.bandNum,
-					  (const char*)band->data.offline.path);
+					  (const char *)band->data.offline.path);
 	}
 	/* online */
 	else
 	{
-		uint8_t* data = NULL;
+		uint8_t *data = NULL;
 		data = rtalloc(rt_pixtype_size(band->pixtype) * band->width * band->height);
 		if (data == NULL)
 		{
@@ -353,7 +353,7 @@ rt_band_destroy(rt_band band)
 	rtdealloc(band);
 }
 
-const char*
+const char *
 rt_band_get_ext_path(rt_band band)
 {
 
@@ -368,7 +368,7 @@ rt_band_get_ext_path(rt_band band)
 }
 
 rt_errorstate
-rt_band_get_ext_band_num(rt_band band, uint8_t* bandnum)
+rt_band_get_ext_band_num(rt_band band, uint8_t *bandnum)
 {
 	assert(NULL != band);
 	assert(NULL != bandnum);
@@ -393,7 +393,7 @@ rt_band_get_ext_band_num(rt_band band, uint8_t* bandnum)
  *
  * @return pointer to band data or NULL if error
  */
-void*
+void *
 rt_band_get_data(rt_band band)
 {
 	assert(NULL != band);
@@ -706,7 +706,7 @@ rt_band_get_isnodata_flag(rt_band band)
  * @return ES_NONE or ES_ERROR
  */
 rt_errorstate
-rt_band_set_nodata(rt_band band, double val, int* converted)
+rt_band_set_nodata(rt_band band, double val, int *converted)
 {
 	rt_pixtype pixtype = PT_END;
 	int32_t checkvalint = 0;
@@ -835,11 +835,11 @@ rt_band_set_nodata(rt_band band, double val, int* converted)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_band_set_pixel_line(rt_band band, int x, int y, void* vals, uint32_t len)
+rt_band_set_pixel_line(rt_band band, int x, int y, void *vals, uint32_t len)
 {
 	rt_pixtype pixtype = PT_END;
 	int size = 0;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	uint32_t offset = 0;
 
 	assert(NULL != band);
@@ -885,49 +885,49 @@ rt_band_set_pixel_line(rt_band band, int x, int y, void* vals, uint32_t len)
 	case PT_8BUI:
 	case PT_8BSI:
 	{
-		uint8_t* ptr = data;
+		uint8_t *ptr = data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_16BUI:
 	{
-		uint16_t* ptr = (uint16_t*)data;
+		uint16_t *ptr = (uint16_t *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_16BSI:
 	{
-		int16_t* ptr = (int16_t*)data;
+		int16_t *ptr = (int16_t *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_32BUI:
 	{
-		uint32_t* ptr = (uint32_t*)data;
+		uint32_t *ptr = (uint32_t *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_32BSI:
 	{
-		int32_t* ptr = (int32_t*)data;
+		int32_t *ptr = (int32_t *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_32BF:
 	{
-		float* ptr = (float*)data;
+		float *ptr = (float *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
 	}
 	case PT_64BF:
 	{
-		double* ptr = (double*)data;
+		double *ptr = (double *)data;
 		ptr += offset;
 		memcpy(ptr, vals, size * len);
 		break;
@@ -965,10 +965,10 @@ rt_band_set_pixel_line(rt_band band, int x, int y, void* vals, uint32_t len)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_band_set_pixel(rt_band band, int x, int y, double val, int* converted)
+rt_band_set_pixel(rt_band band, int x, int y, double val, int *converted)
 {
 	rt_pixtype pixtype = PT_END;
-	unsigned char* data = NULL;
+	unsigned char *data = NULL;
 	uint32_t offset = 0;
 
 	int32_t checkvalint = 0;
@@ -1050,42 +1050,42 @@ rt_band_set_pixel(rt_band band, int x, int y, double val, int* converted)
 	}
 	case PT_16BSI:
 	{
-		int16_t* ptr = (int16_t*)data; /* we assume correct alignment */
+		int16_t *ptr = (int16_t *)data; /* we assume correct alignment */
 		ptr[offset] = rt_util_clamp_to_16BSI(val);
 		checkvalint = (int16_t)ptr[offset];
 		break;
 	}
 	case PT_16BUI:
 	{
-		uint16_t* ptr = (uint16_t*)data; /* we assume correct alignment */
+		uint16_t *ptr = (uint16_t *)data; /* we assume correct alignment */
 		ptr[offset] = rt_util_clamp_to_16BUI(val);
 		checkvalint = ptr[offset];
 		break;
 	}
 	case PT_32BSI:
 	{
-		int32_t* ptr = (int32_t*)data; /* we assume correct alignment */
+		int32_t *ptr = (int32_t *)data; /* we assume correct alignment */
 		ptr[offset] = rt_util_clamp_to_32BSI(val);
 		checkvalint = (int32_t)ptr[offset];
 		break;
 	}
 	case PT_32BUI:
 	{
-		uint32_t* ptr = (uint32_t*)data; /* we assume correct alignment */
+		uint32_t *ptr = (uint32_t *)data; /* we assume correct alignment */
 		ptr[offset] = rt_util_clamp_to_32BUI(val);
 		checkvaluint = ptr[offset];
 		break;
 	}
 	case PT_32BF:
 	{
-		float* ptr = (float*)data; /* we assume correct alignment */
+		float *ptr = (float *)data; /* we assume correct alignment */
 		ptr[offset] = rt_util_clamp_to_32F(val);
 		checkvalfloat = ptr[offset];
 		break;
 	}
 	case PT_64BF:
 	{
-		double* ptr = (double*)data; /* we assume correct alignment */
+		double *ptr = (double *)data; /* we assume correct alignment */
 		ptr[offset] = val;
 		checkvaldouble = ptr[offset];
 		break;
@@ -1133,15 +1133,15 @@ rt_band_set_pixel(rt_band band, int x, int y, double val, int* converted)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_band_get_pixel_line(rt_band band, int x, int y, uint16_t len, void** vals, uint16_t* nvals)
+rt_band_get_pixel_line(rt_band band, int x, int y, uint16_t len, void **vals, uint16_t *nvals)
 {
-	uint8_t* _vals = NULL;
+	uint8_t *_vals = NULL;
 	int pixsize = 0;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	uint32_t offset = 0;
 	uint16_t _nvals = 0;
 	int maxlen = 0;
-	uint8_t* ptr = NULL;
+	uint8_t *ptr = NULL;
 
 	assert(NULL != band);
 	assert(vals != NULL && nvals != NULL);
@@ -1213,10 +1213,10 @@ rt_band_get_pixel_line(rt_band band, int x, int y, uint16_t len, void** vals, ui
  * @return 0 on success, -1 on error (value out of valid range).
  */
 rt_errorstate
-rt_band_get_pixel(rt_band band, int x, int y, double* value, int* nodata)
+rt_band_get_pixel(rt_band band, int x, int y, double *value, int *nodata)
 {
 	rt_pixtype pixtype = PT_END;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	uint32_t offset = 0;
 
 	assert(NULL != band);
@@ -1304,37 +1304,37 @@ rt_band_get_pixel(rt_band band, int x, int y, double* value, int* nodata)
 	}
 	case PT_16BSI:
 	{
-		int16_t* ptr = (int16_t*)data; /* we assume correct alignment */
+		int16_t *ptr = (int16_t *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
 	case PT_16BUI:
 	{
-		uint16_t* ptr = (uint16_t*)data; /* we assume correct alignment */
+		uint16_t *ptr = (uint16_t *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
 	case PT_32BSI:
 	{
-		int32_t* ptr = (int32_t*)data; /* we assume correct alignment */
+		int32_t *ptr = (int32_t *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
 	case PT_32BUI:
 	{
-		uint32_t* ptr = (uint32_t*)data; /* we assume correct alignment */
+		uint32_t *ptr = (uint32_t *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
 	case PT_32BF:
 	{
-		float* ptr = (float*)data; /* we assume correct alignment */
+		float *ptr = (float *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
 	case PT_64BF:
 	{
-		double* ptr = (double*)data; /* we assume correct alignment */
+		double *ptr = (double *)data; /* we assume correct alignment */
 		*value = ptr[offset];
 		break;
 	}
@@ -1378,7 +1378,7 @@ rt_band_get_nearest_pixel(rt_band band,
 			  uint16_t distancex,
 			  uint16_t distancey,
 			  int exclude_nodata_value,
-			  rt_pixel* npixels)
+			  rt_pixel *npixels)
 {
 	rt_pixel npixel = NULL;
 	int extent[4] = {0};
@@ -1392,7 +1392,7 @@ rt_band_get_nearest_pixel(rt_band band,
 	int _max = 0;
 	int _x = 0;
 	int _y = 0;
-	int* _min = NULL;
+	int *_min = NULL;
 	double pixval = 0;
 	double minval = 0;
 	uint32_t count = 0;
@@ -1658,7 +1658,7 @@ rt_band_get_nearest_pixel(rt_band band,
  * @return -1 on error, otherwise number of pixels
  */
 int
-rt_band_get_pixel_of_value(rt_band band, int exclude_nodata_value, double* searchset, int searchcount, rt_pixel* pixels)
+rt_band_get_pixel_of_value(rt_band band, int exclude_nodata_value, double *searchset, int searchcount, rt_pixel *pixels)
 {
 	int x;
 	int y;
@@ -1737,7 +1737,7 @@ rt_band_get_pixel_of_value(rt_band band, int exclude_nodata_value, double* searc
  * @return ES_NONE or ES_ERROR
  */
 rt_errorstate
-rt_band_get_nodata(rt_band band, double* nodata)
+rt_band_get_nodata(rt_band band, double *nodata)
 {
 	assert(NULL != band);
 	assert(NULL != nodata);
@@ -1845,7 +1845,7 @@ rt_band_clamped_value_is_nodata(rt_band band, double val)
  * @return ES_NONE if success, ES_ERROR if error
  */
 rt_errorstate
-rt_band_corrected_clamped_value(rt_band band, double val, double* newval, int* corrected)
+rt_band_corrected_clamped_value(rt_band band, double val, double *newval, int *corrected)
 {
 	double minval = 0.;
 

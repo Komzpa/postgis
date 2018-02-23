@@ -36,10 +36,10 @@ Datum line_from_encoded_polyline(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(line_from_encoded_polyline);
 Datum line_from_encoded_polyline(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	text* encodedpolyline_input;
-	char* encodedpolyline;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	text *encodedpolyline_input;
+	char *encodedpolyline;
 	int precision = 5;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();

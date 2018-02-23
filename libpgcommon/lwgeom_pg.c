@@ -38,9 +38,9 @@
  */
 
 void
-pg_parser_errhint(LWGEOM_PARSER_RESULT* lwg_parser_result)
+pg_parser_errhint(LWGEOM_PARSER_RESULT *lwg_parser_result)
 {
-	char* hintbuffer;
+	char *hintbuffer;
 
 	/* Only display the parser position if the location is > 0; this provides a nicer output when the first token
 	   within the input stream cannot be matched */
@@ -48,8 +48,8 @@ pg_parser_errhint(LWGEOM_PARSER_RESULT* lwg_parser_result)
 	{
 		/* Return a copy of the input string start truncated
 		 * at the error location */
-		hintbuffer =
-		    lwmessage_truncate((char*)lwg_parser_result->wkinput, 0, lwg_parser_result->errlocation - 1, 40, 0);
+		hintbuffer = lwmessage_truncate(
+		    (char *)lwg_parser_result->wkinput, 0, lwg_parser_result->errlocation - 1, 40, 0);
 
 		ereport(ERROR,
 			(errmsg("%s", lwg_parser_result->message),
@@ -67,16 +67,16 @@ pg_parser_errhint(LWGEOM_PARSER_RESULT* lwg_parser_result)
 }
 
 void
-pg_unparser_errhint(LWGEOM_UNPARSER_RESULT* lwg_unparser_result)
+pg_unparser_errhint(LWGEOM_UNPARSER_RESULT *lwg_unparser_result)
 {
 	/* For the unparser simply output the error message without any associated HINT */
 	elog(ERROR, "%s", lwg_unparser_result->message);
 }
 
-static void*
+static void *
 pg_alloc(size_t size)
 {
-	void* result;
+	void *result;
 
 	CHECK_FOR_INTERRUPTS(); /* give interrupter a chance */
 
@@ -94,10 +94,10 @@ pg_alloc(size_t size)
 	return result;
 }
 
-static void*
-pg_realloc(void* mem, size_t size)
+static void *
+pg_realloc(void *mem, size_t size)
 {
-	void* result;
+	void *result;
 
 	CHECK_FOR_INTERRUPTS(); /* give interrupter a chance */
 
@@ -111,13 +111,13 @@ pg_realloc(void* mem, size_t size)
 }
 
 static void
-pg_free(void* ptr)
+pg_free(void *ptr)
 {
 	pfree(ptr);
 }
 
 static void
-pg_error(const char* fmt, va_list ap)
+pg_error(const char *fmt, va_list ap)
 {
 	char errmsg[PGC_ERRMSG_MAXLEN + 1];
 
@@ -128,7 +128,7 @@ pg_error(const char* fmt, va_list ap)
 }
 
 static void
-pg_warning(const char* fmt, va_list ap)
+pg_warning(const char *fmt, va_list ap)
 {
 	char errmsg[PGC_ERRMSG_MAXLEN + 1];
 
@@ -139,7 +139,7 @@ pg_warning(const char* fmt, va_list ap)
 }
 
 static void
-pg_notice(const char* fmt, va_list ap)
+pg_notice(const char *fmt, va_list ap)
 {
 	char errmsg[PGC_ERRMSG_MAXLEN + 1];
 
@@ -150,7 +150,7 @@ pg_notice(const char* fmt, va_list ap)
 }
 
 static void
-pg_debug(int level, const char* fmt, va_list ap)
+pg_debug(int level, const char *fmt, va_list ap)
 {
 	char errmsg[PGC_ERRMSG_MAXLEN + 1];
 	vsnprintf(errmsg, PGC_ERRMSG_MAXLEN, fmt, ap);
@@ -180,11 +180,11 @@ pg_install_lwgeom_handlers(void)
  * Utility method to call the serialization and then set the
  * PgSQL varsize header appropriately with the serialized size.
  */
-GSERIALIZED*
-geography_serialize(LWGEOM* lwgeom)
+GSERIALIZED *
+geography_serialize(LWGEOM *lwgeom)
 {
 	size_t ret_size = 0;
-	GSERIALIZED* g = NULL;
+	GSERIALIZED *g = NULL;
 	/** force to geodetic in case it's not **/
 	lwgeom_set_geodetic(lwgeom, true);
 
@@ -198,11 +198,11 @@ geography_serialize(LWGEOM* lwgeom)
  * Utility method to call the serialization and then set the
  * PgSQL varsize header appropriately with the serialized size.
  */
-GSERIALIZED*
-geometry_serialize(LWGEOM* lwgeom)
+GSERIALIZED *
+geometry_serialize(LWGEOM *lwgeom)
 {
 	size_t ret_size = 0;
-	GSERIALIZED* g = NULL;
+	GSERIALIZED *g = NULL;
 
 	g = gserialized_from_lwgeom(lwgeom, &ret_size);
 	if (!g) lwpgerror("Unable to serialize lwgeom.");
@@ -211,7 +211,7 @@ geometry_serialize(LWGEOM* lwgeom)
 }
 
 void
-lwpgnotice(const char* fmt, ...)
+lwpgnotice(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -223,7 +223,7 @@ lwpgnotice(const char* fmt, ...)
 }
 
 void
-lwpgwarning(const char* fmt, ...)
+lwpgwarning(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -235,7 +235,7 @@ lwpgwarning(const char* fmt, ...)
 }
 
 void
-lwpgerror(const char* fmt, ...)
+lwpgerror(const char *fmt, ...)
 {
 	va_list ap;
 
@@ -250,7 +250,7 @@ lwpgerror(const char* fmt, ...)
  * the bare comparison function for GUC names
  */
 int
-postgis_guc_name_compare(const char* namea, const char* nameb)
+postgis_guc_name_compare(const char *namea, const char *nameb)
 {
 	/*
 	 * The temptation to use strcasecmp() here must be resisted, because the
@@ -275,10 +275,10 @@ postgis_guc_name_compare(const char* namea, const char* nameb)
  * comparator for qsorting and bsearching guc_variables array
  */
 int
-postgis_guc_var_compare(const void* a, const void* b)
+postgis_guc_var_compare(const void *a, const void *b)
 {
-	const struct config_generic* confa = *(struct config_generic* const*)a;
-	const struct config_generic* confb = *(struct config_generic* const*)b;
+	const struct config_generic *confa = *(struct config_generic *const *)a;
+	const struct config_generic *confb = *(struct config_generic *const *)b;
 
 	return postgis_guc_name_compare(confa->name, confb->name);
 }
@@ -291,20 +291,20 @@ postgis_guc_var_compare(const void* a, const void* b)
  * extension upgrade.
  */
 int
-postgis_guc_find_option(const char* name)
+postgis_guc_find_option(const char *name)
 {
-	const char** key = &name;
-	struct config_generic** res;
+	const char **key = &name;
+	struct config_generic **res;
 
 	/*
 	 * By equating const char ** with struct config_generic *, we are assuming
 	 * the name field is first in config_generic.
 	 */
-	res = (struct config_generic**)bsearch((void*)&key,
-					       (void*)get_guc_variables(),
-					       GetNumConfigOptions(),
-					       sizeof(struct config_generic*),
-					       postgis_guc_var_compare);
+	res = (struct config_generic **)bsearch((void *)&key,
+						(void *)get_guc_variables(),
+						GetNumConfigOptions(),
+						sizeof(struct config_generic *),
+						postgis_guc_var_compare);
 
 	/* Found nothing? Good */
 	if (!res) return 0;

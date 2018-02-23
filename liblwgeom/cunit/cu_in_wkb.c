@@ -20,8 +20,8 @@
 /*
 ** Global variable to hold WKB strings
 */
-char* hex_a;
-char* hex_b;
+char *hex_a;
+char *hex_b;
 
 /*
 ** The suite initialization function.
@@ -50,7 +50,7 @@ clean_wkb_in_suite(void)
 }
 
 static void
-cu_wkb_malformed_in(char* hex)
+cu_wkb_malformed_in(char *hex)
 {
 	LWGEOM_PARSER_RESULT p;
 	int rv = 0;
@@ -63,7 +63,7 @@ cu_wkb_malformed_in(char* hex)
 }
 
 static void
-cu_wkb_in(char* wkt)
+cu_wkb_in(char *wkt)
 {
 	LWGEOM_PARSER_RESULT pr;
 	LWGEOM *g_a, *g_b;

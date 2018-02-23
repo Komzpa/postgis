@@ -45,10 +45,10 @@ A lookup string with a particular standardization is prevented
 ------------------------------------------------------------- */
 typedef struct def_blocker
 {
-	char* lookup;
-	char* standard;
+	char *lookup;
+	char *standard;
 	SYMB output_symbol;
-	DEF* definition;
+	DEF *definition;
 } DEF_BLOCKER;
 
 #define NUM_DEF_BLOCKERS 2
@@ -67,34 +67,34 @@ static DEF_BLOCKER __def_block_table__[NUM_DEF_BLOCKERS] = {{"ST", "STREET", PRE
 
 /* -- local prototypes -- */
 
-static int check_def_block(STAND_PARAM*, int);
-static void delete_stz(STZ_PARAM*, int);
-static int delete_duplicate_stz(STZ_PARAM*, int);
-static void first_composition(STAND_PARAM*);
-static int prepare_target_pattern(STAND_PARAM*);
-static int no_break(STAND_PARAM* __stand_param__, int);
-static int do_left_combine(STAND_PARAM*, int, int);
-static int need_compression(STAND_PARAM*, SYMB, int, int);
-static int select_next_composition(STAND_PARAM*);
-static int copy_best(STAND_PARAM*, int*, SYMB, int, SYMB*);
-static void save_current_composition(STAND_PARAM*, SEG*, int, SYMB*, DEF**);
-static void scan_clause_tree(STAND_PARAM*, int, int);
-static void shallow_clause_scan(STAND_PARAM*, int, int);
-static void deposit_stz(STAND_PARAM*, double, int);
-static STZ* copy_stz(STAND_PARAM*, double);
-static void make_singleton(SEG*, SYMB, int, int, double);
-static int lex_has_def(STAND_PARAM*, int, SYMB);
-static void _force_deposit_(STAND_PARAM*, int);
-static int have_schema_symbol(int*, SYMB);
-static void default_seg_val(int*, int, SEG*, int, SYMB, double);
-static int _modify_position_(STAND_PARAM*, SEG*, int, int, SYMB, SYMB);
-static int schema_modify_position(STAND_PARAM*, SEG*, int, int, SYMB, SYMB);
-static void force_arc_clause(STAND_PARAM*);
+static int check_def_block(STAND_PARAM *, int);
+static void delete_stz(STZ_PARAM *, int);
+static int delete_duplicate_stz(STZ_PARAM *, int);
+static void first_composition(STAND_PARAM *);
+static int prepare_target_pattern(STAND_PARAM *);
+static int no_break(STAND_PARAM *__stand_param__, int);
+static int do_left_combine(STAND_PARAM *, int, int);
+static int need_compression(STAND_PARAM *, SYMB, int, int);
+static int select_next_composition(STAND_PARAM *);
+static int copy_best(STAND_PARAM *, int *, SYMB, int, SYMB *);
+static void save_current_composition(STAND_PARAM *, SEG *, int, SYMB *, DEF **);
+static void scan_clause_tree(STAND_PARAM *, int, int);
+static void shallow_clause_scan(STAND_PARAM *, int, int);
+static void deposit_stz(STAND_PARAM *, double, int);
+static STZ *copy_stz(STAND_PARAM *, double);
+static void make_singleton(SEG *, SYMB, int, int, double);
+static int lex_has_def(STAND_PARAM *, int, SYMB);
+static void _force_deposit_(STAND_PARAM *, int);
+static int have_schema_symbol(int *, SYMB);
+static void default_seg_val(int *, int, SEG *, int, SYMB, double);
+static int _modify_position_(STAND_PARAM *, SEG *, int, int, SYMB, SYMB);
+static int schema_modify_position(STAND_PARAM *, SEG *, int, int, SYMB, SYMB);
+static void force_arc_clause(STAND_PARAM *);
 #ifdef USE_FORCE_MACRO
-static void _force_macro_clause_(STAND_PARAM*);
+static void _force_macro_clause_(STAND_PARAM *);
 #endif
-static int non_geocode_address(STAND_PARAM*);
-static int evaluate_micro_l(STAND_PARAM*);
+static int non_geocode_address(STAND_PARAM *);
+static int evaluate_micro_l(STAND_PARAM *);
 
 /* -- Guide to the transition table:
 	 MACRO_C MICRO_C ARC_C   CIVIC_C EXTRA_C
@@ -125,7 +125,7 @@ static double __load_value__[NUMBER_OF_WEIGHTS] =
     {0.00, 0.325, 0.35, 0.375, 0.4, 0.475, 0.55, 0.6, 0.65, 0.675, 0.7, 0.75, 0.8, 0.825, 0.85, 0.9, 0.95, 1.00};
 
 #ifdef OCCUPANCY_DEBUG
-static const char* __rule_type_names__[] = {"MACRO", "MICRO", "ARC", "CIVIC", "EXTRA"};
+static const char *__rule_type_names__[] = {"MACRO", "MICRO", "ARC", "CIVIC", "EXTRA"};
 #endif
 
 /* ====================================================================
@@ -137,13 +137,13 @@ string.h (strcmp)
 uses macro RET_ERR1, LOG_MESS, CLIENT_ERR
 =======================================================================*/
 int
-install_def_block_table(ENTRY** __hash_table__, ERR_PARAM* __err_param__)
+install_def_block_table(ENTRY **__hash_table__, ERR_PARAM *__err_param__)
 {
 	int i;
 	for (i = 0; i < NUM_DEF_BLOCKERS; i++)
 	{
-		DEF* __standard_def__;
-		ENTRY* __lookup_entry__ = find_entry(__hash_table__, __def_block_table__[i].lookup);
+		DEF *__standard_def__;
+		ENTRY *__lookup_entry__ = find_entry(__hash_table__, __def_block_table__[i].lookup);
 		if (__lookup_entry__ == NULL)
 		{
 			RET_ERR1("install_def_block_table: Could not find def_block for %s\n",
@@ -175,14 +175,14 @@ context level initialization -- must come after the lexicon
       is read - called by init_stand_context
 Null on error.
 =======================================================================*/
-STZ_PARAM*
-create_segments(ERR_PARAM* __err_param__)
+STZ_PARAM *
+create_segments(ERR_PARAM *__err_param__)
 {
-	STZ_PARAM* __stz_info__;
+	STZ_PARAM *__stz_info__;
 	int i;
 	/* -- we're going to be re-sorting these pointers -- */
 	PAGC_ALLOC_STRUC(__stz_info__, STZ_PARAM, __err_param__, NULL);
-	PAGC_CALLOC_STRUC(__stz_info__->stz_array, STZ*, MAX_STZ, __err_param__, NULL);
+	PAGC_CALLOC_STRUC(__stz_info__->stz_array, STZ *, MAX_STZ, __err_param__, NULL);
 	for (i = FIRST_STZ; i < MAX_STZ; i++)
 	{
 		PAGC_ALLOC_STRUC(__stz_info__->stz_array[i], STZ, __err_param__, NULL);
@@ -198,7 +198,7 @@ context level cleanup
 uses macros PAGC_DESTROY_2D_ARRAY, FREE_AND_NULL
 =======================================================================*/
 void
-destroy_segments(STZ_PARAM* __stz_info__)
+destroy_segments(STZ_PARAM *__stz_info__)
 {
 	if (__stz_info__ == NULL) { return; }
 	PAGC_DESTROY_2D_ARRAY(__stz_info__->stz_array, STZ, MAX_STZ)
@@ -212,10 +212,10 @@ matching score as higher grade. This can be critical when a lower grade
 standardization produces a perfect match on the wrong reference record
 =======================================================================*/
 double
-get_stz_downgrade(STAND_PARAM* __stand_param__, int request_stz)
+get_stz_downgrade(STAND_PARAM *__stand_param__, int request_stz)
 {
 	double numerator, denominator;
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
 	if ((__stz_info__->stz_list_size - 1) < request_stz) { return 0.; }
 	if (request_stz == 0) { return 1.0; }
 	if ((denominator = __stz_info__->stz_array[0]->score) == 0.) { return denominator; }
@@ -244,16 +244,16 @@ export.c (init_output_fields, stuff_fields)
 </remarks>
 =======================================================================*/
 int
-get_next_stz(STAND_PARAM* __stand_param__, int request_stz_in)
+get_next_stz(STAND_PARAM *__stand_param__, int request_stz_in)
 {
 	int i;
 
-	DEF** __best_defs__ = __stand_param__->best_defs;
-	SYMB* __best_output__ = __stand_param__->best_output;
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
+	DEF **__best_defs__ = __stand_param__->best_defs;
+	SYMB *__best_output__ = __stand_param__->best_output;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
 	int n = __stand_param__->LexNum;
 	int request_stz = request_stz_in;
-	STZ* __cur_stz__;
+	STZ *__cur_stz__;
 	if (request_stz_in != FAIL)
 	{
 		if (((__stz_info__->stz_list_size - 1) < request_stz) || (__stz_info__->last_stz_output == request_stz))
@@ -313,12 +313,12 @@ called by analyze.c (get_next_stz)
 calls analyze.c (delete_stz)
 =======================================================================*/
 static int
-check_def_block(STAND_PARAM* __stand_param__, int request_stz)
+check_def_block(STAND_PARAM *__stand_param__, int request_stz)
 {
 	int i, j;
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
-	SYMB* __cur_sym_ptr__ = __stz_info__->stz_array[request_stz]->output;
-	DEF** __stz_definitions__ = __stz_info__->stz_array[request_stz]->definitions;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
+	SYMB *__cur_sym_ptr__ = __stz_info__->stz_array[request_stz]->output;
+	DEF **__stz_definitions__ = __stz_info__->stz_array[request_stz]->definitions;
 	int n = __stand_param__->LexNum;
 	for (i = FIRST_LEX_POS; i < n; i++)
 	{
@@ -342,11 +342,11 @@ analyze.c (delete_stz)
 called by analyze.c (check_def_block), analyze.c (delete_duplicate_stz)
 =======================================================================*/
 static void
-delete_stz(STZ_PARAM* __stz_info__, int request_stz)
+delete_stz(STZ_PARAM *__stz_info__, int request_stz)
 {
 	int i, n;
-	STZ** __stz_list__;
-	STZ* __stz_ptr__;
+	STZ **__stz_list__;
+	STZ *__stz_ptr__;
 
 	__stz_info__->stz_list_size--; /* -- change list count for deletion -- */
 	n = __stz_info__->stz_list_size;
@@ -383,7 +383,7 @@ calls analyze.c (delete_stz)
 called by analyze.c (get_next_stz)
 =======================================================================*/
 static int
-delete_duplicate_stz(STZ_PARAM* __stz_info__, int request_stz)
+delete_duplicate_stz(STZ_PARAM *__stz_info__, int request_stz)
 {
 	/* ---------------------------------------------------------------------
       if the requested_stz is identical to any earlier ones on the list,
@@ -393,14 +393,14 @@ delete_duplicate_stz(STZ_PARAM* __stz_info__, int request_stz)
 	  -----------------------------------------------------------------------*/
 
 	int i;
-	STZ** __stz_list__ = __stz_info__->stz_array;
+	STZ **__stz_list__ = __stz_info__->stz_array;
 	for (i = FIRST_STZ; i < request_stz; i++)
 	{
 		SYMB a;
-		SYMB* __cur_sym_ptr__ = __stz_list__[request_stz]->output;
-		DEF** __stz_definitions__ = __stz_list__[request_stz]->definitions;
-		SYMB* __prev_sym_ptr__ = __stz_list__[i]->output;
-		DEF** __prev_stz_definitions__ = __stz_list__[i]->definitions;
+		SYMB *__cur_sym_ptr__ = __stz_list__[request_stz]->output;
+		DEF **__stz_definitions__ = __stz_list__[request_stz]->definitions;
+		SYMB *__prev_sym_ptr__ = __stz_list__[i]->output;
+		DEF **__prev_stz_definitions__ = __stz_list__[i]->definitions;
 
 		while ((a = *__prev_sym_ptr__++) == *__cur_sym_ptr__++)
 		{
@@ -428,14 +428,14 @@ called by evaluator
 =======================================================================*/
 
 static int
-evaluate_micro_l(STAND_PARAM* __stand_param__)
+evaluate_micro_l(STAND_PARAM *__stand_param__)
 {
 	int i, desired_type, output_field;
 	int __def_marked__[MAXLEX][MAXDEF];
-	int* __orig_pos__ = __stand_param__->orig_str_pos;
-	int* __sym_sel__ = __stand_param__->cur_sym_sel;
-	int* __num_defs__ = __stand_param__->def_cnt;
-	LEXEME* __lexeme__ = __stand_param__->lex_vector;
+	int *__orig_pos__ = __stand_param__->orig_str_pos;
+	int *__sym_sel__ = __stand_param__->cur_sym_sel;
+	int *__num_defs__ = __stand_param__->def_cnt;
+	LEXEME *__lexeme__ = __stand_param__->lex_vector;
 	int n = __stand_param__->LexNum;
 	/* 2009-08-15 : use lexicon types */
 	switch (__stand_param__->start_state)
@@ -459,7 +459,7 @@ evaluate_micro_l(STAND_PARAM* __stand_param__)
 	for (i = FIRST_LEX_POS; i < n; i++)
 	{
 		int j;
-		DEF* __def__;
+		DEF *__def__;
 		__orig_pos__[i] = i; /* we won't use compression here */
 		__sym_sel__[i] = 0;  /* -- start at 0 for each Lexeme -- */
 		/* -- walk the def chain, counting the symbs and putting them
@@ -510,11 +510,11 @@ analyze.c (prepare_target_pattern)
 <revision date='2012-07-22'> Keep track of start_state </revision>
 =======================================================================*/
 int
-evaluator(STAND_PARAM* __stand_param__)
+evaluator(STAND_PARAM *__stand_param__)
 {
 
 	int state;
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
 	__stz_info__->stz_list_cutoff = INITIAL_STZ_CUTOFF;
 	state = __stand_param__->start_state;
 
@@ -596,19 +596,19 @@ evaluator(STAND_PARAM* __stand_param__)
 </summary>
 =======================================================================*/
 static void
-first_composition(STAND_PARAM* __stand_param__)
+first_composition(STAND_PARAM *__stand_param__)
 {
 	int i;
 
-	int* __sym_sel__ = __stand_param__->cur_sym_sel;
-	int* __num_defs__ = __stand_param__->def_cnt;
-	LEXEME* __lexemes__ = __stand_param__->lex_vector;
+	int *__sym_sel__ = __stand_param__->cur_sym_sel;
+	int *__num_defs__ = __stand_param__->def_cnt;
+	LEXEME *__lexemes__ = __stand_param__->lex_vector;
 	int n = __stand_param__->LexNum;
 	/*-- <remarks> Read the symbols from the definitions into the lex_sym array </remarks> --*/
 	for (i = FIRST_LEX_POS; i < n; i++)
 	{
 		int j;
-		DEF* __def__;
+		DEF *__def__;
 		__sym_sel__[i] = 0; /* -- start at 0 for each Lexeme -- */
 		/*-- <remarks> Walk the def chain, counting the symbs and putting them
 			into the array </remarks> --*/
@@ -628,14 +628,14 @@ calls analyze.c (need_compression) gamma.c (refresh_transducer)
 2006-10-31 : add STAND_PARAM parameter and change calls
 ==============================================================*/
 static int
-prepare_target_pattern(STAND_PARAM* __stand_param__)
+prepare_target_pattern(STAND_PARAM *__stand_param__)
 {
 	int lex_pos, target_pos;
-	int* __sym_sel__ = __stand_param__->cur_sym_sel;
-	SYMB* __p_target__ = __stand_param__->target;
-	int* __orig_pos__ = __stand_param__->orig_str_pos;
+	int *__sym_sel__ = __stand_param__->cur_sym_sel;
+	SYMB *__p_target__ = __stand_param__->target;
+	int *__orig_pos__ = __stand_param__->orig_str_pos;
 	int n = __stand_param__->LexNum;
-	NODE** __g_function__ = __stand_param__->rules->gamma_matrix;
+	NODE **__g_function__ = __stand_param__->rules->gamma_matrix;
 	for (lex_pos = FIRST_LEX_POS, target_pos = TARG_START; lex_pos < n; lex_pos++)
 	{
 		SYMB in_symb = __stand_param__->comp_lex_sym[lex_pos][__sym_sel__[lex_pos]];
@@ -673,7 +673,7 @@ called by analyze.c (do_left_combine)
 -- moved from tokenize.c to analyze.c
 ==============================================================*/
 static int
-no_break(STAND_PARAM* __stand_param__, int n)
+no_break(STAND_PARAM *__stand_param__, int n)
 {
 	int k = __stand_param__->lex_vector[n].EndMorph;
 	/* 0 is no break
@@ -687,7 +687,7 @@ analyze.c (do_left_combine)
 calls analyze.c (no_break) called by analyze.c (need_compression)
 ==============================================================*/
 static int
-do_left_combine(STAND_PARAM* __stand_param__, int lex_pos, int target_pos)
+do_left_combine(STAND_PARAM *__stand_param__, int lex_pos, int target_pos)
 {
 	/*-- A LEFT_COMPRESS left compresses only if a LEFT_COMPRESS there to
 		combine with --*/
@@ -714,7 +714,7 @@ called by analyze.c (prepare_target_pattern)
 calls analyze.c (do_left_combine)
 ==============================================================*/
 static int
-need_compression(STAND_PARAM* __stand_param__, SYMB a, int lex_pos, int target_pos)
+need_compression(STAND_PARAM *__stand_param__, SYMB a, int lex_pos, int target_pos)
 {
 	/*-- No stopwords are accepted, no matter what --*/
 	if (a == RIGHT_COMPRESS)
@@ -752,26 +752,26 @@ Calls analyze.c (deposit_stz)
 2006-11-02 : add KW *** arg, change call to GetOutputLink to direct access
 =========================================================================*/
 static void
-scan_clause_tree(STAND_PARAM* __stand_param__, int start_state, int start_pos)
+scan_clause_tree(STAND_PARAM *__stand_param__, int start_state, int start_pos)
 {
 	int next_state;
 
-	RULE_PARAM* __rules__ = __stand_param__->rules;
-	KW*** __output_link__ = __rules__->output_link;
-	SEG* __segments__ = __stand_param__->stz_info->segs;
+	RULE_PARAM *__rules__ = __stand_param__->rules;
+	KW ***__output_link__ = __rules__->output_link;
+	SEG *__segments__ = __stand_param__->stz_info->segs;
 	double sum = 0.00;       /* -- running total for score calculation --*/
 	int pos = start_pos;     /* -- one beyond the last symbol -- */
 	int state = start_state; /* --for the __tran_table__ -- */
 	int depth = START_DEPTH; /* --how deep in the clause tree -- */
 	int cl = 0;
-	KW* __keyw__ = NULL;
+	KW *__keyw__ = NULL;
 
 	while (TRUE)
 	{
-		SEG* __outer_seg__;
+		SEG *__outer_seg__;
 		while (TRUE)
 		{
-			SEG* __inner_seg__;
+			SEG *__inner_seg__;
 			if (__keyw__ == NULL)
 			{
 				/*-- when we're out of keys for this class, get next class --*/
@@ -864,13 +864,13 @@ Calls analyze.c (deposit_stz)
 2006-11-02 : add KW *** arg, change call to GetOutputLink to direct access
 =========================================================================*/
 static void
-shallow_clause_scan(STAND_PARAM* __stand_param__, int cl, int pos)
+shallow_clause_scan(STAND_PARAM *__stand_param__, int cl, int pos)
 {
-	KW* __kw__;
+	KW *__kw__;
 
-	RULE_PARAM* __rules__ = __stand_param__->rules;
-	KW*** __output_link__ = __rules__->output_link;
-	SEG* __seg__ = __stand_param__->stz_info->segs;
+	RULE_PARAM *__rules__ = __stand_param__->rules;
+	KW ***__output_link__ = __rules__->output_link;
+	SEG *__seg__ = __stand_param__->stz_info->segs;
 	__seg__->End = pos - 1;
 	__seg__->Start = 0;
 	/*-- <revision date='2006-11-02'> Substitute for GetOutputLink </revision> --*/
@@ -890,7 +890,7 @@ shallow_clause_scan(STAND_PARAM* __stand_param__, int cl, int pos)
 #ifdef OCCUPANCY_DEBUG
 		if (cl == EXTRA_C)
 		{
-			SYMB* __ol__;
+			SYMB *__ol__;
 			printf("\nRule is type %d (%s)\n: ", __kw__->Type, __rule_type_names__[__kw__->Type]);
 			printf("Input : ");
 			for (__ol__ = __kw__->Input; *__ol__ != FAIL; __ol__++)
@@ -917,11 +917,11 @@ analyze.c (select_next_composition)
 called by analyze.c (evaluator)
 =======================================================================*/
 static int
-select_next_composition(STAND_PARAM* __stand_param__)
+select_next_composition(STAND_PARAM *__stand_param__)
 {
 	int pos;
-	int* __sym_sel__ = __stand_param__->cur_sym_sel;
-	int* __num_defs__ = __stand_param__->def_cnt;
+	int *__sym_sel__ = __stand_param__->cur_sym_sel;
+	int *__num_defs__ = __stand_param__->def_cnt;
 
 	for (pos = __stand_param__->LexNum - 1; pos >= FIRST_LEX_POS; pos--)
 	{
@@ -947,12 +947,12 @@ select_next_composition(STAND_PARAM* __stand_param__)
 </summary>
 =======================================================================*/
 static void
-make_singleton(SEG* __segments__, SYMB sym, int pos, int depth, double score)
+make_singleton(SEG *__segments__, SYMB sym, int pos, int depth, double score)
 {
 
 	/*-- <remarks> Since the __segments__ go left to right and the positions go right to
 		left, the depth and position will usually be different. </remarks> --*/
-	SEG* __seg__ = __segments__ + depth;
+	SEG *__seg__ = __segments__ + depth;
 	__seg__->Start = pos;
 	__seg__->End = pos;
 	__seg__->Value = score;
@@ -966,10 +966,10 @@ calls analyze.c (copy_stz, save_current_composition)
 called by analyze.c (_force_deposit_, shallow_clause_scan,scan_clause_tree)
 =======================================================================*/
 static void
-deposit_stz(STAND_PARAM* __stand_param__, double sum, int depth)
+deposit_stz(STAND_PARAM *__stand_param__, double sum, int depth)
 {
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
-	STZ* __cur_stz__;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
+	STZ *__cur_stz__;
 
 	/*-- calculate the score here --*/
 	double cur_score = (sum / (double)(depth + 1));
@@ -985,7 +985,7 @@ deposit_stz(STAND_PARAM* __stand_param__, double sum, int depth)
 	/*-- Then add the content, once we have a pointer -- */
 	if ((__stand_param__->rules->collect_statistics) && (depth == START_DEPTH))
 	{
-		SEG* __seg__ = __stz_info__->segs + START_DEPTH;
+		SEG *__seg__ = __stz_info__->segs + START_DEPTH;
 		if (__seg__->Key != NULL) { __cur_stz__->build_key = __seg__->Key; }
 	}
 	save_current_composition(
@@ -998,8 +998,8 @@ deposit_stz(STAND_PARAM* __stand_param__, double sum, int depth)
 analyze.c (copy_stz)
 called by analyze.c (deposit_stz)
 =======================================================================*/
-static STZ*
-copy_stz(STAND_PARAM* __stand_param__, double current_score)
+static STZ *
+copy_stz(STAND_PARAM *__stand_param__, double current_score)
 {
 	/* -- sort it into the list and knock the last one off the list
       if it is MAX_STZ -- */
@@ -1007,10 +1007,10 @@ copy_stz(STAND_PARAM* __stand_param__, double current_score)
       if it is greater than the current cutoff -- */
 	int i;
 	int last_on_list;
-	STZ* __cur_stz__;
+	STZ *__cur_stz__;
 
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
-	STZ** __stz_list__ = __stz_info__->stz_array;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
+	STZ **__stz_list__ = __stz_info__->stz_array;
 
 	/* -- Increase the list size only if it isn't full. If it is full, take
 		the score of the last on the list (which we're going to knock off the
@@ -1041,7 +1041,7 @@ copy_stz(STAND_PARAM* __stand_param__, double current_score)
 		/* -- Get the next pointer on the list and move it back if it has a
 	 lesser score. Otherwise we put the pointer to the new stz in the
 	 present position -- */
-		STZ* __next_stz__ = __stz_list__[i - 1];
+		STZ *__next_stz__ = __stz_list__[i - 1];
 		if (current_score > __next_stz__->raw_score) { __stz_list__[i] = __next_stz__; }
 		else
 		{
@@ -1069,16 +1069,16 @@ calls analyze.c (copy_best)
       Consequently it must be done at the time of deposit </remarks>
 =======================================================================*/
 static void
-save_current_composition(STAND_PARAM* __stand_param__,
-			 SEG* __segments__,
+save_current_composition(STAND_PARAM *__stand_param__,
+			 SEG *__segments__,
 			 int depth,
-			 SYMB* __best_output__,
-			 DEF** __best_defs__)
+			 SYMB *__best_output__,
+			 DEF **__best_defs__)
 {
 
 	int lex_pos;
-	SEG* __seg__;
-	int* __sym_sel__ = __stand_param__->cur_sym_sel;
+	SEG *__seg__;
+	int *__sym_sel__ = __stand_param__->cur_sym_sel;
 
 	/*-- <remarks> Get the definitions selected from save_defs - needed for outputing
 		the lexemes. Different definitions may give a different
@@ -1097,7 +1097,7 @@ save_current_composition(STAND_PARAM* __stand_param__,
 
 	for (__seg__ = __segments__ + depth, lex_pos = FIRST_LEX_POS; __seg__ >= __segments__; __seg__--)
 	{
-		SYMB* __sym_ptr__;
+		SYMB *__sym_ptr__;
 		if ((__sym_ptr__ = __seg__->Output) == NULL)
 		{
 			lex_pos = copy_best(__stand_param__, __sym_sel__, __seg__->sub_sym, lex_pos, __best_output__);
@@ -1117,10 +1117,10 @@ called by analyze.c (save_current_composition)
       sequences </remarks>
 =======================================================================*/
 static int
-copy_best(STAND_PARAM* __stand_param__, int* __sym_sel__, SYMB output_symb, int beg, SYMB* __best_output__)
+copy_best(STAND_PARAM *__stand_param__, int *__sym_sel__, SYMB output_symb, int beg, SYMB *__best_output__)
 {
 	int lex_pos;
-	int* __orig_pos__ = __stand_param__->orig_str_pos;
+	int *__orig_pos__ = __stand_param__->orig_str_pos;
 
 	/*-- <remarks> <code>orig_pos</code> has the (multiple) LEXEME positions to which the
       (single) output symbol corresponds - so we add that symbol to each of
@@ -1153,10 +1153,10 @@ scan the ith row of comp_lex_sym for the symbol sym
 returns the matching cell j
 =======================================================================*/
 static int
-lex_has_def(STAND_PARAM* __stand_param__, int i, SYMB sym)
+lex_has_def(STAND_PARAM *__stand_param__, int i, SYMB sym)
 {
 	int j;
-	int* __num_defs__ = __stand_param__->def_cnt;
+	int *__num_defs__ = __stand_param__->def_cnt;
 	for (j = 0; j < __num_defs__[i]; j++)
 	{
 		if (__stand_param__->comp_lex_sym[i][j] == sym) { return j; }
@@ -1169,7 +1169,7 @@ analyze.c (have_schema_symbol)
 called by analyze.c (schema_modify_position)
 =======================================================================*/
 static int
-have_schema_symbol(int* __check_dir__, SYMB sym)
+have_schema_symbol(int *__check_dir__, SYMB sym)
 {
 	if (__check_dir__ != NULL)
 	{
@@ -1194,7 +1194,7 @@ have_schema_symbol(int* __check_dir__, SYMB sym)
 #define DEPTH_POS (num_lexes - 1) - depth
 
 static void
-default_seg_val(int* __sym_sel__, int num_lexes, SEG* __segments__, int use_default_sym, SYMB sym, double score)
+default_seg_val(int *__sym_sel__, int num_lexes, SEG *__segments__, int use_default_sym, SYMB sym, double score)
 {
 	int depth;
 	for (depth = FIRST_LEX_POS; depth < num_lexes; depth++)
@@ -1217,7 +1217,7 @@ calls analyze.c (lex_has_def)
 at depth in __seg__
 =======================================================================*/
 static int
-_modify_position_(STAND_PARAM* __stand_param__, SEG* __seg__, int depth, int pos, SYMB in_sym, SYMB out_sym)
+_modify_position_(STAND_PARAM *__stand_param__, SEG *__seg__, int depth, int pos, SYMB in_sym, SYMB out_sym)
 {
 	int sel;
 	if ((sel = lex_has_def(__stand_param__, pos, in_sym)) != FAIL)
@@ -1235,8 +1235,8 @@ analyze.c (schema_modify_position)
 calls analyze.c (have_schema_symbol, _modify_position_)
 =======================================================================*/
 static int
-schema_modify_position(STAND_PARAM* __stand_param__,
-		       SEG* __segments__,
+schema_modify_position(STAND_PARAM *__stand_param__,
+		       SEG *__segments__,
 		       int depth,
 		       int lex_pos,
 		       SYMB in_sym,
@@ -1260,10 +1260,10 @@ calls analyze.c (default_seg_val, schema_modify_position and _force_deposit_)
       the schema read as a guide </remarks>
 =======================================================================*/
 static void
-force_arc_clause(STAND_PARAM* __stand_param__)
+force_arc_clause(STAND_PARAM *__stand_param__)
 {
 	int lex_start, lex_end, depth;
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
 	int num_lexes = __stand_param__->LexNum;
 	default_seg_val(__stand_param__->cur_sym_sel, num_lexes, __stz_info__->segs, ARC_C, STREET, VERY_LOW_WEIGHT);
 	depth = lex_start = 0;
@@ -1313,12 +1313,12 @@ force_arc_clause(STAND_PARAM* __stand_param__)
 =======================================================================*/
 #ifdef USE_FORCE_MACRO
 static void
-_force_macro_clause_(STAND_PARAM* __stand_param__)
+_force_macro_clause_(STAND_PARAM *__stand_param__)
 {
 	int lex_sym_pos, depth;
 	int n = __stand_param__->LexNum;
 	int end = n - 1;
-	SEG* __segments__ = __stand_param__->stz_info->segs;
+	SEG *__segments__ = __stand_param__->stz_info->segs;
 
 	default_seg_val(__stand_param__->cur_sym_sel, n, __segments__, MACRO_C, POSTAL, VERY_LOW_WEIGHT);
 	for (lex_sym_pos = 0, depth = end; lex_sym_pos <= end; lex_sym_pos++, depth--)
@@ -1345,13 +1345,13 @@ _force_macro_clause_(STAND_PARAM* __stand_param__)
 </summary>
 =======================================================================*/
 static void
-_force_deposit_(STAND_PARAM* __stand_param__, int depth)
+_force_deposit_(STAND_PARAM *__stand_param__, int depth)
 {
 	/*-- <remarks> Worst case scenario: we have a string of unknowns. It'll score
 		really low, but not zero. </remarks> --*/
 	double sum = 0.00;
-	SEG* __seg__;
-	SEG* __segments__ = __stand_param__->stz_info->segs;
+	SEG *__seg__;
+	SEG *__segments__ = __stand_param__->stz_info->segs;
 	for (__seg__ = __segments__ + depth; __seg__ >= __segments__; __seg__--)
 	{
 		sum += __seg__->Value;
@@ -1365,7 +1365,7 @@ called by analyze.c (evaluator)
 calls analyze.c (lex_has_def)
 =======================================================================*/
 static int
-non_geocode_address(STAND_PARAM* __stand_param__)
+non_geocode_address(STAND_PARAM *__stand_param__)
 {
 	/* -- scan through each position looking for an RR or BOXH token. -- */
 	int lex_sym_pos;
@@ -1384,14 +1384,14 @@ analyze.c (output_raw_elements)
 print out the raw elements of the tokens
 =======================================================================*/
 void
-output_raw_elements(STAND_PARAM* __stand_param__, ERR_PARAM* __err_param__)
+output_raw_elements(STAND_PARAM *__stand_param__, ERR_PARAM *__err_param__)
 {
 	int stz_no, n;
 	int lex_pos;
-	DEF* __def__;
-	STZ** __stz_list__;
+	DEF *__def__;
+	STZ **__stz_list__;
 
-	STZ_PARAM* __stz_info__ = __stand_param__->stz_info;
+	STZ_PARAM *__stz_info__ = __stand_param__->stz_info;
 	if (__err_param__ == NULL) { printf("Input tokenization candidates:\n"); }
 	else
 	{
@@ -1427,7 +1427,7 @@ output_raw_elements(STAND_PARAM* __stand_param__, ERR_PARAM* __err_param__)
 	__stz_list__ = __stz_info__->stz_array;
 	for (stz_no = FIRST_STZ; stz_no < n; stz_no++)
 	{
-		STZ* __cur_stz__ = __stz_list__[stz_no];
+		STZ *__cur_stz__ = __stz_list__[stz_no];
 		if (__err_param__ == NULL)
 		{ printf("Raw standardization %d with score %f:\n", (stz_no), __cur_stz__->score); }
 		else

@@ -51,7 +51,7 @@ Datum LWGEOM_asEncodedPolyline(PG_FUNCTION_ARGS);
  * Could return SRS as short one (i.e EPSG:4326)
  * or as long one: (i.e urn:ogc:def:crs:EPSG::4326)
  */
-char*
+char *
 getSRSbySRID(int srid, bool short_crs)
 {
 	char query[256];
@@ -118,7 +118,7 @@ getSRSbySRID(int srid, bool short_crs)
  *
  */
 int
-getSRIDbySRS(const char* srs)
+getSRIDbySRS(const char *srs)
 {
 	char query[256];
 	int srid, err;
@@ -184,19 +184,19 @@ getSRIDbySRS(const char* srs)
 PG_FUNCTION_INFO_V1(LWGEOM_asGML);
 Datum LWGEOM_asGML(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* gml = NULL;
-	text* result;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *gml = NULL;
+	text *result;
 	int version;
-	char* srs;
+	char *srs;
 	int srid;
 	int option = 0;
 	int lwopts = LW_GML_IS_DIMS;
 	int precision = DBL_DIG;
-	static const char* default_prefix = "gml:"; /* default prefix */
-	const char* prefix = default_prefix;
-	const char* gml_id = NULL;
+	static const char *default_prefix = "gml:"; /* default prefix */
+	const char *prefix = default_prefix;
+	const char *gml_id = NULL;
 	size_t len;
 	char *gml_id_buf, *prefix_buf;
 	text *prefix_text, *gml_id_text;
@@ -313,16 +313,16 @@ Datum LWGEOM_asGML(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_asKML);
 Datum LWGEOM_asKML(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* kml;
-	text* result;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *kml;
+	text *result;
 	int version;
 	int precision = DBL_DIG;
-	static const char* default_prefix = ""; /* default prefix */
-	char* prefixbuf;
-	const char* prefix = default_prefix;
-	text* prefix_text;
+	static const char *default_prefix = ""; /* default prefix */
+	char *prefixbuf;
+	const char *prefix = default_prefix;
+	text *prefix_text;
 
 	/* Get the version */
 	version = PG_GETARG_INT32(0);
@@ -407,13 +407,13 @@ Datum LWGEOM_asGeoJson_old(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_asGeoJson);
 Datum LWGEOM_asGeoJson(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* geojson;
-	text* result;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *geojson;
+	text *result;
 	int has_bbox = 0;
 	int precision = DBL_DIG;
-	char* srs = NULL;
+	char *srs = NULL;
 
 	/* Get the geometry */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
@@ -479,10 +479,10 @@ Datum LWGEOM_asGeoJson(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_asSVG);
 Datum LWGEOM_asSVG(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* svg;
-	text* result;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *svg;
+	text *result;
 	int relative = 0;
 	int precision = DBL_DIG;
 
@@ -519,19 +519,19 @@ Datum LWGEOM_asSVG(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_asX3D);
 Datum LWGEOM_asX3D(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* x3d;
-	text* result;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *x3d;
+	text *result;
 	int version;
-	char* srs;
+	char *srs;
 	int srid;
 	int option = 0;
 	int precision = DBL_DIG;
-	static const char* default_defid = "x3d:"; /* default defid */
-	char* defidbuf;
-	const char* defid = default_defid;
-	text* defid_text;
+	static const char *default_defid = "x3d:"; /* default defid */
+	char *defidbuf;
+	const char *defid = default_defid;
+	text *defid_text;
 
 	/* Get the version */
 	version = PG_GETARG_INT32(0);
@@ -615,11 +615,11 @@ Datum LWGEOM_asX3D(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_asEncodedPolyline);
 Datum LWGEOM_asEncodedPolyline(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	char* encodedpolyline;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	char *encodedpolyline;
 	int precision = 5;
-	text* result;
+	text *result;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 

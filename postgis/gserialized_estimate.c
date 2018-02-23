@@ -145,8 +145,8 @@ Datum _postgis_gserialized_joinsel(PG_FUNCTION_ARGS);
 Datum _postgis_gserialized_stats(PG_FUNCTION_ARGS);
 
 /* Local prototypes */
-static Oid table_get_spatial_index(Oid tbl_oid, text* col, int* key_type);
-static GBOX* spatial_index_read_extent(Oid idx_oid, int key_type);
+static Oid table_get_spatial_index(Oid tbl_oid, text *col, int *key_type);
+static GBOX *spatial_index_read_extent(Oid idx_oid, int key_type);
 
 /* Old Prototype */
 Datum geometry_estimated_extent(PG_FUNCTION_ARGS);
@@ -276,7 +276,7 @@ typedef struct ND_STATS_T
  * we have a little utility function to make it easy.
  */
 static int
-gbox_ndims(const GBOX* gbox)
+gbox_ndims(const GBOX *gbox)
 {
 	int dims = 2;
 	if (FLAGS_GET_GEODETIC(gbox->flags)) return 3;
@@ -291,11 +291,11 @@ gbox_ndims(const GBOX* gbox)
  * by the _postgis_* functions.
  */
 static int
-text_p_get_mode(const text* txt)
+text_p_get_mode(const text *txt)
 {
 	int mode = 2;
 	if (VARSIZE(txt) - VARHDRSZ <= 0) return mode;
-	char* modestr = (char*)VARDATA(txt);
+	char *modestr = (char *)VARDATA(txt);
 	if (modestr[0] == 'N') mode = 0;
 	return mode;
 }
@@ -304,10 +304,10 @@ text_p_get_mode(const text* txt)
  * Integer comparison function for qsort
  */
 static int
-cmp_int(const void* a, const void* b)
+cmp_int(const void *a, const void *b)
 {
-	int ia = *((const int*)a);
-	int ib = *((const int*)b);
+	int ia = *((const int *)a);
+	int ib = *((const int *)b);
 
 	if (ia == ib)
 		return 0;
@@ -322,7 +322,7 @@ cmp_int(const void* a, const void* b)
  * the "inter-quintile range"
  */
 static int
-range_quintile(int* vals, int nvals)
+range_quintile(int *vals, int nvals)
 {
 	qsort(vals, nvals, sizeof(int), cmp_int);
 	return vals[4 * nvals / 5] - vals[nvals / 5];
@@ -332,7 +332,7 @@ range_quintile(int* vals, int nvals)
  * Given double array, return sum of values.
  */
 static double
-total_double(const double* vals, int nvals)
+total_double(const double *vals, int nvals)
 {
 	int i;
 	float total = 0;
@@ -349,7 +349,7 @@ total_double(const double* vals, int nvals)
  * Given int array, return sum of values.
  */
 static int
-total_int(const int* vals, int nvals)
+total_int(const int *vals, int nvals)
 {
 	int i;
 	int total = 0;
@@ -364,7 +364,7 @@ total_int(const int* vals, int nvals)
  * The average of an array of integers.
  */
 static double
-avg(const int* vals, int nvals)
+avg(const int *vals, int nvals)
 {
 	int t = total_int(vals, nvals);
 	return (double)t / (double)nvals;
@@ -374,7 +374,7 @@ avg(const int* vals, int nvals)
  * The standard deviation of an array of integers.
  */
 static double
-stddev(const int* vals, int nvals)
+stddev(const int *vals, int nvals)
 {
 	int i;
 	double sigma2 = 0;
@@ -395,7 +395,7 @@ stddev(const int* vals, int nvals)
  * position in the 1-d values array.
  */
 static int
-nd_stats_value_index(const ND_STATS* stats, int* indexes)
+nd_stats_value_index(const ND_STATS *stats, int *indexes)
 {
 	int d;
 	int accum = 1, vdx = 0;
@@ -420,12 +420,12 @@ nd_stats_value_index(const ND_STATS* stats, int* indexes)
 /**
  * Convert an #ND_BOX to a JSON string for printing
  */
-static char*
-nd_box_to_json(const ND_BOX* nd_box, int ndims)
+static char *
+nd_box_to_json(const ND_BOX *nd_box, int ndims)
 {
-	char* rv;
+	char *rv;
 	int i;
-	stringbuffer_t* sb = stringbuffer_create();
+	stringbuffer_t *sb = stringbuffer_create();
 
 	stringbuffer_append(sb, "{\"min\":[");
 	for (i = 0; i < ndims; i++)
@@ -450,12 +450,12 @@ nd_box_to_json(const ND_BOX* nd_box, int ndims)
  * Convert an #ND_STATS to a JSON representation for
  * external use.
  */
-static char*
-nd_stats_to_json(const ND_STATS* nd_stats)
+static char *
+nd_stats_to_json(const ND_STATS *nd_stats)
 {
 	char *json_extent, *str;
 	int d;
-	stringbuffer_t* sb = stringbuffer_create();
+	stringbuffer_t *sb = stringbuffer_create();
 	int ndims = (int)roundf(nd_stats->ndims);
 
 	stringbuffer_append(sb, "{");
@@ -518,7 +518,7 @@ nd_stats_to_json(const ND_STATS* nd_stats)
 
 /** Expand the bounds of target to include source */
 static int
-nd_box_merge(const ND_BOX* source, ND_BOX* target)
+nd_box_merge(const ND_BOX *source, ND_BOX *target)
 {
 	int d;
 	for (d = 0; d < ND_DIMS; d++)
@@ -531,7 +531,7 @@ nd_box_merge(const ND_BOX* source, ND_BOX* target)
 
 /** Zero out an ND_BOX */
 static int
-nd_box_init(ND_BOX* a)
+nd_box_init(ND_BOX *a)
 {
 	memset(a, 0, sizeof(ND_BOX));
 	return true;
@@ -543,7 +543,7 @@ nd_box_init(ND_BOX* a)
  * the mins to the largest.
  */
 static int
-nd_box_init_bounds(ND_BOX* a)
+nd_box_init_bounds(ND_BOX *a)
 {
 	int d;
 	for (d = 0; d < ND_DIMS; d++)
@@ -556,7 +556,7 @@ nd_box_init_bounds(ND_BOX* a)
 
 /** Set the values of an #ND_BOX from a #GBOX */
 static void
-nd_box_from_gbox(const GBOX* gbox, ND_BOX* nd_box)
+nd_box_from_gbox(const GBOX *gbox, ND_BOX *nd_box)
 {
 	int d = 0;
 	POSTGIS_DEBUGF(3, " %s", gbox_to_string(gbox));
@@ -593,7 +593,7 @@ nd_box_from_gbox(const GBOX* gbox, ND_BOX* nd_box)
  * Return true if #ND_BOX a overlaps b, false otherwise.
  */
 static int
-nd_box_intersects(const ND_BOX* a, const ND_BOX* b, int ndims)
+nd_box_intersects(const ND_BOX *a, const ND_BOX *b, int ndims)
 {
 	int d;
 	for (d = 0; d < ndims; d++)
@@ -607,7 +607,7 @@ nd_box_intersects(const ND_BOX* a, const ND_BOX* b, int ndims)
  * Return true if #ND_BOX a contains b, false otherwise.
  */
 static int
-nd_box_contains(const ND_BOX* a, const ND_BOX* b, int ndims)
+nd_box_contains(const ND_BOX *a, const ND_BOX *b, int ndims)
 {
 	int d;
 	for (d = 0; d < ndims; d++)
@@ -622,7 +622,7 @@ nd_box_contains(const ND_BOX* a, const ND_BOX* b, int ndims)
  * of total width to add.
  */
 static int
-nd_box_expand(ND_BOX* nd_box, double expansion_factor)
+nd_box_expand(ND_BOX *nd_box, double expansion_factor)
 {
 	int d;
 	double size;
@@ -641,7 +641,7 @@ nd_box_expand(ND_BOX* nd_box, double expansion_factor)
  * addresses in ND_IBOX->min and the highest in ND_IBOX->max
  */
 static inline int
-nd_box_overlap(const ND_STATS* nd_stats, const ND_BOX* nd_box, ND_IBOX* nd_ibox)
+nd_box_overlap(const ND_STATS *nd_stats, const ND_BOX *nd_box, ND_IBOX *nd_ibox)
 {
 	int d;
 
@@ -676,7 +676,7 @@ nd_box_overlap(const ND_STATS* nd_stats, const ND_BOX* nd_box, ND_IBOX* nd_ibox)
  * Returns the proportion of b2 that is covered by b1.
  */
 static inline double
-nd_box_ratio(const ND_BOX* b1, const ND_BOX* b2, int ndims)
+nd_box_ratio(const ND_BOX *b1, const ND_BOX *b2, int ndims)
 {
 	int d;
 	bool covered = true;
@@ -731,7 +731,7 @@ nd_box_ratio(const ND_BOX* b1, const ND_BOX* b2, int ndims)
  * less in Z (in a few-hundred meter range).
  */
 static int
-nd_box_array_distribution(const ND_BOX** nd_boxes, int num_boxes, const ND_BOX* extent, int ndims, double* distribution)
+nd_box_array_distribution(const ND_BOX **nd_boxes, int num_boxes, const ND_BOX *extent, int ndims, double *distribution)
 {
 	/* How many bins shall we use in figuring out the distribution? */
 	static int num_bins = 50;
@@ -743,7 +743,7 @@ nd_box_array_distribution(const ND_BOX** nd_boxes, int num_boxes, const ND_BOX* 
 	double average, sdev, sdev_ratio;
 #endif
 	int bmin, bmax; /* Bin min, bin max */
-	const ND_BOX* ndb;
+	const ND_BOX *ndb;
 
 	/* For each dimension... */
 	for (d = 0; d < ndims; d++)
@@ -817,7 +817,7 @@ nd_box_array_distribution(const ND_BOX** nd_boxes, int num_boxes, const ND_BOX* 
  * the domain, in which case return false.
  */
 static inline int
-nd_increment(ND_IBOX* ibox, int ndims, int* counter)
+nd_increment(ND_IBOX *ibox, int ndims, int *counter)
 {
 	int d = 0;
 
@@ -838,12 +838,12 @@ nd_increment(ND_IBOX* ibox, int ndims, int* counter)
 	return true;
 }
 
-static ND_STATS*
+static ND_STATS *
 pg_nd_stats_from_tuple(HeapTuple stats_tuple, int mode)
 {
 	int stats_kind = STATISTIC_KIND_ND;
 	int rv;
-	ND_STATS* nd_stats;
+	ND_STATS *nd_stats;
 
 	/* If we're in 2D mode, set the kind appropriately */
 	if (mode == 2) stats_kind = STATISTIC_KIND_2D;
@@ -851,7 +851,7 @@ pg_nd_stats_from_tuple(HeapTuple stats_tuple, int mode)
 		/* Then read the geom status histogram from that */
 
 #if POSTGIS_PGSQL_VERSION < 100
-	float4* floatptr;
+	float4 *floatptr;
 	int nvalues;
 
 	rv = get_attstatsslot(stats_tuple, 0, 0, stats_kind, InvalidOid, NULL, NULL, NULL, &floatptr, &nvalues);
@@ -891,11 +891,11 @@ pg_nd_stats_from_tuple(HeapTuple stats_tuple, int mode)
  * Pull the stats object from the PgSQL system catalogs. Used
  * by the selectivity functions and the debugging functions.
  */
-static ND_STATS*
+static ND_STATS *
 pg_get_nd_stats(const Oid table_oid, AttrNumber att_num, int mode, bool only_parent)
 {
 	HeapTuple stats_tuple = NULL;
-	ND_STATS* nd_stats;
+	ND_STATS *nd_stats;
 
 	/* First pull the stats tuple for the whole tree */
 	if (!only_parent)
@@ -949,10 +949,10 @@ pg_get_nd_stats(const Oid table_oid, AttrNumber att_num, int mode, bool only_par
  * is true this function only searchs for stats in the parent
  * table ignoring any statistic collected from the children.
  */
-static ND_STATS*
-pg_get_nd_stats_by_name(const Oid table_oid, const text* att_text, int mode, bool only_parent)
+static ND_STATS *
+pg_get_nd_stats_by_name(const Oid table_oid, const text *att_text, int mode, bool only_parent)
 {
-	const char* att_name = text_to_cstring(att_text);
+	const char *att_name = text_to_cstring(att_text);
 	AttrNumber att_num;
 
 	/* We know the name? Look up the num */
@@ -989,7 +989,7 @@ pg_get_nd_stats_by_name(const Oid table_oid, const text* att_text, int mode, boo
  * overlaps: val += val1 * ( val2 * overlap_ratio )
  */
 static float8
-estimate_join_selectivity(const ND_STATS* s1, const ND_STATS* s2)
+estimate_join_selectivity(const ND_STATS *s1, const ND_STATS *s2)
 {
 	int ncells1, ncells2;
 	int ndims1, ndims2, ndims;
@@ -1026,7 +1026,7 @@ estimate_join_selectivity(const ND_STATS* s1, const ND_STATS* s2)
 	/* ...so that we can drive the summation loop with the smaller histogram. */
 	if (ncells1 > ncells2)
 	{
-		const ND_STATS* stats_tmp = s1;
+		const ND_STATS *stats_tmp = s1;
 		s1 = s2;
 		s2 = stats_tmp;
 	}
@@ -1227,9 +1227,9 @@ Datum gserialized_gist_joinsel_2d(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_joinsel);
 Datum gserialized_gist_joinsel(PG_FUNCTION_ARGS)
 {
-	PlannerInfo* root = (PlannerInfo*)PG_GETARG_POINTER(0);
+	PlannerInfo *root = (PlannerInfo *)PG_GETARG_POINTER(0);
 	/* Oid operator = PG_GETARG_OID(1); */
-	List* args = (List*)PG_GETARG_POINTER(2);
+	List *args = (List *)PG_GETARG_POINTER(2);
 	JoinType jointype = (JoinType)PG_GETARG_INT16(3);
 	int mode = PG_GETARG_INT32(4);
 
@@ -1248,10 +1248,10 @@ Datum gserialized_gist_joinsel(PG_FUNCTION_ARGS)
 	}
 
 	/* Find Oids of the geometry columns we are working with */
-	arg1 = (Node*)linitial(args);
-	arg2 = (Node*)lsecond(args);
-	var1 = (Var*)arg1;
-	var2 = (Var*)arg2;
+	arg1 = (Node *)linitial(args);
+	arg2 = (Node *)lsecond(args);
+	var1 = (Var *)arg1;
+	var2 = (Var *)arg2;
 
 	/* We only do column joins right now, no functional joins */
 	/* TODO: handle g1 && ST_Expand(g2) */
@@ -1321,7 +1321,7 @@ Datum gserialized_gist_joinsel(PG_FUNCTION_ARGS)
  * can then use the histogram
  */
 static void
-compute_gserialized_stats_mode(VacAttrStats* stats,
+compute_gserialized_stats_mode(VacAttrStats *stats,
 			       AnalyzeAttrFetchFunc fetchfunc,
 			       int sample_rows,
 			       double total_rows,
@@ -1333,7 +1333,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	int null_cnt = 0;           /* # null rows in the sample */
 	int histogram_features = 0; /* # rows that actually got counted in the histogram */
 
-	ND_STATS* nd_stats;   /* Our histogram */
+	ND_STATS *nd_stats;   /* Our histogram */
 	size_t nd_stats_size; /* Size to allocate */
 
 	double total_width = 0;         /* # of bytes used by sample */
@@ -1344,7 +1344,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	ND_BOX avg;    /* Avg of extents of sample boxes */
 	ND_BOX stddev; /* StdDev of extents of sample boxes */
 
-	const ND_BOX** sample_boxes; /* ND_BOXes for each of the sample features */
+	const ND_BOX **sample_boxes; /* ND_BOXes for each of the sample features */
 	ND_BOX sample_extent;        /* Extent of the raw sample */
 	int histo_size[ND_DIMS];     /* histogram nrows, ncols, etc */
 	ND_BOX histo_extent;         /* Spatial extent of the histogram */
@@ -1379,7 +1379,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	 * We might need less space, but don't think
 	 * its worth saving...
 	 */
-	sample_boxes = palloc(sizeof(ND_BOX*) * sample_rows);
+	sample_boxes = palloc(sizeof(ND_BOX *) * sample_rows);
 
 	/*
 	 * First scan:
@@ -1394,9 +1394,9 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	for (i = 0; i < sample_rows; i++)
 	{
 		Datum datum;
-		GSERIALIZED* geom;
+		GSERIALIZED *geom;
 		GBOX gbox;
-		ND_BOX* nd_box;
+		ND_BOX *nd_box;
 		bool is_null;
 		bool is_copy;
 
@@ -1411,7 +1411,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 		}
 
 		/* Read the bounds from the gserialized. */
-		geom = (GSERIALIZED*)PG_DETOAST_DATUM(datum);
+		geom = (GSERIALIZED *)PG_DETOAST_DATUM(datum);
 		is_copy = VARATT_IS_EXTENDED(datum);
 		if (LW_FAILURE == gserialized_get_gbox_p(geom, &gbox))
 		{
@@ -1506,7 +1506,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 		/* Calculate standard deviation for this dimension bounds */
 		for (i = 0; i < notnull_cnt; i++)
 		{
-			const ND_BOX* ndb = sample_boxes[i];
+			const ND_BOX *ndb = sample_boxes[i];
 			stddev.min[d] += (ndb->min[d] - avg.min[d]) * (ndb->min[d] - avg.min[d]);
 			stddev.max[d] += (ndb->max[d] - avg.max[d]) * (ndb->max[d] - avg.max[d]);
 		}
@@ -1526,7 +1526,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	nd_box_init_bounds(&histo_extent_new);
 	for (i = 0; i < notnull_cnt; i++)
 	{
-		const ND_BOX* ndb = sample_boxes[i];
+		const ND_BOX *ndb = sample_boxes[i];
 		/* Skip any hard deviants (boxes entirely outside our histo_extent */
 		if (!nd_box_intersects(&histo_extent, ndb, ndims))
 		{
@@ -1663,7 +1663,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	 */
 	for (i = 0; i < notnull_cnt; i++)
 	{
-		const ND_BOX* nd_box;
+		const ND_BOX *nd_box;
 		ND_IBOX nd_ibox;
 		int at[ND_DIMS];
 		int d;
@@ -1775,7 +1775,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
 	/* Write the statistics data */
 	stats->stakind[stats_slot] = stats_kind;
 	stats->staop[stats_slot] = InvalidOid;
-	stats->stanumbers[stats_slot] = (float4*)nd_stats;
+	stats->stanumbers[stats_slot] = (float4 *)nd_stats;
 	stats->numnumbers[stats_slot] = nd_stats_size / sizeof(float4);
 	stats->stanullfrac = (float4)null_cnt / sample_rows;
 	stats->stawidth = total_width / notnull_cnt;
@@ -1814,7 +1814,7 @@ compute_gserialized_stats_mode(VacAttrStats* stats,
  * so we'll take the CPU hit and do the computation twice.
  */
 static void
-compute_gserialized_stats(VacAttrStats* stats, AnalyzeAttrFetchFunc fetchfunc, int sample_rows, double total_rows)
+compute_gserialized_stats(VacAttrStats *stats, AnalyzeAttrFetchFunc fetchfunc, int sample_rows, double total_rows)
 {
 	/* 2D Mode */
 	compute_gserialized_stats_mode(stats, fetchfunc, sample_rows, total_rows, 2);
@@ -1852,7 +1852,7 @@ compute_gserialized_stats(VacAttrStats* stats, AnalyzeAttrFetchFunc fetchfunc, i
 PG_FUNCTION_INFO_V1(gserialized_analyze_nd);
 Datum gserialized_analyze_nd(PG_FUNCTION_ARGS)
 {
-	VacAttrStats* stats = (VacAttrStats*)PG_GETARG_POINTER(0);
+	VacAttrStats *stats = (VacAttrStats *)PG_GETARG_POINTER(0);
 	Form_pg_attribute attr = stats->attr;
 
 	POSTGIS_DEBUG(2, "gserialized_analyze_nd called");
@@ -1886,7 +1886,7 @@ Datum gserialized_analyze_nd(PG_FUNCTION_ARGS)
  * divide by the number of features that generated the histogram.
  */
 static float8
-estimate_selectivity(const GBOX* box, const ND_STATS* nd_stats, int mode)
+estimate_selectivity(const GBOX *box, const ND_STATS *nd_stats, int mode)
 {
 	int d; /* counter */
 	float8 selectivity;
@@ -2012,10 +2012,10 @@ PG_FUNCTION_INFO_V1(_postgis_gserialized_stats);
 Datum _postgis_gserialized_stats(PG_FUNCTION_ARGS)
 {
 	Oid table_oid = PG_GETARG_OID(0);
-	text* att_text = PG_GETARG_TEXT_P(1);
-	ND_STATS* nd_stats;
-	char* str;
-	text* json;
+	text *att_text = PG_GETARG_TEXT_P(1);
+	ND_STATS *nd_stats;
+	char *str;
+	text *json;
 	int mode = 2;             /* default to 2D mode */
 	bool only_parent = false; /* default to whole tree stats */
 
@@ -2046,11 +2046,11 @@ PG_FUNCTION_INFO_V1(_postgis_gserialized_sel);
 Datum _postgis_gserialized_sel(PG_FUNCTION_ARGS)
 {
 	Oid table_oid = PG_GETARG_OID(0);
-	text* att_text = PG_GETARG_TEXT_P(1);
+	text *att_text = PG_GETARG_TEXT_P(1);
 	Datum geom_datum = PG_GETARG_DATUM(2);
 	GBOX gbox; /* search box read from gserialized datum */
 	float8 selectivity = 0;
-	ND_STATS* nd_stats;
+	ND_STATS *nd_stats;
 	int mode = 2; /* 2D mode by default */
 
 	/* Check if we've been asked to not use 2d mode */
@@ -2083,9 +2083,9 @@ PG_FUNCTION_INFO_V1(_postgis_gserialized_joinsel);
 Datum _postgis_gserialized_joinsel(PG_FUNCTION_ARGS)
 {
 	Oid table_oid1 = PG_GETARG_OID(0);
-	text* att_text1 = PG_GETARG_TEXT_P(1);
+	text *att_text1 = PG_GETARG_TEXT_P(1);
 	Oid table_oid2 = PG_GETARG_OID(2);
-	text* att_text2 = PG_GETARG_TEXT_P(3);
+	text *att_text2 = PG_GETARG_TEXT_P(3);
 	ND_STATS *nd_stats1, *nd_stats2;
 	float8 selectivity = 0;
 	int mode = 2; /* 2D mode by default */
@@ -2103,8 +2103,8 @@ Datum _postgis_gserialized_joinsel(PG_FUNCTION_ARGS)
 	/* Check if we've been asked to not use 2d mode */
 	if (!PG_ARGISNULL(4))
 	{
-		text* modetxt = PG_GETARG_TEXT_P(4);
-		char* modestr = text_to_cstring(modetxt);
+		text *modetxt = PG_GETARG_TEXT_P(4);
+		char *modestr = text_to_cstring(modetxt);
 		if (modestr[0] == 'N') mode = 0;
 	}
 
@@ -2164,17 +2164,17 @@ Datum gserialized_gist_sel_nd(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_sel);
 Datum gserialized_gist_sel(PG_FUNCTION_ARGS)
 {
-	PlannerInfo* root = (PlannerInfo*)PG_GETARG_POINTER(0);
+	PlannerInfo *root = (PlannerInfo *)PG_GETARG_POINTER(0);
 	/* Oid operator_oid = PG_GETARG_OID(1); */
-	List* args = (List*)PG_GETARG_POINTER(2);
+	List *args = (List *)PG_GETARG_POINTER(2);
 	/* int varRelid = PG_GETARG_INT32(3); */
 	int mode = PG_GETARG_INT32(4);
 
 	VariableStatData vardata;
-	ND_STATS* nd_stats = NULL;
+	ND_STATS *nd_stats = NULL;
 
-	Node* other;
-	Var* self;
+	Node *other;
+	Var *self;
 	GBOX search_box;
 	float8 selectivity = 0;
 
@@ -2197,15 +2197,15 @@ Datum gserialized_gist_sel(PG_FUNCTION_ARGS)
 	}
 
 	/* Find the constant part */
-	other = (Node*)linitial(args);
+	other = (Node *)linitial(args);
 	if (!IsA(other, Const))
 	{
-		self = (Var*)other;
-		other = (Node*)lsecond(args);
+		self = (Var *)other;
+		other = (Node *)lsecond(args);
 	}
 	else
 	{
-		self = (Var*)lsecond(args);
+		self = (Var *)lsecond(args);
 	}
 
 	if (!IsA(other, Const))
@@ -2215,7 +2215,7 @@ Datum gserialized_gist_sel(PG_FUNCTION_ARGS)
 	}
 
 	/* Convert the constant to a BOX */
-	if (!gserialized_datum_get_gbox_p(((Const*)other)->constvalue, &search_box))
+	if (!gserialized_datum_get_gbox_p(((Const *)other)->constvalue, &search_box))
 	{
 		POSTGIS_DEBUG(3, "search box is EMPTY");
 		PG_RETURN_FLOAT8(0.0);
@@ -2223,7 +2223,7 @@ Datum gserialized_gist_sel(PG_FUNCTION_ARGS)
 	POSTGIS_DEBUGF(4, " requested search box is: %s", gbox_to_string(&search_box));
 
 	/* Get pg_statistic row */
-	examine_variable(root, (Node*)self, 0, &vardata);
+	examine_variable(root, (Node *)self, 0, &vardata);
 	if (vardata.statsTuple) { nd_stats = pg_nd_stats_from_tuple(vardata.statsTuple, mode); }
 	ReleaseVariableStats(vardata);
 
@@ -2251,13 +2251,13 @@ Datum gserialized_gist_sel(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_estimated_extent);
 Datum gserialized_estimated_extent(PG_FUNCTION_ARGS)
 {
-	char* nsp = NULL;
-	char* tbl = NULL;
-	text* col = NULL;
-	char* nsp_tbl = NULL;
+	char *nsp = NULL;
+	char *tbl = NULL;
+	text *col = NULL;
+	char *nsp_tbl = NULL;
 	Oid tbl_oid, idx_oid;
-	ND_STATS* nd_stats;
-	GBOX* gbox = NULL;
+	ND_STATS *nd_stats;
+	GBOX *gbox = NULL;
 	bool only_parent = false;
 	int key_type;
 
@@ -2359,7 +2359,7 @@ Datum geometry_estimated_extent(PG_FUNCTION_ARGS)
 /************************************************************************/
 
 static Oid
-typname_to_oid(const char* typname)
+typname_to_oid(const char *typname)
 {
 	Oid typoid = TypenameGetTypid(typname);
 	if (OidIsValid(typoid) && get_typisdefined(typoid))
@@ -2369,13 +2369,13 @@ typname_to_oid(const char* typname)
 }
 
 static Oid
-table_get_spatial_index(Oid tbl_oid, text* col, int* key_type)
+table_get_spatial_index(Oid tbl_oid, text *col, int *key_type)
 {
 	Relation tbl_rel;
-	ListCell* lc;
-	List* idx_list;
+	ListCell *lc;
+	List *idx_list;
 	Oid result = InvalidOid;
-	char* colname = text_to_cstring(col);
+	char *colname = text_to_cstring(col);
 
 	/* Lookup our spatial index key types */
 	Oid b2d_oid = typname_to_oid(INDEX_KEY_2D);
@@ -2429,12 +2429,12 @@ table_get_spatial_index(Oid tbl_oid, text* col, int* key_type)
 	return result;
 }
 
-static GBOX*
+static GBOX *
 spatial_index_read_extent(Oid idx_oid, int key_type)
 {
-	BOX2DF* bounds_2df = NULL;
-	GIDX* bounds_gidx = NULL;
-	GBOX* gbox = NULL;
+	BOX2DF *bounds_2df = NULL;
+	GIDX *bounds_gidx = NULL;
+	GBOX *gbox = NULL;
 
 	if (!idx_oid) return NULL;
 
@@ -2461,7 +2461,7 @@ spatial_index_read_extent(Oid idx_oid, int key_type)
 			{
 				if (key_type == STATISTIC_SLOT_2D)
 				{
-					BOX2DF* b = (BOX2DF*)DatumGetPointer(idx_attr);
+					BOX2DF *b = (BOX2DF *)DatumGetPointer(idx_attr);
 					if (bounds_2df)
 						box2df_merge(bounds_2df, b);
 					else
@@ -2469,7 +2469,7 @@ spatial_index_read_extent(Oid idx_oid, int key_type)
 				}
 				else
 				{
-					GIDX* b = (GIDX*)DatumGetPointer(idx_attr);
+					GIDX *b = (GIDX *)DatumGetPointer(idx_attr);
 					if (bounds_gidx)
 						gidx_merge(&bounds_gidx, b);
 					else
@@ -2511,10 +2511,10 @@ CREATE OR REPLACE FUNCTION _postgis_index_extent(tbl regclass, col text)
 PG_FUNCTION_INFO_V1(_postgis_gserialized_index_extent);
 Datum _postgis_gserialized_index_extent(PG_FUNCTION_ARGS)
 {
-	GBOX* gbox = NULL;
+	GBOX *gbox = NULL;
 	int key_type;
 	Oid tbl_oid = PG_GETARG_DATUM(0);
-	text* col = PG_GETARG_TEXT_P(1);
+	text *col = PG_GETARG_TEXT_P(1);
 
 	Oid idx_oid = table_get_spatial_index(tbl_oid, col, &key_type);
 	if (!idx_oid) PG_RETURN_NULL();

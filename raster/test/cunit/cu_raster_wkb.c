@@ -30,8 +30,8 @@ test_raster_wkb()
 {
 	/* will use default allocators and message handlers */
 	rt_raster raster = NULL;
-	const char* hexwkb = NULL;
-	const char* out = NULL;
+	const char *hexwkb = NULL;
+	const char *out = NULL;
 	uint32_t len = 0;
 	int i = 0;
 
@@ -78,10 +78,10 @@ test_raster_wkb()
 	/* would depend on machine endian...
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
-		void* serialized;
+		void *serialized;
 		rt_raster rast2;
 
 		serialized = rt_raster_serialize(raster);
@@ -138,7 +138,7 @@ test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 1x1, little endian, band0(1bb)                         */
@@ -200,7 +200,7 @@ test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, big endian, band0(8BSI)                           */
@@ -288,10 +288,10 @@ test_raster_wkb()
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
 
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
-		void* serialized;
+		void *serialized;
 		rt_raster rast2;
 
 		serialized = rt_raster_serialize(raster);
@@ -387,7 +387,7 @@ test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, big endian, band0(16BSI)                          */
@@ -473,7 +473,7 @@ test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, bit endian, band0(16BSI ext: 3;/tmp/t.tif)        */
@@ -536,7 +536,7 @@ test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 1x3, little endian, band0 16BSI, nodata 1, srid -1     */
@@ -609,10 +609,10 @@ test_raster_wkb()
 	/* would depend on machine endian
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
-		void* serialized;
+		void *serialized;
 		rt_raster rast2;
 
 		serialized = rt_raster_serialize(raster);
@@ -778,9 +778,9 @@ test_raster_wkb()
 			CU_ASSERT_STRING_EQUAL(hexwkb, out);
 		*/
 
-		free((/*no const*/ void*)out);
+		free((/*no const*/ void *)out);
 		{
-			void* serialized;
+			void *serialized;
 			rt_raster rast2;
 
 			serialized = rt_raster_serialize(raster);

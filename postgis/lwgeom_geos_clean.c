@@ -76,11 +76,11 @@ Datum ST_MakeValid(PG_FUNCTION_ARGS)
 }
 
 /* Uses GEOS internally */
-static LWGEOM* lwgeom_clean(LWGEOM* lwgeom_in);
-static LWGEOM*
-lwgeom_clean(LWGEOM* lwgeom_in)
+static LWGEOM *lwgeom_clean(LWGEOM *lwgeom_in);
+static LWGEOM *
+lwgeom_clean(LWGEOM *lwgeom_in)
 {
-	LWGEOM* lwgeom_out;
+	LWGEOM *lwgeom_out;
 
 	lwgeom_out = lwgeom_make_valid(lwgeom_in);
 	if (!lwgeom_out) { return NULL; }

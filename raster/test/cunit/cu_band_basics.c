@@ -29,13 +29,13 @@ static void
 test_band_metadata()
 {
 	rt_raster rast = NULL;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
 	int temp = 0;
 	double val = 0;
-	char* path = "../regress/loader/testraster.tif";
+	char *path = "../regress/loader/testraster.tif";
 	uint8_t extband = 0;
 	int x;
 	int y;
@@ -139,7 +139,7 @@ static void
 test_band_pixtype_1BB()
 {
 	rt_pixtype pixtype = PT_1BB;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -212,7 +212,7 @@ static void
 test_band_pixtype_2BUI()
 {
 	rt_pixtype pixtype = PT_2BUI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -303,7 +303,7 @@ static void
 test_band_pixtype_4BUI()
 {
 	rt_pixtype pixtype = PT_4BUI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -408,7 +408,7 @@ static void
 test_band_pixtype_8BUI()
 {
 	rt_pixtype pixtype = PT_8BUI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -515,7 +515,7 @@ static void
 test_band_pixtype_8BSI()
 {
 	rt_pixtype pixtype = PT_8BSI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -646,7 +646,7 @@ static void
 test_band_pixtype_16BUI()
 {
 	rt_pixtype pixtype = PT_16BUI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -734,7 +734,7 @@ static void
 test_band_pixtype_16BSI()
 {
 	rt_pixtype pixtype = PT_16BSI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -845,7 +845,7 @@ static void
 test_band_pixtype_32BUI()
 {
 	rt_pixtype pixtype = PT_32BUI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -940,7 +940,7 @@ static void
 test_band_pixtype_32BSI()
 {
 	rt_pixtype pixtype = PT_32BSI;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -1036,7 +1036,7 @@ static void
 test_band_pixtype_32BF()
 {
 	rt_pixtype pixtype = PT_32BF;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -1117,7 +1117,7 @@ static void
 test_band_pixtype_64BF()
 {
 	rt_pixtype pixtype = PT_64BF;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	rt_band band = NULL;
 	int width = 5;
 	int height = 5;
@@ -1203,7 +1203,7 @@ test_band_get_pixel_line()
 	int maxY = 5;
 	int x = 0;
 	int y = 0;
-	void* vals = NULL;
+	void *vals = NULL;
 	uint16_t nvals = 0;
 	int err = 0;
 
@@ -1224,13 +1224,13 @@ test_band_get_pixel_line()
 	err = rt_band_get_pixel_line(band, 0, 0, maxX, &vals, &nvals);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT_EQUAL(nvals, maxX);
-	CU_ASSERT_EQUAL(((int8_t*)vals)[3], 3);
+	CU_ASSERT_EQUAL(((int8_t *)vals)[3], 3);
 	rtdealloc(vals);
 
 	err = rt_band_get_pixel_line(band, 4, 4, maxX, &vals, &nvals);
 	CU_ASSERT_EQUAL(err, ES_NONE);
 	CU_ASSERT_EQUAL(nvals, 1);
-	CU_ASSERT_EQUAL(((int8_t*)vals)[0], 24);
+	CU_ASSERT_EQUAL(((int8_t *)vals)[0], 24);
 	rtdealloc(vals);
 
 	err = rt_band_get_pixel_line(band, maxX, maxY, maxX, &vals, &nvals);
@@ -1245,7 +1245,7 @@ test_band_new_offline_from_path()
 	rt_band band = NULL;
 	int width = 10;
 	int height = 10;
-	char* path = "../regress/loader/testraster.tif";
+	char *path = "../regress/loader/testraster.tif";
 	uint8_t extband = 0;
 
 	/* offline band */

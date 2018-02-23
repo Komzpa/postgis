@@ -85,16 +85,16 @@ typedef struct
 	FunctionCallInfoData ufc_info;
 } rtpg_nmapalgebra_callback_arg;
 
-typedef struct rtpg_nmapalgebra_arg_t* rtpg_nmapalgebra_arg;
+typedef struct rtpg_nmapalgebra_arg_t *rtpg_nmapalgebra_arg;
 struct rtpg_nmapalgebra_arg_t
 {
 	int numraster;
-	rt_pgraster** pgraster;
-	rt_raster* raster;
-	uint8_t* isempty;  /* flag indicating if raster is empty */
-	uint8_t* ownsdata; /* is the raster self owned or just a pointer to another raster */
-	int* nband;        /* source raster's band index, 0-based */
-	uint8_t* hasband;  /* does source raster have band at index nband? */
+	rt_pgraster **pgraster;
+	rt_raster *raster;
+	uint8_t *isempty;  /* flag indicating if raster is empty */
+	uint8_t *ownsdata; /* is the raster self owned or just a pointer to another raster */
+	int *nband;        /* source raster's band index, 0-based */
+	uint8_t *hasband;  /* does source raster have band at index nband? */
 
 	rt_pixtype pixtype; /* output raster band's pixel type */
 	int hasnodata;      /* NODATA flag */
@@ -103,7 +103,7 @@ struct rtpg_nmapalgebra_arg_t
 	int distance[2]; /* distance in X and Y axis */
 
 	rt_extenttype extenttype; /* ouput raster's extent type */
-	rt_pgraster* pgcextent;   /* custom extent of type rt_pgraster */
+	rt_pgraster *pgcextent;   /* custom extent of type rt_pgraster */
 	rt_raster cextent;        /* custom extent of type rt_raster */
 	rt_mask mask;             /* mask for the nmapalgebra operation */
 
@@ -177,14 +177,14 @@ rtpg_nmapalgebra_arg_destroy(rtpg_nmapalgebra_arg arg)
 
 static int
 rtpg_nmapalgebra_rastbandarg_process(rtpg_nmapalgebra_arg arg,
-				     ArrayType* array,
-				     int* allnull,
-				     int* allempty,
-				     int* noband)
+				     ArrayType *array,
+				     int *allnull,
+				     int *allempty,
+				     int *noband)
 {
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -217,7 +217,7 @@ rtpg_nmapalgebra_rastbandarg_process(rtpg_nmapalgebra_arg arg,
 
 	/* prep arg */
 	arg->numraster = n;
-	arg->pgraster = palloc(sizeof(rt_pgraster*) * arg->numraster);
+	arg->pgraster = palloc(sizeof(rt_pgraster *) * arg->numraster);
 	arg->raster = palloc(sizeof(rt_raster) * arg->numraster);
 	arg->isempty = palloc(sizeof(uint8_t) * arg->numraster);
 	arg->ownsdata = palloc(sizeof(uint8_t) * arg->numraster);
@@ -281,7 +281,7 @@ rtpg_nmapalgebra_rastbandarg_process(rtpg_nmapalgebra_arg arg,
 			continue;
 		}
 
-		arg->pgraster[i] = (rt_pgraster*)PG_DETOAST_DATUM(tupv);
+		arg->pgraster[i] = (rt_pgraster *)PG_DETOAST_DATUM(tupv);
 
 		/* see if this is a copy of an existing pgraster */
 		for (j = 0; j < i; j++)
@@ -352,7 +352,7 @@ rtpg_nmapalgebra_rastbandarg_process(rtpg_nmapalgebra_arg arg,
 
 	if (arg->numraster < n)
 	{
-		arg->pgraster = repalloc(arg->pgraster, sizeof(rt_pgraster*) * arg->numraster);
+		arg->pgraster = repalloc(arg->pgraster, sizeof(rt_pgraster *) * arg->numraster);
 		arg->raster = repalloc(arg->raster, sizeof(rt_raster) * arg->numraster);
 		arg->isempty = repalloc(arg->isempty, sizeof(uint8_t) * arg->numraster);
 		arg->ownsdata = repalloc(arg->ownsdata, sizeof(uint8_t) * arg->numraster);
@@ -377,21 +377,21 @@ rtpg_nmapalgebra_rastbandarg_process(rtpg_nmapalgebra_arg arg,
 	Callback for RASTER_nMapAlgebra
 */
 static int
-rtpg_nmapalgebra_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_nmapalgebra_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
-	rtpg_nmapalgebra_callback_arg* callback = (rtpg_nmapalgebra_callback_arg*)userarg;
+	rtpg_nmapalgebra_callback_arg *callback = (rtpg_nmapalgebra_callback_arg *)userarg;
 
 	int16 typlen;
 	bool typbyval;
 	char typalign;
 
-	ArrayType* mdValues = NULL;
-	Datum* _values = NULL;
-	bool* _nodata = NULL;
+	ArrayType *mdValues = NULL;
+	Datum *_values = NULL;
+	bool *_nodata = NULL;
 
-	ArrayType* mdPos = NULL;
-	Datum* _pos = NULL;
-	bool* _null = NULL;
+	ArrayType *mdPos = NULL;
+	Datum *_pos = NULL;
+	bool *_null = NULL;
 
 	int i = 0;
 	uint32_t x = 0;
@@ -532,16 +532,16 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 {
 	rtpg_nmapalgebra_arg arg = NULL;
 	rt_iterator itrset;
-	ArrayType* maskArray;
+	ArrayType *maskArray;
 	Oid etype;
-	Datum* maskElements;
-	bool* maskNulls;
+	Datum *maskElements;
+	bool *maskNulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
 	int ndims = 0;
 	int num;
-	int* maskDims;
+	int *maskDims;
 	int x, y;
 
 	int i = 0;
@@ -552,7 +552,7 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 
 	rt_raster raster = NULL;
 	rt_band band = NULL;
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 
 	POSTGIS_RT_DEBUG(3, "Starting...");
 
@@ -587,7 +587,7 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 	/* pixel type (2) */
 	if (!PG_ARGISNULL(2))
 	{
-		char* pixtypename = text_to_cstring(PG_GETARG_TEXT_P(2));
+		char *pixtypename = text_to_cstring(PG_GETARG_TEXT_P(2));
 
 		/* Get the pixel type index */
 		arg->pixtype = rt_pixtype_index_from_name(pixtypename);
@@ -621,7 +621,7 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 	/* extent type (5) */
 	if (!PG_ARGISNULL(5))
 	{
-		char* extenttypename = rtpg_strtoupper(rtpg_trim(text_to_cstring(PG_GETARG_TEXT_P(5))));
+		char *extenttypename = rtpg_strtoupper(rtpg_trim(text_to_cstring(PG_GETARG_TEXT_P(5))));
 		arg->extenttype = rt_util_extent_type(extenttypename);
 	}
 	POSTGIS_RT_DEBUGF(4, "extenttype: %d", arg->extenttype);
@@ -636,7 +636,7 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 			PG_RETURN_NULL();
 		}
 
-		arg->pgcextent = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(6));
+		arg->pgcextent = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(6));
 
 		/* only need the raster header */
 		arg->cextent = rt_raster_deserialize(arg->pgcextent, TRUE);
@@ -724,12 +724,12 @@ Datum RASTER_nMapAlgebra(PG_FUNCTION_ARGS)
 		}
 
 		/* allocate mem for mask array */
-		arg->mask->values = palloc(sizeof(double*) * maskDims[0]);
-		arg->mask->nodata = palloc(sizeof(int*) * maskDims[0]);
+		arg->mask->values = palloc(sizeof(double *) * maskDims[0]);
+		arg->mask->nodata = palloc(sizeof(int *) * maskDims[0]);
 		for (i = 0; i < maskDims[0]; i++)
 		{
-			arg->mask->values[i] = (double*)palloc(sizeof(double) * maskDims[1]);
-			arg->mask->nodata[i] = (int*)palloc(sizeof(int) * maskDims[1]);
+			arg->mask->values[i] = (double *)palloc(sizeof(double) * maskDims[1]);
+			arg->mask->nodata[i] = (int *)palloc(sizeof(int) * maskDims[1]);
 		}
 
 		/* place values in to mask */
@@ -1028,7 +1028,7 @@ typedef struct
 	{
 		SPIPlanPtr spi_plan;
 		uint32_t spi_argcount;
-		uint8_t* spi_argpos;
+		uint8_t *spi_argpos;
 
 		int hasval;
 		double val;
@@ -1043,12 +1043,12 @@ typedef struct
 	struct
 	{
 		int count;
-		char** val;
+		char **val;
 	} kw;
 
 } rtpg_nmapalgebraexpr_callback_arg;
 
-typedef struct rtpg_nmapalgebraexpr_arg_t* rtpg_nmapalgebraexpr_arg;
+typedef struct rtpg_nmapalgebraexpr_arg_t *rtpg_nmapalgebraexpr_arg;
 struct rtpg_nmapalgebraexpr_arg_t
 {
 	rtpg_nmapalgebra_arg bandarg;
@@ -1057,7 +1057,7 @@ struct rtpg_nmapalgebraexpr_arg_t
 };
 
 static rtpg_nmapalgebraexpr_arg
-rtpg_nmapalgebraexpr_arg_init(int cnt, char** kw)
+rtpg_nmapalgebraexpr_arg_init(int cnt, char **kw)
 {
 	rtpg_nmapalgebraexpr_arg arg = NULL;
 	int i = 0;
@@ -1118,9 +1118,9 @@ rtpg_nmapalgebraexpr_arg_destroy(rtpg_nmapalgebraexpr_arg arg)
 }
 
 static int
-rtpg_nmapalgebraexpr_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_nmapalgebraexpr_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
-	rtpg_nmapalgebraexpr_callback_arg* callback = (rtpg_nmapalgebraexpr_callback_arg*)userarg;
+	rtpg_nmapalgebraexpr_callback_arg *callback = (rtpg_nmapalgebraexpr_callback_arg *)userarg;
 	SPIPlanPtr plan = NULL;
 	int i = 0;
 	int id = -1;
@@ -1224,7 +1224,7 @@ rtpg_nmapalgebraexpr_callback(rt_iterator_arg arg, void* userarg, double* value,
 		int err = 0;
 
 		TupleDesc tupdesc;
-		SPITupleTable* tuptable = NULL;
+		SPITupleTable *tuptable = NULL;
 		HeapTuple tuple;
 		Datum datum;
 		bool isnull = FALSE;
@@ -1379,17 +1379,17 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 	int len = 0;
 
 	TupleDesc tupdesc;
-	SPITupleTable* tuptable = NULL;
+	SPITupleTable *tuptable = NULL;
 	HeapTuple tuple;
 	Datum datum;
 	bool isnull = FALSE;
 
 	rt_raster raster = NULL;
 	rt_band band = NULL;
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 
 	const int argkwcount = 12;
-	char* argkw[] = {"[rast.x]",
+	char *argkw[] = {"[rast.x]",
 			 "[rast.y]",
 			 "[rast.val]",
 			 "[rast]",
@@ -1439,7 +1439,7 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 	/* pixel type (2) */
 	if (!PG_ARGISNULL(2))
 	{
-		char* pixtypename = text_to_cstring(PG_GETARG_TEXT_P(2));
+		char *pixtypename = text_to_cstring(PG_GETARG_TEXT_P(2));
 
 		/* Get the pixel type index */
 		arg->bandarg->pixtype = rt_pixtype_index_from_name(pixtypename);
@@ -1455,7 +1455,7 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 	/* extent type (3) */
 	if (!PG_ARGISNULL(3))
 	{
-		char* extenttypename = rtpg_strtoupper(rtpg_trim(text_to_cstring(PG_GETARG_TEXT_P(3))));
+		char *extenttypename = rtpg_strtoupper(rtpg_trim(text_to_cstring(PG_GETARG_TEXT_P(3))));
 		arg->bandarg->extenttype = rt_util_extent_type(extenttypename);
 	}
 
@@ -1534,9 +1534,9 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 	*/
 	for (i = 0; i < arg->callback.exprcount; i++)
 	{
-		char* expr = NULL;
-		char* tmp = NULL;
-		char* sql = NULL;
+		char *expr = NULL;
+		char *tmp = NULL;
+		char *sql = NULL;
 		char place[12] = "$1";
 
 		if (PG_ARGISNULL(exprpos[i])) continue;
@@ -1565,7 +1565,7 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 		}
 
 		len = strlen("SELECT (") + strlen(expr) + strlen(")::double precision");
-		sql = (char*)palloc(len + 1);
+		sql = (char *)palloc(len + 1);
 		if (sql == NULL)
 		{
 			rtpg_nmapalgebraexpr_arg_destroy(arg);
@@ -1586,7 +1586,7 @@ Datum RASTER_nMapAlgebraExpr(PG_FUNCTION_ARGS)
 		/* prepared plan */
 		if (arg->callback.expr[i].spi_argcount)
 		{
-			Oid* argtype = (Oid*)palloc(arg->callback.expr[i].spi_argcount * sizeof(Oid));
+			Oid *argtype = (Oid *)palloc(arg->callback.expr[i].spi_argcount * sizeof(Oid));
 			POSTGIS_RT_DEBUGF(3, "expression parameter %d is a prepared plan", exprpos[i]);
 			if (argtype == NULL)
 			{
@@ -1800,7 +1800,7 @@ typedef enum
 
 /* internal function translating text of UNION type to enum */
 static rtpg_union_type
-rtpg_uniontype_index_from_name(const char* cutype)
+rtpg_uniontype_index_from_name(const char *cutype)
 {
 	assert(cutype && strlen(cutype) > 0);
 
@@ -1824,17 +1824,17 @@ rtpg_uniontype_index_from_name(const char* cutype)
 	return UT_LAST;
 }
 
-typedef struct rtpg_union_band_arg_t* rtpg_union_band_arg;
+typedef struct rtpg_union_band_arg_t *rtpg_union_band_arg;
 struct rtpg_union_band_arg_t
 {
 	int nband; /* source raster's band index, 0-based */
 	rtpg_union_type uniontype;
 
 	int numraster;
-	rt_raster* raster;
+	rt_raster *raster;
 };
 
-typedef struct rtpg_union_arg_t* rtpg_union_arg;
+typedef struct rtpg_union_arg_t *rtpg_union_arg;
 struct rtpg_union_arg_t
 {
 	int numband; /* number of bandargs */
@@ -1873,9 +1873,9 @@ rtpg_union_arg_destroy(rtpg_union_arg arg)
 }
 
 static int
-rtpg_union_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_union_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
-	rtpg_union_type* utype = (rtpg_union_type*)userarg;
+	rtpg_union_type *utype = (rtpg_union_type *)userarg;
 
 	if (arg == NULL) return 0;
 
@@ -1962,7 +1962,7 @@ rtpg_union_callback(rt_iterator_arg arg, void* userarg, double* value, int* noda
 }
 
 static int
-rtpg_union_mean_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_union_mean_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	if (arg == NULL) return 0;
 
@@ -1990,7 +1990,7 @@ rtpg_union_mean_callback(rt_iterator_arg arg, void* userarg, double* value, int*
 }
 
 static int
-rtpg_union_range_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_union_range_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	if (arg == NULL) return 0;
 
@@ -2019,11 +2019,11 @@ rtpg_union_range_callback(rt_iterator_arg arg, void* userarg, double* value, int
 
 /* called for ST_Union(raster, unionarg[]) */
 static int
-rtpg_union_unionarg_process(rtpg_union_arg arg, ArrayType* array)
+rtpg_union_unionarg_process(rtpg_union_arg arg, ArrayType *array)
 {
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -2035,7 +2035,7 @@ rtpg_union_unionarg_process(rtpg_union_arg arg, ArrayType* array)
 
 	int i;
 	int nband = 1;
-	char* utypename = NULL;
+	char *utypename = NULL;
 	rtpg_union_type utype = UT_LAST;
 
 	etype = ARR_ELEMTYPE(array);
@@ -2102,7 +2102,7 @@ rtpg_union_unionarg_process(rtpg_union_arg arg, ArrayType* array)
 		}
 		else
 		{
-			utypename = text_to_cstring((text*)DatumGetPointer(tupv));
+			utypename = text_to_cstring((text *)DatumGetPointer(tupv));
 			utype = rtpg_uniontype_index_from_name(rtpg_strtoupper(utypename));
 		}
 
@@ -2161,7 +2161,7 @@ rtpg_union_noarg(rtpg_union_arg arg, rt_raster raster)
 		arg->bandarg[i].nband = i;
 		arg->bandarg[i].numraster = 1;
 
-		arg->bandarg[i].raster = (rt_raster*)palloc(sizeof(rt_raster) * arg->bandarg[i].numraster);
+		arg->bandarg[i].raster = (rt_raster *)palloc(sizeof(rt_raster) * arg->bandarg[i].numraster);
 		if (arg->bandarg[i].raster == NULL)
 		{
 			elog(ERROR, "rtpg_union_noarg: Could not allocate memory for working rasters");
@@ -2193,7 +2193,7 @@ Datum RASTER_union_transfn(PG_FUNCTION_ARGS)
 	rtpg_union_arg iwr = NULL;
 	int skiparg = 0;
 
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_raster _raster = NULL;
 	rt_band _band = NULL;
@@ -2210,7 +2210,7 @@ Datum RASTER_union_transfn(PG_FUNCTION_ARGS)
 	int k = 0;
 
 	rt_iterator itrset;
-	char* utypename = NULL;
+	char *utypename = NULL;
 	rtpg_union_type utype = UT_LAST;
 	rt_pixtype pixtype = PT_END;
 	int hasnodata = 1;
@@ -2221,7 +2221,7 @@ Datum RASTER_union_transfn(PG_FUNCTION_ARGS)
 	int reuserast = 0;
 	int y = 0;
 	uint16_t _dim[2] = {0};
-	void* vals = NULL;
+	void *vals = NULL;
 	uint16_t nvals = 0;
 
 	POSTGIS_RT_DEBUG(3, "Starting...");
@@ -2264,7 +2264,7 @@ Datum RASTER_union_transfn(PG_FUNCTION_ARGS)
 	if (!PG_ARGISNULL(1))
 	{
 		/* deserialize raster */
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 
 		/* Get raster object */
 		raster = rt_raster_deserialize(pgraster, FALSE);
@@ -2466,7 +2466,7 @@ Datum RASTER_union_transfn(PG_FUNCTION_ARGS)
 
 			POSTGIS_RT_DEBUGF(4, "Allocating space for working rasters of band %d", i);
 
-			iwr->bandarg[i].raster = (rt_raster*)palloc(sizeof(rt_raster) * iwr->bandarg[i].numraster);
+			iwr->bandarg[i].raster = (rt_raster *)palloc(sizeof(rt_raster) * iwr->bandarg[i].numraster);
 			if (iwr->bandarg[i].raster == NULL)
 			{
 
@@ -2945,7 +2945,7 @@ Datum RASTER_union_finalfn(PG_FUNCTION_ARGS)
 	rtpg_union_arg iwr;
 	rt_raster _rtn = NULL;
 	rt_raster _raster = NULL;
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 
 	int i = 0;
 	int j = 0;
@@ -3100,7 +3100,7 @@ Datum RASTER_union_finalfn(PG_FUNCTION_ARGS)
 /* Clip raster with geometry                                        */
 /* ---------------------------------------------------------------- */
 
-typedef struct rtpg_clip_band_t* rtpg_clip_band;
+typedef struct rtpg_clip_band_t *rtpg_clip_band;
 struct rtpg_clip_band_t
 {
 	int nband;        /* band index */
@@ -3108,7 +3108,7 @@ struct rtpg_clip_band_t
 	double nodataval; /* user-specified NODATA */
 };
 
-typedef struct rtpg_clip_arg_t* rtpg_clip_arg;
+typedef struct rtpg_clip_arg_t *rtpg_clip_arg;
 struct rtpg_clip_arg_t
 {
 	rt_extenttype extenttype;
@@ -3152,7 +3152,7 @@ rtpg_clip_arg_destroy(rtpg_clip_arg arg)
 }
 
 static int
-rtpg_clip_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_clip_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	*value = 0;
 	*nodata = 0;
@@ -3169,23 +3169,23 @@ rtpg_clip_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodat
 PG_FUNCTION_INFO_V1(RASTER_clip);
 Datum RASTER_clip(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	LWGEOM* rastgeom = NULL;
+	rt_pgraster *pgraster = NULL;
+	LWGEOM *rastgeom = NULL;
 	double gt[6] = {0};
 	int srid = SRID_UNKNOWN;
 
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster rtn = NULL;
 
-	GSERIALIZED* gser = NULL;
-	LWGEOM* geom = NULL;
-	unsigned char* wkb = NULL;
+	GSERIALIZED *gser = NULL;
+	LWGEOM *geom = NULL;
+	unsigned char *wkb = NULL;
 	size_t wkb_len;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 
 	int16 typlen;
 	bool typbyval;
@@ -3195,7 +3195,7 @@ Datum RASTER_clip(PG_FUNCTION_ARGS)
 	int j = 0;
 	int k = 0;
 	rtpg_clip_arg arg = NULL;
-	LWGEOM* tmpgeom = NULL;
+	LWGEOM *tmpgeom = NULL;
 	rt_iterator itrset;
 
 	rt_raster _raster = NULL;
@@ -3219,7 +3219,7 @@ Datum RASTER_clip(PG_FUNCTION_ARGS)
 	}
 
 	/* raster (0) */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* Get raster object */
 	arg->raster = rt_raster_deserialize(pgraster, FALSE);
@@ -3265,7 +3265,7 @@ Datum RASTER_clip(PG_FUNCTION_ARGS)
 	/* Get a 2D version of the geometry if necessary */
 	if (lwgeom_ndims(geom) > 2)
 	{
-		LWGEOM* geom2d = lwgeom_force_2d(geom);
+		LWGEOM *geom2d = lwgeom_force_2d(geom);
 		lwgeom_free(geom);
 		geom = geom2d;
 	}
@@ -3681,17 +3681,17 @@ Datum RASTER_clip(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_reclass);
 Datum RASTER_reclass(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	rt_band newband = NULL;
 	uint32_t numBands = 0;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -3705,35 +3705,35 @@ Datum RASTER_reclass(PG_FUNCTION_ARGS)
 	uint32_t b = 0;
 	uint32_t c = 0;
 
-	rt_reclassexpr* exprset = NULL;
+	rt_reclassexpr *exprset = NULL;
 	HeapTupleHeader tup;
 	bool isnull;
 	Datum tupv;
 	uint32_t nband = 0;
-	char* expr = NULL;
-	text* exprtext = NULL;
+	char *expr = NULL;
+	text *exprtext = NULL;
 	double val = 0;
-	char* junk = NULL;
+	char *junk = NULL;
 	int inc_val = 0;
 	int exc_val = 0;
-	char* pixeltype = NULL;
-	text* pixeltypetext = NULL;
+	char *pixeltype = NULL;
+	text *pixeltypetext = NULL;
 	rt_pixtype pixtype = PT_END;
 	double nodataval = 0;
 	bool hasnodata = FALSE;
 
-	char** comma_set = NULL;
+	char **comma_set = NULL;
 	uint32_t comma_n = 0;
-	char** colon_set = NULL;
+	char **colon_set = NULL;
 	uint32_t colon_n = 0;
-	char** dash_set = NULL;
+	char **dash_set = NULL;
 	uint32_t dash_n = 0;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_reclass: Starting");
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, FALSE);
@@ -3845,7 +3845,7 @@ Datum RASTER_reclass(PG_FUNCTION_ARGS)
 			SET_VARSIZE(pgrtn, pgrtn->size);
 			PG_RETURN_POINTER(pgrtn);
 		}
-		exprtext = (text*)DatumGetPointer(tupv);
+		exprtext = (text *)DatumGetPointer(tupv);
 		if (NULL == exprtext)
 		{
 			elog(NOTICE,
@@ -3980,7 +3980,7 @@ Datum RASTER_reclass(PG_FUNCTION_ARGS)
 						dash_n--;
 						c--;
 						pfree(dash_set[dash_n]);
-						dash_set = repalloc(dash_set, sizeof(char*) * dash_n);
+						dash_set = repalloc(dash_set, sizeof(char *) * dash_n);
 					}
 
 					/* there shouldn't be more than two in dash_n */
@@ -4173,7 +4173,7 @@ Datum RASTER_reclass(PG_FUNCTION_ARGS)
 			SET_VARSIZE(pgrtn, pgrtn->size);
 			PG_RETURN_POINTER(pgrtn);
 		}
-		pixeltypetext = (text*)DatumGetPointer(tupv);
+		pixeltypetext = (text *)DatumGetPointer(tupv);
 		if (NULL == pixeltypetext)
 		{
 			elog(NOTICE,
@@ -4280,7 +4280,7 @@ Datum RASTER_reclass(PG_FUNCTION_ARGS)
 /* apply colormap to specified band of a raster                     */
 /* ---------------------------------------------------------------- */
 
-typedef struct rtpg_colormap_arg_t* rtpg_colormap_arg;
+typedef struct rtpg_colormap_arg_t *rtpg_colormap_arg;
 struct rtpg_colormap_arg_t
 {
 	rt_raster raster;
@@ -4291,9 +4291,9 @@ struct rtpg_colormap_arg_t
 	rt_colormap colormap;
 	int nodataentry;
 
-	char** entry;
+	char **entry;
 	uint32_t nentry;
-	char** element;
+	char **element;
 	uint32_t nelement;
 };
 
@@ -4371,9 +4371,9 @@ rtpg_colormap_arg_destroy(rtpg_colormap_arg arg)
 PG_FUNCTION_INFO_V1(RASTER_colorMap);
 Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rtpg_colormap_arg arg = NULL;
-	char* junk = NULL;
+	char *junk = NULL;
 	rt_raster raster = NULL;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_colorMap: Starting");
@@ -4390,7 +4390,7 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 	}
 
 	/* raster (0) */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* raster object */
 	arg->raster = rt_raster_deserialize(pgraster, FALSE);
@@ -4427,7 +4427,7 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 		rt_raster_destroy(raster);
 		if (pgraster == NULL) PG_RETURN_NULL();
 
-		SET_VARSIZE(pgraster, ((rt_pgraster*)pgraster)->size);
+		SET_VARSIZE(pgraster, ((rt_pgraster *)pgraster)->size);
 		PG_RETURN_POINTER(pgraster);
 	}
 
@@ -4445,8 +4445,8 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 	/* method (3) */
 	if (!PG_ARGISNULL(3))
 	{
-		char* method = NULL;
-		char* tmp = text_to_cstring(PG_GETARG_TEXT_P(3));
+		char *method = NULL;
+		char *tmp = text_to_cstring(PG_GETARG_TEXT_P(3));
 		POSTGIS_RT_DEBUGF(4, "raw method = %s", tmp);
 
 		method = rtpg_trim(tmp);
@@ -4480,10 +4480,10 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 	}
 	else
 	{
-		char* tmp = NULL;
-		char* colormap = text_to_cstring(PG_GETARG_TEXT_P(2));
-		char* _entry;
-		char* _element;
+		char *tmp = NULL;
+		char *colormap = text_to_cstring(PG_GETARG_TEXT_P(2));
+		char *_entry;
+		char *_element;
 		uint32_t i = 0;
 		uint32_t j = 0;
 
@@ -4574,7 +4574,7 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 				/* first element is ALWAYS a band value, percentage OR "nv" string */
 				if (j == 0)
 				{
-					char* percent = NULL;
+					char *percent = NULL;
 
 					/* NODATA */
 					if (strcmp(_element, "NV") == 0 || strcmp(_element, "NULL") == 0 ||
@@ -4761,15 +4761,15 @@ Datum RASTER_colorMap(PG_FUNCTION_ARGS)
 
 	if (pgraster == NULL) PG_RETURN_NULL();
 
-	SET_VARSIZE(pgraster, ((rt_pgraster*)pgraster)->size);
+	SET_VARSIZE(pgraster, ((rt_pgraster *)pgraster)->size);
 	PG_RETURN_POINTER(pgraster);
 }
 
 PG_FUNCTION_INFO_V1(RASTER_mapAlgebraExpr);
 Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_raster newrast = NULL;
 	rt_band band = NULL;
@@ -4779,9 +4779,9 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 	double newnodatavalue = 0.0;
 	double newinitialvalue = 0.0;
 	double newval = 0.0;
-	char* newexpr = NULL;
-	char* initexpr = NULL;
-	char* expression = NULL;
+	char *newexpr = NULL;
+	char *initexpr = NULL;
+	char *expression = NULL;
 	int hasnodataval = 0;
 	double nodataval = 0.;
 	rt_pixtype newpixeltype;
@@ -4794,7 +4794,7 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 		kX = 1,
 		kY = 2
 	};
-	char* argkw[] = {"[rast]", "[rast.x]", "[rast.y]"};
+	char *argkw[] = {"[rast]", "[rast.x]", "[rast.y]"};
 	Oid argkwtypes[] = {FLOAT8OID, INT4OID, INT4OID};
 	int argcount = 0;
 	Oid argtype[] = {FLOAT8OID, INT4OID, INT4OID};
@@ -4804,12 +4804,12 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 	int ret = -1;
 	TupleDesc tupdesc;
 	SPIPlanPtr spi_plan = NULL;
-	SPITupleTable* tuptable = NULL;
+	SPITupleTable *tuptable = NULL;
 	HeapTuple tuple;
-	char* strFromText = NULL;
-	Datum* values = NULL;
+	char *strFromText = NULL;
+	Datum *values = NULL;
 	Datum datum = (Datum)NULL;
-	char* nulls = NULL;
+	char *nulls = NULL;
 	bool isnull = FALSE;
 	int i = 0;
 	int j = 0;
@@ -4824,7 +4824,7 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 	}
 
 	/* Deserialize raster */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (NULL == raster)
 	{
@@ -4989,7 +4989,7 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 	{
 		expression = text_to_cstring(PG_GETARG_TEXT_P(3));
 		len = strlen("SELECT (") + strlen(expression) + strlen(")::double precision");
-		initexpr = (char*)palloc(len + 1);
+		initexpr = (char *)palloc(len + 1);
 
 		strncpy(initexpr, "SELECT (", strlen("SELECT ("));
 		strncpy(initexpr + strlen("SELECT ("), expression, strlen(expression));
@@ -5254,7 +5254,7 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 		POSTGIS_RT_DEBUGF(3, "RASTER_mapAlgebraExpr: initexpr = %s", initexpr);
 
 		/* define values */
-		values = (Datum*)palloc(sizeof(Datum) * argcount);
+		values = (Datum *)palloc(sizeof(Datum) * argcount);
 		if (values == NULL)
 		{
 
@@ -5271,7 +5271,7 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 		}
 
 		/* define nulls */
-		nulls = (char*)palloc(argcount);
+		nulls = (char *)palloc(argcount);
 		if (nulls == NULL)
 		{
 
@@ -5471,8 +5471,8 @@ Datum RASTER_mapAlgebraExpr(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_mapAlgebraFct);
 Datum RASTER_mapAlgebraFct(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_raster newrast = NULL;
 	rt_band band = NULL;
@@ -5488,7 +5488,7 @@ Datum RASTER_mapAlgebraFct(PG_FUNCTION_ARGS)
 	FmgrInfo cbinfo;
 	FunctionCallInfoData cbdata;
 	Datum tmpnewval;
-	char* strFromText = NULL;
+	char *strFromText = NULL;
 	int k = 0;
 
 	POSTGIS_RT_DEBUG(2, "RASTER_mapAlgebraFct: STARTING...");
@@ -5501,7 +5501,7 @@ Datum RASTER_mapAlgebraFct(PG_FUNCTION_ARGS)
 	}
 
 	/* Deserialize raster */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (NULL == raster)
 	{
@@ -5852,7 +5852,7 @@ Datum RASTER_mapAlgebraFct(PG_FUNCTION_ARGS)
 				if (cbinfo.fn_nargs == 3)
 				{
 					Datum d[2];
-					ArrayType* a;
+					ArrayType *a;
 
 					d[0] = Int32GetDatum(x + 1);
 					d[1] = Int32GetDatum(y + 1);
@@ -5906,8 +5906,8 @@ Datum RASTER_mapAlgebraFct(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_mapAlgebraFctNgb);
 Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_raster newrast = NULL;
 	rt_band band = NULL;
@@ -5923,15 +5923,15 @@ Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 	FmgrInfo cbinfo;
 	FunctionCallInfoData cbdata;
 	Datum tmpnewval;
-	ArrayType* neighborDatum;
-	char* strFromText = NULL;
-	text* txtNodataMode = NULL;
-	text* txtCallbackParam = NULL;
+	ArrayType *neighborDatum;
+	char *strFromText = NULL;
+	text *txtNodataMode = NULL;
+	text *txtCallbackParam = NULL;
 	int intReplace = 0;
 	float fltReplace = 0;
 	bool valuereplace = false, pixelreplace, nNodataOnly = true, nNullSkip = false;
-	Datum* neighborData = NULL;
-	bool* neighborNulls = NULL;
+	Datum *neighborData = NULL;
+	bool *neighborNulls = NULL;
 	int neighborDims[2];
 	int neighborLbs[2];
 	int16 typlen;
@@ -5948,7 +5948,7 @@ Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 	}
 
 	/* Deserialize raster */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (NULL == raster)
 	{
@@ -6324,9 +6324,9 @@ Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 		txtNodataMode = PG_GETARG_TEXT_P(6);
 	}
 
-	txtCallbackParam = (text*)palloc(VARSIZE(txtNodataMode));
+	txtCallbackParam = (text *)palloc(VARSIZE(txtNodataMode));
 	SET_VARSIZE(txtCallbackParam, VARSIZE(txtNodataMode));
-	memcpy((void*)VARDATA(txtCallbackParam), (void*)VARDATA(txtNodataMode), VARSIZE(txtNodataMode) - VARHDRSZ);
+	memcpy((void *)VARDATA(txtCallbackParam), (void *)VARDATA(txtNodataMode), VARSIZE(txtNodataMode) - VARHDRSZ);
 
 	/* pass the nodata mode into the user function */
 	cbdata.arg[1] = CStringGetDatum(txtCallbackParam);
@@ -6375,8 +6375,8 @@ Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 	POSTGIS_RT_DEBUGF(3, "RASTER_mapAlgebraFctNgb: Main computing loop (%d x %d)", width, height);
 
 	/* Allocate room for the neighborhood. */
-	neighborData = (Datum*)palloc(winwidth * winheight * sizeof(Datum));
-	neighborNulls = (bool*)palloc(winwidth * winheight * sizeof(bool));
+	neighborData = (Datum *)palloc(winwidth * winheight * sizeof(Datum));
+	neighborNulls = (bool *)palloc(winwidth * winheight * sizeof(bool));
 
 	/* The dimensions of the neighborhood array, for creating a multi-dimensional array. */
 	neighborDims[0] = winwidth;
@@ -6468,7 +6468,7 @@ Datum RASTER_mapAlgebraFctNgb(PG_FUNCTION_ARGS)
 						  winwidth,
 						  winheight);
 
-				neighborDatum = construct_md_array((void*)neighborData,
+				neighborDatum = construct_md_array((void *)neighborData,
 								   neighborNulls,
 								   2,
 								   neighborDims,
@@ -6533,9 +6533,9 @@ PG_FUNCTION_INFO_V1(RASTER_mapAlgebra2);
 Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2] = {NULL, NULL};
+	rt_pgraster *pgrast[2] = {NULL, NULL};
 	int pgrastpos[2] = {-1, -1};
-	rt_pgraster* pgrtn;
+	rt_pgraster *pgrtn;
 	rt_raster rast[2] = {NULL};
 	int _isempty[2] = {0};
 	uint32_t bandindex[2] = {0};
@@ -6550,9 +6550,9 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 	int _pos[2][2] = {{0}};
 	uint16_t _dim[2][2] = {{0}};
 
-	char* pixtypename = NULL;
+	char *pixtypename = NULL;
 	rt_pixtype pixtype = PT_END;
-	char* extenttypename = NULL;
+	char *extenttypename = NULL;
 	rt_extenttype extenttype = ET_INTERSECTION;
 
 	rt_raster raster = NULL;
@@ -6568,19 +6568,19 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 	const uint32_t spi_count = 3;
 	uint16_t spi_exprpos[3] = {4, 7, 8};
 	uint32_t spi_argcount[3] = {0};
-	char* expr = NULL;
-	char* sql = NULL;
+	char *expr = NULL;
+	char *sql = NULL;
 	SPIPlanPtr spi_plan[3] = {NULL};
 	uint16_t spi_empty = 0;
-	Oid* argtype = NULL;
+	Oid *argtype = NULL;
 	const uint32_t argkwcount = 8;
 	uint8_t argpos[3][8] = {{0}};
-	char* argkw[] = {
+	char *argkw[] = {
 	    "[rast1.x]", "[rast1.y]", "[rast1.val]", "[rast1]", "[rast2.x]", "[rast2.y]", "[rast2.val]", "[rast2]"};
 	Datum values[argkwcount];
 	bool nulls[argkwcount];
 	TupleDesc tupdesc;
-	SPITupleTable* tuptable = NULL;
+	SPITupleTable *tuptable = NULL;
 	HeapTuple tuple;
 	Datum datum;
 	bool isnull = FALSE;
@@ -6613,7 +6613,7 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 	{
 		if (!PG_ARGISNULL(j))
 		{
-			pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+			pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 			pgrastpos[i] = j;
 			j++;
 
@@ -7090,7 +7090,7 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 		{
 			if (!PG_ARGISNULL(spi_exprpos[i]))
 			{
-				char* tmp = NULL;
+				char *tmp = NULL;
 				char place[5] = "$1";
 				expr = text_to_cstring(PG_GETARG_TEXT_P(spi_exprpos[i]));
 				POSTGIS_RT_DEBUGF(3, "raw expr #%d: %s", i, expr);
@@ -7115,7 +7115,7 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 				}
 
 				len = strlen("SELECT (") + strlen(expr) + strlen(")::double precision");
-				sql = (char*)palloc(len + 1);
+				sql = (char *)palloc(len + 1);
 				if (sql == NULL)
 				{
 
@@ -7149,7 +7149,7 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 				/* create prepared plan */
 				if (spi_argcount[i])
 				{
-					argtype = (Oid*)palloc(spi_argcount[i] * sizeof(Oid));
+					argtype = (Oid *)palloc(spi_argcount[i] * sizeof(Oid));
 					if (argtype == NULL)
 					{
 
@@ -7612,7 +7612,7 @@ Datum RASTER_mapAlgebra2(PG_FUNCTION_ARGS)
 				case REGPROCEDUREOID:
 				{
 					Datum d[4];
-					ArrayType* a;
+					ArrayType *a;
 
 					/* build fcnarg */
 					for (i = 0; i < set_count; i++)

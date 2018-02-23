@@ -35,15 +35,15 @@
 Datum geography_centroid(PG_FUNCTION_ARGS);
 
 /* internal functions */
-LWPOINT* geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM* points, const uint32_t size);
-LWPOINT* geography_centroid_from_mline(const LWMLINE* mline, SPHEROID* s);
-LWPOINT* geography_centroid_from_mpoly(const LWMPOLY* mpoly, bool use_spheroid, SPHEROID* s);
-LWPOINT* cart_to_lwpoint(const double_t x_sum,
+LWPOINT *geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM *points, const uint32_t size);
+LWPOINT *geography_centroid_from_mline(const LWMLINE *mline, SPHEROID *s);
+LWPOINT *geography_centroid_from_mpoly(const LWMPOLY *mpoly, bool use_spheroid, SPHEROID *s);
+LWPOINT *cart_to_lwpoint(const double_t x_sum,
 			 const double_t y_sum,
 			 const double_t z_sum,
 			 const double_t weight_sum,
 			 const uint32_t srid);
-POINT3D* lonlat_to_cart(const double_t raw_lon, const double_t raw_lat);
+POINT3D *lonlat_to_cart(const double_t raw_lon, const double_t raw_lat);
 
 /**
  * geography_centroid(GSERIALIZED *g)
@@ -52,11 +52,11 @@ POINT3D* lonlat_to_cart(const double_t raw_lon, const double_t raw_lat);
 PG_FUNCTION_INFO_V1(geography_centroid);
 Datum geography_centroid(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom = NULL;
-	LWGEOM* lwgeom_out = NULL;
-	LWPOINT* lwpoint_out = NULL;
-	GSERIALIZED* g = NULL;
-	GSERIALIZED* g_out = NULL;
+	LWGEOM *lwgeom = NULL;
+	LWGEOM *lwgeom_out = NULL;
+	LWPOINT *lwpoint_out = NULL;
+	GSERIALIZED *g = NULL;
+	GSERIALIZED *g_out = NULL;
 	uint32_t srid;
 	bool use_spheroid = true;
 	SPHEROID s;
@@ -73,7 +73,7 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
 	/* on empty input, return empty output */
 	if (gserialized_is_empty(g))
 	{
-		LWCOLLECTION* empty = lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
+		LWCOLLECTION *empty = lwcollection_construct_empty(COLLECTIONTYPE, srid, 0, 0);
 		lwgeom_out = lwcollection_as_lwgeom(empty);
 		lwgeom_set_geodetic(lwgeom_out, true);
 		g_out = gserialized_from_lwgeom(lwgeom_out, 0);
@@ -101,7 +101,7 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
 
 	case MULTIPOINTTYPE:
 	{
-		LWMPOINT* mpoints = lwgeom_as_lwmpoint(lwgeom);
+		LWMPOINT *mpoints = lwgeom_as_lwmpoint(lwgeom);
 
 		/* average between all points */
 		uint32_t size = mpoints->ngeoms;
@@ -121,10 +121,10 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
 
 	case LINETYPE:
 	{
-		LWLINE* line = lwgeom_as_lwline(lwgeom);
+		LWLINE *line = lwgeom_as_lwline(lwgeom);
 
 		/* reuse mline function */
-		LWMLINE* mline = lwmline_construct_empty(srid, 0, 0);
+		LWMLINE *mline = lwmline_construct_empty(srid, 0, 0);
 		lwmline_add_lwline(mline, line);
 
 		lwpoint_out = geography_centroid_from_mline(mline, &s);
@@ -134,17 +134,17 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
 
 	case MULTILINETYPE:
 	{
-		LWMLINE* mline = lwgeom_as_lwmline(lwgeom);
+		LWMLINE *mline = lwgeom_as_lwmline(lwgeom);
 		lwpoint_out = geography_centroid_from_mline(mline, &s);
 		break;
 	}
 
 	case POLYGONTYPE:
 	{
-		LWPOLY* poly = lwgeom_as_lwpoly(lwgeom);
+		LWPOLY *poly = lwgeom_as_lwpoly(lwgeom);
 
 		/* reuse mpoly function */
-		LWMPOLY* mpoly = lwmpoly_construct_empty(srid, 0, 0);
+		LWMPOLY *mpoly = lwmpoly_construct_empty(srid, 0, 0);
 		lwmpoly_add_lwpoly(mpoly, poly);
 
 		lwpoint_out = geography_centroid_from_mpoly(mpoly, use_spheroid, &s);
@@ -154,7 +154,7 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
 
 	case MULTIPOLYGONTYPE:
 	{
-		LWMPOLY* mpoly = lwgeom_as_lwmpoly(lwgeom);
+		LWMPOLY *mpoly = lwgeom_as_lwmpoly(lwgeom);
 		lwpoint_out = geography_centroid_from_mpoly(mpoly, use_spheroid, &s);
 		break;
 	}
@@ -176,8 +176,8 @@ Datum geography_centroid(PG_FUNCTION_ARGS)
  * Convert lat-lon-points to x-y-z-coordinates, calculate a weighted average
  * point and return lat-lon-coordinated
  */
-LWPOINT*
-geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM* points, const uint32_t size)
+LWPOINT *
+geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM *points, const uint32_t size)
 {
 	double_t x_sum = 0;
 	double_t y_sum = 0;
@@ -185,7 +185,7 @@ geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM* points, con
 	double_t weight_sum = 0;
 
 	double_t weight = 1;
-	POINT3D* point;
+	POINT3D *point;
 
 	uint32_t i;
 	for (i = 0; i < size; i++)
@@ -205,13 +205,13 @@ geography_centroid_from_wpoints(const uint32_t srid, const POINT3DM* points, con
 	return cart_to_lwpoint(x_sum, y_sum, z_sum, weight_sum, srid);
 }
 
-POINT3D*
+POINT3D *
 lonlat_to_cart(const double_t raw_lon, const double_t raw_lat)
 {
 	double_t lat, lon;
 	double_t sin_lat;
 
-	POINT3D* point = lwalloc(sizeof(POINT3D));
+	POINT3D *point = lwalloc(sizeof(POINT3D));
 	;
 
 	// prepare coordinate for trigonometric functions from [-90, 90] -> [0, pi]
@@ -231,7 +231,7 @@ lonlat_to_cart(const double_t raw_lon, const double_t raw_lat)
 	return point;
 }
 
-LWPOINT*
+LWPOINT *
 cart_to_lwpoint(const double_t x_sum,
 		const double_t y_sum,
 		const double_t z_sum,
@@ -255,8 +255,8 @@ cart_to_lwpoint(const double_t x_sum,
  * Split lines into segments and calculate with middle of segment as weighted
  * point.
  */
-LWPOINT*
-geography_centroid_from_mline(const LWMLINE* mline, SPHEROID* s)
+LWPOINT *
+geography_centroid_from_mline(const LWMLINE *mline, SPHEROID *s)
 {
 	double_t tolerance = 0.0;
 	uint32_t size = 0;
@@ -273,19 +273,19 @@ geography_centroid_from_mline(const LWMLINE* mline, SPHEROID* s)
 
 	for (i = 0; i < mline->ngeoms; i++)
 	{
-		LWLINE* line = mline->geoms[i];
+		LWLINE *line = mline->geoms[i];
 
 		/* add both points of line segment as weighted point */
 		for (k = 0; k < line->points->npoints - 1; k++)
 		{
-			const POINT2D* p1 = getPoint2d_cp(line->points, k);
-			const POINT2D* p2 = getPoint2d_cp(line->points, k + 1);
+			const POINT2D *p1 = getPoint2d_cp(line->points, k);
+			const POINT2D *p2 = getPoint2d_cp(line->points, k + 1);
 
 			/* use line-segment length as weight */
-			LWPOINT* lwp1 = lwpoint_make2d(mline->srid, p1->x, p1->y);
-			LWPOINT* lwp2 = lwpoint_make2d(mline->srid, p2->x, p2->y);
-			LWGEOM* lwgeom1 = lwpoint_as_lwgeom(lwp1);
-			LWGEOM* lwgeom2 = lwpoint_as_lwgeom(lwp2);
+			LWPOINT *lwp1 = lwpoint_make2d(mline->srid, p1->x, p1->y);
+			LWPOINT *lwp2 = lwpoint_make2d(mline->srid, p2->x, p2->y);
+			LWGEOM *lwgeom1 = lwpoint_as_lwgeom(lwp1);
+			LWGEOM *lwgeom2 = lwpoint_as_lwgeom(lwp2);
 			lwgeom_set_geodetic(lwgeom1, LW_TRUE);
 			lwgeom_set_geodetic(lwgeom2, LW_TRUE);
 
@@ -314,8 +314,8 @@ geography_centroid_from_mline(const LWMLINE* mline, SPHEROID* s)
  * Split polygons into triangles and use centroid of the triangle with the
  * triangle area as weight to calculate the centroid of a (multi)polygon.
  */
-LWPOINT*
-geography_centroid_from_mpoly(const LWMPOLY* mpoly, bool use_spheroid, SPHEROID* s)
+LWPOINT *
+geography_centroid_from_mpoly(const LWMPOLY *mpoly, bool use_spheroid, SPHEROID *s)
 {
 	uint32_t size = 0;
 	uint32_t i, ir, ip;
@@ -331,32 +331,32 @@ geography_centroid_from_mpoly(const LWMPOLY* mpoly, bool use_spheroid, SPHEROID*
 	uint32_t j = 0;
 
 	/* use first point as reference to create triangles */
-	const POINT4D* reference_point = (const POINT4D*)getPoint2d_cp(mpoly->geoms[0]->rings[0], 0);
+	const POINT4D *reference_point = (const POINT4D *)getPoint2d_cp(mpoly->geoms[0]->rings[0], 0);
 
 	for (ip = 0; ip < mpoly->ngeoms; ip++)
 	{
-		LWPOLY* poly = mpoly->geoms[ip];
+		LWPOLY *poly = mpoly->geoms[ip];
 
 		for (ir = 0; ir < poly->nrings; ir++)
 		{
-			POINTARRAY* ring = poly->rings[ir];
+			POINTARRAY *ring = poly->rings[ir];
 
 			/* split into triangles (two points + reference point) */
 			for (i = 0; i < ring->npoints - 1; i++)
 			{
-				const POINT4D* p1 = (const POINT4D*)getPoint2d_cp(ring, i);
-				const POINT4D* p2 = (const POINT4D*)getPoint2d_cp(ring, i + 1);
+				const POINT4D *p1 = (const POINT4D *)getPoint2d_cp(ring, i);
+				const POINT4D *p2 = (const POINT4D *)getPoint2d_cp(ring, i + 1);
 
-				POINTARRAY* pa = ptarray_construct_empty(0, 0, 4);
+				POINTARRAY *pa = ptarray_construct_empty(0, 0, 4);
 				ptarray_insert_point(pa, p1, 0);
 				ptarray_insert_point(pa, p2, 1);
 				ptarray_insert_point(pa, reference_point, 2);
 				ptarray_insert_point(pa, p1, 3);
 
-				LWPOLY* poly_tri = lwpoly_construct_empty(mpoly->srid, 0, 0);
+				LWPOLY *poly_tri = lwpoly_construct_empty(mpoly->srid, 0, 0);
 				lwpoly_add_ring(poly_tri, pa);
 
-				LWGEOM* geom_tri = lwpoly_as_lwgeom(poly_tri);
+				LWGEOM *geom_tri = lwpoly_as_lwgeom(poly_tri);
 				lwgeom_set_geodetic(geom_tri, LW_TRUE);
 
 				/* Calculate the weight of the triangle. If counter clockwise,
@@ -383,7 +383,7 @@ geography_centroid_from_mpoly(const LWMPOLY* mpoly, bool use_spheroid, SPHEROID*
 				triangle[2].m = 1;
 
 				/* get center of triangle */
-				LWPOINT* tri_centroid = geography_centroid_from_wpoints(mpoly->srid, triangle, 3);
+				LWPOINT *tri_centroid = geography_centroid_from_wpoints(mpoly->srid, triangle, 3);
 
 				points[j].x = lwpoint_get_x(tri_centroid);
 				points[j].y = lwpoint_get_y(tri_centroid);

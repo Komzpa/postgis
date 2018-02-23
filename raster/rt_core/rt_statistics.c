@@ -45,7 +45,7 @@
 	if (x > y) SWAP(x, y)
 
 static double
-pivot(double* left, double* right)
+pivot(double *left, double *right)
 {
 	double l, m, r, *p;
 
@@ -72,8 +72,8 @@ pivot(double* left, double* right)
 	return -1;
 }
 
-static double*
-partition(double* left, double* right, double pivot)
+static double *
+partition(double *left, double *right, double pivot)
 {
 	while (left <= right)
 	{
@@ -94,10 +94,10 @@ partition(double* left, double* right, double pivot)
 }
 
 static void
-quicksort(double* left, double* right)
+quicksort(double *left, double *right)
 {
 	double p = pivot(left, right);
-	double* pos;
+	double *pos;
 
 	if (p != -1)
 	{
@@ -129,9 +129,9 @@ rt_band_get_summary_stats(rt_band band,
 			  int exclude_nodata_value,
 			  double sample,
 			  int inc_vals,
-			  uint64_t* cK,
-			  double* cM,
-			  double* cQ)
+			  uint64_t *cK,
+			  double *cM,
+			  double *cQ)
 {
 	uint32_t x = 0;
 	uint32_t y = 0;
@@ -141,7 +141,7 @@ rt_band_get_summary_stats(rt_band band,
 	int rtn;
 	int hasnodata = FALSE;
 	double nodata = 0;
-	double* values = NULL;
+	double *values = NULL;
 	double value;
 	int isnodata = 0;
 	rt_bandstats stats = NULL;
@@ -456,12 +456,12 @@ rt_band_get_summary_stats(rt_band band,
 rt_histogram
 rt_band_get_histogram(rt_bandstats stats,
 		      uint32_t bin_count,
-		      double* bin_width,
+		      double *bin_width,
 		      uint32_t bin_width_count,
 		      int right,
 		      double min,
 		      double max,
-		      uint32_t* rtn_count)
+		      uint32_t *rtn_count)
 {
 	rt_histogram bins = NULL;
 	int init_width = 0;
@@ -742,7 +742,7 @@ rt_band_get_histogram(rt_bandstats stats,
  * @return the default set of or requested quantiles for a band or NULL
  */
 rt_quantile
-rt_band_get_quantiles(rt_bandstats stats, double* quantiles, int quantiles_count, uint32_t* rtn_count)
+rt_band_get_quantiles(rt_bandstats stats, double *quantiles, int quantiles_count, uint32_t *rtn_count)
 {
 	rt_quantile rtn;
 	int init_quantiles = 0;
@@ -854,8 +854,8 @@ rt_band_get_quantiles(rt_bandstats stats, double* quantiles, int quantiles_count
  * rt_band_get_quantiles_stream()
  ******************************************************************************/
 
-static struct quantile_llist_element*
-quantile_llist_search(struct quantile_llist_element* element, double needle)
+static struct quantile_llist_element *
+quantile_llist_search(struct quantile_llist_element *element, double needle)
 {
 	if (NULL == element)
 		return NULL;
@@ -870,10 +870,10 @@ quantile_llist_search(struct quantile_llist_element* element, double needle)
 		return element;
 }
 
-static struct quantile_llist_element*
-quantile_llist_insert(struct quantile_llist_element* element, double value, uint32_t* idx)
+static struct quantile_llist_element *
+quantile_llist_insert(struct quantile_llist_element *element, double value, uint32_t *idx)
 {
-	struct quantile_llist_element* qle = NULL;
+	struct quantile_llist_element *qle = NULL;
 
 	if (NULL == element)
 	{
@@ -931,7 +931,7 @@ quantile_llist_insert(struct quantile_llist_element* element, double value, uint
 }
 
 static int
-quantile_llist_delete(struct quantile_llist_element* element)
+quantile_llist_delete(struct quantile_llist_element *element)
 {
 	if (NULL == element) return 0;
 
@@ -956,9 +956,9 @@ quantile_llist_delete(struct quantile_llist_element* element)
 }
 
 int
-quantile_llist_destroy(struct quantile_llist** list, uint32_t list_count)
+quantile_llist_destroy(struct quantile_llist **list, uint32_t list_count)
 {
-	struct quantile_llist_element* element = NULL;
+	struct quantile_llist_element *element = NULL;
 	uint32_t i;
 
 	if (NULL == *list) return 0;
@@ -980,7 +980,7 @@ quantile_llist_destroy(struct quantile_llist** list, uint32_t list_count)
 }
 
 static void
-quantile_llist_index_update(struct quantile_llist* qll, struct quantile_llist_element* qle, uint32_t idx)
+quantile_llist_index_update(struct quantile_llist *qll, struct quantile_llist_element *qle, uint32_t idx)
 {
 	uint32_t anchor = (uint32_t)floor(idx / 100);
 
@@ -1000,7 +1000,7 @@ quantile_llist_index_update(struct quantile_llist* qll, struct quantile_llist_el
 }
 
 static void
-quantile_llist_index_delete(struct quantile_llist* qll, struct quantile_llist_element* qle)
+quantile_llist_index_delete(struct quantile_llist *qll, struct quantile_llist_element *qle)
 {
 	uint32_t i = 0;
 
@@ -1014,8 +1014,8 @@ quantile_llist_index_delete(struct quantile_llist* qll, struct quantile_llist_el
 	}
 }
 
-static struct quantile_llist_element*
-quantile_llist_index_search(struct quantile_llist* qll, double value, uint32_t* index)
+static struct quantile_llist_element *
+quantile_llist_index_search(struct quantile_llist *qll, double value, uint32_t *index)
 {
 	uint32_t i = 0, j = 0;
 	RASTER_DEBUGF(5, "searching index for value %f", value);
@@ -1055,7 +1055,7 @@ quantile_llist_index_search(struct quantile_llist* qll, double value, uint32_t* 
 }
 
 static void
-quantile_llist_index_reset(struct quantile_llist* qll)
+quantile_llist_index_reset(struct quantile_llist *qll)
 {
 	uint32_t i = 0;
 
@@ -1099,21 +1099,21 @@ rt_band_get_quantiles_stream(rt_band band,
 			     int exclude_nodata_value,
 			     double sample,
 			     uint64_t cov_count,
-			     struct quantile_llist** qlls,
-			     uint32_t* qlls_count,
-			     double* quantiles,
+			     struct quantile_llist **qlls,
+			     uint32_t *qlls_count,
+			     double *quantiles,
 			     uint32_t quantiles_count,
-			     uint32_t* rtn_count)
+			     uint32_t *rtn_count)
 {
 	rt_quantile rtn = NULL;
 	int init_quantiles = 0;
 
-	struct quantile_llist* qll = NULL;
-	struct quantile_llist_element* qle = NULL;
-	struct quantile_llist_element* qls = NULL;
+	struct quantile_llist *qll = NULL;
+	struct quantile_llist_element *qle = NULL;
+	struct quantile_llist_element *qls = NULL;
 	const uint32_t MAX_VALUES = 750;
 
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	double value;
 	int isnodata = 0;
 
@@ -1845,15 +1845,15 @@ rt_band_get_quantiles_stream(rt_band band,
 rt_valuecount
 rt_band_get_value_count(rt_band band,
 			int exclude_nodata_value,
-			double* search_values,
+			double *search_values,
 			uint32_t search_values_count,
 			double roundto,
-			uint32_t* rtn_total,
-			uint32_t* rtn_count)
+			uint32_t *rtn_total,
+			uint32_t *rtn_count)
 {
 	rt_valuecount vcnts = NULL;
 	rt_pixtype pixtype = PT_END;
-	uint8_t* data = NULL;
+	uint8_t *data = NULL;
 	double nodata = 0;
 
 	int scale = 0;

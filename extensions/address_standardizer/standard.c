@@ -41,9 +41,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 /* -- local prototypes -- */
 /*-- <revision date='2012-07-22'> Keep track of start_state </revision> --*/
-static int _Close_Stand_Field_(STAND_PARAM*);
-static int _Scan_String_(STAND_PARAM*, char*);
-static char* _Scan_Next_(STAND_PARAM*, char*);
+static int _Close_Stand_Field_(STAND_PARAM *);
+static int _Scan_String_(STAND_PARAM *, char *);
+static char *_Scan_Next_(STAND_PARAM *, char *);
 
 static char __spacer__[] = " \\-.)}>_";
 
@@ -105,7 +105,7 @@ static char __spacer__[] = " \\-.)}>_";
 </summary>
 =========================================================================*/
 int
-standardize_field(STAND_PARAM* __stand_param__, char* __in_str__, int client_start_state)
+standardize_field(STAND_PARAM *__stand_param__, char *__in_str__, int client_start_state)
 {
 	/*-- <revision date='2009-08-13'> Support multiple lexicons </revision> --*/
 	/*-- <revision date='2012-06-01'> Add gaz_lexicon to be triggered on start_state= MACRO </revision> --*/
@@ -126,9 +126,9 @@ standardize_field(STAND_PARAM* __stand_param__, char* __in_str__, int client_sta
 }
 
 static int
-_Scan_String_(STAND_PARAM* __stand_param__, char* __in_str__)
+_Scan_String_(STAND_PARAM *__stand_param__, char *__in_str__)
 {
-	char* __src__ = __in_str__;
+	char *__src__ = __in_str__;
 	while (TRUE)
 	{
 		char a = *__src__;
@@ -142,17 +142,17 @@ _Scan_String_(STAND_PARAM* __stand_param__, char* __in_str__)
 	return FALSE;
 }
 
-static char*
-_Scan_Next_(STAND_PARAM* __stand_param__, char* __in_ptr__)
+static char *
+_Scan_Next_(STAND_PARAM *__stand_param__, char *__in_ptr__)
 {
 	int n;
 	char __scan_buf__[MAXSTRLEN];
 
 	/*-- <remarks> Collect a sequence of characters into the scan_buf </remarks> --*/
 
-	char* __src__ = __in_ptr__;
+	char *__src__ = __in_ptr__;
 	char a = *__src__;
-	char* __dest__ = __scan_buf__;
+	char *__dest__ = __scan_buf__;
 	*__dest__ = SENTINEL;
 
 	/*-- <remarks> Type one terminators </remarks> --*/
@@ -323,15 +323,15 @@ typedef struct STDADDR_s {  // define as required
 
 */
 
-STANDARDIZER*
+STANDARDIZER *
 std_init()
 {
-	STANDARDIZER* std;
+	STANDARDIZER *std;
 
-	std = (STANDARDIZER*)calloc(1, sizeof(STANDARDIZER));
+	std = (STANDARDIZER *)calloc(1, sizeof(STANDARDIZER));
 	if (std == NULL) return NULL;
 
-	std->pagc_p = (PAGC_GLOBAL*)calloc(1, sizeof(PAGC_GLOBAL));
+	std->pagc_p = (PAGC_GLOBAL *)calloc(1, sizeof(PAGC_GLOBAL));
 	if (std->pagc_p == NULL)
 	{
 		free(std);
@@ -345,7 +345,7 @@ std_init()
 }
 
 int
-std_use_lex(STANDARDIZER* std, LEXICON* lex)
+std_use_lex(STANDARDIZER *std, LEXICON *lex)
 {
 	std->pagc_p->addr_lexicon = lex->hash_table;
 	lex->hash_table = NULL;
@@ -355,7 +355,7 @@ std_use_lex(STANDARDIZER* std, LEXICON* lex)
 }
 
 int
-std_use_gaz(STANDARDIZER* std, LEXICON* gaz)
+std_use_gaz(STANDARDIZER *std, LEXICON *gaz)
 {
 	std->pagc_p->gaz_lexicon = gaz->hash_table;
 	gaz->hash_table = NULL;
@@ -364,7 +364,7 @@ std_use_gaz(STANDARDIZER* std, LEXICON* gaz)
 }
 
 int
-std_use_rules(STANDARDIZER* std, RULES* rules)
+std_use_rules(STANDARDIZER *std, RULES *rules)
 {
 	if (!rules->ready) { RET_ERR("std_use_rules: Rules have not been readied!", std->err_p, 1); }
 	std->pagc_p->rules = rules->r_p;
@@ -374,7 +374,7 @@ std_use_rules(STANDARDIZER* std, RULES* rules)
 }
 
 int
-std_ready_standardizer(STANDARDIZER* std)
+std_ready_standardizer(STANDARDIZER *std)
 {
 	std->misc_stand = init_stand_context(std->pagc_p, std->err_p, 1);
 
@@ -383,7 +383,7 @@ std_ready_standardizer(STANDARDIZER* std)
 }
 
 void
-std_free(STANDARDIZER* std)
+std_free(STANDARDIZER *std)
 {
 	if (std == NULL) return;
 	DBG("Calling close_stand_process");
@@ -402,7 +402,7 @@ std_free(STANDARDIZER* std)
 }
 
 void
-stdaddr_free(STDADDR* stdaddr)
+stdaddr_free(STDADDR *stdaddr)
 {
 	if (!stdaddr) return;
 	if (stdaddr->building) free(stdaddr->building);
@@ -425,14 +425,14 @@ stdaddr_free(STDADDR* stdaddr)
 	stdaddr = NULL;
 }
 
-static char*
-coalesce(char* a, char* b)
+static char *
+coalesce(char *a, char *b)
 {
 	return a ? a : b;
 }
 
 void
-print_stdaddr(STDADDR* result)
+print_stdaddr(STDADDR *result)
 {
 	if (result)
 	{
@@ -462,11 +462,11 @@ STDADDR *std_standardize_one(STANDARDIZER *std, char *address_one_line, int opti
 }
 */
 
-STDADDR*
-std_standardize_mm(STANDARDIZER* std, char* micro, char* macro, int options)
+STDADDR *
+std_standardize_mm(STANDARDIZER *std, char *micro, char *macro, int options)
 {
-	STAND_PARAM* stand_address;
-	STDADDR* stdaddr;
+	STAND_PARAM *stand_address;
+	STDADDR *stdaddr;
 	int err;
 
 	stand_address = std->misc_stand;
@@ -520,8 +520,8 @@ std_standardize_mm(STANDARDIZER* std, char* micro, char* macro, int options)
 	return stdaddr;
 }
 
-STDADDR*
-std_standardize(STANDARDIZER* std, char* address, char* city, char* state, char* postcode, char* country, int options)
+STDADDR *
+std_standardize(STANDARDIZER *std, char *address, char *city, char *state, char *postcode, char *country, int options)
 {
 	return NULL;
 }
@@ -539,11 +539,11 @@ std_standardize(STANDARDIZER* std, char* address, char* city, char* state, char*
 </summary>
 =========================================================================*/
 int
-init_stand_process(PAGC_GLOBAL* __pagc_global__,
-		   const char* __rule_name__,
-		   const char* __lexicon_name__,
-		   const char* __gazetteer_name__,
-		   const char* __featword_name__)
+init_stand_process(PAGC_GLOBAL *__pagc_global__,
+		   const char *__rule_name__,
+		   const char *__lexicon_name__,
+		   const char *__gazetteer_name__,
+		   const char *__featword_name__)
 {
 	if ((__pagc_global__->rules = create_rules(__rule_name__, __pagc_global__)) == NULL) { return FALSE; }
 	/*-- <revision date='2009-08-13'> Support multiple lexicons </revision> --*/
@@ -573,7 +573,7 @@ init_stand_process(PAGC_GLOBAL* __pagc_global__,
 </summary>
 =========================================================================*/
 void
-close_stand_process(PAGC_GLOBAL* __pagc_global__)
+close_stand_process(PAGC_GLOBAL *__pagc_global__)
 {
 	if (__pagc_global__ == NULL) { return; }
 	DBG("remove_default_defs(__pagc_global__)");
@@ -600,10 +600,10 @@ close_stand_process(PAGC_GLOBAL* __pagc_global__)
 	<returns>NULL returned on error - if so, call <functionref='close_stand_context'/></returns>
 </summary>
 =========================================================================*/
-STAND_PARAM*
-init_stand_context(PAGC_GLOBAL* __pagc_global__, ERR_PARAM* __err_param__, int exhaustive_flag)
+STAND_PARAM *
+init_stand_context(PAGC_GLOBAL *__pagc_global__, ERR_PARAM *__err_param__, int exhaustive_flag)
 {
-	STAND_PARAM* __stand_param__;
+	STAND_PARAM *__stand_param__;
 	/*-- <remarks> Initialization-time allocation </remarks> --*/
 	PAGC_CALLOC_STRUC(__stand_param__, STAND_PARAM, 1, __err_param__, NULL);
 	if ((__stand_param__->stz_info = create_segments(__err_param__)) == NULL) { return NULL; }
@@ -635,7 +635,7 @@ init_stand_context(PAGC_GLOBAL* __pagc_global__, ERR_PARAM* __err_param__, int e
 <summary>
 =========================================================================*/
 void
-close_stand_context(STAND_PARAM* __stand_param__)
+close_stand_context(STAND_PARAM *__stand_param__)
 {
 	if (__stand_param__ == NULL) { return; }
 	destroy_segments(__stand_param__->stz_info);
@@ -656,7 +656,7 @@ close_stand_context(STAND_PARAM* __stand_param__)
 </summary>
 =========================================================================*/
 static int
-_Close_Stand_Field_(STAND_PARAM* __stand_param__)
+_Close_Stand_Field_(STAND_PARAM *__stand_param__)
 {
 	/*-- <revision date='2012-07-22'> Keep track of start_state </revision> --*/
 	if (evaluator(__stand_param__))

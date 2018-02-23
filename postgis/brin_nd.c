@@ -11,7 +11,7 @@
  * FunctionCallInvoke machinery for each heap tuple.
  */
 
-Datum gidx_brin_inclusion_add_value(BrinDesc* bdesc, BrinValues* column, Datum newval, bool isnull, int max_dims);
+Datum gidx_brin_inclusion_add_value(BrinDesc *bdesc, BrinValues *column, Datum newval, bool isnull, int max_dims);
 
 /*
  * As for the GiST case, geographies are converted into GIDX before
@@ -20,8 +20,8 @@ Datum gidx_brin_inclusion_add_value(BrinDesc* bdesc, BrinValues* column, Datum n
 PG_FUNCTION_INFO_V1(geog_brin_inclusion_add_value);
 Datum geog_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 {
-	BrinDesc* bdesc = (BrinDesc*)PG_GETARG_POINTER(0);
-	BrinValues* column = (BrinValues*)PG_GETARG_POINTER(1);
+	BrinDesc *bdesc = (BrinDesc *)PG_GETARG_POINTER(0);
+	BrinValues *column = (BrinValues *)PG_GETARG_POINTER(1);
 	Datum newval = PG_GETARG_DATUM(2);
 	bool isnull = PG_GETARG_BOOL(3);
 
@@ -31,8 +31,8 @@ Datum geog_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geom3d_brin_inclusion_add_value);
 Datum geom3d_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 {
-	BrinDesc* bdesc = (BrinDesc*)PG_GETARG_POINTER(0);
-	BrinValues* column = (BrinValues*)PG_GETARG_POINTER(1);
+	BrinDesc *bdesc = (BrinDesc *)PG_GETARG_POINTER(0);
+	BrinValues *column = (BrinValues *)PG_GETARG_POINTER(1);
 	Datum newval = PG_GETARG_DATUM(2);
 	bool isnull = PG_GETARG_BOOL(3);
 
@@ -42,8 +42,8 @@ Datum geom3d_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geom4d_brin_inclusion_add_value);
 Datum geom4d_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 {
-	BrinDesc* bdesc = (BrinDesc*)PG_GETARG_POINTER(0);
-	BrinValues* column = (BrinValues*)PG_GETARG_POINTER(1);
+	BrinDesc *bdesc = (BrinDesc *)PG_GETARG_POINTER(0);
+	BrinValues *column = (BrinValues *)PG_GETARG_POINTER(1);
 	Datum newval = PG_GETARG_DATUM(2);
 	bool isnull = PG_GETARG_BOOL(3);
 
@@ -51,8 +51,8 @@ Datum geom4d_brin_inclusion_add_value(PG_FUNCTION_ARGS)
 }
 
 Datum
-gidx_brin_inclusion_add_value(__attribute__((__unused__)) BrinDesc* bdesc,
-			      BrinValues* column,
+gidx_brin_inclusion_add_value(__attribute__((__unused__)) BrinDesc *bdesc,
+			      BrinValues *column,
 			      Datum newval,
 			      bool isnull,
 			      int max_dims)
@@ -82,7 +82,7 @@ gidx_brin_inclusion_add_value(__attribute__((__unused__)) BrinDesc* bdesc,
 	if (!column->bv_allnulls && DatumGetBool(column->bv_values[INCLUSION_UNMERGEABLE])) PG_RETURN_BOOL(false);
 
 	/* create a new GIDX in stack memory, maximum dimensions */
-	gidx_geom = (GIDX*)gboxmem;
+	gidx_geom = (GIDX *)gboxmem;
 
 	/*
 	 * check other cases where it is not possible to retrieve a box
@@ -144,7 +144,7 @@ gidx_brin_inclusion_add_value(__attribute__((__unused__)) BrinDesc* bdesc,
 		PG_RETURN_BOOL(true);
 	}
 
-	gidx_key = (GIDX*)column->bv_values[INCLUSION_UNION];
+	gidx_key = (GIDX *)column->bv_values[INCLUSION_UNION];
 	dims_key = GIDX_NDIMS(gidx_key);
 
 	/*

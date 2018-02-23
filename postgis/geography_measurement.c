@@ -67,10 +67,10 @@ Datum geography_segmentize(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(geography_distance_knn);
 Datum geography_distance_knn(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double distance;
 	double tolerance = FP_TOLERANCE;
 	bool use_spheroid = false; /* must use sphere, can't get index to harmonize with spheroid */
@@ -126,10 +126,10 @@ Datum geography_distance_knn(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_distance_uncached);
 Datum geography_distance_uncached(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double distance;
 	double tolerance = FP_TOLERANCE;
 	bool use_spheroid = true;
@@ -191,8 +191,8 @@ Datum geography_distance_uncached(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_distance);
 Datum geography_distance(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double distance;
 	bool use_spheroid = true;
 	SPHEROID s;
@@ -259,8 +259,8 @@ Datum geography_distance(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_dwithin);
 Datum geography_dwithin(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double tolerance = 0.0;
 	double distance;
 	bool use_spheroid = true;
@@ -296,8 +296,8 @@ Datum geography_dwithin(PG_FUNCTION_ARGS)
 	/* Do the brute force calculation if the cached calculation doesn't tick over */
 	if (LW_FAILURE == geography_dwithin_cache(fcinfo, g1, g2, &s, tolerance, &dwithin))
 	{
-		LWGEOM* lwgeom1 = lwgeom_from_gserialized(g1);
-		LWGEOM* lwgeom2 = lwgeom_from_gserialized(g2);
+		LWGEOM *lwgeom1 = lwgeom_from_gserialized(g1);
+		LWGEOM *lwgeom2 = lwgeom_from_gserialized(g2);
 		distance = lwgeom_distance_spheroid(lwgeom1, lwgeom2, &s, tolerance);
 		/* Something went wrong... */
 		if (distance < 0.0) elog(ERROR, "lwgeom_distance_spheroid returned negative!");
@@ -320,8 +320,8 @@ Datum geography_dwithin(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_distance_tree);
 Datum geography_distance_tree(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double tolerance = 0.0;
 	double distance;
 	bool use_spheroid = true;
@@ -369,10 +369,10 @@ Datum geography_distance_tree(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_dwithin_uncached);
 Datum geography_dwithin_uncached(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double tolerance = 0.0;
 	double distance;
 	bool use_spheroid = true;
@@ -431,8 +431,8 @@ Datum geography_dwithin_uncached(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_expand);
 Datum geography_expand(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* g = NULL;
-	GSERIALIZED* g_out = NULL;
+	GSERIALIZED *g = NULL;
+	GSERIALIZED *g_out = NULL;
 	double distance;
 
 	/* Get a wholly-owned pointer to the geography */
@@ -459,8 +459,8 @@ Datum geography_expand(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_area);
 Datum geography_area(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom = NULL;
-	GSERIALIZED* g = NULL;
+	LWGEOM *lwgeom = NULL;
+	GSERIALIZED *g = NULL;
 	GBOX gbox;
 	double area;
 	bool use_spheroid = LW_TRUE;
@@ -530,8 +530,8 @@ Datum geography_area(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_perimeter);
 Datum geography_perimeter(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom = NULL;
-	GSERIALIZED* g = NULL;
+	LWGEOM *lwgeom = NULL;
+	GSERIALIZED *g = NULL;
 	double length;
 	bool use_spheroid = LW_TRUE;
 	SPHEROID s;
@@ -586,8 +586,8 @@ Datum geography_perimeter(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_length);
 Datum geography_length(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom = NULL;
-	GSERIALIZED* g = NULL;
+	LWGEOM *lwgeom = NULL;
+	GSERIALIZED *g = NULL;
 	double length;
 	bool use_spheroid = LW_TRUE;
 	SPHEROID s;
@@ -637,10 +637,10 @@ PG_FUNCTION_INFO_V1(geography_point_outside);
 Datum geography_point_outside(PG_FUNCTION_ARGS)
 {
 	GBOX gbox;
-	GSERIALIZED* g = NULL;
-	GSERIALIZED* g_out = NULL;
+	GSERIALIZED *g = NULL;
+	GSERIALIZED *g_out = NULL;
 	size_t g_out_size;
-	LWGEOM* lwpoint = NULL;
+	LWGEOM *lwpoint = NULL;
 	POINT2D pt;
 
 	/* Get our geometry object loaded into memory. */
@@ -658,7 +658,7 @@ Datum geography_point_outside(PG_FUNCTION_ARGS)
 	/* Get an exterior point, based on this gbox */
 	gbox_pt_outside(&gbox, &pt);
 
-	lwpoint = (LWGEOM*)lwpoint_make2d(4326, pt.x, pt.y);
+	lwpoint = (LWGEOM *)lwpoint_make2d(4326, pt.x, pt.y);
 	/* TODO: Investigate where this is used, this was probably not
 	 * returning a geography object before. How did this miss checking
 	 */
@@ -680,10 +680,10 @@ Datum geography_point_outside(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_covers);
 Datum geography_covers(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	int result = LW_FALSE;
 
 	/* Get our geometry objects loaded into memory. */
@@ -730,8 +730,8 @@ PG_FUNCTION_INFO_V1(geography_bestsrid);
 Datum geography_bestsrid(PG_FUNCTION_ARGS)
 {
 	GBOX gbox, gbox1, gbox2;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	int empty1 = LW_FALSE;
 	int empty2 = LW_FALSE;
 	double xwidth, ywidth;
@@ -741,7 +741,7 @@ Datum geography_bestsrid(PG_FUNCTION_ARGS)
 	Datum d2 = PG_GETARG_DATUM(1);
 
 	/* Get our geometry objects loaded into memory. */
-	g1 = (GSERIALIZED*)PG_DETOAST_DATUM(d1);
+	g1 = (GSERIALIZED *)PG_DETOAST_DATUM(d1);
 	/* Synchronize our box types */
 	gbox1.flags = g1->flags;
 	/* Calculate if the geometry is empty. */
@@ -755,7 +755,7 @@ Datum geography_bestsrid(PG_FUNCTION_ARGS)
 	/* If we have a unique second argument, fill in all the necessary variables. */
 	if (d1 != d2)
 	{
-		g2 = (GSERIALIZED*)PG_DETOAST_DATUM(d2);
+		g2 = (GSERIALIZED *)PG_DETOAST_DATUM(d2);
 		gbox2.flags = g2->flags;
 		empty2 = gserialized_is_empty(g2);
 		if (!empty2 && gserialized_get_gbox_p(g2, &gbox2) == LW_FAILURE)
@@ -861,10 +861,10 @@ Datum geography_bestsrid(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_project);
 Datum geography_project(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom = NULL;
-	LWPOINT* lwp_projected;
-	GSERIALIZED* g = NULL;
-	GSERIALIZED* g_out = NULL;
+	LWGEOM *lwgeom = NULL;
+	LWPOINT *lwp_projected;
+	GSERIALIZED *g = NULL;
+	GSERIALIZED *g_out = NULL;
 	double azimuth = 0.0;
 	double distance;
 	SPHEROID s;
@@ -930,10 +930,10 @@ Datum geography_project(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_azimuth);
 Datum geography_azimuth(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double azimuth;
 	SPHEROID s;
 	uint32_t type1, type2;
@@ -989,10 +989,10 @@ Datum geography_azimuth(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geography_segmentize);
 Datum geography_segmentize(PG_FUNCTION_ARGS)
 {
-	LWGEOM* lwgeom1 = NULL;
-	LWGEOM* lwgeom2 = NULL;
-	GSERIALIZED* g1 = NULL;
-	GSERIALIZED* g2 = NULL;
+	LWGEOM *lwgeom1 = NULL;
+	LWGEOM *lwgeom2 = NULL;
+	GSERIALIZED *g1 = NULL;
+	GSERIALIZED *g2 = NULL;
 	double max_seg_length;
 	uint32_t type1;
 

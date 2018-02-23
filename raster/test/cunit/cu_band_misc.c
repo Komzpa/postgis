@@ -36,8 +36,8 @@ test_band_get_nearest_pixel()
 	const int maxY = 10;
 	rt_pixel npixels = NULL;
 
-	double** value;
-	int** nodata;
+	double **value;
+	int **nodata;
 	int dimx;
 	int dimy;
 
@@ -257,10 +257,10 @@ test_pixel_set_to_array()
 	int maskY = 3;
 	rt_pixel npixels = NULL;
 	int i;
-	double** value;
+	double **value;
 	double val;
 	int nod;
-	int** nodata;
+	int **nodata;
 	int dimx;
 	int dimy;
 
@@ -286,8 +286,8 @@ test_pixel_set_to_array()
 
 	mask = (rt_mask)rtalloc(sizeof(struct rt_mask_t));
 	CU_ASSERT(mask != NULL);
-	mask->values = rtalloc(sizeof(double*) * maskY);
-	mask->nodata = rtalloc(sizeof(int*) * maskY);
+	mask->values = rtalloc(sizeof(double *) * maskY);
+	mask->nodata = rtalloc(sizeof(int *) * maskY);
 
 	for (i = 0; i < maskY; i++)
 	{

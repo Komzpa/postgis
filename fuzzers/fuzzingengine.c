@@ -29,20 +29,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int LLVMFuzzerTestOneInput(void* buf, size_t len);
-int LLVMFuzzerInitialize(int* argc, char*** argv);
+int LLVMFuzzerTestOneInput(void *buf, size_t len);
+int LLVMFuzzerInitialize(int *argc, char ***argv);
 
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
 	LLVMFuzzerInitialize(&argc, &argv);
 	if (argc < 2) { return LLVMFuzzerTestOneInput(" ", 1); }
 	else
 	{
 		int nRet = 0;
-		void* buf = NULL;
+		void *buf = NULL;
 		int nLen = 0;
-		FILE* f = fopen(argv[1], "rb");
+		FILE *f = fopen(argv[1], "rb");
 		if (!f)
 		{
 			fprintf(stderr, "%s does not exist.\n", argv[1]);

@@ -21,8 +21,8 @@ test_lwgeom_clip_by_rect(void)
 {
 #if POSTGIS_GEOS_VERSION >= 35
 	LWGEOM *in, *out;
-	const char* wkt;
-	char* tmp;
+	const char *wkt;
+	char *tmp;
 
 	/* Because i don't trust that much prior tests...  ;) */
 	cu_error_msg_reset();

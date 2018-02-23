@@ -49,17 +49,17 @@ Datum ST_DistanceRectTreeCached(PG_FUNCTION_ARGS);
 typedef struct
 {
 	GeomCache gcache;
-	RECT_NODE* index;
+	RECT_NODE *index;
 } RectTreeGeomCache;
 
 /**
  * Builder, freeer and public accessor for cached RECT_NODE trees
  */
 static int
-RectTreeBuilder(const LWGEOM* lwgeom, GeomCache* cache)
+RectTreeBuilder(const LWGEOM *lwgeom, GeomCache *cache)
 {
-	RectTreeGeomCache* rect_cache = (RectTreeGeomCache*)cache;
-	RECT_NODE* tree = rect_tree_from_lwgeom(lwgeom);
+	RectTreeGeomCache *rect_cache = (RectTreeGeomCache *)cache;
+	RECT_NODE *tree = rect_tree_from_lwgeom(lwgeom);
 
 	if (rect_cache->index)
 	{
@@ -73,9 +73,9 @@ RectTreeBuilder(const LWGEOM* lwgeom, GeomCache* cache)
 }
 
 static int
-RectTreeFreer(GeomCache* cache)
+RectTreeFreer(GeomCache *cache)
 {
-	RectTreeGeomCache* rect_cache = (RectTreeGeomCache*)cache;
+	RectTreeGeomCache *rect_cache = (RectTreeGeomCache *)cache;
 	if (rect_cache->index)
 	{
 		rect_tree_free(rect_cache->index);
@@ -85,20 +85,20 @@ RectTreeFreer(GeomCache* cache)
 	return LW_SUCCESS;
 }
 
-static GeomCache*
+static GeomCache *
 RectTreeAllocator(void)
 {
-	RectTreeGeomCache* cache = palloc(sizeof(RectTreeGeomCache));
+	RectTreeGeomCache *cache = palloc(sizeof(RectTreeGeomCache));
 	memset(cache, 0, sizeof(RectTreeGeomCache));
-	return (GeomCache*)cache;
+	return (GeomCache *)cache;
 }
 
 static GeomCacheMethods RectTreeCacheMethods = {RECT_CACHE_ENTRY, RectTreeBuilder, RectTreeFreer, RectTreeAllocator};
 
-static RectTreeGeomCache*
-GetRectTreeGeomCache(FunctionCallInfoData* fcinfo, const GSERIALIZED* g1, const GSERIALIZED* g2)
+static RectTreeGeomCache *
+GetRectTreeGeomCache(FunctionCallInfoData *fcinfo, const GSERIALIZED *g1, const GSERIALIZED *g2)
 {
-	return (RectTreeGeomCache*)GetGeomCache(fcinfo, &RectTreeCacheMethods, g1, g2);
+	return (RectTreeGeomCache *)GetGeomCache(fcinfo, &RectTreeCacheMethods, g1, g2);
 }
 
 /**********************************************************************
@@ -108,8 +108,8 @@ GetRectTreeGeomCache(FunctionCallInfoData* fcinfo, const GSERIALIZED* g1, const 
 PG_FUNCTION_INFO_V1(ST_DistanceRectTree);
 Datum ST_DistanceRectTree(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* g1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* g2 = PG_GETARG_GSERIALIZED_P(1);
+	GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
 
 	/* Return NULL on empty arguments. */
 	if (gserialized_is_empty(g1) || gserialized_is_empty(g2))
@@ -119,23 +119,23 @@ Datum ST_DistanceRectTree(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	LWGEOM* lwg1 = lwgeom_from_gserialized(g1);
-	LWGEOM* lwg2 = lwgeom_from_gserialized(g2);
+	LWGEOM *lwg1 = lwgeom_from_gserialized(g1);
+	LWGEOM *lwg2 = lwgeom_from_gserialized(g2);
 
 	/* Two points? Get outa here... */
 	if (lwg1->type == POINTTYPE && lwg2->type == POINTTYPE) PG_RETURN_FLOAT8(lwgeom_mindistance2d(lwg1, lwg2));
 
-	RECT_NODE* n1 = rect_tree_from_lwgeom(lwg1);
-	RECT_NODE* n2 = rect_tree_from_lwgeom(lwg2);
+	RECT_NODE *n1 = rect_tree_from_lwgeom(lwg1);
+	RECT_NODE *n2 = rect_tree_from_lwgeom(lwg2);
 	PG_RETURN_FLOAT8(rect_tree_distance_tree(n1, n2, 0.0));
 }
 
 PG_FUNCTION_INFO_V1(ST_DistanceRectTreeCached);
 Datum ST_DistanceRectTreeCached(PG_FUNCTION_ARGS)
 {
-	RectTreeGeomCache* tree_cache = NULL;
-	GSERIALIZED* g1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* g2 = PG_GETARG_GSERIALIZED_P(1);
+	RectTreeGeomCache *tree_cache = NULL;
+	GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
 
 	/* Return NULL on empty arguments. */
 	if (gserialized_is_empty(g1) || gserialized_is_empty(g2))
@@ -145,8 +145,8 @@ Datum ST_DistanceRectTreeCached(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	LWGEOM* lwg1 = lwgeom_from_gserialized(g1);
-	LWGEOM* lwg2 = lwgeom_from_gserialized(g2);
+	LWGEOM *lwg1 = lwgeom_from_gserialized(g1);
+	LWGEOM *lwg2 = lwgeom_from_gserialized(g2);
 
 	/* Two points? Get outa here... */
 	if (lwg1->type == POINTTYPE && lwg2->type == POINTTYPE) PG_RETURN_FLOAT8(lwgeom_mindistance2d(lwg1, lwg2));
@@ -156,8 +156,8 @@ Datum ST_DistanceRectTreeCached(PG_FUNCTION_ARGS)
 
 	if (tree_cache && tree_cache->gcache.argnum)
 	{
-		RECT_NODE* n;
-		RECT_NODE* n_cached = tree_cache->index;
+		RECT_NODE *n;
+		RECT_NODE *n_cached = tree_cache->index;
 		;
 		if (tree_cache->gcache.argnum == 1) { n = rect_tree_from_lwgeom(lwg2); }
 		else if (tree_cache->gcache.argnum == 2)

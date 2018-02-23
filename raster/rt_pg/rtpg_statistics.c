@@ -68,7 +68,7 @@ Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_summaryStats);
 Datum RASTER_summaryStats(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex = 1;
@@ -86,7 +86,7 @@ Datum RASTER_summaryStats(PG_FUNCTION_ARGS)
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -197,25 +197,25 @@ Datum RASTER_summaryStats(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_summaryStatsCoverage);
 Datum RASTER_summaryStatsCoverage(PG_FUNCTION_ARGS)
 {
-	text* tablenametext = NULL;
-	char* tablename = NULL;
-	text* colnametext = NULL;
-	char* colname = NULL;
+	text *tablenametext = NULL;
+	char *tablename = NULL;
+	text *colnametext = NULL;
+	char *colname = NULL;
 	int32_t bandindex = 1;
 	bool exclude_nodata_value = TRUE;
 	double sample = 0;
 
 	int len = 0;
-	char* sql = NULL;
+	char *sql = NULL;
 	int spi_result;
 	Portal portal;
 	TupleDesc tupdesc;
-	SPITupleTable* tuptable = NULL;
+	SPITupleTable *tuptable = NULL;
 	HeapTuple tuple;
 	Datum datum;
 	bool isNull = FALSE;
 
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int num_bands = 0;
@@ -293,7 +293,7 @@ Datum RASTER_summaryStatsCoverage(PG_FUNCTION_ARGS)
 	/* create sql */
 	len = sizeof(char) *
 	      (strlen("SELECT \"\" FROM \"\" WHERE \"\" IS NOT NULL") + (strlen(colname) * 2) + strlen(tablename) + 1);
-	sql = (char*)palloc(len);
+	sql = (char *)palloc(len);
 	if (NULL == sql)
 	{
 		if (SPI_tuptable) SPI_freetuptable(tuptable);
@@ -333,7 +333,7 @@ Datum RASTER_summaryStatsCoverage(PG_FUNCTION_ARGS)
 			continue;
 		}
 
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(datum);
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(datum);
 
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
@@ -511,7 +511,7 @@ Datum RASTER_summaryStatsCoverage(PG_FUNCTION_ARGS)
 /* Aggregate ST_SummaryStats                                        */
 /* ---------------------------------------------------------------- */
 
-typedef struct rtpg_summarystats_arg_t* rtpg_summarystats_arg;
+typedef struct rtpg_summarystats_arg_t *rtpg_summarystats_arg;
 struct rtpg_summarystats_arg_t
 {
 	rt_bandstats stats;
@@ -585,7 +585,7 @@ Datum RASTER_summaryStats_transfn(PG_FUNCTION_ARGS)
 
 	int i = 0;
 
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int num_bands = 0;
@@ -628,7 +628,7 @@ Datum RASTER_summaryStats_transfn(PG_FUNCTION_ARGS)
 	if (!PG_ARGISNULL(1))
 	{
 		/* deserialize raster */
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 
 		/* Get raster object */
 		raster = rt_raster_deserialize(pgraster, FALSE);
@@ -917,7 +917,7 @@ Datum RASTER_summaryStats_finalfn(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_histogram);
 Datum RASTER_histogram(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	int i;
@@ -931,7 +931,7 @@ Datum RASTER_histogram(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int32_t bandindex = 1;
@@ -939,7 +939,7 @@ Datum RASTER_histogram(PG_FUNCTION_ARGS)
 		bool exclude_nodata_value = TRUE;
 		double sample = 0;
 		uint32_t bin_count = 0;
-		double* bin_width = NULL;
+		double *bin_width = NULL;
 		uint32_t bin_width_count = 0;
 		double width = 0;
 		bool right = FALSE;
@@ -951,10 +951,10 @@ Datum RASTER_histogram(PG_FUNCTION_ARGS)
 		int j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -973,7 +973,7 @@ Datum RASTER_histogram(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
@@ -1209,7 +1209,7 @@ Datum RASTER_histogram(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_histogramCoverage);
 Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	uint32_t i;
@@ -1225,33 +1225,33 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		text* tablenametext = NULL;
-		char* tablename = NULL;
-		text* colnametext = NULL;
-		char* colname = NULL;
+		text *tablenametext = NULL;
+		char *tablename = NULL;
+		text *colnametext = NULL;
+		char *colname = NULL;
 		int32_t bandindex = 1;
 		bool exclude_nodata_value = TRUE;
 		double sample = 0;
 		uint32_t bin_count = 0;
-		double* bin_width = NULL;
+		double *bin_width = NULL;
 		uint32_t bin_width_count = 0;
 		double width = 0;
 		bool right = FALSE;
 		uint32_t count;
 
 		int len = 0;
-		char* sql = NULL;
-		char* tmp = NULL;
+		char *sql = NULL;
+		char *tmp = NULL;
 		double min = 0;
 		double max = 0;
 		int spi_result;
 		Portal portal;
-		SPITupleTable* tuptable = NULL;
+		SPITupleTable *tuptable = NULL;
 		HeapTuple tuple;
 		Datum datum;
 		bool isNull = FALSE;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int num_bands = 0;
@@ -1262,10 +1262,10 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 		int j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -1418,7 +1418,7 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 		len =
 		    sizeof(char) * (strlen("SELECT min, max FROM _st_summarystats('','',,::boolean,)") +
 				    strlen(tablename) + strlen(colname) + (MAX_INT_CHARLEN * 2) + MAX_DBL_CHARLEN + 1);
-		sql = (char*)palloc(len);
+		sql = (char *)palloc(len);
 		if (NULL == sql)
 		{
 
@@ -1499,7 +1499,7 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 		/* create sql */
 		len = sizeof(char) * (strlen("SELECT \"\" FROM \"\" WHERE \"\" IS NOT NULL") + (strlen(colname) * 2) +
 				      strlen(tablename) + 1);
-		sql = (char*)palloc(len);
+		sql = (char *)palloc(len);
 		if (NULL == sql)
 		{
 
@@ -1548,7 +1548,7 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 				continue;
 			}
 
-			pgraster = (rt_pgraster*)PG_DETOAST_DATUM(datum);
+			pgraster = (rt_pgraster *)PG_DETOAST_DATUM(datum);
 
 			raster = rt_raster_deserialize(pgraster, FALSE);
 			if (!raster)
@@ -1781,7 +1781,7 @@ Datum RASTER_histogramCoverage(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_quantile);
 Datum RASTER_quantile(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	int i;
@@ -1795,14 +1795,14 @@ Datum RASTER_quantile(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int32_t bandindex = 0;
 		int num_bands = 0;
 		bool exclude_nodata_value = TRUE;
 		double sample = 0;
-		double* quantiles = NULL;
+		double *quantiles = NULL;
 		uint32_t quantiles_count = 0;
 		double quantile = 0;
 		rt_bandstats stats = NULL;
@@ -1811,10 +1811,10 @@ Datum RASTER_quantile(PG_FUNCTION_ARGS)
 		int j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -1831,7 +1831,7 @@ Datum RASTER_quantile(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
@@ -2048,7 +2048,7 @@ Datum RASTER_quantile(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_quantileCoverage);
 Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	uint32_t i;
@@ -2064,43 +2064,43 @@ Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		text* tablenametext = NULL;
-		char* tablename = NULL;
-		text* colnametext = NULL;
-		char* colname = NULL;
+		text *tablenametext = NULL;
+		char *tablename = NULL;
+		text *colnametext = NULL;
+		char *colname = NULL;
 		int32_t bandindex = 1;
 		bool exclude_nodata_value = TRUE;
 		double sample = 0;
-		double* quantiles = NULL;
+		double *quantiles = NULL;
 		uint32_t quantiles_count = 0;
 		double quantile = 0;
 		uint32_t count;
 
 		int len = 0;
-		char* sql = NULL;
-		char* tmp = NULL;
+		char *sql = NULL;
+		char *tmp = NULL;
 		uint64_t cov_count = 0;
 		int spi_result;
 		Portal portal;
-		SPITupleTable* tuptable = NULL;
+		SPITupleTable *tuptable = NULL;
 		HeapTuple tuple;
 		Datum datum;
 		bool isNull = FALSE;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int num_bands = 0;
-		struct quantile_llist* qlls = NULL;
+		struct quantile_llist *qlls = NULL;
 		uint32_t qlls_count;
 
 		int j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -2240,7 +2240,7 @@ Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 		len =
 		    sizeof(char) * (strlen("SELECT count FROM _st_summarystats('','',,::boolean,)") +
 				    strlen(tablename) + strlen(colname) + (MAX_INT_CHARLEN * 2) + MAX_DBL_CHARLEN + 1);
-		sql = (char*)palloc(len);
+		sql = (char *)palloc(len);
 		if (NULL == sql)
 		{
 
@@ -2298,7 +2298,7 @@ Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 		/* create sql */
 		len = sizeof(char) * (strlen("SELECT \"\" FROM \"\" WHERE \"\" IS NOT NULL") + (strlen(colname) * 2) +
 				      strlen(tablename) + 1);
-		sql = (char*)palloc(len);
+		sql = (char *)palloc(len);
 		if (NULL == sql)
 		{
 
@@ -2344,7 +2344,7 @@ Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 				continue;
 			}
 
-			pgraster = (rt_pgraster*)PG_DETOAST_DATUM(datum);
+			pgraster = (rt_pgraster *)PG_DETOAST_DATUM(datum);
 
 			raster = rt_raster_deserialize(pgraster, FALSE);
 			if (!raster)
@@ -2508,7 +2508,7 @@ Datum RASTER_quantileCoverage(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_valueCount);
 Datum RASTER_valueCount(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	int i;
@@ -2522,13 +2522,13 @@ Datum RASTER_valueCount(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int32_t bandindex = 0;
 		int num_bands = 0;
 		bool exclude_nodata_value = TRUE;
-		double* search_values = NULL;
+		double *search_values = NULL;
 		uint32_t search_values_count = 0;
 		double roundto = 0;
 		uint32_t count;
@@ -2536,10 +2536,10 @@ Datum RASTER_valueCount(PG_FUNCTION_ARGS)
 		int j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -2556,7 +2556,7 @@ Datum RASTER_valueCount(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
@@ -2731,7 +2731,7 @@ Datum RASTER_valueCount(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_valueCountCoverage);
 Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	uint32_t i;
@@ -2749,25 +2749,25 @@ Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		text* tablenametext = NULL;
-		char* tablename = NULL;
-		text* colnametext = NULL;
-		char* colname = NULL;
+		text *tablenametext = NULL;
+		char *tablename = NULL;
+		text *colnametext = NULL;
+		char *colname = NULL;
 		int32_t bandindex = 1;
 		bool exclude_nodata_value = TRUE;
-		double* search_values = NULL;
+		double *search_values = NULL;
 		uint32_t search_values_count = 0;
 		double roundto = 0;
 
 		int len = 0;
-		char* sql = NULL;
+		char *sql = NULL;
 		int spi_result;
 		Portal portal;
-		SPITupleTable* tuptable = NULL;
+		SPITupleTable *tuptable = NULL;
 		HeapTuple tuple;
 		Datum datum;
 		bool isNull = FALSE;
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int num_bands = 0;
@@ -2779,10 +2779,10 @@ Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS)
 		uint32_t j;
 		int n;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -2904,7 +2904,7 @@ Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS)
 		/* create sql */
 		len = sizeof(char) * (strlen("SELECT \"\" FROM \"\" WHERE \"\" IS NOT NULL") + (strlen(colname) * 2) +
 				      strlen(tablename) + 1);
-		sql = (char*)palloc(len);
+		sql = (char *)palloc(len);
 		if (NULL == sql)
 		{
 
@@ -2953,7 +2953,7 @@ Datum RASTER_valueCountCoverage(PG_FUNCTION_ARGS)
 				continue;
 			}
 
-			pgraster = (rt_pgraster*)PG_DETOAST_DATUM(datum);
+			pgraster = (rt_pgraster *)PG_DETOAST_DATUM(datum);
 
 			raster = rt_raster_deserialize(pgraster, FALSE);
 			if (!raster)

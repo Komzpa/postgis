@@ -15,7 +15,7 @@
 #include "cu_tester.h"
 
 /* Internal funcs */
-static void cu_error_reporter(const char* fmt, va_list ap);
+static void cu_error_reporter(const char *fmt, va_list ap);
 
 /* ADD YOUR SUITE SETUP FUNCTION HERE (1 of 2) */
 extern void pixtype_suite_setup(void);
@@ -52,18 +52,18 @@ PG_SuiteSetup setupfuncs[] = {pixtype_suite_setup,
 ** CUnit error code on failure.
 */
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
 	int index;
-	char* suite_name;
+	char *suite_name;
 	CU_pSuite suite_to_run;
-	char* test_name;
+	char *test_name;
 	CU_pTest test_to_run;
 	CU_ErrorCode errCode = 0;
 	CU_pTestRegistry registry;
 	int num_run;
 	int num_failed;
-	PG_SuiteSetup* setupfunc = setupfuncs;
+	PG_SuiteSetup *setupfunc = setupfuncs;
 
 	/* install the custom error handler */
 	lwgeom_set_handlers(0, 0, 0, cu_error_reporter, 0);
@@ -208,7 +208,7 @@ main(int argc, char* argv[])
  * CAUTION: Not stop execution on rterror case !!!
  */
 static void
-cu_error_reporter(const char* fmt, va_list ap)
+cu_error_reporter(const char *fmt, va_list ap)
 {
 	vsnprintf(cu_error_msg, MAX_CUNIT_MSG_LENGTH, fmt, ap);
 	cu_error_msg[MAX_CUNIT_MSG_LENGTH] = '\0';
@@ -239,7 +239,7 @@ cu_free_raster(rt_raster raster)
 rt_band
 cu_add_band(rt_raster raster, rt_pixtype pixtype, int hasnodata, double nodataval)
 {
-	void* mem = NULL;
+	void *mem = NULL;
 	int32_t bandNum = 0;
 	size_t datasize = 0;
 	rt_band band = NULL;

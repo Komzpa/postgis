@@ -36,14 +36,14 @@
 int pgis_opterr = 1;
 int pgis_optind = 1;
 int pgis_optopt;
-char* pgis_optarg;
+char *pgis_optarg;
 
 int
-pgis_getopt(int argc, char** argv, char* opts)
+pgis_getopt(int argc, char **argv, char *opts)
 {
 	static int sp = 1;
 	register int c;
-	register char* cp;
+	register char *cp;
 
 	if (sp == 1)
 	{

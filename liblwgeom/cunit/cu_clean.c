@@ -51,7 +51,7 @@ static void
 test_lwgeom_make_valid(void)
 {
 	LWGEOM *gin, *gout, *gexp;
-	char* ewkt;
+	char *ewkt;
 
 	/* Because i don't trust that much prior tests...  ;) */
 	cu_error_msg_reset();

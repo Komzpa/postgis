@@ -23,9 +23,9 @@ typedef struct
 {
 	int ldid;
 	int cpg;
-	char* desc;
-	char* iconv;
-	char* pg;
+	char *desc;
+	char *iconv;
+	char *pg;
 } code_page_entry;
 
 static int num_code_pages = 60;
@@ -99,8 +99,8 @@ static code_page_entry code_pages[] = {{0x01, 437, "U.S. MS-DOS", "CP437", ""},
  * characters require escaping, simply return the input pointer. Otherwise return a
  * new allocated string.
  */
-char*
-escape_connection_string(char* str)
+char *
+escape_connection_string(char *str)
 {
 	/*
 	 * Escape apostrophes and backslashes:
@@ -111,7 +111,7 @@ escape_connection_string(char* str)
 	 * 2. make new string
 	 */
 
-	char* result;
+	char *result;
 	char *ptr, *optr;
 	int toescape = 0;
 	size_t size;
@@ -147,7 +147,7 @@ escape_connection_string(char* str)
 }
 
 void
-colmap_init(colmap* map)
+colmap_init(colmap *map)
 {
 	map->size = 0;
 	map->pgfieldnames = NULL;
@@ -155,7 +155,7 @@ colmap_init(colmap* map)
 }
 
 void
-colmap_clean(colmap* map)
+colmap_clean(colmap *map)
 {
 	int i;
 	if (map != NULL)
@@ -173,8 +173,8 @@ colmap_clean(colmap* map)
 	}
 }
 
-const char*
-colmap_dbf_by_pg(colmap* map, const char* pgname)
+const char *
+colmap_dbf_by_pg(colmap *map, const char *pgname)
 {
 	int i;
 	for (i = 0; i < map->size; i++)
@@ -184,8 +184,8 @@ colmap_dbf_by_pg(colmap* map, const char* pgname)
 	return NULL;
 }
 
-const char*
-colmap_pg_by_dbf(colmap* map, const char* dbfname)
+const char *
+colmap_pg_by_dbf(colmap *map, const char *dbfname)
 {
 	int i;
 	for (i = 0; i < map->size; i++)
@@ -196,11 +196,11 @@ colmap_pg_by_dbf(colmap* map, const char* dbfname)
 }
 
 int
-colmap_read(const char* filename, colmap* map, char* errbuf, size_t errbuflen)
+colmap_read(const char *filename, colmap *map, char *errbuf, size_t errbuflen)
 {
-	FILE* fptr;
+	FILE *fptr;
 	char linebuffer[1024];
-	char* tmpstr;
+	char *tmpstr;
 	int curmapsize, fieldnamesize;
 
 	/* Read column map file and load the colmap_dbffieldnames
@@ -219,8 +219,8 @@ colmap_read(const char* filename, colmap* map, char* errbuf, size_t errbuflen)
 
 	/* Now we know the final size, allocate the arrays and load the data */
 	fseek(fptr, 0, SEEK_SET);
-	map->pgfieldnames = (char**)malloc(sizeof(char*) * map->size);
-	map->dbffieldnames = (char**)malloc(sizeof(char*) * map->size);
+	map->pgfieldnames = (char **)malloc(sizeof(char *) * map->size);
+	map->dbffieldnames = (char **)malloc(sizeof(char *) * map->size);
 
 	/* Read in a line at a time... */
 	curmapsize = 0;
@@ -274,8 +274,8 @@ colmap_read(const char* filename, colmap* map, char* errbuf, size_t errbuflen)
  * the equivalent iconv encoding string so we can use iconv to transcode
  * the data into UTF8
  */
-char*
-codepage2encoding(const char* cpg)
+char *
+codepage2encoding(const char *cpg)
 {
 	int cpglen;
 	int is_ldid = 0;
@@ -326,8 +326,8 @@ codepage2encoding(const char* cpg)
  *
  * Return null on error (cannot allocate memory)
  */
-char*
-encoding2codepage(const char* encoding)
+char *
+encoding2codepage(const char *encoding)
 {
 	int i;
 	for (i = 0; i < num_code_pages; i++)
@@ -337,7 +337,7 @@ encoding2codepage(const char* encoding)
 			if (code_pages[i].ldid == 0xFF) { return strdup("UTF-8"); }
 			else
 			{
-				char* codepage = NULL;
+				char *codepage = NULL;
 				int ret = asprintf(&codepage, "LDID/%d", code_pages[i].ldid);
 				if (ret == -1) return NULL; /* return null on error */
 				return codepage;

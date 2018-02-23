@@ -30,24 +30,24 @@
 #include <string.h>
 #include <assert.h>
 
-static LWGEOM* lwline_split_by_line(const LWLINE* lwgeom_in, const LWGEOM* blade_in);
-static LWGEOM* lwline_split_by_point(const LWLINE* lwgeom_in, const LWPOINT* blade_in);
-static LWGEOM* lwline_split_by_mpoint(const LWLINE* lwgeom_in, const LWMPOINT* blade_in);
-static LWGEOM* lwline_split(const LWLINE* lwgeom_in, const LWGEOM* blade_in);
-static LWGEOM* lwpoly_split_by_line(const LWPOLY* lwgeom_in, const LWGEOM* blade_in);
-static LWGEOM* lwcollection_split(const LWCOLLECTION* lwcoll_in, const LWGEOM* blade_in);
-static LWGEOM* lwpoly_split(const LWPOLY* lwpoly_in, const LWGEOM* blade_in);
+static LWGEOM *lwline_split_by_line(const LWLINE *lwgeom_in, const LWGEOM *blade_in);
+static LWGEOM *lwline_split_by_point(const LWLINE *lwgeom_in, const LWPOINT *blade_in);
+static LWGEOM *lwline_split_by_mpoint(const LWLINE *lwgeom_in, const LWMPOINT *blade_in);
+static LWGEOM *lwline_split(const LWLINE *lwgeom_in, const LWGEOM *blade_in);
+static LWGEOM *lwpoly_split_by_line(const LWPOLY *lwgeom_in, const LWGEOM *blade_in);
+static LWGEOM *lwcollection_split(const LWCOLLECTION *lwcoll_in, const LWGEOM *blade_in);
+static LWGEOM *lwpoly_split(const LWPOLY *lwpoly_in, const LWGEOM *blade_in);
 
 /* Initializes and uses GEOS internally */
-static LWGEOM*
-lwline_split_by_line(const LWLINE* lwline_in, const LWGEOM* blade_in)
+static LWGEOM *
+lwline_split_by_line(const LWLINE *lwline_in, const LWGEOM *blade_in)
 {
-	LWGEOM** components;
-	LWGEOM* diff;
-	LWCOLLECTION* out;
-	GEOSGeometry* gdiff; /* difference */
-	GEOSGeometry* g1;
-	GEOSGeometry* g2;
+	LWGEOM **components;
+	LWGEOM *diff;
+	LWCOLLECTION *out;
+	GEOSGeometry *gdiff; /* difference */
+	GEOSGeometry *g1;
+	GEOSGeometry *g2;
 	int ret;
 
 	/* ASSERT blade_in is LINE or MULTILINE */
@@ -64,7 +64,7 @@ lwline_split_by_line(const LWLINE* lwline_in, const LWGEOM* blade_in)
 
 	initGEOS(lwgeom_geos_error, lwgeom_geos_error);
 
-	g1 = LWGEOM2GEOS((LWGEOM*)lwline_in, 0);
+	g1 = LWGEOM2GEOS((LWGEOM *)lwline_in, 0);
 	if (!g1)
 	{
 		lwerror("LWGEOM2GEOS: %s", lwgeom_geos_errmsg);
@@ -130,25 +130,25 @@ lwline_split_by_line(const LWLINE* lwline_in, const LWGEOM* blade_in)
 	out = lwgeom_as_lwcollection(diff);
 	if (!out)
 	{
-		components = lwalloc(sizeof(LWGEOM*) * 1);
+		components = lwalloc(sizeof(LWGEOM *) * 1);
 		components[0] = diff;
 		out = lwcollection_construct(COLLECTIONTYPE, lwline_in->srid, NULL, 1, components);
 	}
 	else
 	{
 		/* Set SRID */
-		lwgeom_set_srid((LWGEOM*)out, lwline_in->srid);
+		lwgeom_set_srid((LWGEOM *)out, lwline_in->srid);
 		/* Force collection type */
 		out->type = COLLECTIONTYPE;
 	}
 
-	return (LWGEOM*)out;
+	return (LWGEOM *)out;
 }
 
-static LWGEOM*
-lwline_split_by_point(const LWLINE* lwline_in, const LWPOINT* blade_in)
+static LWGEOM *
+lwline_split_by_point(const LWLINE *lwline_in, const LWPOINT *blade_in)
 {
-	LWMLINE* out;
+	LWMLINE *out;
 
 	out = lwmline_construct_empty(lwline_in->srid, FLAGS_GET_Z(lwline_in->flags), FLAGS_GET_M(lwline_in->flags));
 	if (lwline_split_by_point_to(lwline_in, blade_in, out) < 2)
@@ -157,13 +157,13 @@ lwline_split_by_point(const LWLINE* lwline_in, const LWPOINT* blade_in)
 	/* Turn multiline into collection */
 	out->type = COLLECTIONTYPE;
 
-	return (LWGEOM*)out;
+	return (LWGEOM *)out;
 }
 
-static LWGEOM*
-lwline_split_by_mpoint(const LWLINE* lwline_in, const LWMPOINT* mp)
+static LWGEOM *
+lwline_split_by_mpoint(const LWLINE *lwline_in, const LWMPOINT *mp)
 {
-	LWMLINE* out;
+	LWMLINE *out;
 	uint32_t i, j;
 
 	out = lwmline_construct_empty(lwline_in->srid, FLAGS_GET_Z(lwline_in->flags), FLAGS_GET_M(lwline_in->flags));
@@ -174,7 +174,7 @@ lwline_split_by_mpoint(const LWLINE* lwline_in, const LWMPOINT* mp)
 		for (j = 0; j < out->ngeoms; ++j)
 		{
 			lwline_in = out->geoms[j];
-			LWPOINT* blade_in = mp->geoms[i];
+			LWPOINT *blade_in = mp->geoms[i];
 			int ret = lwline_split_by_point_to(lwline_in, blade_in, out);
 			if (2 == ret)
 			{
@@ -192,18 +192,18 @@ lwline_split_by_mpoint(const LWLINE* lwline_in, const LWMPOINT* mp)
 	/* Turn multiline into collection */
 	out->type = COLLECTIONTYPE;
 
-	return (LWGEOM*)out;
+	return (LWGEOM *)out;
 }
 
 int
-lwline_split_by_point_to(const LWLINE* lwline_in, const LWPOINT* blade_in, LWMLINE* v)
+lwline_split_by_point_to(const LWLINE *lwline_in, const LWPOINT *blade_in, LWMLINE *v)
 {
 	double mindist = -1;
 	POINT4D pt, pt_projected;
 	POINT4D p1, p2;
-	POINTARRAY* ipa = lwline_in->points;
-	POINTARRAY* pa1;
-	POINTARRAY* pa2;
+	POINTARRAY *ipa = lwline_in->points;
+	POINTARRAY *pa1;
+	POINTARRAY *pa2;
 	uint32_t i, nsegs, seg = UINT32_MAX;
 
 	/* Possible outcomes:
@@ -228,7 +228,7 @@ lwline_split_by_point_to(const LWLINE* lwline_in, const LWPOINT* blade_in, LWMLI
 	{
 		getPoint4d_p(ipa, i + 1, &p2);
 		double dist;
-		dist = distance2d_pt_seg((POINT2D*)&pt, (POINT2D*)&p1, (POINT2D*)&p2);
+		dist = distance2d_pt_seg((POINT2D *)&pt, (POINT2D *)&p1, (POINT2D *)&p2);
 		LWDEBUGF(4,
 			 " Distance of point %g %g to segment %g %g, %g %g: %g",
 			 pt.x,
@@ -319,15 +319,15 @@ lwline_split_by_point_to(const LWLINE* lwline_in, const LWPOINT* blade_in, LWMLI
 	return 2;
 }
 
-static LWGEOM*
-lwline_split(const LWLINE* lwline_in, const LWGEOM* blade_in)
+static LWGEOM *
+lwline_split(const LWLINE *lwline_in, const LWGEOM *blade_in)
 {
 	switch (blade_in->type)
 	{
 	case POINTTYPE:
-		return lwline_split_by_point(lwline_in, (LWPOINT*)blade_in);
+		return lwline_split_by_point(lwline_in, (LWPOINT *)blade_in);
 	case MULTIPOINTTYPE:
-		return lwline_split_by_mpoint(lwline_in, (LWMPOINT*)blade_in);
+		return lwline_split_by_mpoint(lwline_in, (LWMPOINT *)blade_in);
 
 	case LINETYPE:
 	case MULTILINETYPE:
@@ -343,15 +343,15 @@ lwline_split(const LWLINE* lwline_in, const LWGEOM* blade_in)
 }
 
 /* Initializes and uses GEOS internally */
-static LWGEOM*
-lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
+static LWGEOM *
+lwpoly_split_by_line(const LWPOLY *lwpoly_in, const LWGEOM *blade_in)
 {
-	LWCOLLECTION* out;
-	GEOSGeometry* g1;
-	GEOSGeometry* g2;
-	GEOSGeometry* g1_bounds;
-	GEOSGeometry* polygons;
-	const GEOSGeometry* vgeoms[1];
+	LWCOLLECTION *out;
+	GEOSGeometry *g1;
+	GEOSGeometry *g2;
+	GEOSGeometry *g1_bounds;
+	GEOSGeometry *polygons;
+	const GEOSGeometry *vgeoms[1];
 	int i, n;
 	int hasZ = FLAGS_GET_Z(lwpoly_in->flags);
 
@@ -365,7 +365,7 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 
 	initGEOS(lwgeom_geos_error, lwgeom_geos_error);
 
-	g1 = LWGEOM2GEOS((LWGEOM*)lwpoly_in, 0);
+	g1 = LWGEOM2GEOS((LWGEOM *)lwpoly_in, 0);
 	if (NULL == g1)
 	{
 		lwerror("LWGEOM2GEOS: %s", lwgeom_geos_errmsg);
@@ -404,7 +404,7 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 		GEOSGeom_destroy(g1);
 		GEOSGeom_destroy(g2);
 		GEOSGeom_destroy(g1_bounds);
-		GEOSGeom_destroy((GEOSGeometry*)vgeoms[0]);
+		GEOSGeom_destroy((GEOSGeometry *)vgeoms[0]);
 		lwerror("GEOSPolygonize: %s", lwgeom_geos_errmsg);
 		return NULL;
 	}
@@ -415,7 +415,7 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 		GEOSGeom_destroy(g1);
 		GEOSGeom_destroy(g2);
 		GEOSGeom_destroy(g1_bounds);
-		GEOSGeom_destroy((GEOSGeometry*)vgeoms[0]);
+		GEOSGeom_destroy((GEOSGeometry *)vgeoms[0]);
 		GEOSGeom_destroy(polygons);
 		lwerror("%s [%s] Unexpected return from GEOSpolygonize", __FILE__, __LINE__);
 		return 0;
@@ -429,12 +429,12 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 	n = GEOSGetNumGeometries(polygons);
 	out = lwcollection_construct_empty(COLLECTIONTYPE, lwpoly_in->srid, hasZ, 0);
 	/* Allocate space for all polys */
-	out->geoms = lwrealloc(out->geoms, sizeof(LWGEOM*) * n);
+	out->geoms = lwrealloc(out->geoms, sizeof(LWGEOM *) * n);
 	assert(0 == out->ngeoms);
 	for (i = 0; i < n; ++i)
 	{
-		GEOSGeometry* pos; /* point on surface */
-		const GEOSGeometry* p = GEOSGetGeometryN(polygons, i);
+		GEOSGeometry *pos; /* point on surface */
+		const GEOSGeometry *p = GEOSGetGeometryN(polygons, i);
 		int contains;
 
 		pos = GEOSPointOnSurface(p);
@@ -443,7 +443,7 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 			GEOSGeom_destroy(g1);
 			GEOSGeom_destroy(g2);
 			GEOSGeom_destroy(g1_bounds);
-			GEOSGeom_destroy((GEOSGeometry*)vgeoms[0]);
+			GEOSGeom_destroy((GEOSGeometry *)vgeoms[0]);
 			GEOSGeom_destroy(polygons);
 			lwerror("GEOSPointOnSurface: %s", lwgeom_geos_errmsg);
 			return NULL;
@@ -455,7 +455,7 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 			GEOSGeom_destroy(g1);
 			GEOSGeom_destroy(g2);
 			GEOSGeom_destroy(g1_bounds);
-			GEOSGeom_destroy((GEOSGeometry*)vgeoms[0]);
+			GEOSGeom_destroy((GEOSGeometry *)vgeoms[0]);
 			GEOSGeom_destroy(polygons);
 			GEOSGeom_destroy(pos);
 			lwerror("GEOSContains: %s", lwgeom_geos_errmsg);
@@ -478,23 +478,23 @@ lwpoly_split_by_line(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 	GEOSGeom_destroy(g1);
 	GEOSGeom_destroy(g2);
 	GEOSGeom_destroy(g1_bounds);
-	GEOSGeom_destroy((GEOSGeometry*)vgeoms[0]);
+	GEOSGeom_destroy((GEOSGeometry *)vgeoms[0]);
 	GEOSGeom_destroy(polygons);
 
-	return (LWGEOM*)out;
+	return (LWGEOM *)out;
 }
 
-static LWGEOM*
-lwcollection_split(const LWCOLLECTION* lwcoll_in, const LWGEOM* blade_in)
+static LWGEOM *
+lwcollection_split(const LWCOLLECTION *lwcoll_in, const LWGEOM *blade_in)
 {
-	LWGEOM** split_vector = NULL;
-	LWCOLLECTION* out;
+	LWGEOM **split_vector = NULL;
+	LWCOLLECTION *out;
 	size_t split_vector_capacity;
 	size_t split_vector_size = 0;
 	size_t i, j;
 
 	split_vector_capacity = 8;
-	split_vector = lwalloc(split_vector_capacity * sizeof(LWGEOM*));
+	split_vector = lwalloc(split_vector_capacity * sizeof(LWGEOM *));
 	if (!split_vector)
 	{
 		lwerror("Out of virtual memory");
@@ -503,8 +503,8 @@ lwcollection_split(const LWCOLLECTION* lwcoll_in, const LWGEOM* blade_in)
 
 	for (i = 0; i < lwcoll_in->ngeoms; ++i)
 	{
-		LWCOLLECTION* col;
-		LWGEOM* split = lwgeom_split(lwcoll_in->geoms[i], blade_in);
+		LWCOLLECTION *col;
+		LWGEOM *split = lwgeom_split(lwcoll_in->geoms[i], blade_in);
 		/* an exception should prevent this from ever returning NULL */
 		if (!split) return NULL;
 
@@ -517,7 +517,7 @@ lwcollection_split(const LWCOLLECTION* lwcoll_in, const LWGEOM* blade_in)
 		{
 			/* NOTE: we could be smarter on reallocations here */
 			split_vector_capacity += col->ngeoms;
-			split_vector = lwrealloc(split_vector, split_vector_capacity * sizeof(LWGEOM*));
+			split_vector = lwrealloc(split_vector, split_vector_capacity * sizeof(LWGEOM *));
 			if (!split_vector)
 			{
 				lwerror("Out of virtual memory");
@@ -537,11 +537,11 @@ lwcollection_split(const LWCOLLECTION* lwcoll_in, const LWGEOM* blade_in)
 	/* Now split_vector has split_vector_size geometries */
 	out = lwcollection_construct(COLLECTIONTYPE, lwcoll_in->srid, NULL, split_vector_size, split_vector);
 
-	return (LWGEOM*)out;
+	return (LWGEOM *)out;
 }
 
-static LWGEOM*
-lwpoly_split(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
+static LWGEOM *
+lwpoly_split(const LWPOLY *lwpoly_in, const LWGEOM *blade_in)
 {
 	switch (blade_in->type)
 	{
@@ -556,21 +556,21 @@ lwpoly_split(const LWPOLY* lwpoly_in, const LWGEOM* blade_in)
 }
 
 /* exported */
-LWGEOM*
-lwgeom_split(const LWGEOM* lwgeom_in, const LWGEOM* blade_in)
+LWGEOM *
+lwgeom_split(const LWGEOM *lwgeom_in, const LWGEOM *blade_in)
 {
 	switch (lwgeom_in->type)
 	{
 	case LINETYPE:
-		return lwline_split((const LWLINE*)lwgeom_in, blade_in);
+		return lwline_split((const LWLINE *)lwgeom_in, blade_in);
 
 	case POLYGONTYPE:
-		return lwpoly_split((const LWPOLY*)lwgeom_in, blade_in);
+		return lwpoly_split((const LWPOLY *)lwgeom_in, blade_in);
 
 	case MULTIPOLYGONTYPE:
 	case MULTILINETYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_split((const LWCOLLECTION*)lwgeom_in, blade_in);
+		return lwcollection_split((const LWCOLLECTION *)lwgeom_in, blade_in);
 
 	default:
 		lwerror("Splitting of %s geometries is unsupported", lwtype_name(lwgeom_in->type));

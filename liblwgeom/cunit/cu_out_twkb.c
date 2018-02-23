@@ -20,8 +20,8 @@
 /*
 ** Global variable to hold hex TWKB strings
 */
-char* s;
-char* w;
+char *s;
+char *w;
 
 /*
 ** The suite initialization function.
@@ -53,11 +53,11 @@ clean_twkb_out_suite(void)
 ** Creating an input TWKB from a wkt string
 */
 static void
-cu_twkb(char* wkt, int8_t prec_xy, int8_t prec_z, int8_t prec_m, uint8_t variant)
+cu_twkb(char *wkt, int8_t prec_xy, int8_t prec_z, int8_t prec_m, uint8_t variant)
 {
-	LWGEOM* g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
 	size_t twkb_size;
-	uint8_t* twkb;
+	uint8_t *twkb;
 	if (!g) lwnotice("input wkt is invalid: %s", wkt);
 	twkb = lwgeom_to_twkb(g, variant, prec_xy, prec_z, prec_m, &twkb_size);
 	lwgeom_free(g);
@@ -70,12 +70,12 @@ cu_twkb(char* wkt, int8_t prec_xy, int8_t prec_z, int8_t prec_m, uint8_t variant
 ** Creating an input TWKB from a wkt string
 */
 static void
-cu_twkb_idlist(char* wkt, int64_t* idlist, int8_t prec_xy, int8_t prec_z, int8_t prec_m, uint8_t variant)
+cu_twkb_idlist(char *wkt, int64_t *idlist, int8_t prec_xy, int8_t prec_z, int8_t prec_m, uint8_t variant)
 {
-	LWGEOM* g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
-	LWGEOM* g_b;
+	LWGEOM *g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *g_b;
 	size_t twkb_size;
-	uint8_t* twkb;
+	uint8_t *twkb;
 	if (!g) lwnotice("input wkt is invalid: %s", wkt);
 	twkb = lwgeom_to_twkb_with_idlist(g, idlist, variant, prec_xy, prec_z, prec_m, &twkb_size);
 	lwgeom_free(g);

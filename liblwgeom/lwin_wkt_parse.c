@@ -104,7 +104,7 @@
 
 /* Prototypes to quiet the compiler */
 int wkt_yyparse(void);
-void wkt_yyerror(const char* str);
+void wkt_yyerror(const char *str);
 int wkt_yylex(void);
 
 /* Declare the global parser variable */
@@ -120,7 +120,7 @@ int wkt_yydebug = 0;
  * around just in case.
  */
 void
-wkt_yyerror(__attribute__((__unused__)) const char* str)
+wkt_yyerror(__attribute__((__unused__)) const char *str)
 {
 	/* If we haven't already set a message and location, let's set one now. */
 	if (!global_parser_result.message)
@@ -139,7 +139,7 @@ wkt_yyerror(__attribute__((__unused__)) const char* str)
  * Note that parser_result.wkinput picks up a reference to wktstr.
  */
 int
-lwgeom_parse_wkt(LWGEOM_PARSER_RESULT* parser_result, char* wktstr, int parser_check_flags)
+lwgeom_parse_wkt(LWGEOM_PARSER_RESULT *parser_result, char *wktstr, int parser_check_flags)
 {
 	int parse_rv = 0;
 
@@ -288,10 +288,10 @@ union YYSTYPE {
 
 	int integervalue;
 	double doublevalue;
-	char* stringvalue;
-	LWGEOM* geometryvalue;
+	char *stringvalue;
+	LWGEOM *geometryvalue;
 	POINT coordinatevalue;
-	POINTARRAY* ptarrayvalue;
+	POINTARRAY *ptarrayvalue;
 
 #line 277 "lwin_wkt_parse.c" /* yacc.c:355  */
 };
@@ -487,13 +487,13 @@ typedef short int yytype_int16;
 #ifndef YYMALLOC
 #define YYMALLOC malloc
 #if !defined malloc && !defined EXIT_SUCCESS
-void* malloc(YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
+void *malloc(YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #endif
 #endif
 #ifndef YYFREE
 #define YYFREE free
 #if !defined free && !defined EXIT_SUCCESS
-void free(void*);       /* INFRINGES ON USER NAME SPACE */
+void free(void *);      /* INFRINGES ON USER NAME SPACE */
 #endif
 #endif
 #endif
@@ -601,7 +601,7 @@ static const yytype_uint16 yyrline[] = {
 #if YYDEBUG || YYERROR_VERBOSE || 1
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
-static const char* const yytname[] = {"$end",
+static const char *const yytname[] = {"$end",
 				      "error",
 				      "$undefined",
 				      "POINT_TOK",
@@ -870,7 +870,7 @@ static const yytype_uint8 yyr2[] = {0, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 YY_ATTRIBUTE_UNUSED
 static unsigned
-yy_location_print_(FILE* yyo, YYLTYPE const* const yylocp)
+yy_location_print_(FILE *yyo, YYLTYPE const *const yylocp)
 {
 	unsigned res = 0;
 	int end_col = 0 != yylocp->last_column ? yylocp->last_column - 1 : 0;
@@ -915,9 +915,9 @@ yy_location_print_(FILE* yyo, YYLTYPE const* const yylocp)
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print(FILE* yyoutput, int yytype, YYSTYPE const* const yyvaluep, YYLTYPE const* const yylocationp)
+yy_symbol_value_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp)
 {
-	FILE* yyo = yyoutput;
+	FILE *yyo = yyoutput;
 	YYUSE(yyo);
 	YYUSE(yylocationp);
 	if (!yyvaluep) return;
@@ -932,7 +932,7 @@ yy_symbol_value_print(FILE* yyoutput, int yytype, YYSTYPE const* const yyvaluep,
 `--------------------------------*/
 
 static void
-yy_symbol_print(FILE* yyoutput, int yytype, YYSTYPE const* const yyvaluep, YYLTYPE const* const yylocationp)
+yy_symbol_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp)
 {
 	YYFPRINTF(yyoutput, "%s %s (", yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
 
@@ -948,7 +948,7 @@ yy_symbol_print(FILE* yyoutput, int yytype, YYSTYPE const* const yyvaluep, YYLTY
 `------------------------------------------------------------------*/
 
 static void
-yy_stack_print(yytype_int16* yybottom, yytype_int16* yytop)
+yy_stack_print(yytype_int16 *yybottom, yytype_int16 *yytop)
 {
 	YYFPRINTF(stderr, "Stack now");
 	for (; yybottom <= yytop; yybottom++)
@@ -970,7 +970,7 @@ yy_stack_print(yytype_int16* yybottom, yytype_int16* yytop)
 `------------------------------------------------*/
 
 static void
-yy_reduce_print(yytype_int16* yyssp, YYSTYPE* yyvsp, YYLTYPE* yylsp, int yyrule)
+yy_reduce_print(yytype_int16 *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule)
 {
 	unsigned long int yylno = yyrline[yyrule];
 	int yynrhs = yyr2[yyrule];
@@ -1028,7 +1028,7 @@ int yydebug;
 #else
 /* Return the length of YYSTR.  */
 static YYSIZE_T
-yystrlen(const char* yystr)
+yystrlen(const char *yystr)
 {
 	YYSIZE_T yylen;
 	for (yylen = 0; yystr[yylen]; yylen++)
@@ -1044,11 +1044,11 @@ yystrlen(const char* yystr)
 #else
 /* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
    YYDEST.  */
-static char*
-yystpcpy(char* yydest, const char* yysrc)
+static char *
+yystpcpy(char *yydest, const char *yysrc)
 {
-	char* yyd = yydest;
-	const char* yys = yysrc;
+	char *yyd = yydest;
+	const char *yys = yysrc;
 
 	while ((*yyd++ = *yys++) != '\0')
 		continue;
@@ -1067,12 +1067,12 @@ yystpcpy(char* yydest, const char* yysrc)
    null, do not copy; instead, return the length of what the result
    would have been.  */
 static YYSIZE_T
-yytnamerr(char* yyres, const char* yystr)
+yytnamerr(char *yyres, const char *yystr)
 {
 	if (*yystr == '"')
 	{
 		YYSIZE_T yyn = 0;
-		char const* yyp = yystr;
+		char const *yyp = yystr;
 
 		for (;;)
 			switch (*++yyp)
@@ -1111,7 +1111,7 @@ yytnamerr(char* yyres, const char* yystr)
    *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
    required number of bytes is too large to store.  */
 static int
-yysyntax_error(YYSIZE_T* yymsg_alloc, char** yymsg, yytype_int16* yyssp, int yytoken)
+yysyntax_error(YYSIZE_T *yymsg_alloc, char **yymsg, yytype_int16 *yyssp, int yytoken)
 {
 	YYSIZE_T yysize0 = yytnamerr(YY_NULLPTR, yytname[yytoken]);
 	YYSIZE_T yysize = yysize0;
@@ -1120,9 +1120,9 @@ yysyntax_error(YYSIZE_T* yymsg_alloc, char** yymsg, yytype_int16* yyssp, int yyt
 		YYERROR_VERBOSE_ARGS_MAXIMUM = 5
 	};
 	/* Internationalized format string. */
-	const char* yyformat = YY_NULLPTR;
+	const char *yyformat = YY_NULLPTR;
 	/* Arguments of yyformat. */
-	char const* yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+	char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
 	/* Number of reported tokens (one for the "unexpected", one per
 	   "expected"). */
 	int yycount = 0;
@@ -1218,7 +1218,7 @@ yysyntax_error(YYSIZE_T* yymsg_alloc, char** yymsg, yytype_int16* yyssp, int yyt
 	   Don't have undefined behavior even if the translation
 	   produced a string with the wrong number of "%s"s.  */
 	{
-		char* yyp = *yymsg;
+		char *yyp = *yymsg;
 		int yyi = 0;
 		while ((*yyp = *yyformat) != '\0')
 			if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
@@ -1241,7 +1241,7 @@ yysyntax_error(YYSIZE_T* yymsg_alloc, char** yymsg, yytype_int16* yyssp, int yyt
 `-----------------------------------------------*/
 
 static void
-yydestruct(const char* yymsg, int yytype, YYSTYPE* yyvaluep, YYLTYPE* yylocationp)
+yydestruct(const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp)
 {
 	YYUSE(yyvaluep);
 	YYUSE(yylocationp);
@@ -1580,18 +1580,18 @@ yyparse(void)
 
 	/* The state stack.  */
 	yytype_int16 yyssa[YYINITDEPTH];
-	yytype_int16* yyss;
-	yytype_int16* yyssp;
+	yytype_int16 *yyss;
+	yytype_int16 *yyssp;
 
 	/* The semantic value stack.  */
 	YYSTYPE yyvsa[YYINITDEPTH];
-	YYSTYPE* yyvs;
-	YYSTYPE* yyvsp;
+	YYSTYPE *yyvs;
+	YYSTYPE *yyvsp;
 
 	/* The location stack.  */
 	YYLTYPE yylsa[YYINITDEPTH];
-	YYLTYPE* yyls;
-	YYLTYPE* yylsp;
+	YYLTYPE *yyls;
+	YYLTYPE *yylsp;
 
 	/* The locations where the error started and ended.  */
 	YYLTYPE yyerror_range[3];
@@ -1610,7 +1610,7 @@ yyparse(void)
 #if YYERROR_VERBOSE
 	/* Buffer for error messages, and its allocated size.  */
 	char yymsgbuf[128];
-	char* yymsg = yymsgbuf;
+	char *yymsg = yymsgbuf;
 	YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
@@ -1655,9 +1655,9 @@ yysetstate:
 			/* Give user a chance to reallocate the stack.  Use copies of
 			   these so that the &'s don't force the real ones into
 			   memory.  */
-			YYSTYPE* yyvs1 = yyvs;
-			yytype_int16* yyss1 = yyss;
-			YYLTYPE* yyls1 = yyls;
+			YYSTYPE *yyvs1 = yyvs;
+			yytype_int16 *yyss1 = yyss;
+			YYLTYPE *yyls1 = yyls;
 
 			/* Each stack pointer address is followed by the size of the
 			   data in use in that stack, in bytes.  This used to be a
@@ -1686,8 +1686,8 @@ yysetstate:
 		if (YYMAXDEPTH < yystacksize) yystacksize = YYMAXDEPTH;
 
 		{
-			yytype_int16* yyss1 = yyss;
-			union yyalloc* yyptr = (union yyalloc*)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
+			yytype_int16 *yyss1 = yyss;
+			union yyalloc *yyptr = (union yyalloc *)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
 			if (!yyptr) goto yyexhaustedlab;
 			YYSTACK_RELOCATE(yyss_alloc, yyss);
 			YYSTACK_RELOCATE(yyvs_alloc, yyvs);
@@ -3088,7 +3088,7 @@ yyerrlab:
 #else
 #define YYSYNTAX_ERROR yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
 		{
-			char const* yymsgp = YY_("syntax error");
+			char const *yymsgp = YY_("syntax error");
 			int yysyntax_error_status;
 			yysyntax_error_status = YYSYNTAX_ERROR;
 			if (yysyntax_error_status == 0)
@@ -3096,7 +3096,7 @@ yyerrlab:
 			else if (yysyntax_error_status == 1)
 			{
 				if (yymsg != yymsgbuf) YYSTACK_FREE(yymsg);
-				yymsg = (char*)YYSTACK_ALLOC(yymsg_alloc);
+				yymsg = (char *)YYSTACK_ALLOC(yymsg_alloc);
 				if (!yymsg)
 				{
 					yymsg = yymsgbuf;

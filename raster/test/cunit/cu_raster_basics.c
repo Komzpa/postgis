@@ -186,7 +186,7 @@ test_raster_replace_band()
 	rt_raster raster;
 	rt_band band;
 	rt_band rband;
-	void* mem;
+	void *mem;
 	size_t datasize;
 	uint16_t width;
 	uint16_t height;

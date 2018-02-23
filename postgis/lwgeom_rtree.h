@@ -44,10 +44,10 @@ typedef struct
  */
 typedef struct rtree_node
 {
-	RTREE_INTERVAL* interval;
-	struct rtree_node* leftNode;
-	struct rtree_node* rightNode;
-	LWLINE* segment;
+	RTREE_INTERVAL *interval;
+	struct rtree_node *leftNode;
+	struct rtree_node *rightNode;
+	LWLINE *segment;
 } RTREE_NODE;
 
 /**
@@ -55,27 +55,27 @@ typedef struct rtree_node
  */
 typedef struct
 {
-	RTREE_NODE** ringIndices;
-	int* ringCounts;
+	RTREE_NODE **ringIndices;
+	int *ringCounts;
 	int polyCount;
 } RTREE_POLY_CACHE;
 
 typedef struct
 {
 	GeomCache gcache;
-	RTREE_POLY_CACHE* index;
+	RTREE_POLY_CACHE *index;
 } RTreeGeomCache;
 
 /**
  * Retrieves a collection of line segments given the root and crossing value.
  */
-LWMLINE* RTreeFindLineSegments(RTREE_NODE* root, double value);
+LWMLINE *RTreeFindLineSegments(RTREE_NODE *root, double value);
 
 /**
  * Checks for a cache hit against the provided geometry and returns
  * a pre-built index structure (RTREE_POLY_CACHE) if one exists. Otherwise
  * builds a new one and returns that.
  */
-RTREE_POLY_CACHE* GetRtreeCache(FunctionCallInfoData* fcinfo, GSERIALIZED* g1);
+RTREE_POLY_CACHE *GetRtreeCache(FunctionCallInfoData *fcinfo, GSERIALIZED *g1);
 
 #endif /* !defined _LWGEOM_RTREE_H */

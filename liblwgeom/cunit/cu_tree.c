@@ -23,8 +23,8 @@
 static void
 test_tree_circ_create(void)
 {
-	LWLINE* g;
-	CIRC_NODE* c;
+	LWLINE *g;
+	CIRC_NODE *c;
 	/* Line with 4 edges */
 	g = lwgeom_as_lwline(lwgeom_from_wkt("LINESTRING(0 88,0 89,0 90,180 89,180 88)", LW_PARSER_CHECK_NONE));
 	c = circ_tree_new(g->points);
@@ -43,8 +43,8 @@ test_tree_circ_create(void)
 static void
 test_tree_circ_pip(void)
 {
-	LWLINE* g;
-	CIRC_NODE* c;
+	LWLINE *g;
+	CIRC_NODE *c;
 	POINT2D pt, pt_outside;
 	int rv, on_boundary;
 
@@ -115,13 +115,13 @@ test_tree_circ_pip(void)
 static void
 test_tree_circ_pip2(void)
 {
-	LWGEOM* g;
-	LWPOLY* p;
-	LWPOINT* lwpt;
+	LWGEOM *g;
+	LWPOLY *p;
+	LWPOINT *lwpt;
 	int rv_classic, rv_tree, on_boundary;
 	POINT2D pt, pt_outside;
 	GBOX gbox;
-	CIRC_NODE* c;
+	CIRC_NODE *c;
 
 	g = lwgeom_from_wkt("POLYGON((0 0,0 1,1 1,1 0,0 0))", LW_PARSER_CHECK_NONE);
 	p = lwgeom_as_lwpoly(g);
@@ -163,7 +163,8 @@ test_tree_circ_pip2(void)
 	    "0000006067354B4000000080E17A1AC000000080C3044B4000000000621119C000000040C70C4B40",
 	    LW_PARSER_CHECK_NONE);
 	p = lwgeom_as_lwpoly(g);
-	lwpt = (LWPOINT*)lwgeom_from_hexwkb("0101000020E610000057B89C28FEB320C09C8102CB3B2B4A40", LW_PARSER_CHECK_NONE);
+	lwpt =
+	    (LWPOINT *)lwgeom_from_hexwkb("0101000020E610000057B89C28FEB320C09C8102CB3B2B4A40", LW_PARSER_CHECK_NONE);
 	lwpoint_getPoint2d_p(lwpt, &pt);
 	lwgeom_calculate_gbox_geodetic(g, &gbox);
 	gbox_pt_outside(&gbox, &pt_outside);
@@ -320,7 +321,8 @@ test_tree_circ_pip2(void)
 	    "FFFF7F5640",
 	    LW_PARSER_CHECK_NONE);
 	p = lwgeom_as_lwpoly(g);
-	lwpt = (LWPOINT*)lwgeom_from_hexwkb("0101000020E610000031B1F9B836A046C03C889D2974124E40", LW_PARSER_CHECK_NONE);
+	lwpt =
+	    (LWPOINT *)lwgeom_from_hexwkb("0101000020E610000031B1F9B836A046C03C889D2974124E40", LW_PARSER_CHECK_NONE);
 	lwpoint_getPoint2d_p(lwpt, &pt);
 	lwgeom_calculate_gbox_geodetic(g, &gbox);
 	gbox_pt_outside(&gbox, &pt_outside);
@@ -526,12 +528,12 @@ test_tree_circ_distance_threshold(void)
 	int i, j;
 	int step = 10;
 
-	const char* txt_poly1 =
+	const char *txt_poly1 =
 	    "0103000020E6100000010000000B0000000AA2F068F47651C0F7893DEB70B8454007ABD4C6D57651C000FB650799B84540C21AA264"
 	    "5A7651C011C24BA84AB8454089A9A325E87751C03314EB5453B74540AF9ED96BF57751C0BF9818F889B74540E936A498B47751C069"
 	    "0C87D1C5B74540F5386204DC7751C02FCA658F1AB8454077B65F7B657751C012C586EE37B845408C1862C5977751C00F17E41674B8"
 	    "4540D4012F57357751C0AD3BC67E99B845400AA2F068F47651C0F7893DEB70B84540";
-	const char* txt_poly2 =
+	const char *txt_poly2 =
 	    "0103000020E610000003000000B5000000E0D13F40187451C01A09009164BB4540771C07D8FA7351C04DBBEDB634BB45400D27D627"
 	    "A47351C070625C9386BB4540D691981FAD7351C02F382CCDFABA4540AA38FA85B97351C03AD3A8271CBB4540D211F0CBBE7351C027"
 	    "F11A8FD9BA4540839AE427EB7351C0BF97C6BBA3BA4540748967A4D47351C00C0037C970BA45408F182A0CF07351C0C050808070BA"
@@ -592,7 +594,7 @@ test_tree_circ_distance_threshold(void)
 	    "BD8E7FF7AEB845406DABE362BF6F51C03B3EAB0286B8454008000000DB185B503E7051C066B728BCD3B245400AC83B92357051C04B"
 	    "A0208DA3B34540D7FCFFA31D7051C0CF7C254CD6B345400E29CDB9907051C012EB7D78CCB34540806300429F7051C0B0D493C19CB3"
 	    "4540786CA34E6C7051C093B0BB4060B345407D77C1F9657051C0497CC614C3B24540DB185B503E7051C066B728BCD3B24540";
-	const char* polys[2];
+	const char *polys[2];
 	static int npolys = 2;
 
 	polys[0] = txt_poly1;
@@ -603,11 +605,11 @@ test_tree_circ_distance_threshold(void)
 
 	for (j = 0; j < npolys; j++)
 	{
-		LWGEOM* lwg1 = lwgeom_from_hexwkb(polys[j], LW_PARSER_CHECK_NONE);
-		LWGEOM* lwg2 = lwgeom_from_wkt("POINT(-69.83262 43.43636)", LW_PARSER_CHECK_NONE);
+		LWGEOM *lwg1 = lwgeom_from_hexwkb(polys[j], LW_PARSER_CHECK_NONE);
+		LWGEOM *lwg2 = lwgeom_from_wkt("POINT(-69.83262 43.43636)", LW_PARSER_CHECK_NONE);
 
-		CIRC_NODE* c1 = lwgeom_calculate_circ_tree(lwg1);
-		CIRC_NODE* c2 = lwgeom_calculate_circ_tree(lwg2);
+		CIRC_NODE *c1 = lwgeom_calculate_circ_tree(lwg1);
+		CIRC_NODE *c2 = lwgeom_calculate_circ_tree(lwg2);
 
 		for (i = 50; i < 1500 / step; i++)
 		{

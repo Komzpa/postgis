@@ -36,7 +36,7 @@ Datum box2d_from_geohash(PG_FUNCTION_ARGS);
 Datum point_from_geohash(PG_FUNCTION_ARGS);
 
 static void
-geohash_lwpgerror(char* msg, __attribute__((__unused__)) int error_code)
+geohash_lwpgerror(char *msg, __attribute__((__unused__)) int error_code)
 {
 	POSTGIS_DEBUGF(3, "ST_Box2dFromGeoHash ERROR %i", error_code);
 	lwpgerror("%s", msg);
@@ -44,10 +44,10 @@ geohash_lwpgerror(char* msg, __attribute__((__unused__)) int error_code)
 
 #include "lwgeom_export.h"
 
-static GBOX*
-parse_geohash(char* geohash, int precision)
+static GBOX *
+parse_geohash(char *geohash, int precision)
 {
-	GBOX* box = NULL;
+	GBOX *box = NULL;
 	double lat[2], lon[2];
 
 	POSTGIS_DEBUG(2, "parse_geohash called.");
@@ -74,9 +74,9 @@ parse_geohash(char* geohash, int precision)
 PG_FUNCTION_INFO_V1(box2d_from_geohash);
 Datum box2d_from_geohash(PG_FUNCTION_ARGS)
 {
-	GBOX* box = NULL;
-	text* geohash_input = NULL;
-	char* geohash = NULL;
+	GBOX *box = NULL;
+	text *geohash_input = NULL;
+	char *geohash = NULL;
 	int precision = -1;
 
 	if (PG_ARGISNULL(0)) { PG_RETURN_NULL(); }
@@ -94,11 +94,11 @@ Datum box2d_from_geohash(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(point_from_geohash);
 Datum point_from_geohash(PG_FUNCTION_ARGS)
 {
-	GBOX* box = NULL;
-	LWPOINT* point = NULL;
-	GSERIALIZED* result = NULL;
-	text* geohash_input = NULL;
-	char* geohash = NULL;
+	GBOX *box = NULL;
+	LWPOINT *point = NULL;
+	GSERIALIZED *result = NULL;
+	text *geohash_input = NULL;
+	char *geohash = NULL;
 	double lon, lat;
 	int precision = -1;
 
@@ -115,7 +115,7 @@ Datum point_from_geohash(PG_FUNCTION_ARGS)
 	lat = box->ymin + (box->ymax - box->ymin) / 2;
 
 	point = lwpoint_make2d(SRID_UNKNOWN, lon, lat);
-	result = geometry_serialize((LWGEOM*)point);
+	result = geometry_serialize((LWGEOM *)point);
 
 	lwfree(box);
 

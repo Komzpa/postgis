@@ -20,7 +20,7 @@
 /*
 ** Global variable to hold hex WKB strings
 */
-char* s;
+char *s;
 size_t s_size;
 
 /*
@@ -50,11 +50,11 @@ clean_wkb_out_suite(void)
 ** Creating an input from a hexwkb
 */
 static void
-cu_wkb_from_hexwkb(char* hexwkb)
+cu_wkb_from_hexwkb(char *hexwkb)
 {
-	LWGEOM* g = lwgeom_from_hexwkb(hexwkb, LW_PARSER_CHECK_NONE);
+	LWGEOM *g = lwgeom_from_hexwkb(hexwkb, LW_PARSER_CHECK_NONE);
 	if (s) free(s);
-	s = (char*)lwgeom_to_wkb(g, WKB_HEX | WKB_XDR | WKB_EXTENDED, 0);
+	s = (char *)lwgeom_to_wkb(g, WKB_HEX | WKB_XDR | WKB_EXTENDED, 0);
 	lwgeom_free(g);
 }
 
@@ -62,18 +62,18 @@ cu_wkb_from_hexwkb(char* hexwkb)
 ** Creating an input WKB from a wkb string
 */
 static void
-cu_wkb(char* wkt)
+cu_wkb(char *wkt)
 {
-	LWGEOM* g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *g = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_NONE);
 	if (s) free(s);
-	s = (char*)lwgeom_to_wkb(g, WKB_HEX | WKB_XDR | WKB_EXTENDED, &s_size);
+	s = (char *)lwgeom_to_wkb(g, WKB_HEX | WKB_XDR | WKB_EXTENDED, &s_size);
 	lwgeom_free(g);
 }
 
 static void
-cu_wkb_empty_point_check(char* hex)
+cu_wkb_empty_point_check(char *hex)
 {
-	LWGEOM* g;
+	LWGEOM *g;
 	g = lwgeom_from_hexwkb(hex, LW_PARSER_CHECK_NONE);
 	CU_ASSERT(g != NULL);
 	CU_ASSERT(lwgeom_is_empty(g));
@@ -296,7 +296,7 @@ static void
 test_wkb_out_polyhedralsurface(void)
 {
 	//	cu_wkb("POLYHEDRALSURFACE(((0 0 0 0,0 0 1 0,0 1 0 2,0 0 0 0)),((0 0 0 0,0 1 0 0,1 0 0 4,0 0 0 0)),((0 0
-	//0 0,1 0 0 0,0 0 1 6,0 0 0 0)),((1 0 0 0,0 1 0 0,0 0 1 0,1 0 0 0)))"); 	CU_ASSERT_STRING_EQUAL(s, t);
+	// 0 0,1 0 0 0,0 0 1 6,0 0 0 0)),((1 0 0 0,0 1 0 0,0 0 1 0,1 0 0 0)))"); 	CU_ASSERT_STRING_EQUAL(s, t);
 	//	printf("\nnew: %s\nold: %s\n",s,t);
 }
 

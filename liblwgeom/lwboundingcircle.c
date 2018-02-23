@@ -27,15 +27,15 @@
 
 typedef struct
 {
-	const POINT2D* p1;
-	const POINT2D* p2;
-	const POINT2D* p3;
+	const POINT2D *p1;
+	const POINT2D *p2;
+	const POINT2D *p3;
 } SUPPORTING_POINTS;
 
-static SUPPORTING_POINTS*
+static SUPPORTING_POINTS *
 supporting_points_create()
 {
-	SUPPORTING_POINTS* s = lwalloc(sizeof(SUPPORTING_POINTS));
+	SUPPORTING_POINTS *s = lwalloc(sizeof(SUPPORTING_POINTS));
 	s->p1 = NULL;
 	s->p2 = NULL;
 	s->p3 = NULL;
@@ -44,13 +44,13 @@ supporting_points_create()
 }
 
 static void
-supporting_points_destroy(SUPPORTING_POINTS* s)
+supporting_points_destroy(SUPPORTING_POINTS *s)
 {
 	lwfree(s);
 }
 
 static uint32_t
-num_supporting_points(SUPPORTING_POINTS* support)
+num_supporting_points(SUPPORTING_POINTS *support)
 {
 	uint32_t N = 0;
 
@@ -62,7 +62,7 @@ num_supporting_points(SUPPORTING_POINTS* support)
 }
 
 static int
-add_supporting_point(SUPPORTING_POINTS* support, const POINT2D* p)
+add_supporting_point(SUPPORTING_POINTS *support, const POINT2D *p)
 {
 	switch (num_supporting_points(support))
 	{
@@ -83,7 +83,7 @@ add_supporting_point(SUPPORTING_POINTS* support, const POINT2D* p)
 }
 
 static int
-point_inside_circle(const POINT2D* p, const LWBOUNDINGCIRCLE* c)
+point_inside_circle(const POINT2D *p, const LWBOUNDINGCIRCLE *c)
 {
 	if (!c) return LW_FALSE;
 
@@ -99,7 +99,7 @@ det(double m00, double m01, double m10, double m11)
 }
 
 static void
-circumcenter(const POINT2D* a, const POINT2D* b, const POINT2D* c, POINT2D* result)
+circumcenter(const POINT2D *a, const POINT2D *b, const POINT2D *c, POINT2D *result)
 {
 	double cx = c->x;
 	double cy = c->y;
@@ -117,7 +117,7 @@ circumcenter(const POINT2D* a, const POINT2D* b, const POINT2D* c, POINT2D* resu
 }
 
 static void
-calculate_mbc_1(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
+calculate_mbc_1(const SUPPORTING_POINTS *support, LWBOUNDINGCIRCLE *mbc)
 {
 	mbc->radius = 0;
 	mbc->center->x = support->p1->x;
@@ -125,7 +125,7 @@ calculate_mbc_1(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
 }
 
 static void
-calculate_mbc_2(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
+calculate_mbc_2(const SUPPORTING_POINTS *support, LWBOUNDINGCIRCLE *mbc)
 {
 	double d1, d2;
 
@@ -139,7 +139,7 @@ calculate_mbc_2(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
 }
 
 static void
-calculate_mbc_3(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
+calculate_mbc_3(const SUPPORTING_POINTS *support, LWBOUNDINGCIRCLE *mbc)
 {
 	double d1, d2, d3;
 	circumcenter(support->p1, support->p2, support->p3, mbc->center);
@@ -152,7 +152,7 @@ calculate_mbc_3(const SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
 }
 
 static int
-calculate_mbc_from_support(SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
+calculate_mbc_from_support(SUPPORTING_POINTS *support, LWBOUNDINGCIRCLE *mbc)
 {
 	switch (num_supporting_points(support))
 	{
@@ -175,7 +175,7 @@ calculate_mbc_from_support(SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
 }
 
 static int
-calculate_mbc(const POINT2D** points, uint32_t max_n, SUPPORTING_POINTS* support, LWBOUNDINGCIRCLE* mbc)
+calculate_mbc(const POINT2D **points, uint32_t max_n, SUPPORTING_POINTS *support, LWBOUNDINGCIRCLE *mbc)
 {
 	uint32_t i;
 
@@ -211,10 +211,10 @@ calculate_mbc(const POINT2D** points, uint32_t max_n, SUPPORTING_POINTS* support
 	return LW_SUCCESS;
 }
 
-static LWBOUNDINGCIRCLE*
+static LWBOUNDINGCIRCLE *
 lwboundingcircle_create()
 {
-	LWBOUNDINGCIRCLE* c = lwalloc(sizeof(LWBOUNDINGCIRCLE));
+	LWBOUNDINGCIRCLE *c = lwalloc(sizeof(LWBOUNDINGCIRCLE));
 	c->center = lwalloc(sizeof(POINT2D));
 
 	c->radius = 0.0;
@@ -225,20 +225,20 @@ lwboundingcircle_create()
 }
 
 void
-lwboundingcircle_destroy(LWBOUNDINGCIRCLE* c)
+lwboundingcircle_destroy(LWBOUNDINGCIRCLE *c)
 {
 	lwfree(c->center);
 	lwfree(c);
 }
 
-LWBOUNDINGCIRCLE*
-lwgeom_calculate_mbc(const LWGEOM* g)
+LWBOUNDINGCIRCLE *
+lwgeom_calculate_mbc(const LWGEOM *g)
 {
-	SUPPORTING_POINTS* support;
-	LWBOUNDINGCIRCLE* result;
-	LWPOINTITERATOR* it;
+	SUPPORTING_POINTS *support;
+	LWBOUNDINGCIRCLE *result;
+	LWPOINTITERATOR *it;
 	uint32_t num_points;
-	POINT2D** points;
+	POINT2D **points;
 	POINT4D p;
 	uint32_t i;
 	int success;
@@ -247,7 +247,7 @@ lwgeom_calculate_mbc(const LWGEOM* g)
 
 	num_points = lwgeom_count_vertices(g);
 	it = lwpointiterator_create(g);
-	points = lwalloc(num_points * sizeof(POINT2D*));
+	points = lwalloc(num_points * sizeof(POINT2D *));
 	for (i = 0; i < num_points; i++)
 	{
 		if (!lwpointiterator_next(it, &p))
@@ -274,7 +274,7 @@ lwgeom_calculate_mbc(const LWGEOM* g)
 	 * before we call calculate_mbc().  However, we make the (perhaps poor) assumption that
 	 * the order we happen to find the points is as good as random, or close enough.
 	 * */
-	success = calculate_mbc((const POINT2D**)points, num_points, support, result);
+	success = calculate_mbc((const POINT2D **)points, num_points, support, result);
 
 	for (i = 0; i < num_points; i++)
 	{

@@ -45,10 +45,10 @@ Datum ST_GeometricMedian(PG_FUNCTION_ARGS);
 Datum ST_IsPolygonCCW(PG_FUNCTION_ARGS);
 Datum ST_IsPolygonCW(PG_FUNCTION_ARGS);
 
-static double determineSide(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point);
-static int isOnSegment(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point);
-static int point_in_ring(POINTARRAY* pts, const POINT2D* point);
-static int point_in_ring_rtree(RTREE_NODE* root, const POINT2D* point);
+static double determineSide(const POINT2D *seg1, const POINT2D *seg2, const POINT2D *point);
+static int isOnSegment(const POINT2D *seg1, const POINT2D *seg2, const POINT2D *point);
+static int point_in_ring(POINTARRAY *pts, const POINT2D *point);
+static int point_in_ring_rtree(RTREE_NODE *root, const POINT2D *point);
 
 /***********************************************************************
  * Simple Douglas-Peucker line simplification.
@@ -61,9 +61,9 @@ static int point_in_ring_rtree(RTREE_NODE* root, const POINT2D* point);
 PG_FUNCTION_INFO_V1(LWGEOM_simplify2d);
 Datum LWGEOM_simplify2d(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
 	double dist = PG_GETARG_FLOAT8(1);
-	GSERIALIZED* result;
+	GSERIALIZED *result;
 	int type = gserialized_get_type(geom);
 	LWGEOM *in, *out;
 	bool preserve_collapsed = false;
@@ -91,11 +91,11 @@ Datum LWGEOM_simplify2d(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_SetEffectiveArea);
 Datum LWGEOM_SetEffectiveArea(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* result;
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *result;
 	int type = gserialized_get_type(geom);
-	LWGEOM* in;
-	LWGEOM* out;
+	LWGEOM *in;
+	LWGEOM *out;
 	double area = 0;
 	int set_area = 0;
 
@@ -131,14 +131,14 @@ Datum LWGEOM_SetEffectiveArea(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(LWGEOM_line_interpolate_point);
 Datum LWGEOM_line_interpolate_point(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* gser = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* result;
+	GSERIALIZED *gser = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *result;
 	double distance_fraction = PG_GETARG_FLOAT8(1);
 	int repeat = PG_NARGS() > 2 && PG_GETARG_BOOL(2);
 	int srid = gserialized_get_srid(gser);
-	LWLINE* lwline;
-	LWGEOM* lwresult;
-	POINTARRAY* opa;
+	LWLINE *lwline;
+	LWGEOM *lwresult;
+	POINTARRAY *opa;
 
 	if (distance_fraction < 0 || distance_fraction > 1)
 	{
@@ -238,12 +238,12 @@ Datum LWGEOM_snaptogrid_pointoff(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(LWGEOM_snaptogrid);
 Datum LWGEOM_snaptogrid(PG_FUNCTION_ARGS)
 {
-	LWGEOM* in_lwgeom;
-	GSERIALIZED* out_geom = NULL;
-	LWGEOM* out_lwgeom;
+	LWGEOM *in_lwgeom;
+	GSERIALIZED *out_geom = NULL;
+	LWGEOM *out_lwgeom;
 	gridspec grid;
 
-	GSERIALIZED* in_geom = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *in_geom = PG_GETARG_GSERIALIZED_P(0);
 
 	/* Set grid values to zero to start */
 	memset(&grid, 0, sizeof(gridspec));
@@ -279,7 +279,7 @@ Datum LWGEOM_snaptogrid(PG_FUNCTION_ARGS)
 #if POSTGIS_DEBUG_LEVEL >= 4
 /* Print grid using given reporter */
 static void
-grid_print(const gridspec* grid)
+grid_print(const gridspec *grid)
 {
 	lwpgnotice("GRID(%g %g %g %g, %g %g %g %g)",
 		   grid->ipx,
@@ -297,10 +297,10 @@ PG_FUNCTION_INFO_V1(LWGEOM_snaptogrid_pointoff);
 Datum LWGEOM_snaptogrid_pointoff(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *in_geom, *in_point;
-	LWGEOM* in_lwgeom;
-	LWPOINT* in_lwpoint;
-	GSERIALIZED* out_geom = NULL;
-	LWGEOM* out_lwgeom;
+	LWGEOM *in_lwgeom;
+	LWPOINT *in_lwpoint;
+	GSERIALIZED *out_geom = NULL;
+	LWGEOM *out_lwgeom;
 	gridspec grid;
 	/* BOX3D box3d; */
 	POINT4D offsetpoint;
@@ -366,10 +366,10 @@ PG_FUNCTION_INFO_V1(ST_LineCrossingDirection);
 Datum ST_LineCrossingDirection(PG_FUNCTION_ARGS)
 {
 	int type1, type2, rv;
-	LWLINE* l1 = NULL;
-	LWLINE* l2 = NULL;
-	GSERIALIZED* geom1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* geom2 = PG_GETARG_GSERIALIZED_P(1);
+	LWLINE *l1 = NULL;
+	LWLINE *l2 = NULL;
+	GSERIALIZED *geom1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom2 = PG_GETARG_GSERIALIZED_P(1);
 
 	error_if_srid_mismatch(gserialized_get_srid(geom1), gserialized_get_srid(geom2));
 
@@ -402,12 +402,12 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(LWGEOM_line_substring);
 Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
 	double from = PG_GETARG_FLOAT8(1);
 	double to = PG_GETARG_FLOAT8(2);
-	LWGEOM* olwgeom;
+	LWGEOM *olwgeom;
 	POINTARRAY *ipa, *opa;
-	GSERIALIZED* ret;
+	GSERIALIZED *ret;
 	int type = gserialized_get_type(geom);
 
 	if (from < 0 || from > 1)
@@ -430,9 +430,9 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 
 	if (type == LINETYPE)
 	{
-		LWLINE* iline = lwgeom_as_lwline(lwgeom_from_gserialized(geom));
+		LWLINE *iline = lwgeom_as_lwline(lwgeom_from_gserialized(geom));
 
-		if (lwgeom_is_empty((LWGEOM*)iline))
+		if (lwgeom_is_empty((LWGEOM *)iline))
 		{
 			/* TODO return empty line */
 			lwline_release(iline);
@@ -445,21 +445,21 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 		opa = ptarray_substring(ipa, from, to, 0);
 
 		if (opa->npoints == 1) /* Point returned */
-			olwgeom = (LWGEOM*)lwpoint_construct(iline->srid, NULL, opa);
+			olwgeom = (LWGEOM *)lwpoint_construct(iline->srid, NULL, opa);
 		else
-			olwgeom = (LWGEOM*)lwline_construct(iline->srid, NULL, opa);
+			olwgeom = (LWGEOM *)lwline_construct(iline->srid, NULL, opa);
 	}
 	else if (type == MULTILINETYPE)
 	{
-		LWMLINE* iline;
+		LWMLINE *iline;
 		uint32_t i = 0, g = 0;
 		int homogeneous = LW_TRUE;
-		LWGEOM** geoms = NULL;
+		LWGEOM **geoms = NULL;
 		double length = 0.0, sublength = 0.0, minprop = 0.0, maxprop = 0.0;
 
 		iline = lwgeom_as_lwmline(lwgeom_from_gserialized(geom));
 
-		if (lwgeom_is_empty((LWGEOM*)iline))
+		if (lwgeom_is_empty((LWGEOM *)iline))
 		{
 			/* TODO return empty collection */
 			lwmline_release(iline);
@@ -470,17 +470,17 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 		/* Calculate the total length of the mline */
 		for (i = 0; i < iline->ngeoms; i++)
 		{
-			LWLINE* subline = (LWLINE*)iline->geoms[i];
+			LWLINE *subline = (LWLINE *)iline->geoms[i];
 			if (subline->points && subline->points->npoints > 1)
 				length += ptarray_length_2d(subline->points);
 		}
 
-		geoms = lwalloc(sizeof(LWGEOM*) * iline->ngeoms);
+		geoms = lwalloc(sizeof(LWGEOM *) * iline->ngeoms);
 
 		/* Slice each sub-geometry of the multiline */
 		for (i = 0; i < iline->ngeoms; i++)
 		{
-			LWLINE* subline = (LWLINE*)iline->geoms[i];
+			LWLINE *subline = (LWLINE *)iline->geoms[i];
 			double subfrom = 0.0, subto = 0.0;
 
 			if (subline->points && subline->points->npoints > 1)
@@ -506,12 +506,12 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 			{
 				if (opa->npoints == 1) /* Point returned */
 				{
-					geoms[g] = (LWGEOM*)lwpoint_construct(SRID_UNKNOWN, NULL, opa);
+					geoms[g] = (LWGEOM *)lwpoint_construct(SRID_UNKNOWN, NULL, opa);
 					homogeneous = LW_FALSE;
 				}
 				else
 				{
-					geoms[g] = (LWGEOM*)lwline_construct(SRID_UNKNOWN, NULL, opa);
+					geoms[g] = (LWGEOM *)lwline_construct(SRID_UNKNOWN, NULL, opa);
 				}
 				g++;
 			}
@@ -519,7 +519,7 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 		/* If we got any points, we need to return a GEOMETRYCOLLECTION */
 		if (!homogeneous) type = COLLECTIONTYPE;
 
-		olwgeom = (LWGEOM*)lwcollection_construct(type, iline->srid, NULL, g, geoms);
+		olwgeom = (LWGEOM *)lwcollection_construct(type, iline->srid, NULL, g, geoms);
 	}
 	else
 	{
@@ -545,7 +545,7 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
  *          0 for a point on the segment
  */
 static double
-determineSide(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point)
+determineSide(const POINT2D *seg1, const POINT2D *seg2, const POINT2D *point)
 {
 	return ((seg2->x - seg1->x) * (point->y - seg1->y) - (point->x - seg1->x) * (seg2->y - seg1->y));
 }
@@ -560,7 +560,7 @@ determineSide(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point)
  *          0 if it is
  */
 static int
-isOnSegment(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point)
+isOnSegment(const POINT2D *seg1, const POINT2D *seg2, const POINT2D *point)
 {
 	double maxX;
 	double maxY;
@@ -611,14 +611,14 @@ isOnSegment(const POINT2D* seg1, const POINT2D* seg2, const POINT2D* point)
  * return 0 iff point is on ring pts
  */
 static int
-point_in_ring_rtree(RTREE_NODE* root, const POINT2D* point)
+point_in_ring_rtree(RTREE_NODE *root, const POINT2D *point)
 {
 	int wn = 0;
 	uint32_t i;
 	double side;
-	const POINT2D* seg1;
-	const POINT2D* seg2;
-	LWMLINE* lines;
+	const POINT2D *seg1;
+	const POINT2D *seg2;
+	LWMLINE *lines;
 
 	POSTGIS_DEBUG(2, "point_in_ring called.");
 
@@ -696,13 +696,13 @@ point_in_ring_rtree(RTREE_NODE* root, const POINT2D* point)
  * return 0 iff point is on ring pts
  */
 static int
-point_in_ring(POINTARRAY* pts, const POINT2D* point)
+point_in_ring(POINTARRAY *pts, const POINT2D *point)
 {
 	int wn = 0;
 	uint32_t i;
 	double side;
-	const POINT2D* seg1;
-	const POINT2D* seg2;
+	const POINT2D *seg1;
+	const POINT2D *seg2;
 
 	POSTGIS_DEBUG(2, "point_in_ring called.");
 
@@ -777,7 +777,7 @@ point_in_ring(POINTARRAY* pts, const POINT2D* point)
  * return 1 iff point inside polygon
  */
 int
-point_in_polygon_rtree(RTREE_NODE** root, int ringCount, LWPOINT* point)
+point_in_polygon_rtree(RTREE_NODE **root, int ringCount, LWPOINT *point)
 {
 	int i;
 	POINT2D pt;
@@ -814,7 +814,7 @@ point_in_polygon_rtree(RTREE_NODE** root, int ringCount, LWPOINT* point)
  * Expected **root order is each exterior ring followed by its holes, eg. EIIEIIEI
  */
 int
-point_in_multipolygon_rtree(RTREE_NODE** root, int polyCount, int* ringCounts, LWPOINT* point)
+point_in_multipolygon_rtree(RTREE_NODE **root, int polyCount, int *ringCounts, LWPOINT *point)
 {
 	int i, p, r, in_ring;
 	POINT2D pt;
@@ -886,7 +886,7 @@ point_in_multipolygon_rtree(RTREE_NODE** root, int polyCount, int* ringCounts, L
  * return 1 iff point inside polygon
  */
 int
-point_in_polygon(LWPOLY* polygon, LWPOINT* point)
+point_in_polygon(LWPOLY *polygon, LWPOINT *point)
 {
 	uint32_t i;
 	int result, in_ring;
@@ -931,7 +931,7 @@ point_in_polygon(LWPOLY* polygon, LWPOINT* point)
  * return 1 iff point inside multipolygon
  */
 int
-point_in_multipolygon(LWMPOLY* mpolygon, LWPOINT* point)
+point_in_multipolygon(LWMPOLY *mpolygon, LWPOINT *point)
 {
 	uint32_t i, j;
 	int result, in_ring;
@@ -947,7 +947,7 @@ point_in_multipolygon(LWMPOLY* mpolygon, LWPOINT* point)
 	for (j = 0; j < mpolygon->ngeoms; j++)
 	{
 
-		LWPOLY* polygon = mpolygon->geoms[j];
+		LWPOLY *polygon = mpolygon->geoms[j];
 
 		/* everything is outside of an empty polygon */
 		if (polygon->nrings == 0) continue;
@@ -995,11 +995,11 @@ point_in_multipolygon(LWMPOLY* mpolygon, LWPOINT* point)
 PG_FUNCTION_INFO_V1(ST_MinimumBoundingRadius);
 Datum ST_MinimumBoundingRadius(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* input;
-	LWBOUNDINGCIRCLE* mbc = NULL;
-	LWGEOM* lwcenter;
-	GSERIALIZED* center;
+	GSERIALIZED *geom;
+	LWGEOM *input;
+	LWBOUNDINGCIRCLE *mbc = NULL;
+	LWGEOM *lwcenter;
+	GSERIALIZED *center;
 	TupleDesc resultTupleDesc;
 	HeapTuple resultTuple;
 	Datum result;
@@ -1013,7 +1013,7 @@ Datum ST_MinimumBoundingRadius(PG_FUNCTION_ARGS)
 
 	/* Empty geometry?  Return POINT EMPTY with zero radius */
 	if (gserialized_is_empty(geom))
-	{ lwcenter = (LWGEOM*)lwpoint_construct_empty(gserialized_get_srid(geom), LW_FALSE, LW_FALSE); }
+	{ lwcenter = (LWGEOM *)lwpoint_construct_empty(gserialized_get_srid(geom), LW_FALSE, LW_FALSE); }
 	else
 	{
 		input = lwgeom_from_gserialized(geom);
@@ -1026,7 +1026,7 @@ Datum ST_MinimumBoundingRadius(PG_FUNCTION_ARGS)
 			PG_RETURN_NULL();
 		}
 
-		lwcenter = (LWGEOM*)lwpoint_make2d(input->srid, mbc->center->x, mbc->center->y);
+		lwcenter = (LWGEOM *)lwpoint_make2d(input->srid, mbc->center->x, mbc->center->y);
 		radius = mbc->radius;
 
 		lwboundingcircle_destroy(mbc);
@@ -1060,11 +1060,11 @@ Datum ST_MinimumBoundingRadius(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(ST_MinimumBoundingCircle);
 Datum ST_MinimumBoundingCircle(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* input;
-	LWBOUNDINGCIRCLE* mbc = NULL;
-	LWGEOM* lwcircle;
-	GSERIALIZED* center;
+	GSERIALIZED *geom;
+	LWGEOM *input;
+	LWBOUNDINGCIRCLE *mbc = NULL;
+	LWGEOM *lwcircle;
+	GSERIALIZED *center;
 	int segs_per_quarter;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
@@ -1074,7 +1074,7 @@ Datum ST_MinimumBoundingCircle(PG_FUNCTION_ARGS)
 
 	/* Empty geometry? Return POINT EMPTY */
 	if (gserialized_is_empty(geom))
-	{ lwcircle = (LWGEOM*)lwpoint_construct_empty(gserialized_get_srid(geom), LW_FALSE, LW_FALSE); }
+	{ lwcircle = (LWGEOM *)lwpoint_construct_empty(gserialized_get_srid(geom), LW_FALSE, LW_FALSE); }
 	else
 	{
 		input = lwgeom_from_gserialized(geom);
@@ -1113,10 +1113,10 @@ Datum ST_MinimumBoundingCircle(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(ST_GeometricMedian);
 Datum ST_GeometricMedian(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	GSERIALIZED* result;
-	LWGEOM* input;
-	LWPOINT* lwresult;
+	GSERIALIZED *geom;
+	GSERIALIZED *result;
+	LWGEOM *input;
+	LWPOINT *lwresult;
 	static const double min_default_tolerance = 1e-8;
 	double tolerance = min_default_tolerance;
 	bool compute_tolerance_from_box;
@@ -1157,7 +1157,7 @@ Datum ST_GeometricMedian(PG_FUNCTION_ARGS)
 		 * of the geometry's bounding box.
 		 */
 		static const double tolerance_coefficient = 1e-6;
-		const GBOX* box = lwgeom_get_bbox(input);
+		const GBOX *box = lwgeom_get_bbox(input);
 
 		if (box)
 		{
@@ -1195,8 +1195,8 @@ Datum ST_GeometricMedian(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(ST_IsPolygonCW);
 Datum ST_IsPolygonCW(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* input;
+	GSERIALIZED *geom;
+	LWGEOM *input;
 	bool is_clockwise;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
@@ -1221,8 +1221,8 @@ Datum ST_IsPolygonCW(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(ST_IsPolygonCCW);
 Datum ST_IsPolygonCCW(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* geom;
-	LWGEOM* input;
+	GSERIALIZED *geom;
+	LWGEOM *input;
 	bool is_ccw;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
