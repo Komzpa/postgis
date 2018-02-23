@@ -336,19 +336,7 @@ LWGEOM_GEOS_nodeLines(const GEOSGeometry* lines)
 	LWDEBUGF(3, "Boundary point: %s", lwgeom_to_ewkt(GEOS2LWGEOM(point, 0)));
 
 	noded = GEOSUnion(lines, point);
-	if (NULL == noded)
-	{
-		GEOSGeom_destroy(point);
-		return NULL;
-	}
-
 	GEOSGeom_destroy(point);
-
-	LWDEBUGF(3,
-		 "LWGEOM_GEOS_nodeLines: in[%s] out[%s]",
-		 lwgeom_to_ewkt(GEOS2LWGEOM(lines, 0)),
-		 lwgeom_to_ewkt(GEOS2LWGEOM(noded, 0)));
-
 	return noded;
 }
 
@@ -664,8 +652,7 @@ LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry* gin)
 			for (j = 0; j < nsubgeoms; ++j)
 			{
 				const GEOSGeometry* gc = GEOSGetGeometryN(vg, j);
-				/* NOTE: ownership of the cloned geoms will be
-				 *       taken by final collection */
+				/* NOTE: ownership of the cloned geoms will be taken by final collection */
 				lines[nlines++] = GEOSGeom_clone(gc);
 			}
 		}
