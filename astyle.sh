@@ -1,22 +1,6 @@
 #!/bin/bash
 
 # Run astyle on the code base ready for release
-
-# If astyle doesn't exist, exit the script and do nothing
-which astyle > /dev/null
-RET=$?
-if [ $RET -ne 0 ]; then
-	echo "Could not find astyle - aborting."
-	exit
-fi
-
-
-RET=`astyle --version 2>&1`
-if [ "$RET" != "Artistic Style Version 3.1" ]; then
-	echo "Only 3.1 astyle version is 'allowed'"
-	exit
-fi
-
 # Find all "pure" C files in the codebase
 #   - not .in.c used for .sql generation
 #   - not lex.yy.c or wktparse.tab.c as these are generated files
@@ -24,4 +8,4 @@ CFILES=`find . -name '*.c' -o -name '*.h' -not \( -name '*_parse.c' -o -name '*_
 
 # Run the standard format on the files, and do not
 # leave .orig files around for altered files.
-astyle --style=ansi --indent=tab --suffix=none $CFILES
+clang-format-7 -i --style=file $CFILES
