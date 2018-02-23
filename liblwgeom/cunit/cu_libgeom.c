@@ -161,7 +161,7 @@ test_serialized_srid(void)
 static void
 test_gserialized_from_lwgeom_size(void)
 {
-	LWGEOM* g;
+	LWGEOM *g;
 	size_t size = 0;
 
 	g = lwgeom_from_wkt("POINT(0 0)", LW_PARSER_CHECK_NONE);
@@ -204,7 +204,7 @@ test_gserialized_from_lwgeom_size(void)
 static void
 test_lwgeom_calculate_gbox(void)
 {
-	LWGEOM* g;
+	LWGEOM *g;
 	GBOX b;
 
 	g = lwgeom_from_wkt("POINT(0 0)", LW_PARSER_CHECK_NONE);
@@ -257,13 +257,13 @@ test_gbox_serialized_size(void)
 static void
 test_lwgeom_from_gserialized(void)
 {
-	LWGEOM* geom;
-	GSERIALIZED* g;
-	char* in_ewkt;
-	char* out_ewkt;
+	LWGEOM *geom;
+	GSERIALIZED *g;
+	char *in_ewkt;
+	char *out_ewkt;
 	size_t i = 0;
 
-	char* ewkt[] = {
+	char *ewkt[] = {
 	    "POINT EMPTY",
 	    "POINT(0 0.2)",
 	    "LINESTRING EMPTY",
@@ -299,9 +299,9 @@ test_lwgeom_from_gserialized(void)
 	    "MULTISURFACE(CURVEPOLYGON(CIRCULARSTRING EMPTY))",
 	};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
-		LWGEOM* geom2;
+		LWGEOM *geom2;
 
 		in_ewkt = ewkt[i];
 		geom = lwgeom_from_wkt(in_ewkt, LW_PARSER_CHECK_NONE);
@@ -334,7 +334,7 @@ test_gserialized_is_empty(void)
 	int i = 0;
 	struct gserialized_empty_cases
 	{
-		const char* wkt;
+		const char *wkt;
 		int isempty;
 	};
 
@@ -361,8 +361,8 @@ test_gserialized_is_empty(void)
 	while (cases[i].wkt)
 	{
 		// i = 11;
-		LWGEOM* lw = lwgeom_from_wkt(cases[i].wkt, LW_PARSER_CHECK_NONE);
-		GSERIALIZED* g = gserialized_from_lwgeom(lw, 0);
+		LWGEOM *lw = lwgeom_from_wkt(cases[i].wkt, LW_PARSER_CHECK_NONE);
+		GSERIALIZED *g = gserialized_from_lwgeom(lw, 0);
 		int ie = gserialized_is_empty(g);
 		// printf("%s: we say %d, they say %d\n", cases[i].wkt, cases[i].isempty, ie);
 		CU_ASSERT_EQUAL(ie, cases[i].isempty);
@@ -378,7 +378,7 @@ test_geometry_type_from_string(void)
 	int rv;
 	uint8_t type = 0;
 	int z = 0, m = 0;
-	char* str;
+	char *str;
 
 	str = "  POINTZ";
 	rv = geometry_type_from_string(str, &type, &z, &m);
@@ -421,7 +421,7 @@ test_geometry_type_from_string(void)
 static void
 test_lwgeom_count_vertices(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 
 	geom = lwgeom_from_wkt("MULTIPOINT(-1 -1,-1 2.5,2 2,2 -1)", LW_PARSER_CHECK_NONE);
 	CU_ASSERT_EQUAL(lwgeom_count_vertices(geom), 4);
@@ -446,8 +446,8 @@ test_lwgeom_count_vertices(void)
 static void
 test_on_gser_lwgeom_count_vertices(void)
 {
-	LWGEOM* lwgeom;
-	GSERIALIZED* g_ser1;
+	LWGEOM *lwgeom;
+	GSERIALIZED *g_ser1;
 	size_t ret_size;
 
 	lwgeom = lwgeom_from_wkt("MULTIPOINT(-1 -1,-1 2.5,2 2,2 -1,1 1,2 2,4 5)", LW_PARSER_CHECK_NONE);
@@ -471,20 +471,20 @@ static void
 test_lwcollection_extract(void)
 {
 
-	LWGEOM* geom;
-	LWCOLLECTION* col;
+	LWGEOM *geom;
+	LWCOLLECTION *col;
 
 	geom = lwgeom_from_wkt("GEOMETRYCOLLECTION(POINT(0 0))", LW_PARSER_CHECK_NONE);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 1);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 1);
 	CU_ASSERT_EQUAL(col->type, MULTIPOINTTYPE);
 	lwcollection_free(col);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 2);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 2);
 	CU_ASSERT_EQUAL(col->type, MULTILINETYPE);
 	lwcollection_free(col);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 3);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 3);
 	CU_ASSERT_EQUAL(col->type, MULTIPOLYGONTYPE);
 	lwcollection_free(col);
 
@@ -492,15 +492,15 @@ test_lwcollection_extract(void)
 
 	geom = lwgeom_from_wkt("GEOMETRYCOLLECTION EMPTY", LW_PARSER_CHECK_NONE);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 1);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 1);
 	CU_ASSERT_EQUAL(col->type, MULTIPOINTTYPE);
 	lwcollection_free(col);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 2);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 2);
 	CU_ASSERT_EQUAL(col->type, MULTILINETYPE);
 	lwcollection_free(col);
 
-	col = lwcollection_extract((LWCOLLECTION*)geom, 3);
+	col = lwcollection_extract((LWCOLLECTION *)geom, 3);
 	CU_ASSERT_EQUAL(col->type, MULTIPOLYGONTYPE);
 	lwcollection_free(col);
 
@@ -510,7 +510,7 @@ test_lwcollection_extract(void)
 static void
 test_lwgeom_free(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 
 	/* Empty geometries don't seem to free properly (#370) */
 	geom = lwgeom_from_wkt("GEOMETRYCOLLECTION EMPTY", LW_PARSER_CHECK_NONE);
@@ -534,10 +534,10 @@ test_lwgeom_free(void)
 }
 
 static void
-do_lwgeom_swap_ordinates(char* in, char* out)
+do_lwgeom_swap_ordinates(char *in, char *out)
 {
-	LWGEOM* g;
-	char* t;
+	LWGEOM *g;
+	char *t;
 	double xmax, ymax;
 	int testbox;
 
@@ -674,7 +674,7 @@ test_lwgeom_clone(void)
 {
 	size_t i;
 
-	char* ewkt[] = {"POINT(0 0.2)",
+	char *ewkt[] = {"POINT(0 0.2)",
 			"LINESTRING(-1 -1,-1 2.5,2 2,2 -1)",
 			"MULTIPOINT(0.9 0.9,0.9 0.9,0.9 0.9,0.9 0.9,0.9 0.9,0.9 0.9)",
 			"SRID=1;MULTILINESTRING((-1 -1,-1 2.5,2 2,2 -1),(-1 -1,-1 2.5,2 2,2 -1),(-1 -1,-1 2.5,2 2,2 "
@@ -700,11 +700,11 @@ test_lwgeom_clone(void)
 			"TIN(((0 0 0,0 0 1,0 1 0,0 0 0)),((0 0 0,0 1 0,1 0 0,0 0 0)),((0 0 0,1 0 0,0 0 1,0 0 0)),((1 0 "
 			"0,0 1 0,0 0 1,1 0 0)))"};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
 		LWGEOM *geom, *cloned;
-		char* in_ewkt;
-		char* out_ewkt;
+		char *in_ewkt;
+		char *out_ewkt;
 
 		in_ewkt = ewkt[i];
 		geom = lwgeom_from_wkt(in_ewkt, LW_PARSER_CHECK_NONE);
@@ -724,8 +724,8 @@ test_lwgeom_clone(void)
 static void
 test_lwgeom_force_clockwise(void)
 {
-	LWGEOM* geom;
-	LWGEOM* geom2;
+	LWGEOM *geom;
+	LWGEOM *geom2;
 	char *in_ewkt, *out_ewkt;
 
 	/* counterclockwise, must be reversed */
@@ -796,7 +796,7 @@ test_lwgeom_force_clockwise(void)
 static void
 test_lwgeom_is_empty(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 
 	geom = lwgeom_from_wkt("POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))", LW_PARSER_CHECK_NONE);
 	CU_ASSERT(!lwgeom_is_empty(geom));
@@ -941,8 +941,8 @@ test_lwgeom_same(void)
 static void
 test_lwgeom_as_curve(void)
 {
-	LWGEOM* geom;
-	LWGEOM* geom2;
+	LWGEOM *geom;
+	LWGEOM *geom2;
 	char *in_ewkt, *out_ewkt;
 
 	geom = lwgeom_from_wkt("LINESTRING(0 0, 10 0)", LW_PARSER_CHECK_NONE);
@@ -989,13 +989,13 @@ test_lwgeom_as_curve(void)
 static void
 test_lwline_from_lwmpoint(void)
 {
-	LWLINE* line;
-	LWMPOINT* mpoint;
+	LWLINE *line;
+	LWMPOINT *mpoint;
 
 	//	LWLINE *
 	//	lwline_from_lwmpoint(int srid, LWMPOINT *mpoint)
 
-	mpoint = (LWMPOINT*)lwgeom_from_wkt("MULTIPOINT(0 0, 0 1, 1 1, 1 2, 2 2)", LW_PARSER_CHECK_NONE);
+	mpoint = (LWMPOINT *)lwgeom_from_wkt("MULTIPOINT(0 0, 0 1, 1 1, 1 2, 2 2)", LW_PARSER_CHECK_NONE);
 	line = lwline_from_lwmpoint(SRID_DEFAULT, mpoint);
 	CU_ASSERT_EQUAL(line->points->npoints, mpoint->ngeoms);
 	CU_ASSERT_DOUBLE_EQUAL(lwline_length_2d(line), 4.0, 0.000001);
@@ -1010,10 +1010,10 @@ test_lwline_from_lwmpoint(void)
 static void
 test_lwgeom_scale(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 	POINT4D factor;
-	char* out_ewkt;
-	GBOX* box;
+	char *out_ewkt;
+	GBOX *box;
 
 	geom = lwgeom_from_wkt(
 	    "SRID=4326;GEOMETRYCOLLECTION(POINT(0 1 2 3),POLYGON((-1 -1 0 1,-1 2.5 0 1,2 2 0 1,2 -1 0 1,-1 -1 0 1),(0 "
@@ -1055,9 +1055,9 @@ void test_gbox_same_2d(void);
 void
 test_gbox_same_2d(void)
 {
-	LWGEOM* g1 = lwgeom_from_wkt("LINESTRING(0 0, 1 1)", LW_PARSER_CHECK_NONE);
-	LWGEOM* g2 = lwgeom_from_wkt("LINESTRING(0 0, 0 1, 1 1)", LW_PARSER_CHECK_NONE);
-	LWGEOM* g3 = lwgeom_from_wkt("LINESTRING(0 0, 1 1.000000000001)", LW_PARSER_CHECK_NONE);
+	LWGEOM *g1 = lwgeom_from_wkt("LINESTRING(0 0, 1 1)", LW_PARSER_CHECK_NONE);
+	LWGEOM *g2 = lwgeom_from_wkt("LINESTRING(0 0, 0 1, 1 1)", LW_PARSER_CHECK_NONE);
+	LWGEOM *g3 = lwgeom_from_wkt("LINESTRING(0 0, 1 1.000000000001)", LW_PARSER_CHECK_NONE);
 
 	lwgeom_add_bbox(g1);
 	lwgeom_add_bbox(g2);
@@ -1069,7 +1069,7 @@ test_gbox_same_2d(void)
 	/* Serializing a GBOX with precise coordinates renders the boxes not strictly equal,
 	 * but still equal according to gbox_same_2d_float.
 	 */
-	GSERIALIZED* s3 = gserialized_from_lwgeom(g3, NULL);
+	GSERIALIZED *s3 = gserialized_from_lwgeom(g3, NULL);
 	GBOX s3box;
 	gserialized_read_gbox_p(s3, &s3box);
 
@@ -1092,20 +1092,20 @@ test_gserialized_peek_gbox_p_no_box_when_empty(void)
 {
 	uint32_t i;
 
-	char* ewkt[] = {"POINT EMPTY",
+	char *ewkt[] = {"POINT EMPTY",
 			"LINESTRING EMPTY",
 			"MULTIPOINT EMPTY",
 			"MULTIPOINT (EMPTY)",
 			"MULTILINESTRING EMPTY",
 			"MULTILINESTRING (EMPTY)"};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
-		LWGEOM* geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
+		LWGEOM *geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
 		GBOX box;
 		gbox_init(&box);
 
-		GSERIALIZED* gser = gserialized_from_lwgeom(geom, NULL);
+		GSERIALIZED *gser = gserialized_from_lwgeom(geom, NULL);
 
 		CU_ASSERT_FALSE(gserialized_has_bbox(gser));
 
@@ -1122,7 +1122,7 @@ test_gserialized_peek_gbox_p_gets_correct_box(void)
 {
 	uint32_t i;
 
-	char* ewkt[] = {"POINT (2.2945672355 48.85822923236)",
+	char *ewkt[] = {"POINT (2.2945672355 48.85822923236)",
 			"POINTZ (2.2945672355 48.85822923236 15)",
 			"POINTM (2.2945672355 48.85822923236 12)",
 			"POINT ZM (2.2945672355 48.85822923236 12 2)",
@@ -1135,15 +1135,15 @@ test_gserialized_peek_gbox_p_gets_correct_box(void)
 			"MULTILINESTRING ((2.2945672355 48.85822923236, -76.45402132523 44.225406213532))",
 			"MULTILINESTRING Z ((2.2945672355 48.85822923236 4, -76.45402132523 44.225406213532 3))"};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
-		LWGEOM* geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
+		LWGEOM *geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
 		GBOX box_from_peek;
 		GBOX box_from_lwgeom;
 		gbox_init(&box_from_peek);
 		gbox_init(&box_from_lwgeom);
 
-		GSERIALIZED* gser = gserialized_from_lwgeom(geom, NULL);
+		GSERIALIZED *gser = gserialized_from_lwgeom(geom, NULL);
 
 		CU_ASSERT_FALSE(gserialized_has_bbox(gser));
 
@@ -1165,15 +1165,15 @@ test_gserialized_peek_gbox_p_fails_for_unsupported_cases(void)
 {
 	uint32_t i;
 
-	char* ewkt[] = {
+	char *ewkt[] = {
 	    "MULTIPOINT ((-76.45402132523 44.225406213532), (-72 33))",
 	    "LINESTRING (2.2945672355 48.85822923236, -76.45402132523 44.225406213532, -72 33)",
 	    "MULTILINESTRING ((2.2945672355 48.85822923236, -76.45402132523 44.225406213532, -72 33))",
 	    "MULTILINESTRING ((2.2945672355 48.85822923236, -76.45402132523 44.225406213532), (-72 33, -71 32))"};
 
-	for (i = 0; i < (sizeof ewkt / sizeof(char*)); i++)
+	for (i = 0; i < (sizeof ewkt / sizeof(char *)); i++)
 	{
-		LWGEOM* geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
+		LWGEOM *geom = lwgeom_from_wkt(ewkt[i], LW_PARSER_CHECK_NONE);
 		GBOX box;
 		gbox_init(&box);
 		lwgeom_drop_bbox(geom);
@@ -1181,8 +1181,8 @@ test_gserialized_peek_gbox_p_fails_for_unsupported_cases(void)
 		/* Construct a GSERIALIZED* that doesn't have a box, so that we can test the
 		 * actual logic of the peek function */
 		size_t expected_size = gserialized_from_lwgeom_size(geom);
-		GSERIALIZED* gser = lwalloc(expected_size);
-		uint8_t* ptr = (uint8_t*)gser;
+		GSERIALIZED *gser = lwalloc(expected_size);
+		uint8_t *ptr = (uint8_t *)gser;
 
 		ptr += 8; // Skip header
 		gserialized_from_lwgeom_any(geom, ptr);

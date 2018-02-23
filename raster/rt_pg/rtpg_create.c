@@ -57,7 +57,7 @@ Datum RASTER_makeEmpty(PG_FUNCTION_ARGS)
 	uint16 width = 0, height = 0;
 	double ipx = 0, ipy = 0, scalex = 0, scaley = 0, skewx = 0, skewy = 0;
 	int32_t srid = SRID_UNKNOWN;
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster;
 
 	if (PG_NARGS() < 9)
@@ -118,16 +118,16 @@ Datum RASTER_makeEmpty(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_addBand);
 Datum RASTER_addBand(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	int bandindex = 0;
 	int maxbandindex = 0;
 	int numbands = 0;
 	int lastnumbands = 0;
 
-	text* text_pixtype = NULL;
-	char* char_pixtype = NULL;
+	text *text_pixtype = NULL;
+	char *char_pixtype = NULL;
 
 	struct addbandarg
 	{
@@ -138,12 +138,12 @@ Datum RASTER_addBand(PG_FUNCTION_ARGS)
 		bool hasnodata;
 		double nodatavalue;
 	};
-	struct addbandarg* arg = NULL;
+	struct addbandarg *arg = NULL;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -157,7 +157,7 @@ Datum RASTER_addBand(PG_FUNCTION_ARGS)
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, FALSE);
@@ -184,7 +184,7 @@ Datum RASTER_addBand(PG_FUNCTION_ARGS)
 	}
 
 	/* allocate addbandarg */
-	arg = (struct addbandarg*)palloc(sizeof(struct addbandarg) * n);
+	arg = (struct addbandarg *)palloc(sizeof(struct addbandarg) * n);
 	if (arg == NULL)
 	{
 		rt_raster_destroy(raster);
@@ -253,7 +253,7 @@ Datum RASTER_addBand(PG_FUNCTION_ARGS)
 			     i);
 			PG_RETURN_NULL();
 		}
-		text_pixtype = (text*)DatumGetPointer(tupv);
+		text_pixtype = (text *)DatumGetPointer(tupv);
 		if (text_pixtype == NULL)
 		{
 			pfree(arg);
@@ -371,9 +371,9 @@ Datum RASTER_addBand(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_addBandRasterArray);
 Datum RASTER_addBandRasterArray(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgsrc = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgsrc = NULL;
+	rt_pgraster *pgrtn = NULL;
 
 	rt_raster raster = NULL;
 	rt_raster src = NULL;
@@ -384,10 +384,10 @@ Datum RASTER_addBandRasterArray(PG_FUNCTION_ARGS)
 	int srcnumbands = 0;
 	int dstnumbands = 0;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -399,7 +399,7 @@ Datum RASTER_addBandRasterArray(PG_FUNCTION_ARGS)
 	/* destination raster */
 	if (!PG_ARGISNULL(0))
 	{
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		/* raster */
 		raster = rt_raster_deserialize(pgraster, FALSE);
@@ -493,7 +493,7 @@ Datum RASTER_addBandRasterArray(PG_FUNCTION_ARGS)
 		if (nulls[i]) continue;
 		src = NULL;
 
-		pgsrc = (rt_pgraster*)PG_DETOAST_DATUM(e[i]);
+		pgsrc = (rt_pgraster *)PG_DETOAST_DATUM(e[i]);
 		src = rt_raster_deserialize(pgsrc, FALSE);
 		if (src == NULL)
 		{
@@ -594,24 +594,24 @@ Datum RASTER_addBandRasterArray(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_addBandOutDB);
 Datum RASTER_addBandOutDB(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int numbands = 0;
 	int dstnband = 1; /* 1-based */
 	int appendband = FALSE;
-	char* outdbfile = NULL;
-	int* srcnband = NULL; /* 1-based */
+	char *outdbfile = NULL;
+	int *srcnband = NULL; /* 1-based */
 	int numsrcnband = 0;
 	int allbands = FALSE;
 	int hasnodata = FALSE;
 	double nodataval = 0.;
 	uint16_t width = 0;
 	uint16_t height = 0;
-	char* authname = NULL;
-	char* authcode = NULL;
+	char *authname = NULL;
+	char *authcode = NULL;
 
 	int i = 0;
 	int j = 0;
@@ -626,7 +626,7 @@ Datum RASTER_addBandOutDB(PG_FUNCTION_ARGS)
 	/* destination raster */
 	if (!PG_ARGISNULL(0))
 	{
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		/* raster */
 		raster = rt_raster_deserialize(pgraster, FALSE);
@@ -677,10 +677,10 @@ Datum RASTER_addBandOutDB(PG_FUNCTION_ARGS)
 	/* outdb band index (3) */
 	if (!PG_ARGISNULL(3))
 	{
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 
 		int16 typlen;
 		bool typbyval;
@@ -929,9 +929,9 @@ Datum RASTER_addBandOutDB(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_copyBand);
 Datum RASTER_copyBand(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgto = NULL;
-	rt_pgraster* pgfrom = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgto = NULL;
+	rt_pgraster *pgfrom = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster torast = NULL;
 	rt_raster fromrast = NULL;
 	int toindex = 0;
@@ -942,7 +942,7 @@ Datum RASTER_copyBand(PG_FUNCTION_ARGS)
 
 	/* Deserialize torast */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgto = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgto = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	torast = rt_raster_deserialize(pgto, FALSE);
 	if (!torast)
@@ -955,7 +955,7 @@ Datum RASTER_copyBand(PG_FUNCTION_ARGS)
 	/* Deserialize fromrast */
 	if (!PG_ARGISNULL(1))
 	{
-		pgfrom = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+		pgfrom = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 
 		fromrast = rt_raster_deserialize(pgfrom, FALSE);
 		if (!fromrast)
@@ -1010,7 +1010,7 @@ Datum RASTER_copyBand(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_tile);
 Datum RASTER_tile(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	int call_cntr;
 	int max_calls;
 	int i = 0;
@@ -1038,7 +1038,7 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 		} tile;
 
 		int numbands;
-		int* nbands;
+		int *nbands;
 
 		struct
 		{
@@ -1047,19 +1047,19 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 			double nodataval;
 		} pad;
 	};
-	struct tile_arg_t* arg1 = NULL;
-	struct tile_arg_t* arg2 = NULL;
+	struct tile_arg_t *arg1 = NULL;
+	struct tile_arg_t *arg2 = NULL;
 
 	if (SRF_IS_FIRSTCALL())
 	{
 		MemoryContext oldcontext;
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		int numbands;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 
 		int16 typlen;
 		bool typbyval;
@@ -1089,7 +1089,7 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 			SRF_RETURN_DONE(funcctx);
 		}
 
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
 		arg1->raster.raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!arg1->raster.raster)
 		{
@@ -1317,7 +1317,7 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 	/* do when there is more left to send */
 	if (call_cntr < max_calls)
 	{
-		rt_pgraster* pgtile = NULL;
+		rt_pgraster *pgtile = NULL;
 		rt_raster tile = NULL;
 		rt_band _band = NULL;
 		rt_band band = NULL;
@@ -1337,7 +1337,7 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 		double ulx = 0;
 		double uly = 0;
 		uint16_t len = 0;
-		void* vals = NULL;
+		void *vals = NULL;
 		uint16_t nvals;
 
 		POSTGIS_RT_DEBUGF(3, "call number %d", call_cntr);
@@ -1559,29 +1559,29 @@ Datum RASTER_tile(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_band);
 Datum RASTER_band(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster;
-	rt_pgraster* pgrast;
+	rt_pgraster *pgraster;
+	rt_pgraster *pgrast;
 	rt_raster raster;
 	rt_raster rast;
 
 	bool skip = FALSE;
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
 
 	uint32_t numBands;
-	uint32_t* bandNums;
+	uint32_t *bandNums;
 	uint32 idx = 0;
 	int n;
 	int i = 0;
 	int j = 0;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)

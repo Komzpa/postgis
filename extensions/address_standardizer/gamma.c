@@ -33,14 +33,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 #ifdef BUILD_API
 #include "pagc_std_api.h"
-RULES* rules_init(ERR_PARAM* err_p);
+RULES *rules_init(ERR_PARAM *err_p);
 #endif
 
 /* -- local prototypes -- */
-static int initialize_link(ERR_PARAM*, KW***, NODE);
-static void classify_link(RULE_PARAM*, KW***, KW*, NODE, SYMB, SYMB);
-static void add_failure_linkage(KW***, NODE, NODE);
-static NODE** precompute_gamma_function(ERR_PARAM*, NODE**, KW***, NODE);
+static int initialize_link(ERR_PARAM *, KW ***, NODE);
+static void classify_link(RULE_PARAM *, KW ***, KW *, NODE, SYMB, SYMB);
+static void add_failure_linkage(KW ***, NODE, NODE);
+static NODE **precompute_gamma_function(ERR_PARAM *, NODE **, KW ***, NODE);
 
 static double load_value[NUMBER_OF_WEIGHTS] =
     {0.00, 0.325, 0.35, 0.375, 0.4, 0.475, 0.55, 0.6, 0.65, 0.675, 0.7, 0.75, 0.8, 0.825, 0.85, 0.9, 0.95, 1.00};
@@ -52,7 +52,7 @@ The registry of matching keywords is regenerated with the use of the
 precomputed Gamma function, Output Links and the current target.
 ----------------------------------------------------------------------------*/
 void
-refresh_transducer(NODE* r, SYMB* S, NODE** gamma_function)
+refresh_transducer(NODE *r, SYMB *S, NODE **gamma_function)
 {
 	NODE q;
 	int i;
@@ -109,17 +109,17 @@ typedef struct RULES_s {
 gamma.c (rules_init)
 api interface to replace (create_rules)
 ---------------------------------------------------------------------------*/
-RULES*
-rules_init(ERR_PARAM* err_p)
+RULES *
+rules_init(ERR_PARAM *err_p)
 {
-	RULES* rules;
+	RULES *rules;
 	/* -- returns size of Gamma Function Matrix -- */
 	SYMB a;
-	KW* k_s;
-	KW*** o_l;
-	NODE** Trie;
-	SYMB* r_s;
-	RULE_PARAM* r_p;
+	KW *k_s;
+	KW ***o_l;
+	NODE **Trie;
+	SYMB *r_s;
+	RULE_PARAM *r_p;
 
 	PAGC_CALLOC_STRUC(rules, RULES, 1, err_p, NULL);
 	rules->err_p = err_p;
@@ -139,7 +139,7 @@ rules_init(ERR_PARAM* err_p)
 	PAGC_CALLOC_STRUC(r_s, SYMB, RULESPACESIZE, err_p, NULL);
 
 	/* -- storage for temporary trie for rules -- */
-	PAGC_CALLOC_STRUC(Trie, NODE*, MAXNODES, err_p, NULL);
+	PAGC_CALLOC_STRUC(Trie, NODE *, MAXNODES, err_p, NULL);
 
 	/* -- initialize the first( EPSILON ) node of the trie -- */
 	PAGC_CALLOC_STRUC(Trie[EPSILON], NODE, MAXINSYM, err_p, NULL);
@@ -150,7 +150,7 @@ rules_init(ERR_PARAM* err_p)
 	}
 
 	/* -- storage for global output_link -- */
-	PAGC_CALLOC_STRUC(o_l, KW**, MAXNODES, err_p, NULL);
+	PAGC_CALLOC_STRUC(o_l, KW **, MAXNODES, err_p, NULL);
 	PAGC_CALLOC_STRUC(k_s, KW, MAXRULES, err_p, NULL);
 
 	if (!initialize_link(err_p, o_l, EPSILON))
@@ -183,15 +183,15 @@ rules_init(ERR_PARAM* err_p)
 }
 
 int
-rules_add_rule(RULES* rules, int num, int* rule)
+rules_add_rule(RULES *rules, int num, int *rule)
 {
 	int i, w;
 	SYMB a, t;
 	SYMB *rule_start, *r;
 	NODE u;
-	NODE** Trie;
+	NODE **Trie;
 	KW *keyw, *k_s;
-	KW*** o_l;
+	KW ***o_l;
 
 	if (!rules) return 1;       /* error rules obj not initialized */
 	if (!rules->r_p) return 2;  /* RULE_PARAM not allocated */
@@ -291,7 +291,7 @@ rules_add_rule(RULES* rules, int num, int* rule)
 }
 
 int
-rules_ready(RULES* rules)
+rules_ready(RULES *rules)
 {
 	SYMB a;
 
@@ -337,7 +337,7 @@ rules_ready(RULES* rules)
 }
 
 void
-rules_free(RULES* rules)
+rules_free(RULES *rules)
 {
 
 	if (!rules) return;
@@ -355,8 +355,8 @@ calls util.c (open_aux_file)
 calls gamma.c (initialize_link, is_input_symbol, is_output_symbol,
 classify_link,precompute_gamma_function)
 ----------------------------------------------------------------------------*/
-RULE_PARAM*
-create_rules(const char* rule_name, PAGC_GLOBAL* glo_p)
+RULE_PARAM *
+create_rules(const char *rule_name, PAGC_GLOBAL *glo_p)
 {
 	/* -- returns size of Gamma Function Matrix -- */
 	SYMB a, t;
@@ -365,14 +365,14 @@ create_rules(const char* rule_name, PAGC_GLOBAL* glo_p)
 	int is_eof = FALSE;
 	int rule_number = 0;
 	int last_node = EPSILON;
-	FILE* rule_file;
+	FILE *rule_file;
 	SYMB *rule_start, *rule_end, *r;
 	KW *keyw, *k_s;
-	KW*** o_l;
-	NODE** Trie;
-	SYMB* r_s;
-	RULE_PARAM* r_p;
-	ERR_PARAM* err_p;
+	KW ***o_l;
+	NODE **Trie;
+	SYMB *r_s;
+	RULE_PARAM *r_p;
+	ERR_PARAM *err_p;
 
 	err_p = glo_p->process_errors;
 
@@ -391,7 +391,7 @@ create_rules(const char* rule_name, PAGC_GLOBAL* glo_p)
 	PAGC_CALLOC_STRUC(r_s, SYMB, RULESPACESIZE, err_p, NULL);
 
 	/* -- storage for temporary trie for rules -- */
-	PAGC_CALLOC_STRUC(Trie, NODE*, MAXNODES, err_p, NULL);
+	PAGC_CALLOC_STRUC(Trie, NODE *, MAXNODES, err_p, NULL);
 
 	/* -- initialize the first( EPSILON ) node of the trie -- */
 	PAGC_CALLOC_STRUC(Trie[EPSILON], NODE, MAXINSYM, err_p, NULL);
@@ -402,7 +402,7 @@ create_rules(const char* rule_name, PAGC_GLOBAL* glo_p)
 	}
 
 	/* -- storage for global output_link -- */
-	PAGC_CALLOC_STRUC(o_l, KW**, MAXNODES, err_p, NULL);
+	PAGC_CALLOC_STRUC(o_l, KW **, MAXNODES, err_p, NULL);
 	PAGC_CALLOC_STRUC(k_s, KW, MAXRULES, err_p, NULL);
 
 	rule_end = r_s + RULESPACESIZE;
@@ -532,7 +532,7 @@ create_rules(const char* rule_name, PAGC_GLOBAL* glo_p)
 gamma.c (destroy_rules)
 ----------------------------------------------------------------------------*/
 void
-destroy_rules(RULE_PARAM* r_p)
+destroy_rules(RULE_PARAM *r_p)
 {
 	if (r_p != NULL)
 	{
@@ -541,7 +541,7 @@ destroy_rules(RULE_PARAM* r_p)
 		DBG("destroy_rules 2");
 		FREE_AND_NULL(r_p->key_space);
 		DBG("destroy_rules 3");
-		PAGC_DESTROY_2D_ARRAY(r_p->output_link, KW*, r_p->num_nodes);
+		PAGC_DESTROY_2D_ARRAY(r_p->output_link, KW *, r_p->num_nodes);
 		DBG("destroy_rules 4");
 		PAGC_DESTROY_2D_ARRAY(r_p->gamma_matrix, NODE, r_p->num_nodes);
 		DBG(" destroy_rules 5");
@@ -556,13 +556,13 @@ gamma.c (initalize_link)
 called by gamma.c (create_rules)
 ----------------------------------------------------------------------------*/
 static int
-initialize_link(ERR_PARAM* err_p, KW*** o_l, NODE u)
+initialize_link(ERR_PARAM *err_p, KW ***o_l, NODE u)
 {
 	int cl;
 
 	/* -- classification by clause type -- */
 
-	PAGC_CALLOC_STRUC(o_l[u], KW*, MAX_CL, err_p, FALSE);
+	PAGC_CALLOC_STRUC(o_l[u], KW *, MAX_CL, err_p, FALSE);
 	for (cl = 0; cl < MAX_CL; cl++)
 	{
 
@@ -576,9 +576,9 @@ gamma.c (classify_link)
 called by gamma.c (create_rules)
 ----------------------------------------------------------------------------*/
 static void
-classify_link(RULE_PARAM* r_p,
-	      KW*** o_l, /* -- 2006-11-02 : arg -- */
-	      KW* k,
+classify_link(RULE_PARAM *r_p,
+	      KW ***o_l, /* -- 2006-11-02 : arg -- */
+	      KW *k,
 	      NODE u,
 	      SYMB w,
 	      SYMB c)
@@ -609,7 +609,7 @@ gamma.c (add_failure_linkage)
 called by gamma.c (precompute_gamma_function)
 ----------------------------------------------------------------------------*/
 static void
-add_failure_linkage(KW*** o_l, NODE x, NODE u)
+add_failure_linkage(KW ***o_l, NODE x, NODE u)
 {
 	/* -- called by precompute_gamma_function
 	   -- x is the node in the failure function of the node u
@@ -647,13 +647,13 @@ gamma.c (precompute_gamma_function)
 called by gamma.c (create_rules)
 calls gamma.c (add_failure_linkage)
 ----------------------------------------------------------------------------*/
-static NODE**
-precompute_gamma_function(ERR_PARAM* err_p, NODE** Trie, KW*** o_l, NODE n)
+static NODE **
+precompute_gamma_function(ERR_PARAM *err_p, NODE **Trie, KW ***o_l, NODE n)
 {
 	NODE u, ua, x;
 	SYMB a;
 	int i, j;
-	NODE** Gamma;
+	NODE **Gamma;
 	NODE *Failure, *Queue;
 
 	/* -- Storage for Failure Function -- */
@@ -705,7 +705,7 @@ precompute_gamma_function(ERR_PARAM* err_p, NODE** Trie, KW*** o_l, NODE n)
 	return Gamma;
 }
 
-static const char* rule_type_names[] = {"MACRO", "MICRO", "ARC", "CIVIC", "EXTRA"};
+static const char *rule_type_names[] = {"MACRO", "MICRO", "ARC", "CIVIC", "EXTRA"};
 
 /* =========================================
 gamma.c (output_rule_statistics)
@@ -714,19 +714,19 @@ stdio.h (printf,fprintf,fflush,fclose)
 ===========================================*/
 #ifdef BUILD_API
 int
-output_rule_statistics(RULE_PARAM* r_p, ERR_PARAM* err_p)
+output_rule_statistics(RULE_PARAM *r_p, ERR_PARAM *err_p)
 {
 #else
 int
-output_rule_statistics(RULE_PARAM* r_p, ERR_PARAM* err_p, char* name, DS_Handle _file_sys_p)
+output_rule_statistics(RULE_PARAM *r_p, ERR_PARAM *err_p, char *name, DS_Handle _file_sys_p)
 {
 #endif
 	int i, found_count, n;
-	SYMB* OL;
-	char* sts_name = NULL;
-	FILE* sts_file = NULL;
-	KW* k;
-	KW* k_s;
+	SYMB *OL;
+	char *sts_name = NULL;
+	FILE *sts_file = NULL;
+	KW *k;
+	KW *k_s;
 	double hit_frequency, best_frequency;
 
 	if (!r_p->collect_statistics)

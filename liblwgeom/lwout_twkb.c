@@ -28,7 +28,7 @@
  * GeometryType, and dimensions
  */
 static uint8_t
-lwgeom_twkb_type(const LWGEOM* geom)
+lwgeom_twkb_type(const LWGEOM *geom)
 {
 	uint8_t twkb_type = 0;
 
@@ -68,7 +68,7 @@ lwgeom_twkb_type(const LWGEOM* geom)
  * xmin, xdelta, ymin, ydelta
  */
 static size_t
-sizeof_bbox(TWKB_STATE* ts, int ndims)
+sizeof_bbox(TWKB_STATE *ts, int ndims)
 {
 	int i;
 	uint8_t buf[16];
@@ -86,7 +86,7 @@ sizeof_bbox(TWKB_STATE* ts, int ndims)
  * xmin, xdelta, ymin, ydelta
  */
 static void
-write_bbox(TWKB_STATE* ts, int ndims)
+write_bbox(TWKB_STATE *ts, int ndims)
 {
 	int i;
 	LWDEBUGF(2, "Entered %s", __func__);
@@ -103,16 +103,16 @@ write_bbox(TWKB_STATE* ts, int ndims)
  * @dimension, states the dimensionality of object this array is part of (0 = point, 1 = linear, 2 = areal)
  */
 static int
-ptarray_to_twkb_buf(const POINTARRAY* pa,
-		    TWKB_GLOBALS* globals,
-		    TWKB_STATE* ts,
+ptarray_to_twkb_buf(const POINTARRAY *pa,
+		    TWKB_GLOBALS *globals,
+		    TWKB_STATE *ts,
 		    int register_npoints,
 		    uint32_t minpoints)
 {
 	uint32_t ndims = FLAGS_NDIMS(pa->flags);
 	uint32_t i, j;
 	bytebuffer_t b;
-	bytebuffer_t* b_p;
+	bytebuffer_t *b_p;
 	int64_t nextdelta[MAX_N_DIMS];
 	int npoints = 0;
 	size_t npoints_offset = 0;
@@ -159,7 +159,7 @@ ptarray_to_twkb_buf(const POINTARRAY* pa,
 
 	for (i = 0; i < pa->npoints; i++)
 	{
-		double* dbl_ptr = (double*)getPoint_internal(pa, i);
+		double *dbl_ptr = (double *)getPoint_internal(pa, i);
 		int diff = 0;
 
 		/* Write this coordinate to the buffer as a varint */
@@ -227,7 +227,7 @@ ptarray_to_twkb_buf(const POINTARRAY* pa,
  *******************************************************************/
 
 static int
-lwpoint_to_twkb_buf(const LWPOINT* pt, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwpoint_to_twkb_buf(const LWPOINT *pt, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	LWDEBUGF(2, "Entered %s", __func__);
 
@@ -241,7 +241,7 @@ lwpoint_to_twkb_buf(const LWPOINT* pt, TWKB_GLOBALS* globals, TWKB_STATE* ts)
  *******************************************************************/
 
 static int
-lwline_to_twkb_buf(const LWLINE* line, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwline_to_twkb_buf(const LWLINE *line, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	LWDEBUGF(2, "Entered %s", __func__);
 
@@ -255,7 +255,7 @@ lwline_to_twkb_buf(const LWLINE* line, TWKB_GLOBALS* globals, TWKB_STATE* ts)
  *******************************************************************/
 
 static int
-lwpoly_to_twkb_buf(const LWPOLY* poly, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwpoly_to_twkb_buf(const LWPOLY *poly, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	uint32_t i;
 
@@ -276,7 +276,7 @@ lwpoly_to_twkb_buf(const LWPOLY* poly, TWKB_GLOBALS* globals, TWKB_STATE* ts)
  *******************************************************************/
 
 static int
-lwmulti_to_twkb_buf(const LWCOLLECTION* col, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwmulti_to_twkb_buf(const LWCOLLECTION *col, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	uint32_t i;
 	int nempty = 0;
@@ -324,7 +324,7 @@ lwmulti_to_twkb_buf(const LWCOLLECTION* col, TWKB_GLOBALS* globals, TWKB_STATE* 
  *******************************************************************/
 
 static int
-lwcollection_to_twkb_buf(const LWCOLLECTION* col, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwcollection_to_twkb_buf(const LWCOLLECTION *col, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	uint32_t i;
 
@@ -357,7 +357,7 @@ lwcollection_to_twkb_buf(const LWCOLLECTION* col, TWKB_GLOBALS* globals, TWKB_ST
  *******************************************************************/
 
 static int
-lwgeom_to_twkb_buf(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* ts)
+lwgeom_to_twkb_buf(const LWGEOM *geom, TWKB_GLOBALS *globals, TWKB_STATE *ts)
 {
 	LWDEBUGF(2, "Entered %s", __func__);
 
@@ -366,18 +366,18 @@ lwgeom_to_twkb_buf(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* ts)
 	case POINTTYPE:
 	{
 		LWDEBUGF(4, "Type found is Point, %d", geom->type);
-		return lwpoint_to_twkb_buf((LWPOINT*)geom, globals, ts);
+		return lwpoint_to_twkb_buf((LWPOINT *)geom, globals, ts);
 	}
 	case LINETYPE:
 	{
 		LWDEBUGF(4, "Type found is Linestring, %d", geom->type);
-		return lwline_to_twkb_buf((LWLINE*)geom, globals, ts);
+		return lwline_to_twkb_buf((LWLINE *)geom, globals, ts);
 	}
 	/* Polygon has 'nrings' and 'rings' elements */
 	case POLYGONTYPE:
 	{
 		LWDEBUGF(4, "Type found is Polygon, %d", geom->type);
-		return lwpoly_to_twkb_buf((LWPOLY*)geom, globals, ts);
+		return lwpoly_to_twkb_buf((LWPOLY *)geom, globals, ts);
 	}
 
 	/* All these Collection types have 'ngeoms' and 'geoms' elements */
@@ -386,12 +386,12 @@ lwgeom_to_twkb_buf(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* ts)
 	case MULTIPOLYGONTYPE:
 	{
 		LWDEBUGF(4, "Type found is Multi, %d", geom->type);
-		return lwmulti_to_twkb_buf((LWCOLLECTION*)geom, globals, ts);
+		return lwmulti_to_twkb_buf((LWCOLLECTION *)geom, globals, ts);
 	}
 	case COLLECTIONTYPE:
 	{
 		LWDEBUGF(4, "Type found is collection, %d", geom->type);
-		return lwcollection_to_twkb_buf((LWCOLLECTION*)geom, globals, ts);
+		return lwcollection_to_twkb_buf((LWCOLLECTION *)geom, globals, ts);
 	}
 	/* Unknown type! */
 	default:
@@ -402,7 +402,7 @@ lwgeom_to_twkb_buf(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* ts)
 }
 
 static int
-lwgeom_write_to_buffer(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* parent_state)
+lwgeom_write_to_buffer(const LWGEOM *geom, TWKB_GLOBALS *globals, TWKB_STATE *parent_state)
 {
 	int i, is_empty, has_z = 0, has_m = 0, ndims;
 	size_t bbox_size = 0, optional_precision_byte = 0;
@@ -555,14 +555,14 @@ lwgeom_write_to_buffer(const LWGEOM* geom, TWKB_GLOBALS* globals, TWKB_STATE* pa
  * Convert LWGEOM to a char* in TWKB format. Caller is responsible for freeing
  * the returned array.
  */
-uint8_t*
-lwgeom_to_twkb_with_idlist(const LWGEOM* geom,
-			   int64_t* idlist,
+uint8_t *
+lwgeom_to_twkb_with_idlist(const LWGEOM *geom,
+			   int64_t *idlist,
 			   uint8_t variant,
 			   int8_t precision_xy,
 			   int8_t precision_z,
 			   int8_t precision_m,
-			   size_t* twkb_size)
+			   size_t *twkb_size)
 {
 	LWDEBUGF(2, "Entered %s", __func__);
 	LWDEBUGF(2, "variant value %x", variant);
@@ -571,7 +571,7 @@ lwgeom_to_twkb_with_idlist(const LWGEOM* geom,
 	TWKB_STATE ts;
 	bytebuffer_t geom_bytebuffer;
 
-	uint8_t* twkb;
+	uint8_t *twkb;
 
 	memset(&ts, 0, sizeof(TWKB_STATE));
 	memset(&tg, 0, sizeof(TWKB_GLOBALS));
@@ -605,13 +605,13 @@ lwgeom_to_twkb_with_idlist(const LWGEOM* geom,
 	return twkb;
 }
 
-uint8_t*
-lwgeom_to_twkb(const LWGEOM* geom,
+uint8_t *
+lwgeom_to_twkb(const LWGEOM *geom,
 	       uint8_t variant,
 	       int8_t precision_xy,
 	       int8_t precision_z,
 	       int8_t precision_m,
-	       size_t* twkb_size)
+	       size_t *twkb_size)
 {
 	return lwgeom_to_twkb_with_idlist(geom, NULL, variant, precision_xy, precision_z, precision_m, twkb_size);
 }

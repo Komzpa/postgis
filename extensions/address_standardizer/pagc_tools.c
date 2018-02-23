@@ -38,10 +38,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #endif
 
 #ifdef MSYS_POSIX
-static void conform_directory_separator(char*);
+static void conform_directory_separator(char *);
 #endif
 
-static const char* OutSymbNames[] = {"BLDNG",
+static const char *OutSymbNames[] = {"BLDNG",
 				     "HOUSE",
 				     "PREDIR",
 				     "QUALIF",
@@ -60,7 +60,7 @@ static const char* OutSymbNames[] = {"BLDNG",
 				     "UNITH",
 				     "UNITT"};
 
-static const char* InSymbNames[] = {
+static const char *InSymbNames[] = {
     "NUMBER", "WORD",   "TYPE",   "QUALIF", "PRETYP", "STREET", "ROAD",  "STOPWORD", "RR",     "DASH",
     "CITY",   "PROV",   "NATION", "AMPERS", "BOXH",   "ORD",    "UNITH", "UNITT",    "SINGLE", "BUILDH",
     "MILE",   "DOUBLE", "DIRECT", "MIXED",  "BUILDT", "FRACT",  "PCT",   "PCH",      "QUINT",  "QUAD",
@@ -71,11 +71,11 @@ static const char* InSymbNames[] = {
    TigerLine will use them.
 ------------------------------------------------------------- */
 void
-convert_latin_one(char* inp)
+convert_latin_one(char *inp)
 {
-	unsigned char* str;
+	unsigned char *str;
 
-	for (str = (unsigned char*)inp; *str != SENTINEL; str++)
+	for (str = (unsigned char *)inp; *str != SENTINEL; str++)
 	{
 		unsigned char ch;
 		ch = *str;
@@ -128,33 +128,33 @@ convert_latin_one(char* inp)
 }
 
 void
-char_append(const char* div, char* dest, const char* src, int max_wid)
+char_append(const char *div, char *dest, const char *src, int max_wid)
 {
 	if (*src == SENTINEL) return;
 	/* -- skip the delimitor if dest is empty -- */
 	if (*dest == SENTINEL)
 	{
-		append_string_to_max(dest, (char*)src, max_wid);
+		append_string_to_max(dest, (char *)src, max_wid);
 		return;
 	}
-	append_string_to_max(dest, (char*)div, max_wid);
-	append_string_to_max(dest, (char*)src, max_wid);
+	append_string_to_max(dest, (char *)div, max_wid);
+	append_string_to_max(dest, (char *)src, max_wid);
 }
 
-const char*
+const char *
 out_symb_name(int i)
 {
 	return (OutSymbNames[i]);
 }
 
-const char*
+const char *
 in_symb_name(int i)
 {
 	return (InSymbNames[i]);
 }
 
 int
-out_symb_value(const char* src)
+out_symb_value(const char *src)
 {
 	int i;
 
@@ -171,7 +171,7 @@ util.c (get_input_line)
 called by initial.c (restore_build_state)
 --------------------------------------------*/
 int
-get_input_line(char* buf, FILE* fp)
+get_input_line(char *buf, FILE *fp)
 {
 	int i;
 
@@ -193,10 +193,10 @@ copies the file name to the output_tail and the path to
 the output_head
 --------------------------------------------------------*/
 void
-parse_file_name(const char* input_path_name, char global_path_separator, char* output_tail, char* output_head)
+parse_file_name(const char *input_path_name, char global_path_separator, char *output_tail, char *output_head)
 {
 	const char *end_ptr, *src;
-	char* dest;
+	char *dest;
 	/* -- find the file name part first -- */
 	/* -- move to end of the pathname -- */
 	for (end_ptr = input_path_name; *end_ptr != SENTINEL; end_ptr++)
@@ -244,7 +244,7 @@ called by util.c (open_aux_file)
 calls char_append
 --------------------------------------------------*/
 void
-combine_path_file(char global_path_separator, char* input_head, char* input_tail, char* output_path_name)
+combine_path_file(char global_path_separator, char *input_head, char *input_tail, char *output_path_name)
 {
 	char combine_buf[2];
 
@@ -262,7 +262,7 @@ combine_path_file(char global_path_separator, char* input_head, char* input_tail
 }
 
 void
-upper_case(char* d, const char* s)
+upper_case(char *d, const char *s)
 {
 	/* -- make an uppercase copy in d of string in s -- */
 	for (; *s != SENTINEL; s++)
@@ -274,7 +274,7 @@ upper_case(char* d, const char* s)
 
 /* 2010-10-22 : new routine */
 int
-upper_case_compare(char* str1, char* str2)
+upper_case_compare(char *str1, char *str2)
 {
 	char upper_buf1[MAXSTRLEN];
 	char upper_buf2[MAXSTRLEN];
@@ -285,7 +285,7 @@ upper_case_compare(char* str1, char* str2)
 
 /* 2010-10-30 : moved here for use in ds */
 void
-fast_reverse_endian(char* location_to_reverse, int bytes_to_reverse)
+fast_reverse_endian(char *location_to_reverse, int bytes_to_reverse)
 {
 	char *start_byte_ptr, *end_byte_ptr;
 
@@ -303,7 +303,7 @@ fast_reverse_endian(char* location_to_reverse, int bytes_to_reverse)
 pagc_tools.c (append_string_to_max ) = format.c (format_ncat)
 =================================================================*/
 void
-append_string_to_max(char* dest_buf_start, char* src_str_start, int buf_size)
+append_string_to_max(char *dest_buf_start, char *src_str_start, int buf_size)
 {
 
 	char a;
@@ -345,9 +345,9 @@ pagc_tools.c (establish_directory)
 Determine the current working directory and path_separator
 ========================================================= */
 int
-establish_directory(char* c_w_d, char* p_s)
+establish_directory(char *c_w_d, char *p_s)
 {
-	char* c_w_d_ptr;
+	char *c_w_d_ptr;
 
 	c_w_d_ptr = getcwd(c_w_d, (PATHNAME_LEN - 1));
 	if (c_w_d_ptr == NULL) { return FALSE; }
@@ -389,7 +389,7 @@ called by init_global
 string.h (strlen)
 -------------------------------------------------------------------*/
 static void
-conform_directory_separator(char* path_name)
+conform_directory_separator(char *path_name)
 {
 	int i, pn_len;
 

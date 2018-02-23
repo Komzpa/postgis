@@ -27,8 +27,8 @@ typedef struct struct_point
 
 typedef struct struct_ring
 {
-	Point* list; /* list of points */
-	struct struct_ring* next;
+	Point *list; /* list of points */
+	struct struct_ring *next;
 	int n;               /* number of points in list */
 	unsigned int linked; /* number of "next" rings */
 } Ring;
@@ -41,22 +41,22 @@ typedef struct struct_ring
 #define UTF8_BAD_RESULT 1
 #define UTF8_NO_RESULT 2
 
-char* escape_copy_string(char* str);
-char* escape_insert_string(char* str);
+char *escape_copy_string(char *str);
+char *escape_insert_string(char *str);
 
-int GeneratePointGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry, int force_multi);
-int GenerateLineStringGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry);
-int PIP(Point P, Point* V, int n);
-int FindPolygons(SHPObject* obj, Ring*** Out);
-void ReleasePolygons(Ring** polys, int npolys);
-int GeneratePolygonGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry);
+int GeneratePointGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry, int force_multi);
+int GenerateLineStringGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry);
+int PIP(Point P, Point *V, int n);
+int FindPolygons(SHPObject *obj, Ring ***Out);
+void ReleasePolygons(Ring **polys, int npolys);
+int GeneratePolygonGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry);
 
 /* Return allocated string containing UTF8 string converted from encoding fromcode */
 static int
-utf8(const char* fromcode, char* inputbuf, char** outputbuf)
+utf8(const char *fromcode, char *inputbuf, char **outputbuf)
 {
 	iconv_t cd;
-	char* outputptr;
+	char *outputptr;
 	size_t outbytesleft;
 	size_t inbytesleft;
 
@@ -67,7 +67,7 @@ utf8(const char* fromcode, char* inputbuf, char** outputbuf)
 
 	outbytesleft = inbytesleft * 3 + 1; /* UTF8 string can be 3 times larger */
 	/* then local string */
-	*outputbuf = (char*)malloc(outbytesleft);
+	*outputbuf = (char *)malloc(outbytesleft);
 	if (!*outputbuf) return UTF8_NO_RESULT;
 
 	memset(*outputbuf, 0, outbytesleft);
@@ -109,8 +109,8 @@ utf8(const char* fromcode, char* inputbuf, char** outputbuf)
  * Escape input string suitable for COPY. If no characters require escaping, simply return
  * the input pointer. Otherwise return a new allocated string.
  */
-char*
-escape_copy_string(char* str)
+char *
+escape_copy_string(char *str)
 {
 	/*
 	 * Escape the following characters by adding a preceding backslash
@@ -121,7 +121,7 @@ escape_copy_string(char* str)
 	 *
 	 */
 
-	char* result;
+	char *result;
 	char *ptr, *optr;
 	int toescape = 0;
 	size_t size;
@@ -160,8 +160,8 @@ escape_copy_string(char* str)
  * Escape input string suitable for INSERT. If no characters require escaping, simply return
  * the input pointer. Otherwise return a new allocated string.
  */
-char*
-escape_insert_string(char* str)
+char *
+escape_insert_string(char *str)
 {
 	/*
 	 * Escape single quotes by adding a preceding single quote
@@ -170,7 +170,7 @@ escape_insert_string(char* str)
 	 * 2. make new string
 	 */
 
-	char* result;
+	char *result;
 	char *ptr, *optr;
 	int toescape = 0;
 	size_t size;
@@ -210,30 +210,30 @@ escape_insert_string(char* str)
  * if "force_multi" is true, single points will instead be created as multipoints with a single vertice.
  */
 int
-GeneratePointGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry, int force_multi)
+GeneratePointGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry, int force_multi)
 {
-	LWGEOM** lwmultipoints;
-	LWGEOM* lwgeom = NULL;
+	LWGEOM **lwmultipoints;
+	LWGEOM *lwgeom = NULL;
 
 	POINT4D point4d;
 
 	int dims = 0;
 	int u;
 
-	char* mem;
+	char *mem;
 	size_t mem_length;
 
 	FLAGS_SET_Z(dims, state->has_z);
 	FLAGS_SET_M(dims, state->has_m);
 
 	/* Allocate memory for our array of LWPOINTs and our dynptarrays */
-	lwmultipoints = malloc(sizeof(LWPOINT*) * obj->nVertices);
+	lwmultipoints = malloc(sizeof(LWPOINT *) * obj->nVertices);
 
 	/* We need an array of pointers to each of our sub-geometries */
 	for (u = 0; u < obj->nVertices; u++)
 	{
 		/* Create a ptarray containing a single point */
-		POINTARRAY* pa = ptarray_construct_empty(state->has_z, state->has_m, 1);
+		POINTARRAY *pa = ptarray_construct_empty(state->has_z, state->has_m, 1);
 
 		/* Generate the point */
 		point4d.x = obj->padfX[u];
@@ -287,15 +287,15 @@ GeneratePointGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry, in
  * @brief Generate an allocated geometry string for shapefile object obj using the state parameters
  */
 int
-GenerateLineStringGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry)
+GenerateLineStringGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry)
 {
 
-	LWGEOM** lwmultilinestrings;
-	LWGEOM* lwgeom = NULL;
+	LWGEOM **lwmultilinestrings;
+	LWGEOM *lwgeom = NULL;
 	POINT4D point4d;
 	int dims = 0;
 	int u, v, start_vertex, end_vertex;
-	char* mem;
+	char *mem;
 	size_t mem_length;
 
 	FLAGS_SET_Z(dims, state->has_z);
@@ -312,13 +312,13 @@ GenerateLineStringGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometr
 	}
 
 	/* Allocate memory for our array of LWLINEs and our dynptarrays */
-	lwmultilinestrings = malloc(sizeof(LWPOINT*) * obj->nParts);
+	lwmultilinestrings = malloc(sizeof(LWPOINT *) * obj->nParts);
 
 	/* We need an array of pointers to each of our sub-geometries */
 	for (u = 0; u < obj->nParts; u++)
 	{
 		/* Create a ptarray containing the line points */
-		POINTARRAY* pa = ptarray_construct_empty(state->has_z, state->has_m, obj->nParts);
+		POINTARRAY *pa = ptarray_construct_empty(state->has_z, state->has_m, obj->nParts);
 
 		/* Set the start/end vertices depending upon whether this is
 		a MULTILINESTRING or not */
@@ -384,7 +384,7 @@ GenerateLineStringGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometr
  * @return   0 = outside, 1 = inside
  */
 int
-PIP(Point P, Point* V, int n)
+PIP(Point P, Point *V, int n)
 {
 	int cn = 0; /* the crossing number counter */
 	int i;
@@ -405,11 +405,11 @@ PIP(Point P, Point* V, int n)
 }
 
 int
-FindPolygons(SHPObject* obj, Ring*** Out)
+FindPolygons(SHPObject *obj, Ring ***Out)
 {
-	Ring** Outer;      /* Pointers to Outer rings */
+	Ring **Outer;      /* Pointers to Outer rings */
 	int out_index = 0; /* Count of Outer rings */
-	Ring** Inner;      /* Pointers to Inner rings */
+	Ring **Inner;      /* Pointers to Inner rings */
 	int in_index = 0;  /* Count of Inner rings */
 	int pi;            /* part index */
 
@@ -421,8 +421,8 @@ FindPolygons(SHPObject* obj, Ring*** Out)
 	LWDEBUGF(4, "FindPolygons[%d]: allocated space for %d rings\n", call, obj->nParts);
 
 	/* Allocate initial memory */
-	Outer = (Ring**)malloc(sizeof(Ring*) * obj->nParts);
-	Inner = (Ring**)malloc(sizeof(Ring*) * obj->nParts);
+	Outer = (Ring **)malloc(sizeof(Ring *) * obj->nParts);
+	Inner = (Ring **)malloc(sizeof(Ring *) * obj->nParts);
 
 	/* Iterate over rings dividing in Outers and Inners */
 	for (pi = 0; pi < obj->nParts; pi++)
@@ -432,7 +432,7 @@ FindPolygons(SHPObject* obj, Ring*** Out)
 		int ve; /* end index */
 		int nv; /* number of vertex */
 		double area = 0.0;
-		Ring* ring;
+		Ring *ring;
 
 		/* Set start and end vertexes */
 		if (pi == obj->nParts - 1)
@@ -446,8 +446,8 @@ FindPolygons(SHPObject* obj, Ring*** Out)
 		nv = ve - vs;
 
 		/* Allocate memory for a ring */
-		ring = (Ring*)malloc(sizeof(Ring));
-		ring->list = (Point*)malloc(sizeof(Point) * nv);
+		ring = (Ring *)malloc(sizeof(Ring));
+		ring->list = (Point *)malloc(sizeof(Point) * nv);
 		ring->n = nv;
 		ring->next = NULL;
 		ring->linked = 0;
@@ -551,7 +551,7 @@ FindPolygons(SHPObject* obj, Ring*** Out)
 }
 
 void
-ReleasePolygons(Ring** polys, int npolys)
+ReleasePolygons(Ring **polys, int npolys)
 {
 	int pi;
 
@@ -580,20 +580,20 @@ ReleasePolygons(Ring** polys, int npolys)
  *
  */
 int
-GeneratePolygonGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry)
+GeneratePolygonGeometry(SHPLOADERSTATE *state, SHPObject *obj, char **geometry)
 {
-	Ring** Outer;
+	Ring **Outer;
 	int polygon_total, ring_total;
 	int pi, vi; /* part index and vertex index */
 
-	LWGEOM** lwpolygons;
-	LWGEOM* lwgeom;
+	LWGEOM **lwpolygons;
+	LWGEOM *lwgeom;
 
 	POINT4D point4d;
 
 	int dims = 0;
 
-	char* mem;
+	char *mem;
 	size_t mem_length;
 
 	FLAGS_SET_Z(dims, state->has_z);
@@ -613,14 +613,14 @@ GeneratePolygonGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry)
 	}
 
 	/* Allocate memory for our array of LWPOLYs */
-	lwpolygons = malloc(sizeof(LWPOLY*) * polygon_total);
+	lwpolygons = malloc(sizeof(LWPOLY *) * polygon_total);
 
 	/* Cycle through each individual polygon */
 	for (pi = 0; pi < polygon_total; pi++)
 	{
-		LWPOLY* lwpoly = lwpoly_construct_empty(state->from_srid, state->has_z, state->has_m);
+		LWPOLY *lwpoly = lwpoly_construct_empty(state->from_srid, state->has_z, state->has_m);
 
-		Ring* polyring;
+		Ring *polyring;
 		int ring_index = 0;
 
 		/* Firstly count through the total number of rings in this polygon */
@@ -638,7 +638,7 @@ GeneratePolygonGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry)
 		while (polyring)
 		{
 			/* Create a POINTARRAY containing the points making up the ring */
-			POINTARRAY* pa = ptarray_construct_empty(state->has_z, state->has_m, polyring->n);
+			POINTARRAY *pa = ptarray_construct_empty(state->has_z, state->has_m, polyring->n);
 
 			for (vi = 0; vi < polyring->n; vi++)
 			{
@@ -707,7 +707,7 @@ GeneratePolygonGeometry(SHPLOADERSTATE* state, SHPObject* obj, char** geometry)
 
 /* Convert the string to lower case */
 void
-strtolower(char* s)
+strtolower(char *s)
 {
 	size_t j;
 
@@ -717,7 +717,7 @@ strtolower(char* s)
 
 /* Default configuration settings */
 void
-set_loader_config_defaults(SHPLOADERCONFIG* config)
+set_loader_config_defaults(SHPLOADERCONFIG *config)
 {
 	config->opt = 'c';
 	config->table = NULL;
@@ -744,10 +744,10 @@ set_loader_config_defaults(SHPLOADERCONFIG* config)
 }
 
 /* Create a new shapefile state object */
-SHPLOADERSTATE*
-ShpLoaderCreate(SHPLOADERCONFIG* config)
+SHPLOADERSTATE *
+ShpLoaderCreate(SHPLOADERCONFIG *config)
 {
-	SHPLOADERSTATE* state;
+	SHPLOADERSTATE *state;
 
 	/* Create a new state object and assign the config to it */
 	state = malloc(sizeof(SHPLOADERSTATE));
@@ -793,9 +793,9 @@ ShpLoaderCreate(SHPLOADERCONFIG* config)
 
 /* Open the shapefile and extract the relevant field information */
 int
-ShpLoaderOpenShape(SHPLOADERSTATE* state)
+ShpLoaderOpenShape(SHPLOADERSTATE *state)
 {
-	SHPObject* obj = NULL;
+	SHPObject *obj = NULL;
 	int j, z;
 	int ret = SHPLOADEROK;
 
@@ -803,7 +803,7 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 	char name[MAXFIELDNAMELEN];
 	char name2[MAXFIELDNAMELEN];
 	DBFFieldType type = -1;
-	char* utf8str;
+	char *utf8str;
 
 	/* If we are reading the entire shapefile, open it */
 	if (state->config->readshape == 1)
@@ -850,7 +850,7 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 		if (state->hDBFHandle->pszCodePage)
 		{
 			/* And we figured out what iconv encoding it maps to, so use it! */
-			char* newencoding = NULL;
+			char *newencoding = NULL;
 			if ((newencoding = codepage2encoding(state->hDBFHandle->pszCodePage)))
 			{
 				lwfree(state->config->encoding);
@@ -1057,11 +1057,11 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 	state->num_records = DBFGetRecordCount(state->hDBFHandle);
 
 	/* Allocate storage for field information */
-	state->field_names = malloc(state->num_fields * sizeof(char*));
-	state->types = (DBFFieldType*)malloc(state->num_fields * sizeof(int));
+	state->field_names = malloc(state->num_fields * sizeof(char *));
+	state->types = (DBFFieldType *)malloc(state->num_fields * sizeof(int));
 	state->widths = malloc(state->num_fields * sizeof(int));
 	state->precisions = malloc(state->num_fields * sizeof(int));
-	state->pgfieldtypes = malloc(state->num_fields * sizeof(char*));
+	state->pgfieldtypes = malloc(state->num_fields * sizeof(char *));
 	state->col_names = malloc((state->num_fields + 2) * sizeof(char) * MAXFIELDNAMELEN);
 
 	/* Generate a string of comma separated column names of the form "(col1, col2 ... colN)" for the SQL
@@ -1079,7 +1079,7 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 
 		if (state->config->encoding)
 		{
-			char* encoding_msg =
+			char *encoding_msg =
 			    _("Try \"LATIN1\" (Western European), or one of the values described at "
 			      "http://www.gnu.org/software/libiconv/.");
 
@@ -1120,7 +1120,7 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 		/* If a column map file has been passed in, use this to create the postgresql field name from
 		   the dbf column name */
 		{
-			const char* mapped = colmap_pg_by_dbf(&state->column_map, name);
+			const char *mapped = colmap_pg_by_dbf(&state->column_map, name);
 			if (mapped)
 			{
 				strncpy(name, mapped, MAXFIELDNAMELEN);
@@ -1239,10 +1239,10 @@ ShpLoaderOpenShape(SHPLOADERSTATE* state)
 
 /* Return a pointer to an allocated string containing the header for the specified loader state */
 int
-ShpLoaderGetSQLHeader(SHPLOADERSTATE* state, char** strheader)
+ShpLoaderGetSQLHeader(SHPLOADERSTATE *state, char **strheader)
 {
-	stringbuffer_t* sb;
-	char* ret;
+	stringbuffer_t *sb;
+	char *ret;
 	int j;
 
 	/* Create the stringbuffer containing the header; we use this API as it's easier
@@ -1341,7 +1341,7 @@ ShpLoaderGetSQLHeader(SHPLOADERSTATE* state, char** strheader)
 		   need to do an AddGeometryColumn() call. */
 		if (state->config->readshape == 1 && state->config->geography)
 		{
-			char* dimschar;
+			char *dimschar;
 
 			if (state->pgdims == 4)
 				dimschar = "ZM";
@@ -1428,8 +1428,8 @@ ShpLoaderGetSQLHeader(SHPLOADERSTATE* state, char** strheader)
 	}
 
 	/* Copy the string buffer into a new string, destroying the string buffer */
-	ret = (char*)malloc(strlen((char*)stringbuffer_getstring(sb)) + 1);
-	strcpy(ret, (char*)stringbuffer_getstring(sb));
+	ret = (char *)malloc(strlen((char *)stringbuffer_getstring(sb)) + 1);
+	strcpy(ret, (char *)stringbuffer_getstring(sb));
 	stringbuffer_destroy(sb);
 
 	*strheader = ret;
@@ -1439,9 +1439,9 @@ ShpLoaderGetSQLHeader(SHPLOADERSTATE* state, char** strheader)
 
 /* Return an allocated string containing the copy statement for this state */
 int
-ShpLoaderGetSQLCopyStatement(SHPLOADERSTATE* state, char** strheader)
+ShpLoaderGetSQLCopyStatement(SHPLOADERSTATE *state, char **strheader)
 {
-	char* copystr;
+	char *copystr;
 
 	/* Allocate the string for the COPY statement */
 	if (state->config->dump_format)
@@ -1481,22 +1481,22 @@ ShpLoaderGetSQLCopyStatement(SHPLOADERSTATE* state, char** strheader)
 
 /* Return a count of the number of entities in this shapefile */
 int
-ShpLoaderGetRecordCount(SHPLOADERSTATE* state)
+ShpLoaderGetRecordCount(SHPLOADERSTATE *state)
 {
 	return state->num_entities;
 }
 
 /* Return an allocated string representation of a specified record item */
 int
-ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strrecord)
+ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE *state, int item, char **strrecord)
 {
-	SHPObject* obj = NULL;
-	stringbuffer_t* sb;
-	stringbuffer_t* sbwarn;
+	SHPObject *obj = NULL;
+	stringbuffer_t *sb;
+	stringbuffer_t *sbwarn;
 	char val[MAXVALUELEN];
-	char* escval;
+	char *escval;
 	char *geometry = NULL, *ret;
-	char* utf8str;
+	char *utf8str;
 	int res, i;
 	int rv;
 
@@ -1616,7 +1616,7 @@ ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strreco
 
 			if (state->config->encoding)
 			{
-				char* encoding_msg =
+				char *encoding_msg =
 				    _("Try \"LATIN1\" (Western European), or one of the values described at "
 				      "http://www.postgresql.org/docs/current/static/multibyte.html.");
 
@@ -1690,7 +1690,7 @@ ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strreco
 	if (state->config->readshape == 1)
 	{
 		/* Force the locale to C */
-		char* oldlocale = setlocale(LC_NUMERIC, "C");
+		char *oldlocale = setlocale(LC_NUMERIC, "C");
 
 		/* Handle the case of a NULL shape */
 		if (obj->nVertices == 0)
@@ -1792,14 +1792,14 @@ ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strreco
 	if (!state->config->dump_format) stringbuffer_aprintf(sb, ");");
 
 	/* Copy the string buffer into a new string, destroying the string buffer */
-	ret = (char*)malloc(strlen((char*)stringbuffer_getstring(sb)) + 1);
-	strcpy(ret, (char*)stringbuffer_getstring(sb));
+	ret = (char *)malloc(strlen((char *)stringbuffer_getstring(sb)) + 1);
+	strcpy(ret, (char *)stringbuffer_getstring(sb));
 	stringbuffer_destroy(sb);
 
 	*strrecord = ret;
 
 	/* If any warnings occurred, set the returned message string and warning status */
-	if (strlen((char*)stringbuffer_getstring(sbwarn)) > 0)
+	if (strlen((char *)stringbuffer_getstring(sbwarn)) > 0)
 	{
 		snprintf(state->message, SHPLOADERMSGLEN, "%s", stringbuffer_getstring(sbwarn));
 		stringbuffer_destroy(sbwarn);
@@ -1817,10 +1817,10 @@ ShpLoaderGenerateSQLRowStatement(SHPLOADERSTATE* state, int item, char** strreco
 
 /* Return a pointer to an allocated string containing the header for the specified loader state */
 int
-ShpLoaderGetSQLFooter(SHPLOADERSTATE* state, char** strfooter)
+ShpLoaderGetSQLFooter(SHPLOADERSTATE *state, char **strfooter)
 {
-	stringbuffer_t* sb;
-	char* ret;
+	stringbuffer_t *sb;
+	char *ret;
 
 	/* Create the stringbuffer containing the header; we use this API as it's easier
 	   for handling string resizing during append */
@@ -1849,8 +1849,8 @@ ShpLoaderGetSQLFooter(SHPLOADERSTATE* state, char** strfooter)
 	stringbuffer_aprintf(sb, "\"%s\";\n", state->config->table);
 
 	/* Copy the string buffer into a new string, destroying the string buffer */
-	ret = (char*)malloc(strlen((char*)stringbuffer_getstring(sb)) + 1);
-	strcpy(ret, (char*)stringbuffer_getstring(sb));
+	ret = (char *)malloc(strlen((char *)stringbuffer_getstring(sb)) + 1);
+	strcpy(ret, (char *)stringbuffer_getstring(sb));
 	stringbuffer_destroy(sb);
 
 	*strfooter = ret;
@@ -1859,7 +1859,7 @@ ShpLoaderGetSQLFooter(SHPLOADERSTATE* state, char** strfooter)
 }
 
 void
-ShpLoaderDestroy(SHPLOADERSTATE* state)
+ShpLoaderDestroy(SHPLOADERSTATE *state)
 {
 	/* Destroy a state object created with ShpLoaderOpenShape */
 	int i;

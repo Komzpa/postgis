@@ -107,12 +107,12 @@ static const double __ac_HASH_UPPER = 0.77;
 	typedef struct \
 	{ \
 		khint_t n_buckets, size, n_occupied, upper_bound; \
-		uint32_t* flags; \
-		khkey_t* keys; \
-		khval_t* vals; \
+		uint32_t *flags; \
+		khkey_t *keys; \
+		khval_t *vals; \
 	} kh_##name##_t; \
-	static inline kh_##name##_t* kh_init_##name() { return (kh_##name##_t*)calloc(1, sizeof(kh_##name##_t)); } \
-	static inline void kh_destroy_##name(kh_##name##_t* h) \
+	static inline kh_##name##_t *kh_init_##name() { return (kh_##name##_t *)calloc(1, sizeof(kh_##name##_t)); } \
+	static inline void kh_destroy_##name(kh_##name##_t *h) \
 	{ \
 		if (h) \
 		{ \
@@ -122,7 +122,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			/*free(h);*/ \
 		} \
 	} \
-	static inline void kh_clear_##name(kh_##name##_t* h) \
+	static inline void kh_clear_##name(kh_##name##_t *h) \
 	{ \
 		if (h && h->flags) \
 		{ \
@@ -130,7 +130,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			h->size = h->n_occupied = 0; \
 		} \
 	} \
-	static inline khint_t kh_get_##name(kh_##name##_t* h, khkey_t key) \
+	static inline khint_t kh_get_##name(kh_##name##_t *h, khkey_t key) \
 	{ \
 		if (h->n_buckets) \
 		{ \
@@ -153,9 +153,9 @@ static const double __ac_HASH_UPPER = 0.77;
 		else \
 			return 0; \
 	} \
-	static inline void kh_resize_##name(kh_##name##_t* h, khint_t new_n_buckets) \
+	static inline void kh_resize_##name(kh_##name##_t *h, khint_t new_n_buckets) \
 	{ \
-		uint32_t* new_flags = 0; \
+		uint32_t *new_flags = 0; \
 		khint_t j = 1; \
 		{ \
 			khint_t t = __ac_HASH_PRIME_SIZE - 1; \
@@ -166,13 +166,14 @@ static const double __ac_HASH_UPPER = 0.77;
 				j = 0; \
 			else \
 			{ \
-				new_flags = (uint32_t*)malloc(((new_n_buckets >> 4) + 1) * sizeof(uint32_t)); \
+				new_flags = (uint32_t *)malloc(((new_n_buckets >> 4) + 1) * sizeof(uint32_t)); \
 				memset(new_flags, 0xaa, ((new_n_buckets >> 4) + 1) * sizeof(uint32_t)); \
 				if (h->n_buckets < new_n_buckets) \
 				{ \
-					h->keys = (khkey_t*)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
+					h->keys = (khkey_t *)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
 					if (kh_is_map) \
-						h->vals = (khval_t*)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+						h->vals = \
+						    (khval_t *)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
 				} \
 			} \
 		} \
@@ -226,8 +227,8 @@ static const double __ac_HASH_UPPER = 0.77;
 			} \
 			if (h->n_buckets > new_n_buckets) \
 			{ \
-				h->keys = (khkey_t*)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
-				if (kh_is_map) h->vals = (khval_t*)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+				h->keys = (khkey_t *)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
+				if (kh_is_map) h->vals = (khval_t *)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
 			} \
 			free(h->flags); \
 			h->flags = new_flags; \
@@ -236,7 +237,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			h->upper_bound = (khint_t)(h->n_buckets * __ac_HASH_UPPER + 0.5); \
 		} \
 	} \
-	static inline khint_t kh_put_##name(kh_##name##_t* h, khkey_t key, int* ret) \
+	static inline khint_t kh_put_##name(kh_##name##_t *h, khkey_t key, int *ret) \
 	{ \
 		khint_t x; \
 		if (h->n_occupied >= h->upper_bound) \
@@ -299,7 +300,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			*ret = 0; \
 		return x; \
 	} \
-	static inline void kh_del_##name(kh_##name##_t* h, khint_t x) \
+	static inline void kh_del_##name(kh_##name##_t *h, khint_t x) \
 	{ \
 		if (x != h->n_buckets && !__ac_iseither(h->flags, x)) \
 		{ \
@@ -315,7 +316,7 @@ static const double __ac_HASH_UPPER = 0.77;
 #define kh_int64_hash_func(key) (uint32_t)((key) >> 33 ^ (key) ^ (key) << 11)
 #define kh_int64_hash_equal(a, b) (a == b)
 static inline khint_t
-__ac_X31_hash_string(const char* s)
+__ac_X31_hash_string(const char *s)
 {
 	khint_t h = *s;
 	if (h)
@@ -360,7 +361,7 @@ __ac_X31_hash_string(const char* s)
 #define KHASH_MAP_INIT_INT64(name, khval_t) \
 	KHASH_INIT(name, uint64_t, khval_t, 1, kh_int64_hash_func, kh_int64_hash_equal)
 
-typedef const char* kh_cstr_t;
+typedef const char *kh_cstr_t;
 #define KHASH_SET_INIT_STR(name) KHASH_INIT(name, kh_cstr_t, char, 0, kh_str_hash_func, kh_str_hash_equal)
 
 #define KHASH_MAP_INIT_STR(name, khval_t) KHASH_INIT(name, kh_cstr_t, khval_t, 1, kh_str_hash_func, kh_str_hash_equal)

@@ -12,7 +12,7 @@
  */
 
 inline void
-hash_set(hash_t* self, char* key, void* val)
+hash_set(hash_t *self, char *key, void *val)
 {
 	int ret;
 	khiter_t k = kh_put(ptr, self, key, &ret);
@@ -23,8 +23,8 @@ hash_set(hash_t* self, char* key, void* val)
  * Get hash `key`, or NULL.
  */
 
-inline void*
-hash_get(hash_t* self, char* key)
+inline void *
+hash_get(hash_t *self, char *key)
 {
 	khiter_t k = kh_get(ptr, self, key);
 	return k == kh_end(self) ? NULL : kh_value(self, k);
@@ -35,7 +35,7 @@ hash_get(hash_t* self, char* key)
  */
 
 inline int
-hash_has(hash_t* self, char* key)
+hash_has(hash_t *self, char *key)
 {
 	khiter_t k = kh_get(ptr, self, key);
 	return kh_exist(self, k);
@@ -46,7 +46,7 @@ hash_has(hash_t* self, char* key)
  */
 
 void
-hash_del(hash_t* self, char* key)
+hash_del(hash_t *self, char *key)
 {
 	khiter_t k = kh_get(ptr, self, key);
 	kh_del(ptr, self, k);
@@ -63,7 +63,7 @@ hash_del(hash_t* self, char* key)
 void
 test_hash_set()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	assert(0 == hash_size(hash));
 
 	hash_set(hash, "name", "tobi");
@@ -77,7 +77,7 @@ test_hash_set()
 void
 test_hash_get()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "foo", "bar");
 	assert(0 == strcmp("bar", hash_get(hash, "foo")));
 	assert(NULL == hash_get(hash, "bar"));
@@ -86,7 +86,7 @@ test_hash_get()
 void
 test_hash_has()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "foo", "bar");
 	assert(1 == hash_has(hash, "foo"));
 	assert(0 == hash_has(hash, "bar"));
@@ -95,7 +95,7 @@ test_hash_has()
 void
 test_hash_size()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	assert(0 == hash_size(hash));
 	hash_set(hash, "foo", "bar");
 	assert(1 == hash_size(hash));
@@ -106,7 +106,7 @@ test_hash_size()
 void
 test_hash_del()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "foo", "bar");
 	assert(1 == hash_has(hash, "foo"));
 	assert(0 == hash_has(hash, "bar"));
@@ -118,7 +118,7 @@ test_hash_del()
 void
 test_hash_clear()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "foo", "bar");
 	hash_set(hash, "bar", "baz");
 	hash_set(hash, "raz", "jaz");
@@ -130,12 +130,12 @@ test_hash_clear()
 void
 test_hash_each()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "name", "tj");
 	hash_set(hash, "age", "25");
 
-	const char* keys[2];
-	void* vals[2];
+	const char *keys[2];
+	void *vals[2];
 	int n = 0;
 
 	hash_each(hash, {
@@ -153,11 +153,11 @@ test_hash_each()
 void
 test_hash_each_key()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "name", "tj");
 	hash_set(hash, "age", "25");
 
-	const char* keys[2];
+	const char *keys[2];
 	int n = 0;
 
 	hash_each_key(hash, { keys[n++] = key; });
@@ -169,11 +169,11 @@ test_hash_each_key()
 void
 test_hash_each_val()
 {
-	hash_t* hash = hash_new();
+	hash_t *hash = hash_new();
 	hash_set(hash, "name", "tj");
 	hash_set(hash, "age", "25");
 
-	void* vals[2];
+	void *vals[2];
 	int n = 0;
 
 	hash_each_val(hash, { vals[n++] = val; });

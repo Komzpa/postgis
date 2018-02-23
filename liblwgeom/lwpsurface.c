@@ -28,14 +28,14 @@
 #include "liblwgeom_internal.h"
 #include "lwgeom_log.h"
 
-LWPSURFACE*
-lwpsurface_add_lwpoly(LWPSURFACE* mobj, const LWPOLY* obj)
+LWPSURFACE *
+lwpsurface_add_lwpoly(LWPSURFACE *mobj, const LWPOLY *obj)
 {
-	return (LWPSURFACE*)lwcollection_add_lwgeom((LWCOLLECTION*)mobj, (LWGEOM*)obj);
+	return (LWPSURFACE *)lwcollection_add_lwgeom((LWCOLLECTION *)mobj, (LWGEOM *)obj);
 }
 
 void
-lwpsurface_free(LWPSURFACE* psurf)
+lwpsurface_free(LWPSURFACE *psurf)
 {
 	uint32_t i;
 	if (!psurf) return;
@@ -50,10 +50,10 @@ lwpsurface_free(LWPSURFACE* psurf)
 }
 
 void
-printLWPSURFACE(LWPSURFACE* psurf)
+printLWPSURFACE(LWPSURFACE *psurf)
 {
 	uint32_t i, j;
-	LWPOLY* patch;
+	LWPOLY *patch;
 
 	if (psurf->type != POLYHEDRALSURFACETYPE)
 		lwerror("printLWPSURFACE called with something else than a POLYHEDRALSURFACE");
@@ -65,7 +65,7 @@ printLWPSURFACE(LWPSURFACE* psurf)
 
 	for (i = 0; i < psurf->ngeoms; i++)
 	{
-		patch = (LWPOLY*)psurf->geoms[i];
+		patch = (LWPOLY *)psurf->geoms[i];
 		for (j = 0; j < patch->nrings; j++)
 		{
 			lwnotice("    RING # %i :", j);
@@ -85,19 +85,19 @@ struct struct_psurface_arcs
 	double bx, by, bz;
 	uint32_t cnt, face;
 };
-typedef struct struct_psurface_arcs* psurface_arcs;
+typedef struct struct_psurface_arcs *psurface_arcs;
 
 /* We supposed that the geometry is valid
    we could have wrong result if not */
 int
-lwpsurface_is_closed(const LWPSURFACE* psurface)
+lwpsurface_is_closed(const LWPSURFACE *psurface)
 {
 	uint32_t i, j, k;
 	uint32_t narcs, carc;
 	int found;
 	psurface_arcs arcs;
 	POINT4D pa, pb;
-	LWPOLY* patch;
+	LWPOLY *patch;
 
 	/* If surface is not 3D, it's can't be closed */
 	if (!FLAGS_GET_Z(psurface->flags)) return 0;
@@ -108,7 +108,7 @@ lwpsurface_is_closed(const LWPSURFACE* psurface)
 	/* Max theorical arcs number if no one is shared ... */
 	for (i = 0, narcs = 0; i < psurface->ngeoms; i++)
 	{
-		patch = (LWPOLY*)psurface->geoms[i];
+		patch = (LWPOLY *)psurface->geoms[i];
 		narcs += patch->rings[0]->npoints - 1;
 	}
 
@@ -116,7 +116,7 @@ lwpsurface_is_closed(const LWPSURFACE* psurface)
 	for (i = 0, carc = 0; i < psurface->ngeoms; i++)
 	{
 
-		patch = (LWPOLY*)psurface->geoms[i];
+		patch = (LWPOLY *)psurface->geoms[i];
 		for (j = 0; j < patch->rings[0]->npoints - 1; j++)
 		{
 

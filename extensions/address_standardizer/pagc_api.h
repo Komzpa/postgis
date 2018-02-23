@@ -73,7 +73,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 typedef int SYMB;
 typedef double DS_Score_t;
-typedef void* DS_Handle;
+typedef void *DS_Handle;
 
 #endif
 
@@ -257,8 +257,8 @@ typedef struct err_param
 	int first_err;
 	int next_fatal;
 	ERR_REC err_array[MAX_ERRORS];
-	char* error_buf;
-	FILE* stream; /* -- stream for log file -- */
+	char *error_buf;
+	FILE *stream; /* -- stream for log file -- */
 } ERR_PARAM;
 
 /*===================================================================
@@ -336,36 +336,36 @@ typedef struct def
 	int Order; /* -- the order in the list -- */
 	SYMB Type; /* -- the Input symbol -- */
 	int Protect;
-	char* Standard; /* -- The standardization -- */
-	struct def* Next;
+	char *Standard; /* -- The standardization -- */
+	struct def *Next;
 } DEF;
 
 /* -- This stores the data for a lexical entry -- */
 typedef struct entry
 {
-	char* Lookup; /* -- To match against the input word -- */
-	DEF* DefList; /* -- list of definitions and outputs for this word -- */
-	struct entry* Next;
+	char *Lookup; /* -- To match against the input word -- */
+	DEF *DefList; /* -- list of definitions and outputs for this word -- */
+	struct entry *Next;
 } ENTRY;
 
 /* -- storage for standardization rules -- */
 typedef struct keyword
 {
-	SYMB* Input;  /* -- List of input symbols -- */
-	SYMB* Output; /* -- List of output symbols, 1-1 with input -- */
+	SYMB *Input;  /* -- List of input symbols -- */
+	SYMB *Output; /* -- List of output symbols, 1-1 with input -- */
 	SYMB Type;    /* -- The classification of the rule -- */
 	SYMB Weight;
 	int Length; /* -- The number of symbols -- */
 	int hits;   /* -- if collecting statistics -- */
 	int best;   /* -- if collecting statistics -- */
-	struct keyword* OutputNext;
+	struct keyword *OutputNext;
 } KW;
 
 typedef struct lexeme
 {
 	int StartMorph;
 	int EndMorph;
-	DEF* DefList;
+	DEF *DefList;
 	char Text[MAXTEXT];
 } LEXEME;
 
@@ -377,10 +377,10 @@ typedef struct rule_param
 	int collect_statistics;
 	int total_key_hits;
 	int total_best_keys;
-	NODE** gamma_matrix;
-	SYMB* rule_space;
-	KW*** output_link;
-	KW* key_space;
+	NODE **gamma_matrix;
+	SYMB *rule_space;
+	KW ***output_link;
+	KW *key_space;
 } RULE_PARAM;
 
 /* -- structure used to assemble composite output -- */
@@ -391,8 +391,8 @@ typedef struct seg
 	int End;          /* -- the end position -- */
 	int State;        /* -- row number of the tran table, used in clausetree -- */
 	DS_Score_t Value; /* -- the calculated value of the target segment -- */
-	SYMB* Output;     /* -- the output copied from the rule -- */
-	KW* Key;          /* -- the rule itself, used in clausetree construction -- */
+	SYMB *Output;     /* -- the output copied from the rule -- */
+	KW *Key;          /* -- the rule itself, used in clausetree construction -- */
 } SEG;
 
 /* -- storage structure for standardization candidates -- */
@@ -400,8 +400,8 @@ typedef struct stz
 {
 	DS_Score_t score; /* -- standardization score -- */
 	DS_Score_t raw_score;
-	KW* build_key;            /* -- use to collect statistics -- */
-	DEF* definitions[MAXLEX]; /* -- lexical or input definitions -- */
+	KW *build_key;            /* -- use to collect statistics -- */
+	DEF *definitions[MAXLEX]; /* -- lexical or input definitions -- */
 	SYMB output[MAXLEX];      /* -- output tokens -- */
 } STZ;
 
@@ -411,8 +411,8 @@ typedef struct stz_param
 	int stz_list_size;
 	int last_stz_output;
 	double stz_list_cutoff;
-	SEG* segs;
-	STZ** stz_array;
+	SEG *segs;
+	STZ **stz_array;
 } STZ_PARAM;
 
 /* 2006-11-14 */
@@ -430,20 +430,20 @@ typedef struct stand_param
 	int base_morph;
 	int LexNum;
 	int analyze_complete;
-	int* have_ref_att; /* build.c (transform_rows) */
-	RULE_PARAM* rules;
+	int *have_ref_att; /* build.c (transform_rows) */
+	RULE_PARAM *rules;
 	/*-- <remarks> 2009-08-13 : support multiple lexicons </remarks> --*/
-	ENTRY** lexicon;
-	ENTRY** address_lexicon;
-	ENTRY** poi_lexicon;
+	ENTRY **lexicon;
+	ENTRY **address_lexicon;
+	ENTRY **poi_lexicon;
 	/*-- <revision date='2012-06-01'> Add gaz_lexicon to be triggered on __start_state__ = MACRO </revision> --*/
-	ENTRY** gaz_lexicon;
+	ENTRY **gaz_lexicon;
 	/*-- <revision date='2012-07-22'> Keep track of start_state </revision> --*/
 	int start_state;
-	ERR_PARAM* errors;
-	STZ_PARAM* stz_info; /* structure created by analyze.c (create_segments) */
-	DEF** default_def;
-	char** standard_fields;
+	ERR_PARAM *errors;
+	STZ_PARAM *stz_info; /* structure created by analyze.c (create_segments) */
+	DEF **default_def;
+	char **standard_fields;
 	struct morph morph_array[MAXMORPHS];
 	SYMB best_output[MAXLEX];
 	SYMB target[MAXLEX]; /* -- target for Aho-Corasick -- */
@@ -454,8 +454,8 @@ typedef struct stand_param
 	int def_cnt[MAXLEX];       /* -- number of symbols for each lexeme -- */
 	NODE registry[MAXLEX + 1]; /* -- Aho-Corasick : offsets to output
 					links -- */
-	DEF* best_defs[MAXLEX];
-	DEF* def_array[MAXLEX][MAXDEF];    /* -- the definitions for each
+	DEF *best_defs[MAXLEX];
+	DEF *def_array[MAXLEX][MAXDEF];    /* -- the definitions for each
 						 lexeme -- */
 	SYMB comp_lex_sym[MAXLEX][MAXDEF]; /* -- symbols for each lexeme -- */
 } STAND_PARAM;
@@ -522,21 +522,21 @@ typedef struct int_candidate
 typedef struct pagc_global
 {
 	int log_init;
-	RULE_PARAM* rules;
-	DEF** default_def;
+	RULE_PARAM *rules;
+	DEF **default_def;
 	/*-- <revision date='2009-08-13'> Support multiple lexicons </revision> --*/
-	ENTRY** addr_lexicon; /*-- 2006-11-20 --*/
-	ENTRY** poi_lexicon;
+	ENTRY **addr_lexicon; /*-- 2006-11-20 --*/
+	ENTRY **poi_lexicon;
 	/*-- <revision date='2012-07-16'> gaz_lexicon </revision> --*/
-	ENTRY** gaz_lexicon;
+	ENTRY **gaz_lexicon;
 	DS_Handle _file_sys;
-	ERR_PARAM* process_errors;
+	ERR_PARAM *process_errors;
 } PAGC_GLOBAL;
 
 #ifndef BUILD_API
 /* <revision date='2012-04-26'>Divert approx functions to TRIE_ARRAY -- moved approx definitions to approx.c
  * </revision>*/
-typedef void* RECOGNIZER_HANDLE;
+typedef void *RECOGNIZER_HANDLE;
 
 /* ============================ main schema record ========================== */
 
@@ -617,14 +617,14 @@ typedef struct schema
 	int q_depth;                           /* granularity for reverse geocoding */
 	PAGC_FLAG_T flags;                     /* bit flags indicating what features are enabled for this schema */
 	ATTRIBUTE attributes[MAXOUTSYM];       /* array for address attributes */
-	ATTRIBUTE* last_att;                   /* address of the last attribute */
-	ATTRIBUTE* attribute_index[MAXOUTSYM]; /* an index into the attributes by token */
+	ATTRIBUTE *last_att;                   /* address of the last attribute */
+	ATTRIBUTE *attribute_index[MAXOUTSYM]; /* an index into the attributes by token */
 #ifdef USE_DITTO_FIELD
 	/*-- <revision date='2008-05-08'> Allocated field to store last postal code read. </revision> --*/
-	char* ditto_field;
+	char *ditto_field;
 #endif
-	char* idx_nam[MAX_INDICES]; /* pointers to allocated index names */
-	char* beta_table_name;
+	char *idx_nam[MAX_INDICES]; /* pointers to allocated index names */
+	char *beta_table_name;
 	DS_Handle _beta_factory;
 	/*-- <revision date='2012-03-27'> Remove pool handles and replace with RECOGNIZER_HANDLES </revision> --*/
 	RECOGNIZER_HANDLE street_postal_trie; /*-- <revision date='2012-03-27'>change type</revision> --*/
@@ -636,11 +636,11 @@ typedef struct schema
 
 typedef struct bdb_build_param
 {
-	ERR_PARAM* errors;
-	SCHEMA* schema;
+	ERR_PARAM *errors;
+	SCHEMA *schema;
 	DS_Handle _beta_attribute_interface;
 	DS_Handle _idx_db[MAX_INDICES];
-	DS_Byte_t* shape_buf;
+	DS_Byte_t *shape_buf;
 } BDB_BUILD_PARAM;
 
 /* ============ structures for intersection search =========== */
@@ -654,21 +654,21 @@ typedef struct x_cand
 	int distance;
 	DS_Coord_t X;
 	DS_Coord_t Y;
-	struct x_cand* cluster;
+	struct x_cand *cluster;
 } X_CAND;
 
 typedef struct pair_read
 {
 	DS_Entity_t record_1;
 	DS_Entity_t record_2;
-	struct pair_read* next;
+	struct pair_read *next;
 } PAIR_READ;
 
 typedef struct box_cell
 {
-	X_CAND* splitter;
-	PAIR_READ* pair_list;
-	struct box_cell* cell_list[4];
+	X_CAND *splitter;
+	PAIR_READ *pair_list;
+	struct box_cell *cell_list[4];
 } BOX_CELL;
 
 /* ============== structure for recording beta records read ======== */
@@ -677,22 +677,22 @@ typedef struct record_read
 {
 	DS_Entity_t row_no;
 	int stz;
-	struct record_read* left;
-	struct record_read* right;
+	struct record_read *left;
+	struct record_read *right;
 } RECORD_READ;
 
 typedef struct r_r_mgr
 {
 	int current_offset;
-	void* base; /* 2010-06-24 : change to void * for flexibility */
-	struct r_r_mgr* prev_block;
-	struct r_r_mgr* next_block;
+	void *base; /* 2010-06-24 : change to void * for flexibility */
+	struct r_r_mgr *prev_block;
+	struct r_r_mgr *next_block;
 } R_R_MGR;
 
 /* 2011-01-24 : keep schema linkages on hand until closure */
 typedef struct schema_db_linkage
 {
-	SCHEMA* linked_schema;
+	SCHEMA *linked_schema;
 	DS_Handle _linked_beta;
 	DS_Handle _linked_idx[MAX_INDICES];
 } SCHEMA_DB_LINKAGE;
@@ -701,10 +701,10 @@ typedef struct schema_db_linkage
 
 typedef struct pagc_context
 {
-	SCHEMA* schema;
-	ERR_PARAM* errors;
+	SCHEMA *schema;
+	ERR_PARAM *errors;
 	int num_backlinks;                                /* 2011-01-24 : keep schema linkages on hand until closure */
-	SCHEMA_DB_LINKAGE* schema_backlinks[MAX_SCHEMAS]; /* 2011-01-24 */
+	SCHEMA_DB_LINKAGE *schema_backlinks[MAX_SCHEMAS]; /* 2011-01-24 */
 	DS_Handle _beta_attribute_interface;
 	DS_Handle _idx_db[MAX_INDICES]; /* reader handles */
 	int private_errs;
@@ -716,27 +716,27 @@ typedef struct pagc_context
 	int query_begin;
 	int concat_reverse; /* use for intersection concat keys */
 	int collect_all;
-	INT_CANDIDATE** int_cand_list;
-	char** street_words;
-	char** landmark_words; /* 2009-09-17 */
-	CANDIDATE** cand_list;
+	INT_CANDIDATE **int_cand_list;
+	char **street_words;
+	char **landmark_words; /* 2009-09-17 */
+	CANDIDATE **cand_list;
 	/*   int numb_x_cands ;  2010-06-26, no longer needed */
 	/*   X_CAND *x_cand_list ;  2010-06-26, no longer needed */
-	STAND_PARAM* standard_p;
-	STAND_PARAM* standard_p_B;
+	STAND_PARAM *standard_p;
+	STAND_PARAM *standard_p_B;
 	double seg_length[DS_MAX_VERTICES];
 	DS_Score_t cand_list_cutoff;
 	DS_Score_t intersection_cutoff;
-	R_R_MGR* r_r;               /* -- allocated memory -- */
-	R_R_MGR* pair_r_r;          /* 2010-06-26 new structure */
-	R_R_MGR* box_r_r;           /* 2010-06-26 new structure */
-	R_R_MGR* x_cand_r_r;        /* 2010-06-26 new structure */
-	RECORD_READ** rec_hash_tab; /* -- allocated memory -- */
-	DS_Byte_t* shape_buf;
+	R_R_MGR *r_r;               /* -- allocated memory -- */
+	R_R_MGR *pair_r_r;          /* 2010-06-26 new structure */
+	R_R_MGR *box_r_r;           /* 2010-06-26 new structure */
+	R_R_MGR *x_cand_r_r;        /* 2010-06-26 new structure */
+	RECORD_READ **rec_hash_tab; /* -- allocated memory -- */
+	DS_Byte_t *shape_buf;
 	char transfer_buf[MAX_TRANSFER_BUF_SIZE];
 	/*   PAIR_READ *pair_buf ;  2010-06-26, no longer needed */
-	BOX_CELL** overlap_buf; /* -- allocated memory -- */
-	BOX_CELL* box_root;
+	BOX_CELL **overlap_buf; /* -- allocated memory -- */
+	BOX_CELL *box_root;
 	/*   BOX_CELL *box_cell_array ;   2010-06-26, no longer needed */
 	/*   int num_box_cells ;  2010-06-26, no longer needed */
 } PAGC_CONTEXT;
@@ -748,11 +748,11 @@ typedef struct client_handle
 	int handle_check;
 	int num_contexts;
 	int num_schemas;
-	PAGC_GLOBAL* global_record;
-	FILE* misc_aux_stream;
-	STAND_PARAM* misc_stand;
-	PAGC_CONTEXT* context_records[MAX_CONTEXTS];
-	SCHEMA* schema_records[MAX_SCHEMAS];
+	PAGC_GLOBAL *global_record;
+	FILE *misc_aux_stream;
+	STAND_PARAM *misc_stand;
+	PAGC_CONTEXT *context_records[MAX_CONTEXTS];
+	SCHEMA *schema_records[MAX_SCHEMAS];
 } CLIENT_HANDLE;
 
 /* 2009-07-27 : structure for landmark scoring */
@@ -765,8 +765,8 @@ typedef struct cand_score_params
 	int type_idx;
 	int subdistrict_idx;
 	int soundex_approx;
-	char** words_buf;
-	DS_Score_t* word_weights; /* 2009-11-20 */
+	char **words_buf;
+	DS_Score_t *word_weights; /* 2009-11-20 */
 } CAND_SCORE_PARAMS;
 
 /*-- <revision date='2012-08-20'> New definition </revision> --*/
@@ -796,122 +796,122 @@ typedef struct check_macro
 
 /* -- approx.c -- */
 /*-- <revision date='2012-04-26'>Divert approx functions to TRIE_ARRAY</revision> --*/
-RECOGNIZER_HANDLE _new_recognizer_(DS_Handle, DS_Index_Link, int, int, const char*, int, ERR_PARAM*);
+RECOGNIZER_HANDLE _new_recognizer_(DS_Handle, DS_Index_Link, int, int, const char *, int, ERR_PARAM *);
 void _free_recognizer_(RECOGNIZER_HANDLE);
-int _insert_recognizer_key_(RECOGNIZER_HANDLE, char*, char*);
-int _recognize_approx_(RECOGNIZER_HANDLE, PAGC_CONTEXT*, char*, char*, int, char**, int, int, CAND_SCORE_PARAMS*);
+int _insert_recognizer_key_(RECOGNIZER_HANDLE, char *, char *);
+int _recognize_approx_(RECOGNIZER_HANDLE, PAGC_CONTEXT *, char *, char *, int, char **, int, int, CAND_SCORE_PARAMS *);
 
 #endif
 
 /* -- standard.c -- */
-int standardize_field(STAND_PARAM*, char*, int);
-void close_stand_context(STAND_PARAM*);
-STAND_PARAM* init_stand_context(PAGC_GLOBAL*, ERR_PARAM*, int);
-void close_stand_process(PAGC_GLOBAL*);
+int standardize_field(STAND_PARAM *, char *, int);
+void close_stand_context(STAND_PARAM *);
+STAND_PARAM *init_stand_context(PAGC_GLOBAL *, ERR_PARAM *, int);
+void close_stand_process(PAGC_GLOBAL *);
 /* 2009-08-13 : support multiple lexicons */
-int init_stand_process(PAGC_GLOBAL*, const char*, const char*, const char*, const char*);
+int init_stand_process(PAGC_GLOBAL *, const char *, const char *, const char *, const char *);
 
 /* -- tokenize.c -- */
-void initialize_morphs(STAND_PARAM*);
-int setup_default_defs(PAGC_GLOBAL*);
-void remove_default_defs(PAGC_GLOBAL*);
-int process_input(STAND_PARAM*);
-int new_morph(STAND_PARAM*, DEFDEF, const char*, int);
-void set_term(STAND_PARAM*, int, const char*);
+void initialize_morphs(STAND_PARAM *);
+int setup_default_defs(PAGC_GLOBAL *);
+void remove_default_defs(PAGC_GLOBAL *);
+int process_input(STAND_PARAM *);
+int new_morph(STAND_PARAM *, DEFDEF, const char *, int);
+void set_term(STAND_PARAM *, int, const char *);
 
-int is_symb_on_list(SYMB, SYMB*);
-int find_def_type(DEF*, SYMB*);
+int is_symb_on_list(SYMB, SYMB *);
+int find_def_type(DEF *, SYMB *);
 
 /* -- export.c -- */
-void stuff_fields(STAND_PARAM*);
-void init_output_fields(STAND_PARAM*, int);
+void stuff_fields(STAND_PARAM *);
+void init_output_fields(STAND_PARAM *, int);
 int sym_to_field(SYMB);
-void send_fields_to_stream(char**, FILE*, int, int);
+void send_fields_to_stream(char **, FILE *, int, int);
 
 /* -- analyze.c -- */
-int install_def_block_table(ENTRY**, ERR_PARAM*);
-STZ_PARAM* create_segments(ERR_PARAM*);
-void destroy_segments(STZ_PARAM*);
-int get_next_stz(STAND_PARAM*, int);
-double get_stz_downgrade(STAND_PARAM*, int);
+int install_def_block_table(ENTRY **, ERR_PARAM *);
+STZ_PARAM *create_segments(ERR_PARAM *);
+void destroy_segments(STZ_PARAM *);
+int get_next_stz(STAND_PARAM *, int);
+double get_stz_downgrade(STAND_PARAM *, int);
 /*-- <revision date='2012-07-22'> Keep track of start_state </revision> --*/
-int evaluator(STAND_PARAM*);
-void output_raw_elements(STAND_PARAM*, ERR_PARAM*);
+int evaluator(STAND_PARAM *);
+void output_raw_elements(STAND_PARAM *, ERR_PARAM *);
 
 /* -- gamma.c -- */
-void refresh_transducer(NODE*, SYMB*, NODE**);
+void refresh_transducer(NODE *, SYMB *, NODE **);
 int is_input_symbol(SYMB);
 int is_output_symbol(SYMB);
-RULE_PARAM* create_rules(const char*, PAGC_GLOBAL*);
-void destroy_rules(RULE_PARAM*);
+RULE_PARAM *create_rules(const char *, PAGC_GLOBAL *);
+void destroy_rules(RULE_PARAM *);
 #ifdef BUILD_API
-int output_rule_statistics(RULE_PARAM*, ERR_PARAM*);
+int output_rule_statistics(RULE_PARAM *, ERR_PARAM *);
 #else
-int output_rule_statistics(RULE_PARAM*, ERR_PARAM*, char*, DS_Handle);
+int output_rule_statistics(RULE_PARAM *, ERR_PARAM *, char *, DS_Handle);
 #endif
 
 /* -- lexicon.c -- */
-ENTRY** create_lexicon(PAGC_GLOBAL*, const char*, const char*);
-void destroy_lexicon(ENTRY**);
-void destroy_def_list(DEF*);
-ENTRY* find_entry(ENTRY**, char*);
-DEF* create_def(SYMB, char*, int, int, ERR_PARAM*);
+ENTRY **create_lexicon(PAGC_GLOBAL *, const char *, const char *);
+void destroy_lexicon(ENTRY **);
+void destroy_def_list(DEF *);
+ENTRY *find_entry(ENTRY **, char *);
+DEF *create_def(SYMB, char *, int, int, ERR_PARAM *);
 
 /* -- err_param.c -- */
-ERR_PARAM* init_errors(PAGC_GLOBAL*, const char*);
-void close_errors(ERR_PARAM*);
-int empty_errors(ERR_PARAM*, int*, char*);
-void register_error(ERR_PARAM*);
-void send_fields_to_error(ERR_PARAM*, char**);
+ERR_PARAM *init_errors(PAGC_GLOBAL *, const char *);
+void close_errors(ERR_PARAM *);
+int empty_errors(ERR_PARAM *, int *, char *);
+void register_error(ERR_PARAM *);
+void send_fields_to_error(ERR_PARAM *, char **);
 
 /* -- util.c -- */
 
-FILE* open_aux_file(PAGC_GLOBAL*, const char*);
+FILE *open_aux_file(PAGC_GLOBAL *, const char *);
 
 #ifndef BUILD_API
 
 /* -- candform.c -- */
-int sads_format_standard_fields(STAND_PARAM*, int, char*);
-void fetch_standard_headers(char*);
+int sads_format_standard_fields(STAND_PARAM *, int, char *);
+void fetch_standard_headers(char *);
 /* 2008-07-21 sads_format_candidate : add is_parity_mismatch argument,
    add source_identifier argument */
 #ifdef THREE_SOURCE_IDS
-int sads_format_candidate(PAGC_CONTEXT*, DS_Entity_t, int, char*, int, int, int, int*, char*, char*, char*);
+int sads_format_candidate(PAGC_CONTEXT *, DS_Entity_t, int, char *, int, int, int, int *, char *, char *, char *);
 #else
-int sads_format_candidate(PAGC_CONTEXT*, DS_Entity_t, int, char*, int, int, int, int*, char*);
+int sads_format_candidate(PAGC_CONTEXT *, DS_Entity_t, int, char *, int, int, int, int *, char *);
 #endif
-void cand_header_list(PAGC_CONTEXT*, int, char*);
+void cand_header_list(PAGC_CONTEXT *, int, char *);
 /* 2008-07-28 ols_format_candidate : new routine */
-int ols_format_candidate(PAGC_CONTEXT*, DS_Entity_t, int, char*, char*, int, int, int*);
+int ols_format_candidate(PAGC_CONTEXT *, DS_Entity_t, int, char *, char *, int, int, int *);
 
 /* -- init.c -- */
 /* 2009-08-13 : support multiple lexicons */
-PAGC_GLOBAL* init_global(int, const char*, const char*, const char*, const char*, const char*, const char*);
-void close_global(PAGC_GLOBAL*);
-SCHEMA* init_schema(ERR_PARAM*);
-int close_schema(SCHEMA*, ERR_PARAM*); /* 2011-01-22 : return error code */
-PAGC_CONTEXT* init_context(PAGC_GLOBAL*, SCHEMA*, ERR_PARAM*, int, const char*);
-void close_context(PAGC_CONTEXT*);
+PAGC_GLOBAL *init_global(int, const char *, const char *, const char *, const char *, const char *, const char *);
+void close_global(PAGC_GLOBAL *);
+SCHEMA *init_schema(ERR_PARAM *);
+int close_schema(SCHEMA *, ERR_PARAM *); /* 2011-01-22 : return error code */
+PAGC_CONTEXT *init_context(PAGC_GLOBAL *, SCHEMA *, ERR_PARAM *, int, const char *);
+void close_context(PAGC_CONTEXT *);
 
 /* -- build.c -- */
-int build_beta(PAGC_GLOBAL*,
-	       SCHEMA*,
-	       ERR_PARAM*,
+int build_beta(PAGC_GLOBAL *,
+	       SCHEMA *,
+	       ERR_PARAM *,
 	       DS_Handle,
 	       DS_Handle,
-	       BDB_BUILD_PARAM*,
-	       char*,
-	       char*,
+	       BDB_BUILD_PARAM *,
+	       char *,
+	       char *,
 	       DS_Entity_t,
 	       DS_Entity_t);
 
 /* -- collect.c -- */
-int match_address(PAGC_CONTEXT*, char*, char*, int, int);
-int match_landmark(PAGC_CONTEXT*, char*, char*, char*, char*, int);
+int match_address(PAGC_CONTEXT *, char *, char *, int, int);
+int match_landmark(PAGC_CONTEXT *, char *, char *, char *, char *, int);
 /* 2008-12-15 : add int arg to save_candidate */
-int save_candidate(PAGC_CONTEXT*, DS_Entity_t, int, DS_Score_t, int, int, char*);
-int match_intersection(PAGC_CONTEXT*, char*, char*, char*, char*, int);
-int save_intersection_candidate(PAGC_CONTEXT*,
+int save_candidate(PAGC_CONTEXT *, DS_Entity_t, int, DS_Score_t, int, int, char *);
+int match_intersection(PAGC_CONTEXT *, char *, char *, char *, char *, int);
+int save_intersection_candidate(PAGC_CONTEXT *,
 				DS_Entity_t,
 				DS_Entity_t,
 				int,
@@ -923,136 +923,143 @@ int save_intersection_candidate(PAGC_CONTEXT*,
 				DS_Coord_t);
 
 /* -- geocode.c -- */
-DS_Entity_t locate_incident_arcs(PAGC_CONTEXT*, DS_Entity_t, int, int);
-DS_Score_t score_arc_direction(PAGC_CONTEXT*, DS_Entity_t, PAGC_POINT*, DS_Angular_t);
-int geocode_address_candidate(PAGC_CONTEXT*, PAGC_POINT*, int, int*, DS_Metric_t);
-int geocode_intersection_candidate(PAGC_CONTEXT*, PAGC_POINT*, int);
-int geocode_landmark_candidate(PAGC_CONTEXT*, PAGC_POINT*, int);
-DS_Metric_t pyth_dist2(SCHEMA*, DS_Coord_t*, DS_Coord_t*, DS_Coord_t*, DS_Coord_t*);
+DS_Entity_t locate_incident_arcs(PAGC_CONTEXT *, DS_Entity_t, int, int);
+DS_Score_t score_arc_direction(PAGC_CONTEXT *, DS_Entity_t, PAGC_POINT *, DS_Angular_t);
+int geocode_address_candidate(PAGC_CONTEXT *, PAGC_POINT *, int, int *, DS_Metric_t);
+int geocode_intersection_candidate(PAGC_CONTEXT *, PAGC_POINT *, int);
+int geocode_landmark_candidate(PAGC_CONTEXT *, PAGC_POINT *, int);
+DS_Metric_t pyth_dist2(SCHEMA *, DS_Coord_t *, DS_Coord_t *, DS_Coord_t *, DS_Coord_t *);
 DS_Metric_t degree_dist(DS_Metric_t, DS_Coord_t, DS_Coord_t);
-int collect_incident_arcs(PAGC_CONTEXT*, int, int, int);
+int collect_incident_arcs(PAGC_CONTEXT *, int, int, int);
 
 /* -- score.c -- */
-int read_score_stand(PAGC_CONTEXT*, DS_Score_t*, char**, DS_Entity_t, int, int*);
-int read_score_stand_land(PAGC_CONTEXT*, DS_Score_t*, char**, DS_Entity_t, int*, CAND_SCORE_PARAMS*);
-int resolve_range_direction(int*, int*, int, int, int, int);
+int read_score_stand(PAGC_CONTEXT *, DS_Score_t *, char **, DS_Entity_t, int, int *);
+int read_score_stand_land(PAGC_CONTEXT *, DS_Score_t *, char **, DS_Entity_t, int *, CAND_SCORE_PARAMS *);
+int resolve_range_direction(int *, int *, int, int, int, int);
 DS_Score_t interpolate_weight(DS_Score_t, DS_Score_t, DS_Score_t);
 int match_number_interval_left_right(int, int, int, int, int, int);
-DS_Score_t normalize_score(SCHEMA*, DS_Score_t);
-DS_Score_t normalize_landmark_score(SCHEMA*, DS_Score_t);
-DS_Score_t max_context_score(PAGC_CONTEXT*);
+DS_Score_t normalize_score(SCHEMA *, DS_Score_t);
+DS_Score_t normalize_landmark_score(SCHEMA *, DS_Score_t);
+DS_Score_t max_context_score(PAGC_CONTEXT *);
 
 /* -- make_sch.c -- */
-void get_weight_pair(SCHEMA*, ATTRIBUTE*);
-int build_ref_schema(SCHEMA*, DS_Handle, ERR_PARAM*, DS_Handle, const char*, PAGC_FLAG_T);
-ATTRIBUTE* get_att_by_symbol(SCHEMA*, SYMB);
-int is_official(SCHEMA*, SYMB); /* 2009-11-23 : new function */
+void get_weight_pair(SCHEMA *, ATTRIBUTE *);
+int build_ref_schema(SCHEMA *, DS_Handle, ERR_PARAM *, DS_Handle, const char *, PAGC_FLAG_T);
+ATTRIBUTE *get_att_by_symbol(SCHEMA *, SYMB);
+int is_official(SCHEMA *, SYMB); /* 2009-11-23 : new function */
 
 /* -- restore.c -- */
-int restore_build_state(PAGC_GLOBAL*, SCHEMA*, const char*, int);
-int save_build_state(SCHEMA*, const char*, ERR_PARAM*, DS_Handle);
+int restore_build_state(PAGC_GLOBAL *, SCHEMA *, const char *, int);
+int save_build_state(SCHEMA *, const char *, ERR_PARAM *, DS_Handle);
 
 /* -- shapeset.c -- */
-int open_alpha_for_build(DS_Handle*, DS_Handle*, DS_Handle*, DS_Handle, const char*, const char*, char**, ERR_PARAM*);
-void close_alpha(DS_Handle*, DS_Handle*, DS_Handle*, ERR_PARAM*);
-int open_positioning(SCHEMA*, DS_Handle*, char*, DS_Handle, ERR_PARAM*);
-void set_feature_shape_type(SCHEMA*);
-int set_matching_units(SCHEMA*);
-void update_mbr(SCHEMA*, DS_Handle);
+int open_alpha_for_build(DS_Handle *,
+			 DS_Handle *,
+			 DS_Handle *,
+			 DS_Handle,
+			 const char *,
+			 const char *,
+			 char **,
+			 ERR_PARAM *);
+void close_alpha(DS_Handle *, DS_Handle *, DS_Handle *, ERR_PARAM *);
+int open_positioning(SCHEMA *, DS_Handle *, char *, DS_Handle, ERR_PARAM *);
+void set_feature_shape_type(SCHEMA *);
+int set_matching_units(SCHEMA *);
+void update_mbr(SCHEMA *, DS_Handle);
 
 /* -- index.c -- */
-BDB_BUILD_PARAM* open_build_db(SCHEMA*, ERR_PARAM*);
-void close_build_db(BDB_BUILD_PARAM*);
-int open_context_db(PAGC_CONTEXT*, SCHEMA*, ERR_PARAM*);
-void close_context_db(PAGC_CONTEXT*);
-int open_schema_db(SCHEMA*, ERR_PARAM*, DS_Handle, const char*, int);
-int close_schema_db(SCHEMA*, ERR_PARAM*);
-int create_schema_indices(SCHEMA*, ERR_PARAM*);
-int open_index(SCHEMA*, ERR_PARAM*, DS_Index_Link, int);
+BDB_BUILD_PARAM *open_build_db(SCHEMA *, ERR_PARAM *);
+void close_build_db(BDB_BUILD_PARAM *);
+int open_context_db(PAGC_CONTEXT *, SCHEMA *, ERR_PARAM *);
+void close_context_db(PAGC_CONTEXT *);
+int open_schema_db(SCHEMA *, ERR_PARAM *, DS_Handle, const char *, int);
+int close_schema_db(SCHEMA *, ERR_PARAM *);
+int create_schema_indices(SCHEMA *, ERR_PARAM *);
+int open_index(SCHEMA *, ERR_PARAM *, DS_Index_Link, int);
 
 /* -- indexput.c -- */
 /*	<revision date='2012-03-27'>new args for insert_key and insert_concat_key */
-int insert_key(BDB_BUILD_PARAM*, DS_Index_Link, char*, DS_Entity_t, char*);
-int insert_concat_key(BDB_BUILD_PARAM*, DS_Index_Link, char*, DS_Entity_t, int, PAGC_POINT*, char*);
-int insert_attribute_point(SCHEMA*, BDB_BUILD_PARAM*, DS_Handle, DS_Entity_t, DS_Entity_t, ERR_PARAM*);
-int insert_shape(SCHEMA*,
-		 BDB_BUILD_PARAM*,
+int insert_key(BDB_BUILD_PARAM *, DS_Index_Link, char *, DS_Entity_t, char *);
+int insert_concat_key(BDB_BUILD_PARAM *, DS_Index_Link, char *, DS_Entity_t, int, PAGC_POINT *, char *);
+int insert_attribute_point(SCHEMA *, BDB_BUILD_PARAM *, DS_Handle, DS_Entity_t, DS_Entity_t, ERR_PARAM *);
+int insert_shape(SCHEMA *,
+		 BDB_BUILD_PARAM *,
 		 DS_Handle,
 		 DS_Entity_t,
 		 DS_Entity_t,
-		 ERR_PARAM* err_p,
-		 PAGC_POINT*,
-		 PAGC_POINT*);
+		 ERR_PARAM *err_p,
+		 PAGC_POINT *,
+		 PAGC_POINT *);
 
 /* -- indexget.c -- */
-int fetch_shape(PAGC_CONTEXT*, DS_Entity_t, int*, DS_Coord_t**, DS_Coord_t**);
-int register_candidate(PAGC_CONTEXT*, char**, DS_Index_Link, int, char*, int, CAND_SCORE_PARAMS*);
-int read_arc_endpoints(PAGC_CONTEXT*, DS_Entity_t, PAGC_POINT*, PAGC_POINT*);
-DS_Entity_t find_arcs_by_point(PAGC_CONTEXT*, DS_Entity_t, PAGC_POINT*, DS_Angular_t);
-int print_beta_text(PAGC_CONTEXT*);
-int print_index_text(PAGC_CONTEXT*, DS_Index_Link);
-int print_shape_index(PAGC_CONTEXT*, DS_Index_Link);
-int calc_landmark_word_weights(PAGC_CONTEXT*, int, int*, DS_Score_t*);
+int fetch_shape(PAGC_CONTEXT *, DS_Entity_t, int *, DS_Coord_t **, DS_Coord_t **);
+int register_candidate(PAGC_CONTEXT *, char **, DS_Index_Link, int, char *, int, CAND_SCORE_PARAMS *);
+int read_arc_endpoints(PAGC_CONTEXT *, DS_Entity_t, PAGC_POINT *, PAGC_POINT *);
+DS_Entity_t find_arcs_by_point(PAGC_CONTEXT *, DS_Entity_t, PAGC_POINT *, DS_Angular_t);
+int print_beta_text(PAGC_CONTEXT *);
+int print_index_text(PAGC_CONTEXT *, DS_Index_Link);
+int print_shape_index(PAGC_CONTEXT *, DS_Index_Link);
+int calc_landmark_word_weights(PAGC_CONTEXT *, int, int *, DS_Score_t *);
 
 /* -- alpharef.c -- */
 int read_alpha_house(DS_Handle, DS_Entity_t, DS_Field_t, int);
-int extract_house(const char*, int);
+int extract_house(const char *, int);
 /* 2008-07-30 : add unstandard_mac_alternate arg and flag for alternate city names
    2009-11-23 : add arrays for official name fields */
 /*-- <revision date='2012-08-30'> Use check_macro </revision> --*/
-int read_unstandardized(SCHEMA*,
+int read_unstandardized(SCHEMA *,
 			DS_Handle,
 			DS_Entity_t,
-			int*,
-			int*,
-			int*,
-			char*,
-			CHECK_MACRO*,
-			char*,
-			char**,
-			DS_Field_t*,
-			int*,
-			ERR_PARAM*);
+			int *,
+			int *,
+			int *,
+			char *,
+			CHECK_MACRO *,
+			char *,
+			char **,
+			DS_Field_t *,
+			int *,
+			ERR_PARAM *);
 
 /* -- makebeta.c -- */
-int init_standardized_table(SCHEMA*, ERR_PARAM*);
-int soundex_street_words(char*, char**);
+int init_standardized_table(SCHEMA *, ERR_PARAM *);
+int soundex_street_words(char *, char **);
 /* 2008-08-01 : add stand_alt_macro flag for alternate city names */
 /*-- <revision date='2012-08-30'> Use check_macro </revision> --*/
-int write_standardized(SCHEMA*,
-		       BDB_BUILD_PARAM*,
-		       char**,
-		       char**,
-		       CHECK_MACRO*,
+int write_standardized(SCHEMA *,
+		       BDB_BUILD_PARAM *,
+		       char **,
+		       char **,
+		       CHECK_MACRO *,
 		       int,
-		       int*,
-		       char*,
-		       char*,
-		       char*,
+		       int *,
+		       char *,
+		       char *,
+		       char *,
 		       DS_Entity_t,
 		       int);
-void do_left_saves(char**, char*, char*, char*, int);
-int index_cross_streets(SCHEMA*,
-			BDB_BUILD_PARAM*,
-			char**,
-			char**,
+void do_left_saves(char **, char *, char *, char *, int);
+int index_cross_streets(SCHEMA *,
+			BDB_BUILD_PARAM *,
+			char **,
+			char **,
 			DS_Handle,
 			DS_Entity_t,
 			DS_Entity_t,
-			STAND_PARAM*,
-			PAGC_POINT*,
-			PAGC_POINT*,
-			ERR_PARAM*);
-int write_occupancy_only(SCHEMA*, DS_Handle, char**, DS_Entity_t);
+			STAND_PARAM *,
+			PAGC_POINT *,
+			PAGC_POINT *,
+			ERR_PARAM *);
+int write_occupancy_only(SCHEMA *, DS_Handle, char **, DS_Entity_t);
 /* 2008-08-01 : new routine to standardize alternate city names */
 #ifdef WITH_ALT_LEFT_RIGHT
-int write_alt_macro_only(SCHEMA*, DS_Handle, char**, int, DS_Entity_t);
+int write_alt_macro_only(SCHEMA *, DS_Handle, char **, int, DS_Entity_t);
 #else
-int write_alt_macro_only(SCHEMA*, DS_Handle, char**, DS_Entity_t);
+int write_alt_macro_only(SCHEMA *, DS_Handle, char **, DS_Entity_t);
 #endif
 /* 2009-07-22 : new routines to standardize and write landmark names */
-int write_landmark_name_only(SCHEMA*, BDB_BUILD_PARAM*, char**, char**, char**, DS_Entity_t, ERR_PARAM*);
-int tokenize_landmark_words(char*, char**);
+int write_landmark_name_only(SCHEMA *, BDB_BUILD_PARAM *, char **, char **, char **, DS_Entity_t, ERR_PARAM *);
+int tokenize_landmark_words(char *, char **);
 
 #endif
 
@@ -1118,24 +1125,24 @@ int tokenize_landmark_words(char*, char**);
 /* ----------- ALLOCATION MACROS ----------- */
 
 #define PAGC_STORE_STR(DEST, SRC, WHERE, RET_VAL) \
-	DEST = (char*)malloc(sizeof(char) * (strlen(SRC) + 1)); \
+	DEST = (char *)malloc(sizeof(char) * (strlen(SRC) + 1)); \
 	MEM_ERR(DEST, WHERE, RET_VAL); \
 	BLANK_STRING(DEST); \
 	strcpy(DEST, SRC)
 
 #define PAGC_ALLOC_STRUC(LOC, TYP, WHERE, EXIT_TYPE) \
-	LOC = (TYP*)malloc(sizeof(TYP)); \
+	LOC = (TYP *)malloc(sizeof(TYP)); \
 	MEM_ERR(LOC, WHERE, EXIT_TYPE)
 
 #define PAGC_CALLOC_STRUC(LOC, TYP, NUM, WHERE, EXIT_TYPE) \
-	LOC = (TYP*)calloc((NUM), sizeof(TYP)); \
+	LOC = (TYP *)calloc((NUM), sizeof(TYP)); \
 	MEM_ERR(LOC, WHERE, EXIT_TYPE)
 
 #define PAGC_CALLOC_2D_ARRAY(PTR, TYP, ROWS, COLS, WHERE, EXIT_TYPE) \
 	{ \
-		TYP** temp_ptr; \
+		TYP **temp_ptr; \
 		int row_num; \
-		PAGC_CALLOC_STRUC(temp_ptr, TYP*, ROWS, WHERE, EXIT_TYPE); \
+		PAGC_CALLOC_STRUC(temp_ptr, TYP *, ROWS, WHERE, EXIT_TYPE); \
 		for (row_num = 0; row_num < ROWS; row_num++) \
 		{ \
 			PAGC_CALLOC_STRUC(temp_ptr[row_num], TYP, COLS, WHERE, EXIT_TYPE); \
@@ -1153,7 +1160,7 @@ int tokenize_landmark_words(char*, char**);
 #define PAGC_DESTROY_2D_ARRAY(PTR, TYP, ROWS) \
 	{ \
 		int row_num; \
-		TYP* row_val; \
+		TYP *row_val; \
 		for (row_num = 0; row_num < ROWS; row_num++) \
 		{ \
 			if ((row_val = PTR[row_num]) != NULL) { FREE_AND_NULL(row_val); } \
@@ -1208,7 +1215,7 @@ macros for converting and verifying pagc_client args
 
 #define CONVERT_HANDLE(NATIVE_PTR, CLIENT_PTR) \
 	if (CLIENT_PTR == NULL) return FALSE; \
-	NATIVE_PTR = (CLIENT_HANDLE*)CLIENT_PTR; \
+	NATIVE_PTR = (CLIENT_HANDLE *)CLIENT_PTR; \
 	if (NATIVE_PTR->handle_check != HANDLE_CHECK) return 0
 
 #define CHECK_BOUNDS(ARRAY_SIZE, ARRAY_IDX) \
@@ -1252,11 +1259,11 @@ macros for converting and verifying pagc_client args
 	DEST = ds_attribute_read_integer_field(ctx_p->_beta_attribute_interface, row_num, att->rs_fld_idx[NUM]); \
 	if (DEST == ERR_FAIL) return FALSE
 
-#define INT32_AS_BYTES(PTR_VAL) *((int32_t*)(PTR_VAL))
+#define INT32_AS_BYTES(PTR_VAL) *((int32_t *)(PTR_VAL))
 
-#define INTEGER_AS_BYTES(PTR_VAL) *((int*)(PTR_VAL))
+#define INTEGER_AS_BYTES(PTR_VAL) *((int *)(PTR_VAL))
 
-#define DOUBLE_AS_BYTES(PTR_VAL) *((double*)(PTR_VAL))
+#define DOUBLE_AS_BYTES(PTR_VAL) *((double *)(PTR_VAL))
 
 /* ================= floating point comparison macros ======== */
 #define R_ERR .00001

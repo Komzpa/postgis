@@ -3980,7 +3980,7 @@ test_raster_same_alignment()
 	rt_raster rast2;
 	int rtn;
 	int aligned;
-	char* reason;
+	char *reason;
 
 	rast1 = rt_raster_new(2, 2);
 	CU_ASSERT(rast1 != NULL);

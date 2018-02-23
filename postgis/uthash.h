@@ -53,8 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DECLTYPE_ASSIGN(dst, src) \
 	do \
 	{ \
-		char** _da_dst = (char**)(&(dst)); \
-		*_da_dst = (char*)(src); \
+		char **_da_dst = (char **)(&(dst)); \
+		*_da_dst = (char *)(src); \
 	} while (0)
 #else
 #define DECLTYPE_ASSIGN(dst, src) \
@@ -110,9 +110,9 @@ typedef unsigned char uint8_t;
 #define HASH_BKT_CAPACITY_THRESH 10U     /* expand when bucket count reaches */
 
 /* calculate the element whose hash handle address is hhp */
-#define ELMT_FROM_HH(tbl, hhp) ((void*)(((char*)(hhp)) - ((tbl)->hho)))
+#define ELMT_FROM_HH(tbl, hhp) ((void *)(((char *)(hhp)) - ((tbl)->hho)))
 /* calculate the hash handle from element address elp */
-#define HH_FROM_ELMT(tbl, elp) ((UT_hash_handle*)(((char*)(elp)) + ((tbl)->hho)))
+#define HH_FROM_ELMT(tbl, elp) ((UT_hash_handle *)(((char *)(elp)) + ((tbl)->hho)))
 
 #define HASH_VALUE(keyptr, keylen, hashv) \
 	do \
@@ -156,7 +156,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		(tbl)->bloom_nbits = HASH_BLOOM; \
-		(tbl)->bloom_bv = (uint8_t*)uthash_malloc(HASH_BLOOM_BYTELEN); \
+		(tbl)->bloom_bv = (uint8_t *)uthash_malloc(HASH_BLOOM_BYTELEN); \
 		if (!((tbl)->bloom_bv)) { uthash_fatal("out of memory"); } \
 		memset((tbl)->bloom_bv, 0, HASH_BLOOM_BYTELEN); \
 		(tbl)->bloom_sig = HASH_BLOOM_SIGNATURE; \
@@ -188,15 +188,15 @@ typedef unsigned char uint8_t;
 #define HASH_MAKE_TABLE(hh, head) \
 	do \
 	{ \
-		(head)->hh.tbl = (UT_hash_table*)uthash_malloc(sizeof(UT_hash_table)); \
+		(head)->hh.tbl = (UT_hash_table *)uthash_malloc(sizeof(UT_hash_table)); \
 		if (!((head)->hh.tbl)) { uthash_fatal("out of memory"); } \
 		memset((head)->hh.tbl, 0, sizeof(UT_hash_table)); \
 		(head)->hh.tbl->tail = &((head)->hh); \
 		(head)->hh.tbl->num_buckets = HASH_INITIAL_NUM_BUCKETS; \
 		(head)->hh.tbl->log2_num_buckets = HASH_INITIAL_NUM_BUCKETS_LOG2; \
-		(head)->hh.tbl->hho = (char*)(&(head)->hh) - (char*)(head); \
+		(head)->hh.tbl->hho = (char *)(&(head)->hh) - (char *)(head); \
 		(head)->hh.tbl->buckets = \
-		    (UT_hash_bucket*)uthash_malloc(HASH_INITIAL_NUM_BUCKETS * sizeof(struct UT_hash_bucket)); \
+		    (UT_hash_bucket *)uthash_malloc(HASH_INITIAL_NUM_BUCKETS * sizeof(struct UT_hash_bucket)); \
 		if (!(head)->hh.tbl->buckets) { uthash_fatal("out of memory"); } \
 		memset((head)->hh.tbl->buckets, 0, HASH_INITIAL_NUM_BUCKETS * sizeof(struct UT_hash_bucket)); \
 		HASH_BLOOM_MAKE((head)->hh.tbl); \
@@ -260,7 +260,7 @@ typedef unsigned char uint8_t;
 #define HASH_AKBI_INNER_LOOP(hh, head, add, cmpfcn) \
 	do \
 	{ \
-		char* _hs_saved_head = (char*)(head); \
+		char *_hs_saved_head = (char *)(head); \
 		do \
 		{ \
 			DECLTYPE_ASSIGN(head, _hs_iter); \
@@ -279,7 +279,7 @@ typedef unsigned char uint8_t;
 	{ \
 		unsigned _ha_bkt; \
 		(add)->hh.hashv = (hashval); \
-		(add)->hh.key = (char*)(keyptr); \
+		(add)->hh.key = (char *)(keyptr); \
 		(add)->hh.keylen = (unsigned)(keylen_in); \
 		if (!(head)) \
 		{ \
@@ -290,7 +290,7 @@ typedef unsigned char uint8_t;
 		} \
 		else \
 		{ \
-			void* _hs_iter = (head); \
+			void *_hs_iter = (head); \
 			(add)->hh.tbl = (head)->hh.tbl; \
 			HASH_AKBI_INNER_LOOP(hh, head, add, cmpfcn); \
 			if (_hs_iter) \
@@ -336,7 +336,7 @@ typedef unsigned char uint8_t;
 	{ \
 		unsigned _ha_bkt; \
 		(add)->hh.hashv = (hashval); \
-		(add)->hh.key = (char*)(keyptr); \
+		(add)->hh.key = (char *)(keyptr); \
 		(add)->hh.keylen = (unsigned)(keylen_in); \
 		if (!(head)) \
 		{ \
@@ -392,7 +392,7 @@ typedef unsigned char uint8_t;
 #define HASH_DELETE(hh, head, delptr) \
 	do \
 	{ \
-		struct UT_hash_handle* _hd_hh_del; \
+		struct UT_hash_handle *_hd_hh_del; \
 		if (((delptr)->hh.prev == NULL) && ((delptr)->hh.next == NULL)) \
 		{ \
 			uthash_free((head)->hh.tbl->buckets, \
@@ -408,11 +408,11 @@ typedef unsigned char uint8_t;
 			if ((delptr) == ELMT_FROM_HH((head)->hh.tbl, (head)->hh.tbl->tail)) \
 			{ \
 				(head)->hh.tbl->tail = \
-				    (UT_hash_handle*)((ptrdiff_t)((delptr)->hh.prev) + (head)->hh.tbl->hho); \
+				    (UT_hash_handle *)((ptrdiff_t)((delptr)->hh.prev) + (head)->hh.tbl->hho); \
 			} \
 			if ((delptr)->hh.prev != NULL) \
 			{ \
-				((UT_hash_handle*)((ptrdiff_t)((delptr)->hh.prev) + (head)->hh.tbl->hho))->next = \
+				((UT_hash_handle *)((ptrdiff_t)((delptr)->hh.prev) + (head)->hh.tbl->hho))->next = \
 				    (delptr)->hh.next; \
 			} \
 			else \
@@ -421,7 +421,7 @@ typedef unsigned char uint8_t;
 			} \
 			if (_hd_hh_del->next != NULL) \
 			{ \
-				((UT_hash_handle*)((ptrdiff_t)_hd_hh_del->next + (head)->hh.tbl->hho))->prev = \
+				((UT_hash_handle *)((ptrdiff_t)_hd_hh_del->next + (head)->hh.tbl->hho))->prev = \
 				    _hd_hh_del->prev; \
 			} \
 			HASH_TO_BKT(_hd_hh_del->hashv, (head)->hh.tbl->num_buckets, _hd_bkt); \
@@ -439,9 +439,9 @@ typedef unsigned char uint8_t;
 #define HASH_FIND_INT(head, findint, out) HASH_FIND(hh, head, findint, sizeof(int), out)
 #define HASH_ADD_INT(head, intfield, add) HASH_ADD(hh, head, intfield, sizeof(int), add)
 #define HASH_REPLACE_INT(head, intfield, add, replaced) HASH_REPLACE(hh, head, intfield, sizeof(int), add, replaced)
-#define HASH_FIND_PTR(head, findptr, out) HASH_FIND(hh, head, findptr, sizeof(void*), out)
-#define HASH_ADD_PTR(head, ptrfield, add) HASH_ADD(hh, head, ptrfield, sizeof(void*), add)
-#define HASH_REPLACE_PTR(head, ptrfield, add, replaced) HASH_REPLACE(hh, head, ptrfield, sizeof(void*), add, replaced)
+#define HASH_FIND_PTR(head, findptr, out) HASH_FIND(hh, head, findptr, sizeof(void *), out)
+#define HASH_ADD_PTR(head, ptrfield, add) HASH_ADD(hh, head, ptrfield, sizeof(void *), add)
+#define HASH_REPLACE_PTR(head, ptrfield, add, replaced) HASH_REPLACE(hh, head, ptrfield, sizeof(void *), add, replaced)
 #define HASH_DEL(head, delptr) HASH_DELETE(hh, head, delptr)
 
 /* HASH_FSCK checks hash integrity on every add/delete when HASH_DEBUG is defined.
@@ -457,12 +457,12 @@ typedef unsigned char uint8_t;
 #define HASH_FSCK(hh, head) \
 	do \
 	{ \
-		struct UT_hash_handle* _thh; \
+		struct UT_hash_handle *_thh; \
 		if (head) \
 		{ \
 			unsigned _bkt_i; \
 			unsigned _count; \
-			char* _prev; \
+			char *_prev; \
 			_count = 0; \
 			for (_bkt_i = 0; _bkt_i < (head)->hh.tbl->num_buckets; _bkt_i++) \
 			{ \
@@ -471,10 +471,10 @@ typedef unsigned char uint8_t;
 				_prev = NULL; \
 				while (_thh) \
 				{ \
-					if (_prev != (char*)(_thh->hh_prev)) \
+					if (_prev != (char *)(_thh->hh_prev)) \
 					{ HASH_OOPS("invalid hh_prev %p, actual %p\n", _thh->hh_prev, _prev); } \
 					_bkt_count++; \
-					_prev = (char*)(_thh); \
+					_prev = (char *)(_thh); \
 					_thh = _thh->hh_next; \
 				} \
 				_count += _bkt_count; \
@@ -494,10 +494,10 @@ typedef unsigned char uint8_t;
 			while (_thh) \
 			{ \
 				_count++; \
-				if (_prev != (char*)(_thh->prev)) \
+				if (_prev != (char *)(_thh->prev)) \
 				{ HASH_OOPS("invalid prev %p, actual %p\n", _thh->prev, _prev); } \
-				_prev = (char*)ELMT_FROM_HH((head)->hh.tbl, _thh); \
-				_thh = (_thh->next ? (UT_hash_handle*)((char*)(_thh->next) + (head)->hh.tbl->hho) \
+				_prev = (char *)ELMT_FROM_HH((head)->hh.tbl, _thh); \
+				_thh = (_thh->next ? (UT_hash_handle *)((char *)(_thh->next) + (head)->hh.tbl->hho) \
 						   : NULL); \
 			} \
 			if (_count != (head)->hh.tbl->num_items) \
@@ -532,7 +532,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		unsigned _hb_keylen = (unsigned)keylen; \
-		const unsigned char* _hb_key = (const unsigned char*)(key); \
+		const unsigned char *_hb_key = (const unsigned char *)(key); \
 		(hashv) = 0; \
 		while (_hb_keylen-- != 0U) \
 		{ \
@@ -546,7 +546,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		unsigned _sx_i; \
-		const unsigned char* _hs_key = (const unsigned char*)(key); \
+		const unsigned char *_hs_key = (const unsigned char *)(key); \
 		hashv = 0; \
 		for (_sx_i = 0; _sx_i < keylen; _sx_i++) \
 		{ \
@@ -558,7 +558,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		unsigned _fn_i; \
-		const unsigned char* _hf_key = (const unsigned char*)(key); \
+		const unsigned char *_hf_key = (const unsigned char *)(key); \
 		hashv = 2166136261U; \
 		for (_fn_i = 0; _fn_i < keylen; _fn_i++) \
 		{ \
@@ -571,7 +571,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		unsigned _ho_i; \
-		const unsigned char* _ho_key = (const unsigned char*)(key); \
+		const unsigned char *_ho_key = (const unsigned char *)(key); \
 		hashv = 0; \
 		for (_ho_i = 0; _ho_i < keylen; _ho_i++) \
 		{ \
@@ -620,7 +620,7 @@ typedef unsigned char uint8_t;
 	do \
 	{ \
 		unsigned _hj_i, _hj_j, _hj_k; \
-		unsigned const char* _hj_key = (unsigned const char*)(key); \
+		unsigned const char *_hj_key = (unsigned const char *)(key); \
 		hashv = 0xfeedbeefu; \
 		_hj_i = _hj_j = 0x9e3779b9u; \
 		_hj_k = (unsigned)(keylen); \
@@ -671,16 +671,16 @@ typedef unsigned char uint8_t;
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) || defined(_MSC_VER) || defined(__BORLANDC__) || \
     defined(__TURBOC__)
-#define get16bits(d) (*((const uint16_t*)(d)))
+#define get16bits(d) (*((const uint16_t *)(d)))
 #endif
 
 #if !defined(get16bits)
-#define get16bits(d) ((((uint32_t)(((const uint8_t*)(d))[1])) << 8) + (uint32_t)(((const uint8_t*)(d))[0]))
+#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8) + (uint32_t)(((const uint8_t *)(d))[0]))
 #endif
 #define HASH_SFH(key, keylen, hashv) \
 	do \
 	{ \
-		unsigned const char* _sfh_key = (unsigned const char*)(key); \
+		unsigned const char *_sfh_key = (unsigned const char *)(key); \
 		uint32_t _sfh_tmp, _sfh_len = (uint32_t)keylen; \
 \
 		unsigned _sfh_rem = _sfh_len & 3U; \
@@ -743,7 +743,7 @@ typedef unsigned char uint8_t;
 #define MUR_PLUS1_ALIGNED(p) (((unsigned long)p & 3UL) == 1UL)
 #define MUR_PLUS2_ALIGNED(p) (((unsigned long)p & 3UL) == 2UL)
 #define MUR_PLUS3_ALIGNED(p) (((unsigned long)p & 3UL) == 3UL)
-#define WP(p) ((uint32_t*)((unsigned long)(p) & ~3UL))
+#define WP(p) ((uint32_t *)((unsigned long)(p) & ~3UL))
 #if (defined(__BIG_ENDIAN__) || defined(SPARC) || defined(__ppc__) || defined(__ppc64__))
 #define MUR_THREE_ONE(p) ((((*WP(p)) & 0x00ffffff) << 8) | (((*(WP(p) + 1)) & 0xff000000) >> 24))
 #define MUR_TWO_TWO(p) ((((*WP(p)) & 0x0000ffff) << 16) | (((*(WP(p) + 1)) & 0xffff0000) >> 16))
@@ -772,14 +772,14 @@ typedef unsigned char uint8_t;
 #define HASH_MUR(key, keylen, hashv) \
 	do \
 	{ \
-		const uint8_t* _mur_data = (const uint8_t*)(key); \
+		const uint8_t *_mur_data = (const uint8_t *)(key); \
 		const int _mur_nblocks = (int)(keylen) / 4; \
 		uint32_t _mur_h1 = 0xf88D5353u; \
 		uint32_t _mur_c1 = 0xcc9e2d51u; \
 		uint32_t _mur_c2 = 0x1b873593u; \
 		uint32_t _mur_k1 = 0; \
-		const uint8_t* _mur_tail; \
-		const uint32_t* _mur_blocks = (const uint32_t*)(_mur_data + (_mur_nblocks * 4)); \
+		const uint8_t *_mur_tail; \
+		const uint32_t *_mur_blocks = (const uint32_t *)(_mur_data + (_mur_nblocks * 4)); \
 		int _mur_i; \
 		for (_mur_i = -_mur_nblocks; _mur_i != 0; _mur_i++) \
 		{ \
@@ -792,7 +792,7 @@ typedef unsigned char uint8_t;
 			_mur_h1 = MUR_ROTL32(_mur_h1, 13); \
 			_mur_h1 = (_mur_h1 * 5U) + 0xe6546b64u; \
 		} \
-		_mur_tail = (const uint8_t*)(_mur_data + (_mur_nblocks * 4)); \
+		_mur_tail = (const uint8_t *)(_mur_data + (_mur_nblocks * 4)); \
 		_mur_k1 = 0; \
 		switch ((keylen)&3U) \
 		{ \
@@ -894,7 +894,7 @@ typedef unsigned char uint8_t;
 		struct UT_hash_handle *_he_thh, *_he_hh_nxt; \
 		UT_hash_bucket *_he_new_buckets, *_he_newbkt; \
 		_he_new_buckets = \
-		    (UT_hash_bucket*)uthash_malloc(2UL * tbl->num_buckets * sizeof(struct UT_hash_bucket)); \
+		    (UT_hash_bucket *)uthash_malloc(2UL * tbl->num_buckets * sizeof(struct UT_hash_bucket)); \
 		if (!_he_new_buckets) { uthash_fatal("out of memory"); } \
 		memset(_he_new_buckets, 0, 2UL * tbl->num_buckets * sizeof(struct UT_hash_bucket)); \
 		tbl->ideal_chain_maxlen = (tbl->num_items >> (tbl->log2_num_buckets + 1U)) + \
@@ -962,10 +962,10 @@ typedef unsigned char uint8_t;
 					for (_hs_i = 0; _hs_i < _hs_insize; _hs_i++) \
 					{ \
 						_hs_psize++; \
-						_hs_q = (UT_hash_handle*)((_hs_q->next != NULL) \
-									      ? ((void*)((char*)(_hs_q->next) + \
-											 (head)->hh.tbl->hho)) \
-									      : NULL); \
+						_hs_q = (UT_hash_handle *)((_hs_q->next != NULL) \
+									       ? ((void *)((char *)(_hs_q->next) + \
+											   (head)->hh.tbl->hho)) \
+									       : NULL); \
 						if (!(_hs_q)) { break; } \
 					} \
 					_hs_qsize = _hs_insize; \
@@ -975,10 +975,10 @@ typedef unsigned char uint8_t;
 						{ \
 							_hs_e = _hs_q; \
 							_hs_q = \
-							    (UT_hash_handle*)((_hs_q->next != NULL) \
-										  ? ((void*)((char*)(_hs_q->next) + \
-											     (head)->hh.tbl->hho)) \
-										  : NULL); \
+							    (UT_hash_handle *)((_hs_q->next != NULL) \
+										   ? ((void *)((char *)(_hs_q->next) + \
+											       (head)->hh.tbl->hho)) \
+										   : NULL); \
 							_hs_qsize--; \
 						} \
 						else if ((_hs_qsize == 0U) || (_hs_q == NULL)) \
@@ -987,13 +987,11 @@ typedef unsigned char uint8_t;
 							if (_hs_p != NULL) \
 							{ \
 								_hs_p = \
-								    (UT_hash_handle*)((_hs_p->next != NULL) \
-											  ? ((void*)((char*)(_hs_p \
-														 ->next) + \
-												     (head) \
-													 ->hh.tbl \
-													 ->hho)) \
-											  : NULL); \
+								    (UT_hash_handle \
+									 *)((_hs_p->next != NULL) \
+										? ((void *)((char *)(_hs_p->next) + \
+											    (head)->hh.tbl->hho)) \
+										: NULL); \
 							} \
 							_hs_psize--; \
 						} \
@@ -1005,13 +1003,11 @@ typedef unsigned char uint8_t;
 							if (_hs_p != NULL) \
 							{ \
 								_hs_p = \
-								    (UT_hash_handle*)((_hs_p->next != NULL) \
-											  ? ((void*)((char*)(_hs_p \
-														 ->next) + \
-												     (head) \
-													 ->hh.tbl \
-													 ->hho)) \
-											  : NULL); \
+								    (UT_hash_handle \
+									 *)((_hs_p->next != NULL) \
+										? ((void *)((char *)(_hs_p->next) + \
+											    (head)->hh.tbl->hho)) \
+										: NULL); \
 							} \
 							_hs_psize--; \
 						} \
@@ -1019,10 +1015,10 @@ typedef unsigned char uint8_t;
 						{ \
 							_hs_e = _hs_q; \
 							_hs_q = \
-							    (UT_hash_handle*)((_hs_q->next != NULL) \
-										  ? ((void*)((char*)(_hs_q->next) + \
-											     (head)->hh.tbl->hho)) \
-										  : NULL); \
+							    (UT_hash_handle *)((_hs_q->next != NULL) \
+										   ? ((void *)((char *)(_hs_q->next) + \
+											       (head)->hh.tbl->hho)) \
+										   : NULL); \
 							_hs_qsize--; \
 						} \
 						if (_hs_tail != NULL) \
@@ -1069,7 +1065,7 @@ typedef unsigned char uint8_t;
 		unsigned _src_bkt, _dst_bkt; \
 		void *_last_elt = NULL, *_elt; \
 		UT_hash_handle *_src_hh, *_dst_hh, *_last_elt_hh = NULL; \
-		ptrdiff_t _dst_hho = ((char*)(&(dst)->hh_dst) - (char*)(dst)); \
+		ptrdiff_t _dst_hho = ((char *)(&(dst)->hh_dst) - (char *)(dst)); \
 		if (src != NULL) \
 		{ \
 			for (_src_bkt = 0; _src_bkt < (src)->hh_src.tbl->num_buckets; _src_bkt++) \
@@ -1080,7 +1076,7 @@ typedef unsigned char uint8_t;
 					_elt = ELMT_FROM_HH((src)->hh_src.tbl, _src_hh); \
 					if (cond(_elt)) \
 					{ \
-						_dst_hh = (UT_hash_handle*)(((char*)_elt) + _dst_hho); \
+						_dst_hh = (UT_hash_handle *)(((char *)_elt) + _dst_hho); \
 						_dst_hh->key = _src_hh->key; \
 						_dst_hh->keylen = _src_hh->keylen; \
 						_dst_hh->hashv = _src_hh->hashv; \
@@ -1129,8 +1125,9 @@ typedef unsigned char uint8_t;
 
 #ifdef NO_DECLTYPE
 #define HASH_ITER(hh, head, el, tmp) \
-	for (((el) = (head)), ((*(char**)(&(tmp))) = (char*)((head != NULL) ? (head)->hh.next : NULL)); (el) != NULL; \
-	     ((el) = (tmp)), ((*(char**)(&(tmp))) = (char*)((tmp != NULL) ? (tmp)->hh.next : NULL)))
+	for (((el) = (head)), ((*(char **)(&(tmp))) = (char *)((head != NULL) ? (head)->hh.next : NULL)); \
+	     (el) != NULL; \
+	     ((el) = (tmp)), ((*(char **)(&(tmp))) = (char *)((tmp != NULL) ? (tmp)->hh.next : NULL)))
 #else
 #define HASH_ITER(hh, head, el, tmp) \
 	for (((el) = (head)), ((tmp) = DECLTYPE(el)((head != NULL) ? (head)->hh.next : NULL)); (el) != NULL; \
@@ -1143,7 +1140,7 @@ typedef unsigned char uint8_t;
 
 typedef struct UT_hash_bucket
 {
-	struct UT_hash_handle* hh_head;
+	struct UT_hash_handle *hh_head;
 	unsigned count;
 
 	/* expand_mult is normally set to 0. In this situation, the max chain length
@@ -1168,10 +1165,10 @@ typedef struct UT_hash_bucket
 
 typedef struct UT_hash_table
 {
-	UT_hash_bucket* buckets;
+	UT_hash_bucket *buckets;
 	unsigned num_buckets, log2_num_buckets;
 	unsigned num_items;
-	struct UT_hash_handle* tail; /* tail hh in app order, for fast append    */
+	struct UT_hash_handle *tail; /* tail hh in app order, for fast append    */
 	ptrdiff_t hho;               /* hash handle offset (byte pos of hash handle in element */
 
 	/* in an ideal situation (all buckets used equally), no bucket would have
@@ -1194,7 +1191,7 @@ typedef struct UT_hash_table
 	uint32_t signature; /* used only to find hash tables in external analysis */
 #ifdef HASH_BLOOM
 	uint32_t bloom_sig; /* used only to test bloom exists in external analysis */
-	uint8_t* bloom_bv;
+	uint8_t *bloom_bv;
 	uint8_t bloom_nbits;
 #endif
 
@@ -1202,12 +1199,12 @@ typedef struct UT_hash_table
 
 typedef struct UT_hash_handle
 {
-	struct UT_hash_table* tbl;
-	void* prev;                     /* prev element in app order      */
-	void* next;                     /* next element in app order      */
-	struct UT_hash_handle* hh_prev; /* previous hh in bucket order    */
-	struct UT_hash_handle* hh_next; /* next hh in bucket order        */
-	void* key;                      /* ptr to enclosing struct's key  */
+	struct UT_hash_table *tbl;
+	void *prev;                     /* prev element in app order      */
+	void *next;                     /* next element in app order      */
+	struct UT_hash_handle *hh_prev; /* previous hh in bucket order    */
+	struct UT_hash_handle *hh_next; /* next hh in bucket order        */
+	void *key;                      /* ptr to enclosing struct's key  */
 	unsigned keylen;                /* enclosing struct's key len     */
 	unsigned hashv;                 /* result of hash-fcn(key)        */
 } UT_hash_handle;

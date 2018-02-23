@@ -35,11 +35,11 @@
  * Construct a new LWLINE.  points will *NOT* be copied
  * use SRID=SRID_UNKNOWN for unknown SRID (will have 8bit type's S = 0)
  */
-LWLINE*
-lwline_construct(int srid, GBOX* bbox, POINTARRAY* points)
+LWLINE *
+lwline_construct(int srid, GBOX *bbox, POINTARRAY *points)
 {
-	LWLINE* result;
-	result = (LWLINE*)lwalloc(sizeof(LWLINE));
+	LWLINE *result;
+	result = (LWLINE *)lwalloc(sizeof(LWLINE));
 
 	LWDEBUG(2, "lwline_construct called.");
 
@@ -57,10 +57,10 @@ lwline_construct(int srid, GBOX* bbox, POINTARRAY* points)
 	return result;
 }
 
-LWLINE*
+LWLINE *
 lwline_construct_empty(int srid, char hasz, char hasm)
 {
-	LWLINE* result = lwalloc(sizeof(LWLINE));
+	LWLINE *result = lwalloc(sizeof(LWLINE));
 	result->type = LINETYPE;
 	result->flags = gflags(hasz, hasm, 0);
 	result->srid = srid;
@@ -70,7 +70,7 @@ lwline_construct_empty(int srid, char hasz, char hasm)
 }
 
 void
-lwline_free(LWLINE* line)
+lwline_free(LWLINE *line)
 {
 	if (!line) return;
 
@@ -80,7 +80,7 @@ lwline_free(LWLINE* line)
 }
 
 void
-printLWLINE(LWLINE* line)
+printLWLINE(LWLINE *line)
 {
 	lwnotice("LWLINE {");
 	lwnotice("    ndims = %i", (int)FLAGS_NDIMS(line->flags));
@@ -93,10 +93,10 @@ printLWLINE(LWLINE* line)
  *
  * @see ptarray_clone
  */
-LWLINE*
-lwline_clone(const LWLINE* g)
+LWLINE *
+lwline_clone(const LWLINE *g)
 {
-	LWLINE* ret = lwalloc(sizeof(LWLINE));
+	LWLINE *ret = lwalloc(sizeof(LWLINE));
 
 	LWDEBUGF(2, "lwline_clone called with %p", g);
 
@@ -109,10 +109,10 @@ lwline_clone(const LWLINE* g)
 }
 
 /* Deep clone LWLINE object. POINTARRAY *is* copied. */
-LWLINE*
-lwline_clone_deep(const LWLINE* g)
+LWLINE *
+lwline_clone_deep(const LWLINE *g)
 {
-	LWLINE* ret = lwalloc(sizeof(LWLINE));
+	LWLINE *ret = lwalloc(sizeof(LWLINE));
 
 	LWDEBUGF(2, "lwline_clone_deep called with %p", g);
 	memcpy(ret, g, sizeof(LWLINE));
@@ -125,22 +125,22 @@ lwline_clone_deep(const LWLINE* g)
 }
 
 void
-lwline_release(LWLINE* lwline)
+lwline_release(LWLINE *lwline)
 {
 	lwgeom_release(lwline_as_lwgeom(lwline));
 }
 
-LWLINE*
-lwline_segmentize2d(const LWLINE* line, double dist)
+LWLINE *
+lwline_segmentize2d(const LWLINE *line, double dist)
 {
-	POINTARRAY* segmentized = ptarray_segmentize2d(line->points, dist);
+	POINTARRAY *segmentized = ptarray_segmentize2d(line->points, dist);
 	if (!segmentized) return NULL;
 	return lwline_construct(line->srid, NULL, segmentized);
 }
 
 /* check coordinate equality  */
 char
-lwline_same(const LWLINE* l1, const LWLINE* l2)
+lwline_same(const LWLINE *l1, const LWLINE *l2)
 {
 	return ptarray_same(l1->points, l2->points);
 }
@@ -149,16 +149,16 @@ lwline_same(const LWLINE* l1, const LWLINE* l2)
  * Construct a LWLINE from an array of point and line geometries
  * LWLINE dimensions are large enough to host all input dimensions.
  */
-LWLINE*
-lwline_from_lwgeom_array(int srid, uint32_t ngeoms, LWGEOM** geoms)
+LWLINE *
+lwline_from_lwgeom_array(int srid, uint32_t ngeoms, LWGEOM **geoms)
 {
 	uint32_t i;
 	int hasz = LW_FALSE;
 	int hasm = LW_FALSE;
-	POINTARRAY* pa;
-	LWLINE* line;
+	POINTARRAY *pa;
+	LWLINE *line;
 	POINT4D pt;
-	LWPOINTITERATOR* it;
+	LWPOINTITERATOR *it;
 
 	/*
 	 * Find output dimensions, check integrity
@@ -177,13 +177,13 @@ lwline_from_lwgeom_array(int srid, uint32_t ngeoms, LWGEOM** geoms)
 
 	for (i = 0; i < ngeoms; i++)
 	{
-		LWGEOM* g = geoms[i];
+		LWGEOM *g = geoms[i];
 
 		if (lwgeom_is_empty(g)) continue;
 
 		if (g->type == POINTTYPE)
 		{
-			lwpoint_getPoint4d_p((LWPOINT*)g, &pt);
+			lwpoint_getPoint4d_p((LWPOINT *)g, &pt);
 			ptarray_append_point(pa, &pt, LW_TRUE);
 		}
 		else if (g->type == LINETYPE)
@@ -192,7 +192,7 @@ lwline_from_lwgeom_array(int srid, uint32_t ngeoms, LWGEOM** geoms)
 			 * Append the new line points, de-duplicating against the previous points.
 			 * Duplicated points internal to the linestring are untouched.
 			 */
-			ptarray_append_ptarray(pa, ((LWLINE*)g)->points, -1);
+			ptarray_append_ptarray(pa, ((LWLINE *)g)->points, -1);
 		}
 		else if (g->type == MULTIPOINTTYPE)
 		{
@@ -227,14 +227,14 @@ lwline_from_lwgeom_array(int srid, uint32_t ngeoms, LWGEOM** geoms)
  * Construct a LWLINE from an array of LWPOINTs
  * LWLINE dimensions are large enough to host all input dimensions.
  */
-LWLINE*
-lwline_from_ptarray(int srid, uint32_t npoints, LWPOINT** points)
+LWLINE *
+lwline_from_ptarray(int srid, uint32_t npoints, LWPOINT **points)
 {
 	uint32_t i;
 	int hasz = LW_FALSE;
 	int hasm = LW_FALSE;
-	POINTARRAY* pa;
-	LWLINE* line;
+	POINTARRAY *pa;
+	LWLINE *line;
 	POINT4D pt;
 
 	/*
@@ -274,12 +274,12 @@ lwline_from_ptarray(int srid, uint32_t npoints, LWPOINT** points)
 /*
  * Construct a LWLINE from a LWMPOINT
  */
-LWLINE*
-lwline_from_lwmpoint(int srid, const LWMPOINT* mpoint)
+LWLINE *
+lwline_from_lwmpoint(int srid, const LWMPOINT *mpoint)
 {
 	uint32_t i;
-	POINTARRAY* pa = NULL;
-	LWGEOM* lwgeom = (LWGEOM*)mpoint;
+	POINTARRAY *pa = NULL;
+	LWGEOM *lwgeom = (LWGEOM *)mpoint;
 	POINT4D pt;
 
 	char hasz = lwgeom_has_z(lwgeom);
@@ -305,12 +305,12 @@ lwline_from_lwmpoint(int srid, const LWMPOINT* mpoint)
  * Returns freshly allocated #LWPOINT that corresponds to the index where.
  * Returns NULL if the geometry is empty or the index invalid.
  */
-LWPOINT*
-lwline_get_lwpoint(const LWLINE* line, uint32_t where)
+LWPOINT *
+lwline_get_lwpoint(const LWLINE *line, uint32_t where)
 {
 	POINT4D pt;
-	LWPOINT* lwpoint;
-	POINTARRAY* pa;
+	LWPOINT *lwpoint;
+	POINTARRAY *pa;
 
 	if (lwline_is_empty(line) || where >= line->points->npoints) return NULL;
 
@@ -322,7 +322,7 @@ lwline_get_lwpoint(const LWLINE* line, uint32_t where)
 }
 
 int
-lwline_add_lwpoint(LWLINE* line, LWPOINT* point, uint32_t where)
+lwline_add_lwpoint(LWLINE *line, LWPOINT *point, uint32_t where)
 {
 	POINT4D pt;
 	getPoint4d_p(point->point, 0, &pt);
@@ -330,21 +330,21 @@ lwline_add_lwpoint(LWLINE* line, LWPOINT* point, uint32_t where)
 	if (ptarray_insert_point(line->points, &pt, where) != LW_SUCCESS) return LW_FAILURE;
 
 	/* Update the bounding box */
-	if (line->bbox) { lwgeom_refresh_bbox((LWGEOM*)line); }
+	if (line->bbox) { lwgeom_refresh_bbox((LWGEOM *)line); }
 
 	return LW_SUCCESS;
 }
 
-LWLINE*
-lwline_removepoint(LWLINE* line, uint32_t index)
+LWLINE *
+lwline_removepoint(LWLINE *line, uint32_t index)
 {
-	POINTARRAY* newpa;
-	LWLINE* ret;
+	POINTARRAY *newpa;
+	LWLINE *ret;
 
 	newpa = ptarray_removePoint(line->points, index);
 
 	ret = lwline_construct(line->srid, NULL, newpa);
-	lwgeom_add_bbox((LWGEOM*)ret);
+	lwgeom_add_bbox((LWGEOM *)ret);
 
 	return ret;
 }
@@ -353,19 +353,19 @@ lwline_removepoint(LWLINE* line, uint32_t index)
  * Note: input will be changed, make sure you have permissions for this.
  */
 void
-lwline_setPoint4d(LWLINE* line, uint32_t index, POINT4D* newpoint)
+lwline_setPoint4d(LWLINE *line, uint32_t index, POINT4D *newpoint)
 {
 	ptarray_set_point4d(line->points, index, newpoint);
 	/* Update the box, if there is one to update */
-	if (line->bbox) { lwgeom_refresh_bbox((LWGEOM*)line); }
+	if (line->bbox) { lwgeom_refresh_bbox((LWGEOM *)line); }
 }
 
 /**
  * Re-write the measure ordinate (or add one, if it isn't already there) interpolating
  * the measure between the supplied start and end values.
  */
-LWLINE*
-lwline_measured_from_lwline(const LWLINE* lwline, double m_start, double m_end)
+LWLINE *
+lwline_measured_from_lwline(const LWLINE *lwline, double m_start, double m_end)
 {
 	int i = 0;
 	int hasm = 0, hasz = 0;
@@ -374,7 +374,7 @@ lwline_measured_from_lwline(const LWLINE* lwline, double m_start, double m_end)
 	double length_so_far = 0.0;
 	double m_range = m_end - m_start;
 	double m;
-	POINTARRAY* pa = NULL;
+	POINTARRAY *pa = NULL;
 	POINT3DZ p1, p2;
 
 	if (lwline->type != LINETYPE)
@@ -423,14 +423,14 @@ lwline_measured_from_lwline(const LWLINE* lwline, double m_start, double m_end)
 	return lwline_construct(lwline->srid, NULL, pa);
 }
 
-LWGEOM*
-lwline_remove_repeated_points(const LWLINE* lwline, double tolerance)
+LWGEOM *
+lwline_remove_repeated_points(const LWLINE *lwline, double tolerance)
 {
-	return lwgeom_remove_repeated_points((LWGEOM*)lwline, tolerance);
+	return lwgeom_remove_repeated_points((LWGEOM *)lwline, tolerance);
 }
 
 int
-lwline_is_closed(const LWLINE* line)
+lwline_is_closed(const LWLINE *line)
 {
 	if (FLAGS_GET_Z(line->flags)) return ptarray_is_closed_3d(line->points);
 
@@ -438,7 +438,7 @@ lwline_is_closed(const LWLINE* line)
 }
 
 int
-lwline_is_trajectory(const LWLINE* line)
+lwline_is_trajectory(const LWLINE *line)
 {
 	POINT3DM p;
 	int i, n;
@@ -468,11 +468,11 @@ lwline_is_trajectory(const LWLINE* line)
 	return LW_TRUE;
 }
 
-LWLINE*
-lwline_force_dims(const LWLINE* line, int hasz, int hasm)
+LWLINE *
+lwline_force_dims(const LWLINE *line, int hasz, int hasm)
 {
-	POINTARRAY* pdims = NULL;
-	LWLINE* lineout;
+	POINTARRAY *pdims = NULL;
+	LWLINE *lineout;
 
 	/* Return 2D empty */
 	if (lwline_is_empty(line)) { lineout = lwline_construct_empty(line->srid, hasz, hasm); }
@@ -486,14 +486,14 @@ lwline_force_dims(const LWLINE* line, int hasz, int hasm)
 }
 
 int
-lwline_is_empty(const LWLINE* line)
+lwline_is_empty(const LWLINE *line)
 {
 	if (!line->points || line->points->npoints < 1) return LW_TRUE;
 	return LW_FALSE;
 }
 
 uint32_t
-lwline_count_vertices(LWLINE* line)
+lwline_count_vertices(LWLINE *line)
 {
 	assert(line);
 	if (!line->points) return 0;
@@ -501,21 +501,21 @@ lwline_count_vertices(LWLINE* line)
 }
 
 double
-lwline_length(const LWLINE* line)
+lwline_length(const LWLINE *line)
 {
 	if (lwline_is_empty(line)) return 0.0;
 	return ptarray_length(line->points);
 }
 
 double
-lwline_length_2d(const LWLINE* line)
+lwline_length_2d(const LWLINE *line)
 {
 	if (lwline_is_empty(line)) return 0.0;
 	return ptarray_length_2d(line->points);
 }
 
-POINTARRAY*
-lwline_interpolate_points(const LWLINE* line, double length_fraction, char repeat)
+POINTARRAY *
+lwline_interpolate_points(const LWLINE *line, double length_fraction, char repeat)
 {
 	POINT4D pt;
 	uint32_t i;
@@ -526,8 +526,8 @@ lwline_interpolate_points(const LWLINE* line, double length_fraction, char repea
 	double length_fraction_consumed = 0;
 	char has_z = (char)lwgeom_has_z(lwline_as_lwgeom(line));
 	char has_m = (char)lwgeom_has_m(lwline_as_lwgeom(line));
-	const POINTARRAY* ipa = line->points;
-	POINTARRAY* opa;
+	const POINTARRAY *ipa = line->points;
+	POINTARRAY *opa;
 
 	/* Empty.InterpolatePoint == Point Empty */
 	if (lwline_is_empty(line)) { return ptarray_construct_empty(has_z, has_m, 0); }
@@ -553,10 +553,10 @@ lwline_interpolate_points(const LWLINE* line, double length_fraction, char repea
 	points_to_interpolate = repeat ? (uint32_t)floor(1 / length_fraction) : 1;
 	opa = ptarray_construct(has_z, has_m, points_to_interpolate);
 
-	const POINT2D* p1 = getPoint2d_cp(ipa, 0);
+	const POINT2D *p1 = getPoint2d_cp(ipa, 0);
 	for (i = 0; i < ipa->npoints - 1 && points_found < points_to_interpolate; i++)
 	{
-		const POINT2D* p2 = getPoint2d_cp(ipa, i + 1);
+		const POINT2D *p2 = getPoint2d_cp(ipa, i + 1);
 		double segment_length_frac = distance2d_pt_pt(p1, p2) / length;
 
 		/* If our target distance is before the total length we've seen

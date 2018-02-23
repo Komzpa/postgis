@@ -30,13 +30,13 @@
 #include "lwgeom_log.h"
 
 static double
-calc_weighted_distances_3d(const POINT3D* curr, const POINT4D* points, uint32_t npoints, double* distances)
+calc_weighted_distances_3d(const POINT3D *curr, const POINT4D *points, uint32_t npoints, double *distances)
 {
 	uint32_t i;
 	double weight = 0.0;
 	for (i = 0; i < npoints; i++)
 	{
-		double dist = distance3d_pt_pt(curr, (POINT3D*)&points[i]);
+		double dist = distance3d_pt_pt(curr, (POINT3D *)&points[i]);
 		distances[i] = dist / points[i].m;
 		weight += dist * points[i].m;
 	}
@@ -45,13 +45,13 @@ calc_weighted_distances_3d(const POINT3D* curr, const POINT4D* points, uint32_t 
 }
 
 static uint32_t
-iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const uint32_t max_iter, const double tol)
+iterate_4d(POINT3D *curr, const POINT4D *points, const uint32_t npoints, const uint32_t max_iter, const double tol)
 {
 	uint32_t i, iter;
 	double delta;
 	double sum_curr = 0, sum_next = 0;
 	int hit = LW_FALSE;
-	double* distances = lwalloc(npoints * sizeof(double));
+	double *distances = lwalloc(npoints * sizeof(double));
 
 	sum_curr = calc_weighted_distances_3d(curr, points, npoints, distances);
 
@@ -146,7 +146,7 @@ iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const u
 }
 
 static POINT3D
-init_guess(const POINT4D* points, uint32_t npoints)
+init_guess(const POINT4D *points, uint32_t npoints)
 {
 	assert(npoints > 0);
 	POINT3D guess = {0, 0, 0};
@@ -165,21 +165,21 @@ init_guess(const POINT4D* points, uint32_t npoints)
 	return guess;
 }
 
-POINT4D*
-lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empty)
+POINT4D *
+lwmpoint_extract_points_4d(const LWMPOINT *g, uint32_t *npoints, int *input_empty)
 {
 	uint32_t i;
 	uint32_t n = 0;
-	POINT4D* points = lwalloc(g->ngeoms * sizeof(POINT4D));
-	int has_m = lwgeom_has_m((LWGEOM*)g);
+	POINT4D *points = lwalloc(g->ngeoms * sizeof(POINT4D));
+	int has_m = lwgeom_has_m((LWGEOM *)g);
 
 	for (i = 0; i < g->ngeoms; i++)
 	{
-		LWGEOM* subg = lwcollection_getsubgeom((LWCOLLECTION*)g, i);
+		LWGEOM *subg = lwcollection_getsubgeom((LWCOLLECTION *)g, i);
 		if (!lwgeom_is_empty(subg))
 		{
 			*input_empty = LW_FALSE;
-			if (!getPoint4d_p(((LWPOINT*)subg)->point, 0, &points[n]))
+			if (!getPoint4d_p(((LWPOINT *)subg)->point, 0, &points[n]))
 			{
 				lwerror(
 				    "Geometric median: getPoint4d_p reported failure on point (POINT(%g %g %g %g), "
@@ -233,7 +233,7 @@ lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empt
 
 #if PARANOIA_LEVEL > 0
 	/* check Z=0 for 2D inputs*/
-	if (!lwgeom_has_z((LWGEOM*)g))
+	if (!lwgeom_has_z((LWGEOM *)g))
 		for (i = 0; i < n; i++)
 			assert(points[i].z == 0);
 #endif
@@ -242,15 +242,15 @@ lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empt
 	return points;
 }
 
-LWPOINT*
-lwmpoint_median(const LWMPOINT* g, double tol, uint32_t max_iter, char fail_if_not_converged)
+LWPOINT *
+lwmpoint_median(const LWMPOINT *g, double tol, uint32_t max_iter, char fail_if_not_converged)
 {
 	/* m ordinate is considered weight, if defined */
 	uint32_t npoints = 0; /* we need to count this ourselves so we can exclude empties and weightless points */
 	uint32_t i;
 	int input_empty = LW_TRUE;
 	POINT3D median;
-	POINT4D* points = lwmpoint_extract_points_4d(g, &npoints, &input_empty);
+	POINT4D *points = lwmpoint_extract_points_4d(g, &npoints, &input_empty);
 
 	/* input validation failed, error reported already */
 	if (points == NULL) return NULL;
@@ -278,15 +278,15 @@ lwmpoint_median(const LWMPOINT* g, double tol, uint32_t max_iter, char fail_if_n
 		return NULL;
 	}
 
-	if (lwgeom_has_z((LWGEOM*)g)) { return lwpoint_make3dz(g->srid, median.x, median.y, median.z); }
+	if (lwgeom_has_z((LWGEOM *)g)) { return lwpoint_make3dz(g->srid, median.x, median.y, median.z); }
 	else
 	{
 		return lwpoint_make2d(g->srid, median.x, median.y);
 	}
 }
 
-LWPOINT*
-lwgeom_median(const LWGEOM* g, double tol, uint32_t max_iter, char fail_if_not_converged)
+LWPOINT *
+lwgeom_median(const LWGEOM *g, double tol, uint32_t max_iter, char fail_if_not_converged)
 {
 	switch (lwgeom_get_type(g))
 	{

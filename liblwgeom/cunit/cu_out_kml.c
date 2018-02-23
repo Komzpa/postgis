@@ -18,10 +18,10 @@
 #include "cu_tester.h"
 
 static void
-do_kml_test(char* in, char* out, int precision)
+do_kml_test(char *in, char *out, int precision)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_kml2(g, precision, "");
@@ -35,10 +35,10 @@ do_kml_test(char* in, char* out, int precision)
 }
 
 static void
-do_kml_unsupported(char* in, char* out)
+do_kml_unsupported(char *in, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_kml2(g, 0, "");
@@ -53,10 +53,10 @@ do_kml_unsupported(char* in, char* out)
 }
 
 static void
-do_kml_test_prefix(char* in, char* out, int precision, const char* prefix)
+do_kml_test_prefix(char *in, char *out, int precision, const char *prefix)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_kml2(g, precision, prefix);

@@ -1,12 +1,12 @@
 #define NUM_STATES 59
 
-static const char* states[NUM_STATES] = {"AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "FM",
+static const char *states[NUM_STATES] = {"AK", "AL", "AR", "AS", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "FM",
 					 "GA", "GU", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD",
 					 "ME", "MH", "MI", "MN", "MO", "MP", "MS", "MT", "NC", "ND", "NE", "NH",
 					 "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "PR", "PW", "RI", "SC",
 					 "SD", "TN", "TX", "UT", "VA", "VI", "VT", "WA", "WI", "WV", "WY"};
 
-static const char* stcities[NUM_STATES] = {
+static const char *stcities[NUM_STATES] = {
     /* -- AK -- AK -- AK -- AK -- AK -- AK -- AK -- AK -- AK -- AK -- */
     "(?:\\b)((?^:(?i:(?:S(?:T(?:E(?:VENS V(?:ILLAGE|LG)|BBINS|RLING|ES"
     "E)| (?:GEORGE IS|PAUL ISLE)|ONY RIVER)|A(?:INT (?:(?:GEORGE|PAUL)"

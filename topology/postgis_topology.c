@@ -52,7 +52,7 @@
  */
 PG_MODULE_MAGIC;
 
-LWT_BE_IFACE* be_iface;
+LWT_BE_IFACE *be_iface;
 
 /*
  * Private data we'll use for this backend
@@ -79,8 +79,8 @@ LWT_BE_DATA be_data;
 
 struct LWT_BE_TOPOLOGY_T
 {
-	LWT_BE_DATA* be_data;
-	char* name;
+	LWT_BE_DATA *be_data;
+	char *name;
 	int id;
 	int srid;
 	double precision;
@@ -90,12 +90,12 @@ struct LWT_BE_TOPOLOGY_T
 
 /* utility funx */
 
-static void cberror(const LWT_BE_DATA* be, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
+static void cberror(const LWT_BE_DATA *be, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
 static void
-cberror(const LWT_BE_DATA* be_in, const char* fmt, ...)
+cberror(const LWT_BE_DATA *be_in, const char *fmt, ...)
 {
-	LWT_BE_DATA* be = (LWT_BE_DATA*)be_in; /*const cast*/
+	LWT_BE_DATA *be = (LWT_BE_DATA *)be_in; /*const cast*/
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -107,9 +107,9 @@ cberror(const LWT_BE_DATA* be_in, const char* fmt, ...)
 }
 
 static void
-_lwtype_upper_name(int type, char* buf, size_t buflen)
+_lwtype_upper_name(int type, char *buf, size_t buflen)
 {
-	char* ptr;
+	char *ptr;
 	snprintf(buf, buflen, "%s", lwtype_name(type));
 	buf[buflen - 1] = '\0';
 	ptr = buf;
@@ -121,12 +121,12 @@ _lwtype_upper_name(int type, char* buf, size_t buflen)
 }
 
 /* Return an lwalloc'ed geometrical representation of the box */
-static LWGEOM*
-_box2d_to_lwgeom(const GBOX* bbox, int srid)
+static LWGEOM *
+_box2d_to_lwgeom(const GBOX *bbox, int srid)
 {
-	POINTARRAY* pa = ptarray_construct(0, 0, 2);
+	POINTARRAY *pa = ptarray_construct(0, 0, 2);
 	POINT4D p;
-	LWLINE* line;
+	LWLINE *line;
 
 	p.x = bbox->xmin;
 	p.y = bbox->ymin;
@@ -139,12 +139,12 @@ _box2d_to_lwgeom(const GBOX* bbox, int srid)
 }
 
 /* Return lwalloc'ed hexwkb representation for a GBOX */
-static char*
-_box2d_to_hexwkb(const GBOX* bbox, int srid)
+static char *
+_box2d_to_hexwkb(const GBOX *bbox, int srid)
 {
-	char* hex;
+	char *hex;
 	size_t sz;
-	LWGEOM* geom = _box2d_to_lwgeom(bbox, srid);
+	LWGEOM *geom = _box2d_to_lwgeom(bbox, srid);
 	hex = lwgeom_to_hexwkb(geom, WKT_EXTENDED, &sz);
 	lwgeom_free(geom);
 	assert(hex[sz - 1] == '\0');
@@ -153,20 +153,20 @@ _box2d_to_hexwkb(const GBOX* bbox, int srid)
 
 /* Backend callbacks */
 
-static const char*
-cb_lastErrorMessage(const LWT_BE_DATA* be)
+static const char *
+cb_lastErrorMessage(const LWT_BE_DATA *be)
 {
 	return be->lastErrorMsg;
 }
 
-static LWT_BE_TOPOLOGY*
-cb_loadTopologyByName(const LWT_BE_DATA* be, const char* name)
+static LWT_BE_TOPOLOGY *
+cb_loadTopologyByName(const LWT_BE_DATA *be, const char *name)
 {
 	int spi_result;
-	const char* sql;
+	const char *sql;
 	Datum dat;
 	bool isnull;
-	LWT_BE_TOPOLOGY* topo;
+	LWT_BE_TOPOLOGY *topo;
 	MemoryContext oldcontext = CurrentMemoryContext;
 	Datum values[1];
 	Oid argtypes[1];
@@ -214,7 +214,7 @@ cb_loadTopologyByName(const LWT_BE_DATA* be, const char* name)
 	}
 
 	topo = palloc(sizeof(LWT_BE_TOPOLOGY));
-	topo->be_data = (LWT_BE_DATA*)be; /* const cast.. */
+	topo->be_data = (LWT_BE_DATA *)be; /* const cast.. */
 	topo->name = pstrdup(name);
 
 	dat = SPI_getbinval(SPI_tuptable->vals[0], SPI_tuptable->tupdesc, 1, &isnull);
@@ -276,25 +276,25 @@ cb_loadTopologyByName(const LWT_BE_DATA* be, const char* name)
 }
 
 static int
-cb_topoGetSRID(const LWT_BE_TOPOLOGY* topo)
+cb_topoGetSRID(const LWT_BE_TOPOLOGY *topo)
 {
 	return topo->srid;
 }
 
 static int
-cb_topoHasZ(const LWT_BE_TOPOLOGY* topo)
+cb_topoHasZ(const LWT_BE_TOPOLOGY *topo)
 {
 	return topo->hasZ;
 }
 
 static double
-cb_topoGetPrecision(const LWT_BE_TOPOLOGY* topo)
+cb_topoGetPrecision(const LWT_BE_TOPOLOGY *topo)
 {
 	return topo->precision;
 }
 
 static int
-cb_freeTopology(LWT_BE_TOPOLOGY* topo)
+cb_freeTopology(LWT_BE_TOPOLOGY *topo)
 {
 	pfree(topo->name);
 	pfree(topo);
@@ -304,7 +304,7 @@ cb_freeTopology(LWT_BE_TOPOLOGY* topo)
 static void
 addEdgeFields(StringInfo str, int fields, int fullEdgeData)
 {
-	const char* sep = "";
+	const char *sep = "";
 
 	if (fields & LWT_COL_EDGE_EDGE_ID)
 	{
@@ -348,11 +348,11 @@ addEdgeFields(StringInfo str, int fields, int fullEdgeData)
 
 /* Add edge values in text form, include the parens */
 static void
-addEdgeValues(StringInfo str, const LWT_ISO_EDGE* edge, int fields, int fullEdgeData)
+addEdgeValues(StringInfo str, const LWT_ISO_EDGE *edge, int fields, int fullEdgeData)
 {
 	size_t hexewkb_size;
-	char* hexewkb;
-	const char* sep = "";
+	char *hexewkb;
+	const char *sep = "";
 
 	appendStringInfoChar(str, '(');
 	if (fields & LWT_COL_EDGE_EDGE_ID)
@@ -419,13 +419,13 @@ enum UpdateType
 };
 
 static void
-addEdgeUpdate(StringInfo str, const LWT_ISO_EDGE* edge, int fields, int fullEdgeData, enum UpdateType updType)
+addEdgeUpdate(StringInfo str, const LWT_ISO_EDGE *edge, int fields, int fullEdgeData, enum UpdateType updType)
 {
-	const char* sep = "";
-	const char* sep1;
-	const char* op;
+	const char *sep = "";
+	const char *sep1;
+	const char *op;
 	size_t hexewkb_size;
-	char* hexewkb;
+	char *hexewkb;
 
 	switch (updType)
 	{
@@ -506,13 +506,13 @@ addEdgeUpdate(StringInfo str, const LWT_ISO_EDGE* edge, int fields, int fullEdge
 }
 
 static void
-addNodeUpdate(StringInfo str, const LWT_ISO_NODE* node, int fields, int fullNodeData, enum UpdateType updType)
+addNodeUpdate(StringInfo str, const LWT_ISO_NODE *node, int fields, int fullNodeData, enum UpdateType updType)
 {
-	const char* sep = "";
-	const char* sep1;
-	const char* op;
+	const char *sep = "";
+	const char *sep1;
+	const char *op;
 	size_t hexewkb_size;
-	char* hexewkb;
+	char *hexewkb;
 
 	switch (updType)
 	{
@@ -559,7 +559,7 @@ addNodeUpdate(StringInfo str, const LWT_ISO_NODE* node, int fields, int fullNode
 static void
 addNodeFields(StringInfo str, int fields)
 {
-	const char* sep = "";
+	const char *sep = "";
 
 	if (fields & LWT_COL_NODE_NODE_ID)
 	{
@@ -577,7 +577,7 @@ addNodeFields(StringInfo str, int fields)
 static void
 addFaceFields(StringInfo str, int fields)
 {
-	const char* sep = "";
+	const char *sep = "";
 
 	if (fields & LWT_COL_FACE_FACE_ID)
 	{
@@ -593,11 +593,11 @@ addFaceFields(StringInfo str, int fields)
 
 /* Add node values for an insert, in text form */
 static void
-addNodeValues(StringInfo str, const LWT_ISO_NODE* node, int fields)
+addNodeValues(StringInfo str, const LWT_ISO_NODE *node, int fields)
 {
 	size_t hexewkb_size;
-	char* hexewkb;
-	const char* sep = "";
+	char *hexewkb;
+	const char *sep = "";
 
 	appendStringInfoChar(str, '(');
 
@@ -637,7 +637,7 @@ addNodeValues(StringInfo str, const LWT_ISO_NODE* node, int fields)
 
 /* Add face values for an insert, in text form */
 static void
-addFaceValues(StringInfo str, LWT_ISO_FACE* face, int srid)
+addFaceValues(StringInfo str, LWT_ISO_FACE *face, int srid)
 {
 	if (face->face_id != -1)
 		appendStringInfo(str, "(%" LWTFMT_ELEMID, face->face_id);
@@ -647,7 +647,7 @@ addFaceValues(StringInfo str, LWT_ISO_FACE* face, int srid)
 	if (face->mbr)
 	{
 		{
-			char* hexbox;
+			char *hexbox;
 			hexbox = _box2d_to_hexwkb(face->mbr, srid);
 			appendStringInfo(str, ",ST_Envelope('%s'::geometry))", hexbox);
 			lwfree(hexbox);
@@ -660,13 +660,13 @@ addFaceValues(StringInfo str, LWT_ISO_FACE* face, int srid)
 }
 
 static void
-fillEdgeFields(LWT_ISO_EDGE* edge, HeapTuple row, TupleDesc rowdesc, int fields)
+fillEdgeFields(LWT_ISO_EDGE *edge, HeapTuple row, TupleDesc rowdesc, int fields)
 {
 	bool isnull;
 	Datum dat;
 	int val;
-	GSERIALIZED* geom;
-	LWGEOM* lwg;
+	GSERIALIZED *geom;
+	LWGEOM *lwg;
 	int colno = 0;
 
 	POSTGIS_DEBUGF(2, "fillEdgeFields: got %d atts and fields %x", rowdesc->natts, fields);
@@ -811,7 +811,7 @@ fillEdgeFields(LWT_ISO_EDGE* edge, HeapTuple row, TupleDesc rowdesc, int fields)
 		{
 			{
 				MemoryContext oldcontext = CurrentMemoryContext;
-				geom = (GSERIALIZED*)PG_DETOAST_DATUM(dat);
+				geom = (GSERIALIZED *)PG_DETOAST_DATUM(dat);
 				lwg = lwgeom_from_gserialized(geom);
 				MemoryContextSwitchTo(TopMemoryContext);
 				edge->geom = lwgeom_as_lwline(lwgeom_clone_deep(lwg));
@@ -829,12 +829,12 @@ fillEdgeFields(LWT_ISO_EDGE* edge, HeapTuple row, TupleDesc rowdesc, int fields)
 }
 
 static void
-fillNodeFields(LWT_ISO_NODE* node, HeapTuple row, TupleDesc rowdesc, int fields)
+fillNodeFields(LWT_ISO_NODE *node, HeapTuple row, TupleDesc rowdesc, int fields)
 {
 	bool isnull;
 	Datum dat;
-	GSERIALIZED* geom;
-	LWGEOM* lwg;
+	GSERIALIZED *geom;
+	LWGEOM *lwg;
 	int colno = 0;
 
 	if (fields & LWT_COL_NODE_NODE_ID)
@@ -855,7 +855,7 @@ fillNodeFields(LWT_ISO_NODE* node, HeapTuple row, TupleDesc rowdesc, int fields)
 		dat = SPI_getbinval(row, rowdesc, ++colno, &isnull);
 		if (!isnull)
 		{
-			geom = (GSERIALIZED*)PG_DETOAST_DATUM(dat);
+			geom = (GSERIALIZED *)PG_DETOAST_DATUM(dat);
 			lwg = lwgeom_from_gserialized(geom);
 			node->geom = lwgeom_as_lwpoint(lwgeom_clone_deep(lwg));
 			lwgeom_free(lwg);
@@ -870,13 +870,13 @@ fillNodeFields(LWT_ISO_NODE* node, HeapTuple row, TupleDesc rowdesc, int fields)
 }
 
 static void
-fillFaceFields(LWT_ISO_FACE* face, HeapTuple row, TupleDesc rowdesc, int fields)
+fillFaceFields(LWT_ISO_FACE *face, HeapTuple row, TupleDesc rowdesc, int fields)
 {
 	bool isnull;
 	Datum dat;
-	GSERIALIZED* geom;
-	LWGEOM* g;
-	const GBOX* box;
+	GSERIALIZED *geom;
+	LWGEOM *g;
+	const GBOX *box;
 	int colno = 0;
 
 	if (fields & LWT_COL_FACE_FACE_ID)
@@ -890,7 +890,7 @@ fillFaceFields(LWT_ISO_FACE* face, HeapTuple row, TupleDesc rowdesc, int fields)
 		if (!isnull)
 		{
 			/* NOTE: this is a geometry of which we want to take (and clone) the BBOX */
-			geom = (GSERIALIZED*)PG_DETOAST_DATUM(dat);
+			geom = (GSERIALIZED *)PG_DETOAST_DATUM(dat);
 			g = lwgeom_from_gserialized(geom);
 			box = lwgeom_get_bbox(g);
 			if (box) { face->mbr = gbox_clone(box); }
@@ -913,7 +913,7 @@ fillFaceFields(LWT_ISO_FACE* face, HeapTuple row, TupleDesc rowdesc, int fields)
 
 /* return 0 on failure (null) 1 otherwise */
 static int
-getNotNullInt32(HeapTuple row, TupleDesc desc, int col, int32* val)
+getNotNullInt32(HeapTuple row, TupleDesc desc, int col, int32 *val)
 {
 	bool isnull;
 	Datum dat = SPI_getbinval(row, desc, col, &isnull);
@@ -924,10 +924,10 @@ getNotNullInt32(HeapTuple row, TupleDesc desc, int col, int32* val)
 
 /* ----------------- Callbacks start here ------------------------ */
 
-static LWT_ISO_EDGE*
-cb_getEdgeById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields)
+static LWT_ISO_EDGE *
+cb_getEdgeById(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields)
 {
-	LWT_ISO_EDGE* edges;
+	LWT_ISO_EDGE *edges;
 	int spi_result;
 	MemoryContext oldcontext = CurrentMemoryContext;
 	StringInfoData sqldata;
@@ -974,10 +974,10 @@ cb_getEdgeById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems
 	return edges;
 }
 
-static LWT_ISO_EDGE*
-cb_getEdgeByNode(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields)
+static LWT_ISO_EDGE *
+cb_getEdgeByNode(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields)
 {
-	LWT_ISO_EDGE* edges;
+	LWT_ISO_EDGE *edges;
 	int spi_result;
 
 	StringInfoData sqldata;
@@ -1033,21 +1033,21 @@ cb_getEdgeByNode(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numele
 	return edges;
 }
 
-static LWT_ISO_EDGE*
-cb_getEdgeByFace(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields, const GBOX* box)
+static LWT_ISO_EDGE *
+cb_getEdgeByFace(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields, const GBOX *box)
 {
-	LWT_ISO_EDGE* edges;
+	LWT_ISO_EDGE *edges;
 	int spi_result;
 	MemoryContext oldcontext = CurrentMemoryContext;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
 	int i;
-	ArrayType* array_ids;
-	Datum* datum_ids;
+	ArrayType *array_ids;
+	Datum *datum_ids;
 	Datum values[2];
 	Oid argtypes[2];
 	int nargs = 1;
-	GSERIALIZED* gser = NULL;
+	GSERIALIZED *gser = NULL;
 
 	datum_ids = palloc(sizeof(Datum) * (*numelems));
 	for (i = 0; i < *numelems; ++i)
@@ -1068,7 +1068,7 @@ cb_getEdgeByFace(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numele
 
 	if (box)
 	{
-		LWGEOM* g = _box2d_to_lwgeom(box, topo->srid);
+		LWGEOM *g = _box2d_to_lwgeom(box, topo->srid);
 		gser = geometry_serialize(g);
 		lwgeom_free(g);
 		appendStringInfo(sql, " AND geom && $2");
@@ -1110,10 +1110,10 @@ cb_getEdgeByFace(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numele
 	return edges;
 }
 
-static LWT_ISO_FACE*
-cb_getFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields)
+static LWT_ISO_FACE *
+cb_getFacesById(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields)
 {
-	LWT_ISO_FACE* faces;
+	LWT_ISO_FACE *faces;
 	int spi_result;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
@@ -1162,10 +1162,10 @@ cb_getFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelem
 	return faces;
 }
 
-static LWT_ELEMID*
-cb_getRingEdges(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID edge, int* numelems, int limit)
+static LWT_ELEMID *
+cb_getRingEdges(const LWT_BE_TOPOLOGY *topo, LWT_ELEMID edge, int *numelems, int limit)
 {
-	LWT_ELEMID* edges;
+	LWT_ELEMID *edges;
 	int spi_result;
 	TupleDesc rowdesc;
 	StringInfoData sqldata;
@@ -1245,10 +1245,10 @@ cb_getRingEdges(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID edge, int* numelems, int
 	return edges;
 }
 
-static LWT_ISO_NODE*
-cb_getNodeById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields)
+static LWT_ISO_NODE *
+cb_getNodeById(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields)
 {
-	LWT_ISO_NODE* nodes;
+	LWT_ISO_NODE *nodes;
 	int spi_result;
 
 	StringInfoData sqldata;
@@ -1295,16 +1295,16 @@ cb_getNodeById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems
 	return nodes;
 }
 
-static LWT_ISO_NODE*
-cb_getNodeByFace(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numelems, int fields, const GBOX* box)
+static LWT_ISO_NODE *
+cb_getNodeByFace(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int *numelems, int fields, const GBOX *box)
 {
-	LWT_ISO_NODE* nodes;
+	LWT_ISO_NODE *nodes;
 	int spi_result;
 	MemoryContext oldcontext = CurrentMemoryContext;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
 	int i;
-	char* hexbox;
+	char *hexbox;
 
 	initStringInfo(sql);
 	appendStringInfoString(sql, "SELECT ");
@@ -1352,19 +1352,19 @@ cb_getNodeByFace(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int* numele
 	return nodes;
 }
 
-static LWT_ISO_EDGE*
-cb_getEdgeWithinDistance2D(const LWT_BE_TOPOLOGY* topo,
-			   const LWPOINT* pt,
+static LWT_ISO_EDGE *
+cb_getEdgeWithinDistance2D(const LWT_BE_TOPOLOGY *topo,
+			   const LWPOINT *pt,
 			   double dist,
-			   int* numelems,
+			   int *numelems,
 			   int fields,
 			   int limit)
 {
-	LWT_ISO_EDGE* edges;
+	LWT_ISO_EDGE *edges;
 	int spi_result;
 	int elems_requested = limit;
 	size_t hexewkb_size;
-	char* hexewkb;
+	char *hexewkb;
 	MemoryContext oldcontext = CurrentMemoryContext;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
@@ -1440,19 +1440,19 @@ cb_getEdgeWithinDistance2D(const LWT_BE_TOPOLOGY* topo,
 	return edges;
 }
 
-static LWT_ISO_NODE*
-cb_getNodeWithinDistance2D(const LWT_BE_TOPOLOGY* topo,
-			   const LWPOINT* pt,
+static LWT_ISO_NODE *
+cb_getNodeWithinDistance2D(const LWT_BE_TOPOLOGY *topo,
+			   const LWPOINT *pt,
 			   double dist,
-			   int* numelems,
+			   int *numelems,
 			   int fields,
 			   int limit)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
-	LWT_ISO_NODE* nodes;
+	LWT_ISO_NODE *nodes;
 	int spi_result;
 	size_t hexewkb_size;
-	char* hexewkb;
+	char *hexewkb;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
 	int elems_requested = limit;
@@ -1542,7 +1542,7 @@ cb_getNodeWithinDistance2D(const LWT_BE_TOPOLOGY* topo,
 }
 
 static int
-cb_insertNodes(const LWT_BE_TOPOLOGY* topo, LWT_ISO_NODE* nodes, int numelems)
+cb_insertNodes(const LWT_BE_TOPOLOGY *topo, LWT_ISO_NODE *nodes, int numelems)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -1597,7 +1597,7 @@ cb_insertNodes(const LWT_BE_TOPOLOGY* topo, LWT_ISO_NODE* nodes, int numelems)
 }
 
 static int
-cb_insertEdges(const LWT_BE_TOPOLOGY* topo, LWT_ISO_EDGE* edges, int numelems)
+cb_insertEdges(const LWT_BE_TOPOLOGY *topo, LWT_ISO_EDGE *edges, int numelems)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -1655,7 +1655,7 @@ cb_insertEdges(const LWT_BE_TOPOLOGY* topo, LWT_ISO_EDGE* edges, int numelems)
 }
 
 static int
-cb_insertFaces(const LWT_BE_TOPOLOGY* topo, LWT_ISO_FACE* faces, int numelems)
+cb_insertFaces(const LWT_BE_TOPOLOGY *topo, LWT_ISO_FACE *faces, int numelems)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -1712,12 +1712,12 @@ cb_insertFaces(const LWT_BE_TOPOLOGY* topo, LWT_ISO_FACE* faces, int numelems)
 }
 
 static int
-cb_updateEdges(const LWT_BE_TOPOLOGY* topo,
-	       const LWT_ISO_EDGE* sel_edge,
+cb_updateEdges(const LWT_BE_TOPOLOGY *topo,
+	       const LWT_ISO_EDGE *sel_edge,
 	       int sel_fields,
-	       const LWT_ISO_EDGE* upd_edge,
+	       const LWT_ISO_EDGE *upd_edge,
 	       int upd_fields,
-	       const LWT_ISO_EDGE* exc_edge,
+	       const LWT_ISO_EDGE *exc_edge,
 	       int exc_fields)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
@@ -1756,12 +1756,12 @@ cb_updateEdges(const LWT_BE_TOPOLOGY* topo,
 }
 
 static int
-cb_updateNodes(const LWT_BE_TOPOLOGY* topo,
-	       const LWT_ISO_NODE* sel_node,
+cb_updateNodes(const LWT_BE_TOPOLOGY *topo,
+	       const LWT_ISO_NODE *sel_node,
 	       int sel_fields,
-	       const LWT_ISO_NODE* upd_node,
+	       const LWT_ISO_NODE *upd_node,
 	       int upd_fields,
-	       const LWT_ISO_NODE* exc_node,
+	       const LWT_ISO_NODE *exc_node,
 	       int exc_fields)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
@@ -1800,15 +1800,15 @@ cb_updateNodes(const LWT_BE_TOPOLOGY* topo,
 }
 
 static int
-cb_updateNodesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_NODE* nodes, int numnodes, int fields)
+cb_updateNodesById(const LWT_BE_TOPOLOGY *topo, const LWT_ISO_NODE *nodes, int numnodes, int fields)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int i;
 	int spi_result;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
-	const char* sep = "";
-	const char* sep1 = ",";
+	const char *sep = "";
+	const char *sep1 = ",";
 
 	if (!fields)
 	{
@@ -1828,7 +1828,7 @@ cb_updateNodesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_NODE* nodes, int n
 	appendStringInfoString(sql, ") AS ( VALUES ");
 	for (i = 0; i < numnodes; ++i)
 	{
-		const LWT_ISO_NODE* node = &(nodes[i]);
+		const LWT_ISO_NODE *node = &(nodes[i]);
 		if (i) appendStringInfoString(sql, ",");
 		addNodeValues(sql, node, LWT_COL_NODE_NODE_ID | fields);
 	}
@@ -1869,7 +1869,7 @@ cb_updateNodesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_NODE* nodes, int n
 }
 
 static int
-cb_updateFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_FACE* faces, int numfaces)
+cb_updateFacesById(const LWT_BE_TOPOLOGY *topo, const LWT_ISO_FACE *faces, int numfaces)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int i;
@@ -1881,8 +1881,8 @@ cb_updateFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_FACE* faces, int n
 	appendStringInfoString(sql, "WITH newfaces(id,mbr) AS ( VALUES ");
 	for (i = 0; i < numfaces; ++i)
 	{
-		const LWT_ISO_FACE* face = &(faces[i]);
-		char* hexbox = _box2d_to_hexwkb(face->mbr, topo->srid);
+		const LWT_ISO_FACE *face = &(faces[i]);
+		char *hexbox = _box2d_to_hexwkb(face->mbr, topo->srid);
 
 		if (i) appendStringInfoChar(sql, ',');
 
@@ -1914,15 +1914,15 @@ cb_updateFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_FACE* faces, int n
 }
 
 static int
-cb_updateEdgesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_EDGE* edges, int numedges, int fields)
+cb_updateEdgesById(const LWT_BE_TOPOLOGY *topo, const LWT_ISO_EDGE *edges, int numedges, int fields)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int i;
 	int spi_result;
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
-	const char* sep = "";
-	const char* sep1 = ",";
+	const char *sep = "";
+	const char *sep1 = ",";
 
 	if (!fields)
 	{
@@ -1936,7 +1936,7 @@ cb_updateEdgesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_EDGE* edges, int n
 	appendStringInfoString(sql, ") AS ( VALUES ");
 	for (i = 0; i < numedges; ++i)
 	{
-		const LWT_ISO_EDGE* edge = &(edges[i]);
+		const LWT_ISO_EDGE *edge = &(edges[i]);
 		if (i) appendStringInfoString(sql, ",");
 		addEdgeValues(sql, edge, fields | LWT_COL_EDGE_EDGE_ID, 0);
 	}
@@ -2003,7 +2003,7 @@ cb_updateEdgesById(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_EDGE* edges, int n
 }
 
 static int
-cb_deleteEdges(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_EDGE* sel_edge, int sel_fields)
+cb_deleteEdges(const LWT_BE_TOPOLOGY *topo, const LWT_ISO_EDGE *sel_edge, int sel_fields)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2034,7 +2034,7 @@ cb_deleteEdges(const LWT_BE_TOPOLOGY* topo, const LWT_ISO_EDGE* sel_edge, int se
 }
 
 static LWT_ELEMID
-cb_getNextEdgeId(const LWT_BE_TOPOLOGY* topo)
+cb_getNextEdgeId(const LWT_BE_TOPOLOGY *topo)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2078,7 +2078,7 @@ cb_getNextEdgeId(const LWT_BE_TOPOLOGY* topo)
 }
 
 static int
-cb_updateTopoGeomEdgeSplit(const LWT_BE_TOPOLOGY* topo,
+cb_updateTopoGeomEdgeSplit(const LWT_BE_TOPOLOGY *topo,
 			   LWT_ELEMID split_edge,
 			   LWT_ELEMID new_edge1,
 			   LWT_ELEMID new_edge2)
@@ -2088,7 +2088,7 @@ cb_updateTopoGeomEdgeSplit(const LWT_BE_TOPOLOGY* topo,
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
 	int i, ntopogeoms;
-	const char* proj = "r.element_id, r.topogeo_id, r.layer_id, r.element_type";
+	const char *proj = "r.element_id, r.topogeo_id, r.layer_id, r.element_type";
 
 	initStringInfo(sql);
 	if (new_edge2 == -1) { appendStringInfo(sql, "SELECT %s", proj); }
@@ -2204,7 +2204,7 @@ cb_updateTopoGeomEdgeSplit(const LWT_BE_TOPOLOGY* topo,
 }
 
 static int
-cb_updateTopoGeomFaceSplit(const LWT_BE_TOPOLOGY* topo,
+cb_updateTopoGeomFaceSplit(const LWT_BE_TOPOLOGY *topo,
 			   LWT_ELEMID split_face,
 			   LWT_ELEMID new_face1,
 			   LWT_ELEMID new_face2)
@@ -2214,7 +2214,7 @@ cb_updateTopoGeomFaceSplit(const LWT_BE_TOPOLOGY* topo,
 	StringInfoData sqldata;
 	StringInfo sql = &sqldata;
 	int i, ntopogeoms;
-	const char* proj = "r.element_id, r.topogeo_id, r.layer_id, r.element_type";
+	const char *proj = "r.element_id, r.topogeo_id, r.layer_id, r.element_type";
 
 	POSTGIS_DEBUGF(1,
 		       "cb_updateTopoGeomFaceSplit signalled "
@@ -2334,7 +2334,7 @@ cb_updateTopoGeomFaceSplit(const LWT_BE_TOPOLOGY* topo,
 }
 
 static int
-cb_checkTopoGeomRemEdge(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID rem_edge, LWT_ELEMID face_left, LWT_ELEMID face_right)
+cb_checkTopoGeomRemEdge(const LWT_BE_TOPOLOGY *topo, LWT_ELEMID rem_edge, LWT_ELEMID face_left, LWT_ELEMID face_right)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2472,7 +2472,7 @@ cb_checkTopoGeomRemEdge(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID rem_edge, LWT_EL
 }
 
 static int
-cb_checkTopoGeomRemNode(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID rem_node, LWT_ELEMID edge1, LWT_ELEMID edge2)
+cb_checkTopoGeomRemNode(const LWT_BE_TOPOLOGY *topo, LWT_ELEMID rem_node, LWT_ELEMID edge1, LWT_ELEMID edge2)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2547,7 +2547,7 @@ cb_checkTopoGeomRemNode(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID rem_node, LWT_EL
 }
 
 static int
-cb_updateTopoGeomFaceHeal(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID face1, LWT_ELEMID face2, LWT_ELEMID newface)
+cb_updateTopoGeomFaceHeal(const LWT_BE_TOPOLOGY *topo, LWT_ELEMID face1, LWT_ELEMID face2, LWT_ELEMID newface)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2643,7 +2643,7 @@ cb_updateTopoGeomFaceHeal(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID face1, LWT_ELE
 }
 
 static int
-cb_updateTopoGeomEdgeHeal(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID edge1, LWT_ELEMID edge2, LWT_ELEMID newedge)
+cb_updateTopoGeomEdgeHeal(const LWT_BE_TOPOLOGY *topo, LWT_ELEMID edge1, LWT_ELEMID edge2, LWT_ELEMID newedge)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2738,7 +2738,7 @@ cb_updateTopoGeomEdgeHeal(const LWT_BE_TOPOLOGY* topo, LWT_ELEMID edge1, LWT_ELE
 }
 
 static LWT_ELEMID
-cb_getFaceContainingPoint(const LWT_BE_TOPOLOGY* topo, const LWPOINT* pt)
+cb_getFaceContainingPoint(const LWT_BE_TOPOLOGY *topo, const LWPOINT *pt)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2747,7 +2747,7 @@ cb_getFaceContainingPoint(const LWT_BE_TOPOLOGY* topo, const LWPOINT* pt)
 	bool isnull;
 	Datum dat;
 	LWT_ELEMID face_id;
-	GSERIALIZED* pts;
+	GSERIALIZED *pts;
 	Datum values[1];
 	Oid argtypes[1];
 
@@ -2797,7 +2797,7 @@ cb_getFaceContainingPoint(const LWT_BE_TOPOLOGY* topo, const LWPOINT* pt)
 }
 
 static int
-cb_deleteFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int numelems)
+cb_deleteFacesById(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int numelems)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result, i;
@@ -2832,7 +2832,7 @@ cb_deleteFacesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int numel
 }
 
 static int
-cb_deleteNodesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int numelems)
+cb_deleteNodesById(const LWT_BE_TOPOLOGY *topo, const LWT_ELEMID *ids, int numelems)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result, i;
@@ -2866,8 +2866,8 @@ cb_deleteNodesById(const LWT_BE_TOPOLOGY* topo, const LWT_ELEMID* ids, int numel
 	return SPI_processed;
 }
 
-static LWT_ISO_NODE*
-cb_getNodeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelems, int fields, int limit)
+static LWT_ISO_NODE *
+cb_getNodeWithinBox2D(const LWT_BE_TOPOLOGY *topo, const GBOX *box, int *numelems, int fields, int limit)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2875,8 +2875,8 @@ cb_getNodeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelem
 	StringInfo sql = &sqldata;
 	int i;
 	int elems_requested = limit;
-	LWT_ISO_NODE* nodes;
-	char* hexbox;
+	LWT_ISO_NODE *nodes;
+	char *hexbox;
 
 	initStringInfo(sql);
 
@@ -2941,8 +2941,8 @@ cb_getNodeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelem
 	return nodes;
 }
 
-static LWT_ISO_EDGE*
-cb_getEdgeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelems, int fields, int limit)
+static LWT_ISO_EDGE *
+cb_getEdgeWithinBox2D(const LWT_BE_TOPOLOGY *topo, const GBOX *box, int *numelems, int fields, int limit)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -2950,8 +2950,8 @@ cb_getEdgeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelem
 	StringInfo sql = &sqldata;
 	int i;
 	int elems_requested = limit;
-	LWT_ISO_EDGE* edges;
-	char* hexbox;
+	LWT_ISO_EDGE *edges;
+	char *hexbox;
 
 	initStringInfo(sql);
 
@@ -3022,8 +3022,8 @@ cb_getEdgeWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelem
 	return edges;
 }
 
-static LWT_ISO_FACE*
-cb_getFaceWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelems, int fields, int limit)
+static LWT_ISO_FACE *
+cb_getFaceWithinBox2D(const LWT_BE_TOPOLOGY *topo, const GBOX *box, int *numelems, int fields, int limit)
 {
 	MemoryContext oldcontext = CurrentMemoryContext;
 	int spi_result;
@@ -3031,8 +3031,8 @@ cb_getFaceWithinBox2D(const LWT_BE_TOPOLOGY* topo, const GBOX* box, int* numelem
 	StringInfo sql = &sqldata;
 	int i;
 	int elems_requested = limit;
-	LWT_ISO_FACE* faces;
-	char* hexbox;
+	LWT_ISO_FACE *faces;
+	char *hexbox;
 
 	initStringInfo(sql);
 
@@ -3139,9 +3139,9 @@ static LWT_BE_CALLBACKS be_callbacks = {cb_lastErrorMessage,
 					cb_getFaceWithinBox2D};
 
 static void
-xact_callback(XactEvent event, void* arg)
+xact_callback(XactEvent event, void *arg)
 {
-	LWT_BE_DATA* data = (LWT_BE_DATA*)arg;
+	LWT_BE_DATA *data = (LWT_BE_DATA *)arg;
 	POSTGIS_DEBUGF(1, "xact_callback called with event %d", event);
 	data->data_changed = false;
 }
@@ -3201,14 +3201,14 @@ Datum ST_ModEdgeSplit(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_ModEdgeSplit);
 Datum ST_ModEdgeSplit(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID edge_id;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
 	{
@@ -3271,14 +3271,14 @@ Datum ST_NewEdgesSplit(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_NewEdgesSplit);
 Datum ST_NewEdgesSplit(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID edge_id;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
 	{
@@ -3341,14 +3341,14 @@ Datum ST_AddIsoNode(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_AddIsoNode);
 Datum ST_AddIsoNode(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID containing_face;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(2))
 	{
@@ -3428,14 +3428,14 @@ Datum ST_AddIsoEdge(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_AddIsoEdge);
 Datum ST_AddIsoEdge(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID edge_id;
 	LWT_ELEMID start_node, end_node;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWLINE* curve;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWLINE *curve;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3))
 	{
@@ -3505,14 +3505,14 @@ Datum ST_AddEdgeModFace(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_AddEdgeModFace);
 Datum ST_AddEdgeModFace(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID startnode_id, endnode_id;
 	int edge_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWLINE* line;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWLINE *line;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3))
 	{
@@ -3576,14 +3576,14 @@ Datum ST_AddEdgeNewFaces(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_AddEdgeNewFaces);
 Datum ST_AddEdgeNewFaces(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID startnode_id, endnode_id;
 	int edge_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWLINE* line;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWLINE *line;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3))
 	{
@@ -3647,12 +3647,12 @@ Datum ST_GetFaceGeometry(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_GetFaceGeometry);
 Datum ST_GetFaceGeometry(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID face_id;
-	LWGEOM* lwgeom;
-	LWT_TOPOLOGY* topo;
-	GSERIALIZED* geom;
+	LWGEOM *lwgeom;
+	LWT_TOPOLOGY *topo;
+	GSERIALIZED *geom;
 	MemoryContext old_context;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
@@ -3707,7 +3707,7 @@ Datum ST_GetFaceGeometry(PG_FUNCTION_ARGS)
 
 typedef struct FACEEDGESSTATE
 {
-	LWT_ELEMID* elems;
+	LWT_ELEMID *elems;
 	int nelems;
 	int curr;
 } FACEEDGESSTATE;
@@ -3717,20 +3717,20 @@ Datum ST_GetFaceEdges(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_GetFaceEdges);
 Datum ST_GetFaceEdges(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	LWT_ELEMID face_id;
 	int nelems;
-	LWT_ELEMID* elems;
-	LWT_TOPOLOGY* topo;
-	FuncCallContext* funcctx;
+	LWT_ELEMID *elems;
+	LWT_TOPOLOGY *topo;
+	FuncCallContext *funcctx;
 	MemoryContext oldcontext, newcontext;
 	TupleDesc tupdesc;
 	HeapTuple tuple;
-	AttInMetadata* attinmeta;
-	FACEEDGESSTATE* state;
+	AttInMetadata *attinmeta;
+	FACEEDGESSTATE *state;
 	char buf[64];
-	char* values[2];
+	char *values[2];
 	Datum result;
 
 	values[0] = buf;
@@ -3836,15 +3836,15 @@ Datum ST_ChangeEdgeGeom(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_ChangeEdgeGeom);
 Datum ST_ChangeEdgeGeom(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
+	text *toponame_text;
 	char buf[64];
-	char* toponame;
+	char *toponame;
 	int ret;
 	LWT_ELEMID edge_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWLINE* line;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWLINE *line;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
 	{
@@ -3909,12 +3909,12 @@ Datum ST_RemoveIsoNode(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_RemoveIsoNode);
 Datum ST_RemoveIsoNode(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
+	text *toponame_text;
 	char buf[64];
-	char* toponame;
+	char *toponame;
 	int ret;
 	LWT_ELEMID node_id;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
 	{
@@ -3969,12 +3969,12 @@ Datum ST_RemIsoEdge(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_RemIsoEdge);
 Datum ST_RemIsoEdge(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
+	text *toponame_text;
 	char buf[64];
-	char* toponame;
+	char *toponame;
 	int ret;
 	LWT_ELEMID node_id;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
 	{
@@ -4029,15 +4029,15 @@ Datum ST_MoveIsoNode(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_MoveIsoNode);
 Datum ST_MoveIsoNode(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
+	text *toponame_text;
 	char buf[64];
-	char* toponame;
+	char *toponame;
 	int ret;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 	POINT2D p;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
@@ -4115,11 +4115,11 @@ Datum ST_RemEdgeModFace(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_RemEdgeModFace);
 Datum ST_RemEdgeModFace(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	int ret;
 	LWT_ELEMID node_id;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
 	{
@@ -4170,11 +4170,11 @@ Datum ST_RemEdgeNewFace(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_RemEdgeNewFace);
 Datum ST_RemEdgeNewFace(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	int ret;
 	LWT_ELEMID node_id;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1))
 	{
@@ -4223,11 +4223,11 @@ Datum ST_ModEdgeHeal(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_ModEdgeHeal);
 Datum ST_ModEdgeHeal(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	int ret;
 	LWT_ELEMID eid1, eid2;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
 	{
@@ -4277,11 +4277,11 @@ Datum ST_NewEdgeHeal(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(ST_NewEdgeHeal);
 Datum ST_NewEdgeHeal(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	int ret;
 	LWT_ELEMID eid1, eid2;
-	LWT_TOPOLOGY* topo;
+	LWT_TOPOLOGY *topo;
 
 	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2))
 	{
@@ -4331,14 +4331,14 @@ Datum GetNodeByPoint(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(GetNodeByPoint);
 Datum GetNodeByPoint(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	toponame_text = PG_GETARG_TEXT_P(0);
 	toponame = text_to_cstring(toponame_text);
@@ -4401,14 +4401,14 @@ Datum GetEdgeByPoint(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(GetEdgeByPoint);
 Datum GetEdgeByPoint(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	toponame_text = PG_GETARG_TEXT_P(0);
 	toponame = text_to_cstring(toponame_text);
@@ -4471,14 +4471,14 @@ Datum GetFaceByPoint(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(GetFaceByPoint);
 Datum GetFaceByPoint(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	toponame_text = PG_GETARG_TEXT_P(0);
 	toponame = text_to_cstring(toponame_text);
@@ -4541,14 +4541,14 @@ Datum TopoGeo_AddPoint(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(TopoGeo_AddPoint);
 Datum TopoGeo_AddPoint(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
 	LWT_ELEMID node_id;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOINT* pt;
-	LWT_TOPOLOGY* topo;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOINT *pt;
+	LWT_TOPOLOGY *topo;
 
 	toponame_text = PG_GETARG_TEXT_P(0);
 	toponame = text_to_cstring(toponame_text);
@@ -4623,18 +4623,18 @@ Datum TopoGeo_AddLinestring(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(TopoGeo_AddLinestring);
 Datum TopoGeo_AddLinestring(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
-	LWT_ELEMID* elems;
+	LWT_ELEMID *elems;
 	int nelems;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWLINE* ln;
-	LWT_TOPOLOGY* topo;
-	FuncCallContext* funcctx;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWLINE *ln;
+	LWT_TOPOLOGY *topo;
+	FuncCallContext *funcctx;
 	MemoryContext oldcontext, newcontext;
-	FACEEDGESSTATE* state;
+	FACEEDGESSTATE *state;
 	Datum result;
 	LWT_ELEMID id;
 
@@ -4755,18 +4755,18 @@ Datum TopoGeo_AddPolygon(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(TopoGeo_AddPolygon);
 Datum TopoGeo_AddPolygon(PG_FUNCTION_ARGS)
 {
-	text* toponame_text;
-	char* toponame;
+	text *toponame_text;
+	char *toponame;
 	double tol;
-	LWT_ELEMID* elems;
+	LWT_ELEMID *elems;
 	int nelems;
-	GSERIALIZED* geom;
-	LWGEOM* lwgeom;
-	LWPOLY* pol;
-	LWT_TOPOLOGY* topo;
-	FuncCallContext* funcctx;
+	GSERIALIZED *geom;
+	LWGEOM *lwgeom;
+	LWPOLY *pol;
+	LWT_TOPOLOGY *topo;
+	FuncCallContext *funcctx;
 	MemoryContext oldcontext, newcontext;
-	FACEEDGESSTATE* state;
+	FACEEDGESSTATE *state;
 	Datum result;
 	LWT_ELEMID id;
 

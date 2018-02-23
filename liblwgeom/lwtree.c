@@ -28,7 +28,7 @@
 #include "measures.h"
 
 static inline int
-rect_node_is_leaf(const RECT_NODE* node)
+rect_node_is_leaf(const RECT_NODE *node)
 {
 	return node->type == RECT_NODE_LEAF_TYPE;
 }
@@ -38,11 +38,11 @@ rect_node_is_leaf(const RECT_NODE* node)
  * are in "spatial adjacent" order prior to merging.
  */
 static int
-rect_node_cmp(const void* pn1, const void* pn2)
+rect_node_cmp(const void *pn1, const void *pn2)
 {
 	GBOX b1, b2;
-	RECT_NODE* n1 = *((RECT_NODE**)pn1);
-	RECT_NODE* n2 = *((RECT_NODE**)pn2);
+	RECT_NODE *n1 = *((RECT_NODE **)pn1);
+	RECT_NODE *n2 = *((RECT_NODE **)pn2);
 	uint64_t h1, h2;
 	b1.flags = 0;
 	b1.xmin = n1->xmin;
@@ -66,7 +66,7 @@ rect_node_cmp(const void* pn1, const void* pn2)
  * does not free underlying point array.
  */
 void
-rect_tree_free(RECT_NODE* node)
+rect_tree_free(RECT_NODE *node)
 {
 	int i;
 	if (!node) return;
@@ -82,7 +82,7 @@ rect_tree_free(RECT_NODE* node)
 }
 
 static int
-rect_leaf_node_intersects(RECT_NODE_LEAF* n1, RECT_NODE_LEAF* n2)
+rect_leaf_node_intersects(RECT_NODE_LEAF *n1, RECT_NODE_LEAF *n2)
 {
 	const POINT2D *p1, *p2, *p3, *q1, *q2, *q3;
 	DISTPTS dl;
@@ -189,7 +189,7 @@ rect_leaf_node_intersects(RECT_NODE_LEAF* n1, RECT_NODE_LEAF* n2)
  * Returns 1 if segment is to the right of point.
  */
 static inline int
-rect_leaf_node_segment_side(RECT_NODE_LEAF* node, const POINT2D* q, int* on_boundary)
+rect_leaf_node_segment_side(RECT_NODE_LEAF *node, const POINT2D *q, int *on_boundary)
 {
 	const POINT2D *p1, *p2, *p3;
 	switch (node->seg_type)
@@ -279,7 +279,7 @@ rect_leaf_node_segment_side(RECT_NODE_LEAF* node, const POINT2D* q, int* on_boun
  * be on both sides, and will have a zero return sum.
  */
 static int
-rect_tree_ring_contains_point(RECT_NODE* node, const POINT2D* pt, int* on_boundary)
+rect_tree_ring_contains_point(RECT_NODE *node, const POINT2D *pt, int *on_boundary)
 {
 	/* Only test nodes that straddle our stabline vertically */
 	/* and might be to the right horizontally */
@@ -306,7 +306,7 @@ rect_tree_ring_contains_point(RECT_NODE* node, const POINT2D* pt, int* on_bounda
  * (multiply contained by interior rings?)
  */
 static int
-rect_tree_area_contains_point(RECT_NODE* node, const POINT2D* pt)
+rect_tree_area_contains_point(RECT_NODE *node, const POINT2D *pt)
 {
 	/* Can't do anything with a leaf node, makes no sense */
 	if (rect_node_is_leaf(node)) return 0;
@@ -341,7 +341,7 @@ rect_tree_area_contains_point(RECT_NODE* node, const POINT2D* pt)
  * Simple containment test for node/point inputs
  */
 static int
-rect_node_bounds_point(RECT_NODE* node, const POINT2D* pt)
+rect_node_bounds_point(RECT_NODE *node, const POINT2D *pt)
 {
 	if (pt->y < node->ymin || pt->y > node->ymax || pt->x < node->xmin || pt->x > node->xmax)
 		return LW_FALSE;
@@ -354,7 +354,7 @@ rect_node_bounds_point(RECT_NODE* node, const POINT2D* pt)
  * and false otherwise.
  */
 int
-rect_tree_contains_point(RECT_NODE* node, const POINT2D* pt)
+rect_tree_contains_point(RECT_NODE *node, const POINT2D *pt)
 {
 	int i, c;
 
@@ -391,7 +391,7 @@ rect_tree_contains_point(RECT_NODE* node, const POINT2D* pt)
  * intersecting.
  */
 static int
-rect_tree_is_area(const RECT_NODE* node)
+rect_tree_is_area(const RECT_NODE *node)
 {
 	switch (node->geom_type)
 	{
@@ -442,11 +442,11 @@ static RECT_NODE_SEG_TYPE lwgeomTypeArc[] = {
 /*
  * Create a new leaf node.
  */
-static RECT_NODE*
-rect_node_leaf_new(const POINTARRAY* pa, int seg_num, int geom_type)
+static RECT_NODE *
+rect_node_leaf_new(const POINTARRAY *pa, int seg_num, int geom_type)
 {
 	const POINT2D *p1, *p2, *p3;
-	RECT_NODE* node;
+	RECT_NODE *node;
 	GBOX gbox;
 	RECT_NODE_SEG_TYPE seg_type = lwgeomTypeArc[geom_type];
 
@@ -505,7 +505,7 @@ rect_node_leaf_new(const POINTARRAY* pa, int seg_num, int geom_type)
 }
 
 static void
-rect_node_internal_add_node(RECT_NODE* node, RECT_NODE* add)
+rect_node_internal_add_node(RECT_NODE *node, RECT_NODE *add)
 {
 	if (rect_node_is_leaf(node)) lwerror("%s: call on leaf node", __func__);
 	node->xmin = FP_MIN(node->xmin, add->xmin);
@@ -516,10 +516,10 @@ rect_node_internal_add_node(RECT_NODE* node, RECT_NODE* add)
 	return;
 }
 
-static RECT_NODE*
-rect_node_internal_new(const RECT_NODE* seed)
+static RECT_NODE *
+rect_node_internal_new(const RECT_NODE *seed)
 {
-	RECT_NODE* node = lwalloc(sizeof(RECT_NODE));
+	RECT_NODE *node = lwalloc(sizeof(RECT_NODE));
 	node->xmin = seed->xmin;
 	node->xmax = seed->xmax;
 	node->ymin = seed->ymin;
@@ -542,15 +542,15 @@ rect_node_internal_new(const RECT_NODE* seed)
  * nodes using a z-order first, so that this merge step results in a
  * spatially coherent structure.
  */
-static RECT_NODE*
-rect_nodes_merge(RECT_NODE** nodes, int num_nodes)
+static RECT_NODE *
+rect_nodes_merge(RECT_NODE **nodes, int num_nodes)
 {
 	if (num_nodes < 1) { return NULL; }
 
 	while (num_nodes > 1)
 	{
 		int i, k = 0;
-		RECT_NODE* node = NULL;
+		RECT_NODE *node = NULL;
 		for (i = 0; i < num_nodes; i++)
 		{
 			if (!node) node = rect_node_internal_new(nodes[i]);
@@ -573,13 +573,13 @@ rect_nodes_merge(RECT_NODE** nodes, int num_nodes)
 /*
  * Build a tree of nodes from a point array, one node per edge.
  */
-RECT_NODE*
-rect_tree_from_ptarray(const POINTARRAY* pa, int geom_type)
+RECT_NODE *
+rect_tree_from_ptarray(const POINTARRAY *pa, int geom_type)
 {
 	int num_edges = 0, i = 0, j = 0;
 	RECT_NODE_SEG_TYPE seg_type = lwgeomTypeArc[geom_type];
-	RECT_NODE** nodes = NULL;
-	RECT_NODE* tree = NULL;
+	RECT_NODE **nodes = NULL;
+	RECT_NODE *tree = NULL;
 
 	/* No-op on empty ring/line/pt */
 	if (pa->npoints < 1) return NULL;
@@ -601,10 +601,10 @@ rect_tree_from_ptarray(const POINTARRAY* pa, int geom_type)
 	}
 
 	/* First create a flat list of nodes, one per edge. */
-	nodes = lwalloc(sizeof(RECT_NODE*) * num_edges);
+	nodes = lwalloc(sizeof(RECT_NODE *) * num_edges);
 	for (i = 0; i < num_edges; i++)
 	{
-		RECT_NODE* node = rect_node_leaf_new(pa, i, geom_type);
+		RECT_NODE *node = rect_node_leaf_new(pa, i, geom_type);
 		if (node) /* Not zero length? */
 			nodes[j++] = node;
 	}
@@ -619,35 +619,35 @@ rect_tree_from_ptarray(const POINTARRAY* pa, int geom_type)
 	return tree;
 }
 
-LWGEOM*
-rect_tree_to_lwgeom(const RECT_NODE* node)
+LWGEOM *
+rect_tree_to_lwgeom(const RECT_NODE *node)
 {
-	LWGEOM* poly = (LWGEOM*)lwpoly_construct_envelope(0, node->xmin, node->ymin, node->xmax, node->ymax);
+	LWGEOM *poly = (LWGEOM *)lwpoly_construct_envelope(0, node->xmin, node->ymin, node->xmax, node->ymax);
 	if (rect_node_is_leaf(node)) { return poly; }
 	else
 	{
 		int i;
-		LWCOLLECTION* col = lwcollection_construct_empty(COLLECTIONTYPE, 0, 0, 0);
+		LWCOLLECTION *col = lwcollection_construct_empty(COLLECTIONTYPE, 0, 0, 0);
 		lwcollection_add_lwgeom(col, poly);
 		for (i = 0; i < node->i.num_nodes; i++)
 		{
 			lwcollection_add_lwgeom(col, rect_tree_to_lwgeom(node->i.nodes[i]));
 		}
-		return (LWGEOM*)col;
+		return (LWGEOM *)col;
 	}
 }
 
-char*
-rect_tree_to_wkt(const RECT_NODE* node)
+char *
+rect_tree_to_wkt(const RECT_NODE *node)
 {
-	LWGEOM* geom = rect_tree_to_lwgeom(node);
-	char* wkt = lwgeom_to_wkt(geom, WKT_ISO, 12, 0);
+	LWGEOM *geom = rect_tree_to_lwgeom(node);
+	char *wkt = lwgeom_to_wkt(geom, WKT_ISO, 12, 0);
 	lwgeom_free(geom);
 	return wkt;
 }
 
 void
-rect_tree_printf(const RECT_NODE* node, int depth)
+rect_tree_printf(const RECT_NODE *node, int depth)
 {
 	printf("%*s----\n", depth, "");
 	printf("%*stype: %d\n", depth, "", node->type);
@@ -668,34 +668,34 @@ rect_tree_printf(const RECT_NODE* node, int depth)
 	}
 }
 
-static RECT_NODE*
-rect_tree_from_lwpoint(const LWGEOM* lwgeom)
+static RECT_NODE *
+rect_tree_from_lwpoint(const LWGEOM *lwgeom)
 {
-	const LWPOINT* lwpt = (const LWPOINT*)lwgeom;
+	const LWPOINT *lwpt = (const LWPOINT *)lwgeom;
 	return rect_tree_from_ptarray(lwpt->point, lwgeom->type);
 }
 
-static RECT_NODE*
-rect_tree_from_lwline(const LWGEOM* lwgeom)
+static RECT_NODE *
+rect_tree_from_lwline(const LWGEOM *lwgeom)
 {
-	const LWLINE* lwline = (const LWLINE*)lwgeom;
+	const LWLINE *lwline = (const LWLINE *)lwgeom;
 	return rect_tree_from_ptarray(lwline->points, lwgeom->type);
 }
 
-static RECT_NODE*
-rect_tree_from_lwpoly(const LWGEOM* lwgeom)
+static RECT_NODE *
+rect_tree_from_lwpoly(const LWGEOM *lwgeom)
 {
-	RECT_NODE** nodes;
-	RECT_NODE* tree;
+	RECT_NODE **nodes;
+	RECT_NODE *tree;
 	int i, j = 0;
-	const LWPOLY* lwpoly = (const LWPOLY*)lwgeom;
+	const LWPOLY *lwpoly = (const LWPOLY *)lwgeom;
 
 	if (lwpoly->nrings < 1) return NULL;
 
-	nodes = lwalloc(sizeof(RECT_NODE*) * lwpoly->nrings);
+	nodes = lwalloc(sizeof(RECT_NODE *) * lwpoly->nrings);
 	for (i = 0; i < lwpoly->nrings; i++)
 	{
-		RECT_NODE* node = rect_tree_from_ptarray(lwpoly->rings[i], lwgeom->type);
+		RECT_NODE *node = rect_tree_from_ptarray(lwpoly->rings[i], lwgeom->type);
 		if (node)
 		{
 			node->i.ring_type = i ? RECT_NODE_RING_INTERIOR : RECT_NODE_RING_EXTERIOR;
@@ -708,20 +708,20 @@ rect_tree_from_lwpoly(const LWGEOM* lwgeom)
 	return tree;
 }
 
-static RECT_NODE*
-rect_tree_from_lwcurvepoly(const LWGEOM* lwgeom)
+static RECT_NODE *
+rect_tree_from_lwcurvepoly(const LWGEOM *lwgeom)
 {
-	RECT_NODE** nodes;
-	RECT_NODE* tree;
+	RECT_NODE **nodes;
+	RECT_NODE *tree;
 	int i, j = 0;
-	const LWCURVEPOLY* lwcol = (const LWCURVEPOLY*)lwgeom;
+	const LWCURVEPOLY *lwcol = (const LWCURVEPOLY *)lwgeom;
 
 	if (lwcol->nrings < 1) return NULL;
 
-	nodes = lwalloc(sizeof(RECT_NODE*) * lwcol->nrings);
+	nodes = lwalloc(sizeof(RECT_NODE *) * lwcol->nrings);
 	for (i = 0; i < lwcol->nrings; i++)
 	{
-		RECT_NODE* node = rect_tree_from_lwgeom(lwcol->rings[i]);
+		RECT_NODE *node = rect_tree_from_lwgeom(lwcol->rings[i]);
 		if (node)
 		{
 			/*
@@ -732,7 +732,7 @@ rect_tree_from_lwcurvepoly(const LWGEOM* lwgeom)
 			 */
 			if (node->type == RECT_NODE_LEAF_TYPE)
 			{
-				RECT_NODE* internal = rect_node_internal_new(node);
+				RECT_NODE *internal = rect_node_internal_new(node);
 				rect_node_internal_add_node(internal, node);
 				node = internal;
 			}
@@ -743,7 +743,7 @@ rect_tree_from_lwcurvepoly(const LWGEOM* lwgeom)
 	}
 	/* Put the top nodes in a z-order curve for a spatially coherent */
 	/* tree after node merge */
-	qsort(nodes, j, sizeof(RECT_NODE*), rect_node_cmp);
+	qsort(nodes, j, sizeof(RECT_NODE *), rect_node_cmp);
 
 	tree = rect_nodes_merge(nodes, j);
 
@@ -752,23 +752,23 @@ rect_tree_from_lwcurvepoly(const LWGEOM* lwgeom)
 	return tree;
 }
 
-static RECT_NODE*
-rect_tree_from_lwcollection(const LWGEOM* lwgeom)
+static RECT_NODE *
+rect_tree_from_lwcollection(const LWGEOM *lwgeom)
 {
-	RECT_NODE** nodes;
-	RECT_NODE* tree;
+	RECT_NODE **nodes;
+	RECT_NODE *tree;
 	int i, j = 0;
-	const LWCOLLECTION* lwcol = (const LWCOLLECTION*)lwgeom;
+	const LWCOLLECTION *lwcol = (const LWCOLLECTION *)lwgeom;
 
 	if (lwcol->ngeoms < 1) return NULL;
 
 	/* Build one tree for each sub-geometry, then below */
 	/* we merge the root notes of those trees to get a single */
 	/* top node for the collection */
-	nodes = lwalloc(sizeof(RECT_NODE*) * lwcol->ngeoms);
+	nodes = lwalloc(sizeof(RECT_NODE *) * lwcol->ngeoms);
 	for (i = 0; i < lwcol->ngeoms; i++)
 	{
-		RECT_NODE* node = rect_tree_from_lwgeom(lwcol->geoms[i]);
+		RECT_NODE *node = rect_tree_from_lwgeom(lwcol->geoms[i]);
 		if (node)
 		{
 			/* Curvepolygons are collections where the sub-geometries */
@@ -784,7 +784,7 @@ rect_tree_from_lwcollection(const LWGEOM* lwgeom)
 	/* gives a spatially coherent tree (near things are in near nodes) */
 	/* Note: CompoundCurve has edges already spatially organized, no */
 	/* sorting needed */
-	if (lwgeom->type != COMPOUNDTYPE) qsort(nodes, j, sizeof(RECT_NODE*), rect_node_cmp);
+	if (lwgeom->type != COMPOUNDTYPE) qsort(nodes, j, sizeof(RECT_NODE *), rect_node_cmp);
 
 	tree = rect_nodes_merge(nodes, j);
 
@@ -793,8 +793,8 @@ rect_tree_from_lwcollection(const LWGEOM* lwgeom)
 	return tree;
 }
 
-RECT_NODE*
-rect_tree_from_lwgeom(const LWGEOM* lwgeom)
+RECT_NODE *
+rect_tree_from_lwgeom(const LWGEOM *lwgeom)
 {
 	switch (lwgeom->type)
 	{
@@ -829,8 +829,8 @@ rect_tree_from_lwgeom(const LWGEOM* lwgeom)
  * Get an actual coordinate point from a tree to use
  * for point-in-polygon testing.
  */
-static const POINT2D*
-rect_tree_get_point(const RECT_NODE* node)
+static const POINT2D *
+rect_tree_get_point(const RECT_NODE *node)
 {
 	if (!node) return NULL;
 	if (rect_node_is_leaf(node))
@@ -840,7 +840,7 @@ rect_tree_get_point(const RECT_NODE* node)
 }
 
 static inline int
-rect_node_intersects(const RECT_NODE* n1, const RECT_NODE* n2)
+rect_node_intersects(const RECT_NODE *n1, const RECT_NODE *n2)
 {
 	if (n1->xmin > n2->xmax || n2->xmin > n1->xmax || n1->ymin > n2->ymax || n2->ymin > n1->ymax) { return 0; }
 	else
@@ -850,10 +850,10 @@ rect_node_intersects(const RECT_NODE* n1, const RECT_NODE* n2)
 }
 
 #if POSTGIS_DEBUG_LEVEL >= 4
-static char*
-rect_node_to_str(const RECT_NODE* n)
+static char *
+rect_node_to_str(const RECT_NODE *n)
 {
-	char* buf = lwalloc(256);
+	char *buf = lwalloc(256);
 	snprintf(buf, 256, "(%.9g %.9g,%.9g %.9g)", n->xmin, n->ymin, n->xmax, n->ymax);
 	return buf;
 }
@@ -864,7 +864,7 @@ rect_node_to_str(const RECT_NODE* n)
  * that intersect. Prune branches that do not intersect.
  */
 static int
-rect_tree_intersects_tree_recursive(RECT_NODE* n1, RECT_NODE* n2)
+rect_tree_intersects_tree_recursive(RECT_NODE *n1, RECT_NODE *n2)
 {
 	int i, j;
 	LWDEBUGF(4, "n1 %s  n2 %s", rect_node_to_str(n1), rect_node_to_str(n2));
@@ -909,7 +909,7 @@ rect_tree_intersects_tree_recursive(RECT_NODE* n1, RECT_NODE* n2)
 }
 
 int
-rect_tree_intersects_tree(RECT_NODE* n1, RECT_NODE* n2)
+rect_tree_intersects_tree(RECT_NODE *n1, RECT_NODE *n2)
 {
 	/*
 	 * It is possible for an area to intersect another object
@@ -953,7 +953,7 @@ distance(double x1, double y1, double x2, double y2)
  * distance between the nodes themselves.
  */
 static inline double
-rect_node_min_distance(const RECT_NODE* n1, const RECT_NODE* n2)
+rect_node_min_distance(const RECT_NODE *n1, const RECT_NODE *n2)
 {
 	int left = n1->xmin > n2->xmax;
 	int right = n1->xmax < n2->xmin;
@@ -989,7 +989,7 @@ rect_node_min_distance(const RECT_NODE* n1, const RECT_NODE* n2)
  * are at opposite corners of the bbox that contains both nodes
  */
 static inline double
-rect_node_max_distance(const RECT_NODE* n1, const RECT_NODE* n2)
+rect_node_max_distance(const RECT_NODE *n1, const RECT_NODE *n2)
 {
 	double xmin = FP_MIN(n1->xmin, n2->xmin);
 	double ymin = FP_MIN(n1->ymin, n2->ymin);
@@ -1011,7 +1011,7 @@ rect_node_max_distance(const RECT_NODE* n1, const RECT_NODE* n2)
  * up the right combination of inputs to the right distance calculation.
  */
 static double
-rect_leaf_node_distance(const RECT_NODE_LEAF* n1, const RECT_NODE_LEAF* n2, RECT_TREE_DISTANCE_STATE* state)
+rect_leaf_node_distance(const RECT_NODE_LEAF *n1, const RECT_NODE_LEAF *n2, RECT_TREE_DISTANCE_STATE *state)
 {
 	const POINT2D *p1, *p2, *p3, *q1, *q2, *q3;
 	DISTPTS dl;
@@ -1136,10 +1136,10 @@ rect_leaf_node_distance(const RECT_NODE_LEAF* n1, const RECT_NODE_LEAF* n2, RECT
 }
 
 static int
-rect_tree_node_sort_cmp(const void* a, const void* b)
+rect_tree_node_sort_cmp(const void *a, const void *b)
 {
-	RECT_NODE* n1 = *(RECT_NODE**)a;
-	RECT_NODE* n2 = *(RECT_NODE**)b;
+	RECT_NODE *n1 = *(RECT_NODE **)a;
+	RECT_NODE *n2 = *(RECT_NODE **)b;
 	if (n1->d < n2->d)
 		return -1;
 	else if (n1->d > n2->d)
@@ -1150,7 +1150,7 @@ rect_tree_node_sort_cmp(const void* a, const void* b)
 
 /* Calculate the center of a node */
 static inline void
-rect_node_to_p2d(const RECT_NODE* n, POINT2D* pt)
+rect_node_to_p2d(const RECT_NODE *n, POINT2D *pt)
 {
 	pt->x = (n->xmin + n->xmax) / 2;
 	pt->y = (n->ymin + n->ymax) / 2;
@@ -1161,10 +1161,10 @@ rect_node_to_p2d(const RECT_NODE* n, POINT2D* pt)
  * order of their distance from the enter of the other node.
  */
 static void
-rect_tree_node_sort(RECT_NODE* n1, RECT_NODE* n2)
+rect_tree_node_sort(RECT_NODE *n1, RECT_NODE *n2)
 {
 	int i;
-	RECT_NODE* n;
+	RECT_NODE *n;
 	POINT2D c1, c2, c;
 	if (!rect_node_is_leaf(n1) && !n1->i.sorted)
 	{
@@ -1178,7 +1178,7 @@ rect_tree_node_sort(RECT_NODE* n1, RECT_NODE* n2)
 		}
 		/* Sort the children by distance */
 		n1->i.sorted = 1;
-		qsort(n1->i.nodes, n1->i.num_nodes, sizeof(RECT_NODE*), rect_tree_node_sort_cmp);
+		qsort(n1->i.nodes, n1->i.num_nodes, sizeof(RECT_NODE *), rect_tree_node_sort_cmp);
 	}
 	if (!rect_node_is_leaf(n2) && !n2->i.sorted)
 	{
@@ -1192,12 +1192,12 @@ rect_tree_node_sort(RECT_NODE* n1, RECT_NODE* n2)
 		}
 		/* Sort the children by distance */
 		n2->i.sorted = 1;
-		qsort(n2->i.nodes, n2->i.num_nodes, sizeof(RECT_NODE*), rect_tree_node_sort_cmp);
+		qsort(n2->i.nodes, n2->i.num_nodes, sizeof(RECT_NODE *), rect_tree_node_sort_cmp);
 	}
 }
 
 static double
-rect_tree_distance_tree_recursive(RECT_NODE* n1, RECT_NODE* n2, RECT_TREE_DISTANCE_STATE* state)
+rect_tree_distance_tree_recursive(RECT_NODE *n1, RECT_NODE *n2, RECT_TREE_DISTANCE_STATE *state)
 {
 	double min, max;
 
@@ -1257,7 +1257,7 @@ rect_tree_distance_tree_recursive(RECT_NODE* n1, RECT_NODE* n2, RECT_TREE_DISTAN
 }
 
 double
-rect_tree_distance_tree(RECT_NODE* n1, RECT_NODE* n2, double threshold)
+rect_tree_distance_tree(RECT_NODE *n1, RECT_NODE *n2, double threshold)
 {
 	double distance;
 	RECT_TREE_DISTANCE_STATE state;

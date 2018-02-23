@@ -17,8 +17,8 @@
 void test_ShpDumperCreate(void);
 void test_ShpDumperDestroy(void);
 
-SHPDUMPERCONFIG* dumper_config;
-SHPDUMPERSTATE* dumper_state;
+SHPDUMPERCONFIG *dumper_config;
+SHPDUMPERSTATE *dumper_state;
 
 /*
 ** Called from test harness to register the tests in this file.
@@ -66,7 +66,7 @@ clean_pgsql2shp_suite(void)
 void
 test_ShpDumperCreate(void)
 {
-	dumper_config = (SHPDUMPERCONFIG*)calloc(1, sizeof(SHPDUMPERCONFIG));
+	dumper_config = (SHPDUMPERCONFIG *)calloc(1, sizeof(SHPDUMPERCONFIG));
 	set_dumper_config_defaults(dumper_config);
 	dumper_state = ShpDumperCreate(dumper_config);
 	CU_ASSERT_PTR_NOT_NULL(dumper_state);

@@ -49,7 +49,7 @@ Datum intersects3d_dwithin(PG_FUNCTION_ARGS);
 
 struct lwgeom_backend_definition
 {
-	const char* name;
+	const char *name;
 	Datum (*intersects_fn)(PG_FUNCTION_ARGS);
 	Datum (*intersects3d_fn)(PG_FUNCTION_ARGS);
 	Datum (*intersection_fn)(PG_FUNCTION_ARGS);
@@ -89,11 +89,11 @@ struct lwgeom_backend_definition lwgeom_backends[LWGEOM_NUM_BACKENDS] = {{.name 
 };
 
 /* Geometry Backend */
-char* lwgeom_backend_name;
-struct lwgeom_backend_definition* lwgeom_backend = &lwgeom_backends[0];
+char *lwgeom_backend_name;
+struct lwgeom_backend_definition *lwgeom_backend = &lwgeom_backends[0];
 
 static void
-lwgeom_backend_switch(const char* newvalue, __attribute__((__unused__)) void* extra)
+lwgeom_backend_switch(const char *newvalue, __attribute__((__unused__)) void *extra)
 {
 	int i;
 
@@ -118,7 +118,7 @@ lwgeom_init_backend()
 	/* During an upgrade, a prior copy of the PostGIS library will */
 	/* already be loaded in memory and the GUC already defined. We */
 	/* can skip GUC definition in this case, so we just return. */
-	static const char* guc_name = "postgis.backend";
+	static const char *guc_name = "postgis.backend";
 	// const char *guc_installed = GetConfigOption(guc_name, TRUE, FALSE);
 
 	/* Uh oh, this GUC name already exists. Ordinarily we could just go on */
@@ -142,7 +142,7 @@ lwgeom_init_backend()
 	    "Sets the PostGIS Geometry Backend.",                                        /* short_desc */
 	    "Sets the PostGIS Geometry Backend (allowed values are 'geos' or 'sfcgal')", /* long_desc */
 	    &lwgeom_backend_name,                                                        /* valueAddr */
-	    (char*)lwgeom_backends[0].name,                                              /* bootValue */
+	    (char *)lwgeom_backends[0].name,                                             /* bootValue */
 	    PGC_USERSET,                                                                 /* GucContext context */
 	    0,                                                                           /* int flags */
 	    NULL,                  /* GucStringCheckHook check_hook */
@@ -216,10 +216,10 @@ PG_FUNCTION_INFO_V1(intersects3d_dwithin);
 Datum intersects3d_dwithin(PG_FUNCTION_ARGS)
 {
 	double mindist;
-	GSERIALIZED* geom1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* geom2 = PG_GETARG_GSERIALIZED_P(1);
-	LWGEOM* lwgeom1 = lwgeom_from_gserialized(geom1);
-	LWGEOM* lwgeom2 = lwgeom_from_gserialized(geom2);
+	GSERIALIZED *geom1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom2 = PG_GETARG_GSERIALIZED_P(1);
+	LWGEOM *lwgeom1 = lwgeom_from_gserialized(geom1);
+	LWGEOM *lwgeom2 = lwgeom_from_gserialized(geom2);
 
 	error_if_srid_mismatch(lwgeom1->srid, lwgeom2->srid);
 

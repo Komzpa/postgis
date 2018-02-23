@@ -20,19 +20,19 @@ Datum check_authorization(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(check_authorization);
 Datum check_authorization(PG_FUNCTION_ARGS)
 {
-	TriggerData* trigdata = (TriggerData*)fcinfo->context;
-	char* colname;
+	TriggerData *trigdata = (TriggerData *)fcinfo->context;
+	char *colname;
 	HeapTuple rettuple_ok;
 	HeapTuple rettuple_fail;
 	TupleDesc tupdesc;
 	int SPIcode;
 	char query[1024];
-	const char* pk_id = NULL;
-	SPITupleTable* tuptable;
+	const char *pk_id = NULL;
+	SPITupleTable *tuptable;
 	HeapTuple tuple;
-	char* lockcode;
-	char* authtable = "authorization_table";
-	const char* op;
+	char *lockcode;
+	char *authtable = "authorization_table";
+	const char *op;
 #define ERRMSGLEN 256
 	char errmsg[ERRMSGLEN];
 

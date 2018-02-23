@@ -26,51 +26,51 @@
 #include "stringbuffer.h"
 #include "liblwgeom_internal.h"
 
-static char* lwline_to_encoded_polyline(const LWLINE*, int precision);
-static char* lwmmpoint_to_encoded_polyline(const LWMPOINT*, int precision);
-static char* pointarray_to_encoded_polyline(const POINTARRAY*, int precision);
+static char *lwline_to_encoded_polyline(const LWLINE *, int precision);
+static char *lwmmpoint_to_encoded_polyline(const LWMPOINT *, int precision);
+static char *pointarray_to_encoded_polyline(const POINTARRAY *, int precision);
 
 /* takes a GEOMETRY and returns an Encoded Polyline representation */
-extern char*
-lwgeom_to_encoded_polyline(const LWGEOM* geom, int precision)
+extern char *
+lwgeom_to_encoded_polyline(const LWGEOM *geom, int precision)
 {
 	int type = geom->type;
 	switch (type)
 	{
 	case LINETYPE:
-		return lwline_to_encoded_polyline((LWLINE*)geom, precision);
+		return lwline_to_encoded_polyline((LWLINE *)geom, precision);
 	case MULTIPOINTTYPE:
-		return lwmmpoint_to_encoded_polyline((LWMPOINT*)geom, precision);
+		return lwmmpoint_to_encoded_polyline((LWMPOINT *)geom, precision);
 	default:
 		lwerror("lwgeom_to_encoded_polyline: '%s' geometry type not supported", lwtype_name(type));
 		return NULL;
 	}
 }
 
-static char*
-lwline_to_encoded_polyline(const LWLINE* line, int precision)
+static char *
+lwline_to_encoded_polyline(const LWLINE *line, int precision)
 {
 	return pointarray_to_encoded_polyline(line->points, precision);
 }
 
-static char*
-lwmmpoint_to_encoded_polyline(const LWMPOINT* mpoint, int precision)
+static char *
+lwmmpoint_to_encoded_polyline(const LWMPOINT *mpoint, int precision)
 {
-	LWLINE* line = lwline_from_lwmpoint(mpoint->srid, mpoint);
-	char* encoded_polyline = lwline_to_encoded_polyline(line, precision);
+	LWLINE *line = lwline_from_lwmpoint(mpoint->srid, mpoint);
+	char *encoded_polyline = lwline_to_encoded_polyline(line, precision);
 
 	lwline_free(line);
 	return encoded_polyline;
 }
 
-static char*
-pointarray_to_encoded_polyline(const POINTARRAY* pa, int precision)
+static char *
+pointarray_to_encoded_polyline(const POINTARRAY *pa, int precision)
 {
 	uint32_t i;
-	const POINT2D* prevPoint;
-	int* delta;
-	char* encoded_polyline = NULL;
-	stringbuffer_t* sb;
+	const POINT2D *prevPoint;
+	int *delta;
+	char *encoded_polyline = NULL;
+	stringbuffer_t *sb;
 	double scale = pow(10, precision);
 
 	/* Empty input is empty string */
@@ -92,7 +92,7 @@ pointarray_to_encoded_polyline(const POINTARRAY* pa, int precision)
 	/* Points only include the offset from the previous point */
 	for (i = 1; i < pa->npoints; i++)
 	{
-		const POINT2D* point = getPoint2d_cp(pa, i);
+		const POINT2D *point = getPoint2d_cp(pa, i);
 		delta[2 * i] = round(point->y * scale) - round(prevPoint->y * scale);
 		delta[(2 * i) + 1] = round(point->x * scale) - round(prevPoint->x * scale);
 		prevPoint = point;

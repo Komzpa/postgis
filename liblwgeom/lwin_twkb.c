@@ -35,9 +35,9 @@
 typedef struct
 {
 	/* Pointers to the bytes */
-	const uint8_t* twkb;     /* Points to start of TWKB */
-	const uint8_t* twkb_end; /* Points to end of TWKB */
-	const uint8_t* pos;      /* Current read position */
+	const uint8_t *twkb;     /* Points to start of TWKB */
+	const uint8_t *twkb_end; /* Points to end of TWKB */
+	const uint8_t *pos;      /* Current read position */
 
 	uint32_t check;  /* Simple validity checks on geometries */
 	uint32_t lwtype; /* Current type we are handling */
@@ -61,14 +61,14 @@ typedef struct
 
 	int ndims; /* Number of dimensions */
 
-	int64_t* coords; /* An array to keep delta values from 4 dimensions */
+	int64_t *coords; /* An array to keep delta values from 4 dimensions */
 
 } twkb_parse_state;
 
 /**
  * Internal function declarations.
  */
-LWGEOM* lwgeom_from_twkb_state(twkb_parse_state* s);
+LWGEOM *lwgeom_from_twkb_state(twkb_parse_state *s);
 
 /**********************************************************************/
 
@@ -77,7 +77,7 @@ LWGEOM* lwgeom_from_twkb_state(twkb_parse_state* s);
  * array.
  */
 static inline void
-twkb_parse_state_advance(twkb_parse_state* s, size_t next)
+twkb_parse_state_advance(twkb_parse_state *s, size_t next)
 {
 	if ((s->pos + next) > s->twkb_end)
 	{
@@ -89,7 +89,7 @@ twkb_parse_state_advance(twkb_parse_state* s, size_t next)
 }
 
 static inline int64_t
-twkb_parse_state_varint(twkb_parse_state* s)
+twkb_parse_state_varint(twkb_parse_state *s)
 {
 	size_t size;
 	int64_t val = varint_s64_decode(s->pos, s->twkb_end, &size);
@@ -98,7 +98,7 @@ twkb_parse_state_varint(twkb_parse_state* s)
 }
 
 static inline uint64_t
-twkb_parse_state_uvarint(twkb_parse_state* s)
+twkb_parse_state_uvarint(twkb_parse_state *s)
 {
 	size_t size;
 	uint64_t val = varint_u64_decode(s->pos, s->twkb_end, &size);
@@ -107,7 +107,7 @@ twkb_parse_state_uvarint(twkb_parse_state* s)
 }
 
 static inline double
-twkb_parse_state_double(twkb_parse_state* s, double factor)
+twkb_parse_state_double(twkb_parse_state *s, double factor)
 {
 	size_t size;
 	int64_t val = varint_s64_decode(s->pos, s->twkb_end, &size);
@@ -116,7 +116,7 @@ twkb_parse_state_double(twkb_parse_state* s, double factor)
 }
 
 static inline void
-twkb_parse_state_varint_skip(twkb_parse_state* s)
+twkb_parse_state_varint_skip(twkb_parse_state *s)
 {
 	size_t size = varint_size(s->pos, s->twkb_end);
 
@@ -158,7 +158,7 @@ lwtype_from_twkb_type(uint8_t twkb_type)
  * Read a byte and advance the parse state forward.
  */
 static uint8_t
-byte_from_twkb_state(twkb_parse_state* s)
+byte_from_twkb_state(twkb_parse_state *s)
 {
 	uint8_t val = *(s->pos);
 	twkb_parse_state_advance(s, WKB_BYTE_SIZE);
@@ -169,13 +169,13 @@ byte_from_twkb_state(twkb_parse_state* s)
  * POINTARRAY
  * Read a dynamically sized point array and advance the parse state forward.
  */
-static POINTARRAY*
-ptarray_from_twkb_state(twkb_parse_state* s, uint32_t npoints)
+static POINTARRAY *
+ptarray_from_twkb_state(twkb_parse_state *s, uint32_t npoints)
 {
-	POINTARRAY* pa = NULL;
+	POINTARRAY *pa = NULL;
 	uint32_t ndims = s->ndims;
 	uint32_t i;
-	double* dlist;
+	double *dlist;
 
 	LWDEBUG(2, "Entering ptarray_from_twkb_state");
 	LWDEBUGF(4, "Pointarray has %d points", npoints);
@@ -184,7 +184,7 @@ ptarray_from_twkb_state(twkb_parse_state* s, uint32_t npoints)
 	if (npoints == 0) return ptarray_construct_empty(s->has_z, s->has_m, 0);
 
 	pa = ptarray_construct(s->has_z, s->has_m, npoints);
-	dlist = (double*)(pa->serialized_pointlist);
+	dlist = (double *)(pa->serialized_pointlist);
 	for (i = 0; i < npoints; i++)
 	{
 		int j = 0;
@@ -218,11 +218,11 @@ ptarray_from_twkb_state(twkb_parse_state* s, uint32_t npoints)
 /**
  * POINT
  */
-static LWPOINT*
-lwpoint_from_twkb_state(twkb_parse_state* s)
+static LWPOINT *
+lwpoint_from_twkb_state(twkb_parse_state *s)
 {
 	static uint32_t npoints = 1;
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	LWDEBUG(2, "Entering lwpoint_from_twkb_state");
 
@@ -235,11 +235,11 @@ lwpoint_from_twkb_state(twkb_parse_state* s)
 /**
  * LINESTRING
  */
-static LWLINE*
-lwline_from_twkb_state(twkb_parse_state* s)
+static LWLINE *
+lwline_from_twkb_state(twkb_parse_state *s)
 {
 	uint32_t npoints;
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	LWDEBUG(2, "Entering lwline_from_twkb_state");
 
@@ -267,12 +267,12 @@ lwline_from_twkb_state(twkb_parse_state* s)
 /**
  * POLYGON
  */
-static LWPOLY*
-lwpoly_from_twkb_state(twkb_parse_state* s)
+static LWPOLY *
+lwpoly_from_twkb_state(twkb_parse_state *s)
 {
 	uint32_t nrings;
 	uint32_t i;
-	LWPOLY* poly;
+	LWPOLY *poly;
 
 	LWDEBUG(2, "Entering lwpoly_from_twkb_state");
 
@@ -293,7 +293,7 @@ lwpoly_from_twkb_state(twkb_parse_state* s)
 	{
 		/* Ret number of points */
 		uint32_t npoints = twkb_parse_state_uvarint(s);
-		POINTARRAY* pa = ptarray_from_twkb_state(s, npoints);
+		POINTARRAY *pa = ptarray_from_twkb_state(s, npoints);
 
 		/* Skip empty rings */
 		if (pa == NULL) continue;
@@ -327,12 +327,12 @@ lwpoly_from_twkb_state(twkb_parse_state* s)
 /**
  * MULTIPOINT
  */
-static LWCOLLECTION*
-lwmultipoint_from_twkb_state(twkb_parse_state* s)
+static LWCOLLECTION *
+lwmultipoint_from_twkb_state(twkb_parse_state *s)
 {
 	int ngeoms, i;
-	LWGEOM* geom = NULL;
-	LWCOLLECTION* col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
+	LWGEOM *geom = NULL;
+	LWCOLLECTION *col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
 
 	LWDEBUG(2, "Entering lwmultipoint_from_twkb_state");
 
@@ -365,12 +365,12 @@ lwmultipoint_from_twkb_state(twkb_parse_state* s)
 /**
  * MULTILINESTRING
  */
-static LWCOLLECTION*
-lwmultiline_from_twkb_state(twkb_parse_state* s)
+static LWCOLLECTION *
+lwmultiline_from_twkb_state(twkb_parse_state *s)
 {
 	int ngeoms, i;
-	LWGEOM* geom = NULL;
-	LWCOLLECTION* col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
+	LWGEOM *geom = NULL;
+	LWCOLLECTION *col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
 
 	LWDEBUG(2, "Entering lwmultilinestring_from_twkb_state");
 
@@ -404,12 +404,12 @@ lwmultiline_from_twkb_state(twkb_parse_state* s)
 /**
  * MULTIPOLYGON
  */
-static LWCOLLECTION*
-lwmultipoly_from_twkb_state(twkb_parse_state* s)
+static LWCOLLECTION *
+lwmultipoly_from_twkb_state(twkb_parse_state *s)
 {
 	int ngeoms, i;
-	LWGEOM* geom = NULL;
-	LWCOLLECTION* col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
+	LWGEOM *geom = NULL;
+	LWCOLLECTION *col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
 
 	LWDEBUG(2, "Entering lwmultipolygon_from_twkb_state");
 
@@ -442,12 +442,12 @@ lwmultipoly_from_twkb_state(twkb_parse_state* s)
 /**
  * COLLECTION, MULTIPOINTTYPE, MULTILINETYPE, MULTIPOLYGONTYPE
  **/
-static LWCOLLECTION*
-lwcollection_from_twkb_state(twkb_parse_state* s)
+static LWCOLLECTION *
+lwcollection_from_twkb_state(twkb_parse_state *s)
 {
 	int ngeoms, i;
-	LWGEOM* geom = NULL;
-	LWCOLLECTION* col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
+	LWGEOM *geom = NULL;
+	LWCOLLECTION *col = lwcollection_construct_empty(s->lwtype, SRID_UNKNOWN, s->has_z, s->has_m);
 
 	LWDEBUG(2, "Entering lwcollection_from_twkb_state");
 
@@ -479,7 +479,7 @@ lwcollection_from_twkb_state(twkb_parse_state* s)
 }
 
 static void
-header_from_twkb_state(twkb_parse_state* s)
+header_from_twkb_state(twkb_parse_state *s)
 {
 	LWDEBUG(2, "Entering magicbyte_from_twkb_state");
 
@@ -546,11 +546,11 @@ header_from_twkb_state(twkb_parse_state* s)
  * then optional size, bbox, etc. Read those, then switch to particular type
  * handling code.
  */
-LWGEOM*
-lwgeom_from_twkb_state(twkb_parse_state* s)
+LWGEOM *
+lwgeom_from_twkb_state(twkb_parse_state *s)
 {
 	GBOX bbox;
-	LWGEOM* geom = NULL;
+	LWGEOM *geom = NULL;
 	uint32_t has_bbox = LW_FALSE;
 	int i;
 
@@ -637,8 +637,8 @@ lwgeom_from_twkb_state(twkb_parse_state* s)
  * Check is a bitmask of: LW_PARSER_CHECK_MINPOINTS, LW_PARSER_CHECK_ODD,
  * LW_PARSER_CHECK_CLOSURE, LW_PARSER_CHECK_NONE, LW_PARSER_CHECK_ALL
  */
-LWGEOM*
-lwgeom_from_twkb(const uint8_t* twkb, size_t twkb_size, char check)
+LWGEOM *
+lwgeom_from_twkb(const uint8_t *twkb, size_t twkb_size, char check)
 {
 	int64_t coords[TWKB_IN_MAXCOORDS] = {0, 0, 0, 0};
 	twkb_parse_state s;

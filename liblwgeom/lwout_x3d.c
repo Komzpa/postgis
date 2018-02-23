@@ -32,17 +32,17 @@
  * VERSION X3D 3.0.2 http://www.web3d.org/specifications/x3d-3.0.dtd
  */
 /* takes a GEOMETRY and returns a X3D representation */
-char*
-lwgeom_to_x3d3(const LWGEOM* geom, char* srs, int precision, int opts, const char* defid)
+char *
+lwgeom_to_x3d3(const LWGEOM *geom, char *srs, int precision, int opts, const char *defid)
 {
-	stringbuffer_t* sb;
+	stringbuffer_t *sb;
 	int rv;
-	char* result;
+	char *result;
 
 	/* Empty string for empties */
 	if (lwgeom_is_empty(geom))
 	{
-		char* ret = NULL;
+		char *ret = NULL;
 		ret = lwalloc(1);
 		ret[0] = '\0';
 		return ret;
@@ -64,45 +64,45 @@ lwgeom_to_x3d3(const LWGEOM* geom, char* srs, int precision, int opts, const cha
 }
 /* takes a GEOMETRY and appends to string buffer the x3d output */
 static int
-lwgeom_to_x3d3_sb(const LWGEOM* geom, char* srs, int precision, int opts, const char* defid, stringbuffer_t* sb)
+lwgeom_to_x3d3_sb(const LWGEOM *geom, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb)
 {
 	int type = geom->type;
 
 	switch (type)
 	{
 	case POINTTYPE:
-		return asx3d3_point_sb((LWPOINT*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_point_sb((LWPOINT *)geom, srs, precision, opts, defid, sb);
 
 	case LINETYPE:
-		return asx3d3_line_sb((LWLINE*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_line_sb((LWLINE *)geom, srs, precision, opts, defid, sb);
 
 	case POLYGONTYPE:
 	{
 		/** We might change this later, but putting a polygon in an indexed face set
 		 * seems like the simplest way to go so treat just like a mulitpolygon
 		 */
-		LWCOLLECTION* tmp = (LWCOLLECTION*)lwgeom_as_multi(geom);
+		LWCOLLECTION *tmp = (LWCOLLECTION *)lwgeom_as_multi(geom);
 		asx3d3_multi_sb(tmp, srs, precision, opts, defid, sb);
 		lwcollection_free(tmp);
 		return LW_SUCCESS;
 	}
 
 	case TRIANGLETYPE:
-		return asx3d3_triangle_sb((LWTRIANGLE*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_triangle_sb((LWTRIANGLE *)geom, srs, precision, opts, defid, sb);
 
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
-		return asx3d3_multi_sb((LWCOLLECTION*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_multi_sb((LWCOLLECTION *)geom, srs, precision, opts, defid, sb);
 
 	case POLYHEDRALSURFACETYPE:
-		return asx3d3_psurface_sb((LWPSURFACE*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_psurface_sb((LWPSURFACE *)geom, srs, precision, opts, defid, sb);
 
 	case TINTYPE:
-		return asx3d3_tin_sb((LWTIN*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_tin_sb((LWTIN *)geom, srs, precision, opts, defid, sb);
 
 	case COLLECTIONTYPE:
-		return asx3d3_collection_sb((LWCOLLECTION*)geom, srs, precision, opts, defid, sb);
+		return asx3d3_collection_sb((LWCOLLECTION *)geom, srs, precision, opts, defid, sb);
 
 	default:
 		lwerror("lwgeom_to_x3d3: '%s' geometry type not supported", lwtype_name(type));
@@ -111,19 +111,19 @@ lwgeom_to_x3d3_sb(const LWGEOM* geom, char* srs, int precision, int opts, const 
 }
 
 static int
-asx3d3_point_sb(const LWPOINT* point,
-		__attribute__((__unused__)) char* srs,
+asx3d3_point_sb(const LWPOINT *point,
+		__attribute__((__unused__)) char *srs,
 		int precision,
 		int opts,
-		__attribute__((__unused__)) const char* defid,
-		stringbuffer_t* sb)
+		__attribute__((__unused__)) const char *defid,
+		stringbuffer_t *sb)
 {
 	/** for point we just output the coordinates **/
 	return ptarray_to_x3d3_sb(point->point, precision, opts, 0, sb);
 }
 
 static int
-asx3d3_line_coords_sb(const LWLINE* line, int precision, int opts, stringbuffer_t* sb)
+asx3d3_line_coords_sb(const LWLINE *line, int precision, int opts, stringbuffer_t *sb)
 {
 	return ptarray_to_x3d3_sb(line->points, precision, opts, lwline_is_closed(line), sb);
 }
@@ -131,17 +131,17 @@ asx3d3_line_coords_sb(const LWLINE* line, int precision, int opts, stringbuffer_
 /* Calculate the coordIndex property of the IndexedLineSet for the multilinestring
 and add to string buffer */
 static int
-asx3d3_mline_coordindex_sb(const LWMLINE* mgeom, stringbuffer_t* sb)
+asx3d3_mline_coordindex_sb(const LWMLINE *mgeom, stringbuffer_t *sb)
 {
-	LWLINE* geom;
+	LWLINE *geom;
 	uint32_t i, j, k, si;
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 	uint32_t np;
 
 	j = 0;
 	for (i = 0; i < mgeom->ngeoms; i++)
 	{
-		geom = (LWLINE*)mgeom->geoms[i];
+		geom = (LWLINE *)mgeom->geoms[i];
 		pa = geom->points;
 		np = pa->npoints;
 		si = j; /* start index of first point of linestring */
@@ -170,15 +170,15 @@ asx3d3_mline_coordindex_sb(const LWMLINE* mgeom, stringbuffer_t* sb)
     This is not ideal -- would be really nice to just share this function with psurf,
     but I'm not smart enough to do that yet*/
 static int
-asx3d3_mpoly_coordindex_sb(const LWMPOLY* psur, stringbuffer_t* sb)
+asx3d3_mpoly_coordindex_sb(const LWMPOLY *psur, stringbuffer_t *sb)
 {
-	LWPOLY* patch;
+	LWPOLY *patch;
 	uint32_t i, j, k, l;
 	uint32_t np;
 	j = 0;
 	for (i = 0; i < psur->ngeoms; i++)
 	{
-		patch = (LWPOLY*)psur->geoms[i];
+		patch = (LWPOLY *)psur->geoms[i];
 		for (l = 0; l < patch->nrings; l++)
 		{
 			np = patch->rings[l]->npoints - 1;
@@ -211,16 +211,16 @@ asx3d3_mpoly_coordindex_sb(const LWMPOLY* psur, stringbuffer_t* sb)
 
 /** Return the linestring as an X3D LineSet */
 static int
-asx3d3_line_sb(const LWLINE* line,
-	       __attribute__((__unused__)) char* srs,
+asx3d3_line_sb(const LWLINE *line,
+	       __attribute__((__unused__)) char *srs,
 	       int precision,
 	       int opts,
-	       __attribute__((__unused__)) const char* defid,
-	       stringbuffer_t* sb)
+	       __attribute__((__unused__)) const char *defid,
+	       stringbuffer_t *sb)
 {
 
 	/* int dimension=2; */
-	POINTARRAY* pa;
+	POINTARRAY *pa;
 
 	/* if (FLAGS_GET_Z(line->flags)) dimension = 3; */
 
@@ -234,7 +234,7 @@ asx3d3_line_sb(const LWLINE* line,
 	else
 		stringbuffer_aprintf(sb, "<Coordinate point='");
 
-	ptarray_to_x3d3_sb(line->points, precision, opts, lwline_is_closed((LWLINE*)line), sb);
+	ptarray_to_x3d3_sb(line->points, precision, opts, lwline_is_closed((LWLINE *)line), sb);
 
 	stringbuffer_aprintf(sb, "' />");
 
@@ -243,13 +243,13 @@ asx3d3_line_sb(const LWLINE* line,
 
 /** Compute the X3D coordinates of the polygon and add to string buffer **/
 static int
-asx3d3_poly_sb(const LWPOLY* poly,
-	       __attribute__((__unused__)) char* srs,
+asx3d3_poly_sb(const LWPOLY *poly,
+	       __attribute__((__unused__)) char *srs,
 	       int precision,
 	       int opts,
 	       __attribute__((__unused__)) int is_patch,
-	       __attribute__((__unused__)) const char* defid,
-	       stringbuffer_t* sb)
+	       __attribute__((__unused__)) const char *defid,
+	       stringbuffer_t *sb)
 {
 	uint32_t i;
 	for (i = 0; i < poly->nrings; i++)
@@ -261,12 +261,12 @@ asx3d3_poly_sb(const LWPOLY* poly,
 }
 
 static int
-asx3d3_triangle_sb(const LWTRIANGLE* triangle,
-		   __attribute__((__unused__)) char* srs,
+asx3d3_triangle_sb(const LWTRIANGLE *triangle,
+		   __attribute__((__unused__)) char *srs,
 		   int precision,
 		   int opts,
-		   __attribute__((__unused__)) const char* defid,
-		   stringbuffer_t* sb)
+		   __attribute__((__unused__)) const char *defid,
+		   stringbuffer_t *sb)
 {
 	return ptarray_to_x3d3_sb(triangle->points, precision, opts, 1, sb);
 }
@@ -275,19 +275,19 @@ asx3d3_triangle_sb(const LWTRIANGLE* triangle,
  * Don't call this with single-geoms inspected!
  */
 static int
-asx3d3_multi_sb(const LWCOLLECTION* col,
-		__attribute__((__unused__)) char* srs,
+asx3d3_multi_sb(const LWCOLLECTION *col,
+		__attribute__((__unused__)) char *srs,
 		int precision,
 		int opts,
-		const char* defid,
-		stringbuffer_t* sb)
+		const char *defid,
+		stringbuffer_t *sb)
 {
-	char* x3dtype;
+	char *x3dtype;
 	uint32_t i;
 	int dimension = 2;
 
 	if (FLAGS_GET_Z(col->flags)) dimension = 3;
-	LWGEOM* subgeom;
+	LWGEOM *subgeom;
 	x3dtype = "";
 
 	switch (col->type)
@@ -307,13 +307,13 @@ asx3d3_multi_sb(const LWCOLLECTION* col,
 	case MULTILINETYPE:
 		x3dtype = "IndexedLineSet";
 		stringbuffer_aprintf(sb, "<%s %s coordIndex='", x3dtype, defid);
-		asx3d3_mline_coordindex_sb((const LWMLINE*)col, sb);
+		asx3d3_mline_coordindex_sb((const LWMLINE *)col, sb);
 		stringbuffer_aprintf(sb, "'>");
 		break;
 	case MULTIPOLYGONTYPE:
 		x3dtype = "IndexedFaceSet";
 		stringbuffer_aprintf(sb, "<%s %s convex='false' coordIndex='", x3dtype, defid);
-		asx3d3_mpoly_coordindex_sb((const LWMPOLY*)col, sb);
+		asx3d3_mpoly_coordindex_sb((const LWMPOLY *)col, sb);
 		stringbuffer_aprintf(sb, "'>");
 		break;
 	default:
@@ -335,17 +335,17 @@ asx3d3_multi_sb(const LWCOLLECTION* col,
 		subgeom = col->geoms[i];
 		if (subgeom->type == POINTTYPE)
 		{
-			asx3d3_point_sb((LWPOINT*)subgeom, 0, precision, opts, defid, sb);
+			asx3d3_point_sb((LWPOINT *)subgeom, 0, precision, opts, defid, sb);
 			stringbuffer_aprintf(sb, " ");
 		}
 		else if (subgeom->type == LINETYPE)
 		{
-			asx3d3_line_coords_sb((LWLINE*)subgeom, precision, opts, sb);
+			asx3d3_line_coords_sb((LWLINE *)subgeom, precision, opts, sb);
 			stringbuffer_aprintf(sb, " ");
 		}
 		else if (subgeom->type == POLYGONTYPE)
 		{
-			asx3d3_poly_sb((LWPOLY*)subgeom, 0, precision, opts, 0, defid, sb);
+			asx3d3_poly_sb((LWPOLY *)subgeom, 0, precision, opts, 0, defid, sb);
 			stringbuffer_aprintf(sb, " ");
 		}
 	}
@@ -363,13 +363,13 @@ asx3d3_multi_sb(const LWCOLLECTION* col,
  * Don't call this with single-geoms inspected!
  */
 static int
-asx3d3_psurface_sb(const LWPSURFACE* psur, char* srs, int precision, int opts, const char* defid, stringbuffer_t* sb)
+asx3d3_psurface_sb(const LWPSURFACE *psur, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb)
 {
 	uint32_t i;
 	uint32_t j;
 	uint32_t k;
 	uint32_t np;
-	LWPOLY* patch;
+	LWPOLY *patch;
 
 	/* Open outmost tag */
 	stringbuffer_aprintf(sb, "<IndexedFaceSet convex='false' %s coordIndex='", defid);
@@ -377,7 +377,7 @@ asx3d3_psurface_sb(const LWPSURFACE* psur, char* srs, int precision, int opts, c
 	j = 0;
 	for (i = 0; i < psur->ngeoms; i++)
 	{
-		patch = (LWPOLY*)psur->geoms[i];
+		patch = (LWPOLY *)psur->geoms[i];
 		np = patch->rings[0]->npoints - 1;
 		for (k = 0; k < np; k++)
 		{
@@ -413,12 +413,12 @@ asx3d3_psurface_sb(const LWPSURFACE* psur, char* srs, int precision, int opts, c
  * Computes X3D representation of TIN (as IndexedTriangleSet and adds to string buffer)
  */
 static int
-asx3d3_tin_sb(const LWTIN* tin,
-	      __attribute__((__unused__)) char* srs,
+asx3d3_tin_sb(const LWTIN *tin,
+	      __attribute__((__unused__)) char *srs,
 	      int precision,
 	      int opts,
-	      const char* defid,
-	      stringbuffer_t* sb)
+	      const char *defid,
+	      stringbuffer_t *sb)
 {
 	uint32_t i;
 	uint32_t k;
@@ -453,10 +453,10 @@ asx3d3_tin_sb(const LWTIN* tin,
 }
 
 static int
-asx3d3_collection_sb(const LWCOLLECTION* col, char* srs, int precision, int opts, const char* defid, stringbuffer_t* sb)
+asx3d3_collection_sb(const LWCOLLECTION *col, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb)
 {
 	uint32_t i;
-	LWGEOM* subgeom;
+	LWGEOM *subgeom;
 
 	/* Open outmost tag */
 	/** @TODO: if collection should be grouped, we'll wrap in a group tag.  Still needs cleanup
@@ -469,29 +469,29 @@ asx3d3_collection_sb(const LWCOLLECTION* col, char* srs, int precision, int opts
 	{
 		subgeom = col->geoms[i];
 		stringbuffer_aprintf(sb, "<Shape%s>", defid);
-		if (subgeom->type == POINTTYPE) { asx3d3_point_sb((LWPOINT*)subgeom, 0, precision, opts, defid, sb); }
+		if (subgeom->type == POINTTYPE) { asx3d3_point_sb((LWPOINT *)subgeom, 0, precision, opts, defid, sb); }
 		else if (subgeom->type == LINETYPE)
 		{
-			asx3d3_line_sb((LWLINE*)subgeom, 0, precision, opts, defid, sb);
+			asx3d3_line_sb((LWLINE *)subgeom, 0, precision, opts, defid, sb);
 		}
 		else if (subgeom->type == POLYGONTYPE)
 		{
-			asx3d3_poly_sb((LWPOLY*)subgeom, 0, precision, opts, 0, defid, sb);
+			asx3d3_poly_sb((LWPOLY *)subgeom, 0, precision, opts, 0, defid, sb);
 		}
 		else if (subgeom->type == TINTYPE)
 		{
-			asx3d3_tin_sb((LWTIN*)subgeom, srs, precision, opts, defid, sb);
+			asx3d3_tin_sb((LWTIN *)subgeom, srs, precision, opts, defid, sb);
 		}
 		else if (subgeom->type == POLYHEDRALSURFACETYPE)
 		{
-			asx3d3_psurface_sb((LWPSURFACE*)subgeom, srs, precision, opts, defid, sb);
+			asx3d3_psurface_sb((LWPSURFACE *)subgeom, srs, precision, opts, defid, sb);
 		}
 		else if (lwgeom_is_collection(subgeom))
 		{
 			if (subgeom->type == COLLECTIONTYPE)
-				asx3d3_collection_sb((LWCOLLECTION*)subgeom, 0, precision, opts, defid, sb);
+				asx3d3_collection_sb((LWCOLLECTION *)subgeom, 0, precision, opts, defid, sb);
 			else
-				asx3d3_multi_sb((LWCOLLECTION*)subgeom, 0, precision, opts, defid, sb);
+				asx3d3_multi_sb((LWCOLLECTION *)subgeom, 0, precision, opts, defid, sb);
 		}
 		else
 			lwerror("asx3d3_collection_buf: unknown geometry type");
@@ -510,7 +510,7 @@ asx3d3_collection_sb(const LWCOLLECTION* col, char* srs, int precision, int opts
 /** In X3D3, coordinates are separated by a space separator
  */
 static int
-ptarray_to_x3d3_sb(POINTARRAY* pa, int precision, int opts, int is_closed, stringbuffer_t* sb)
+ptarray_to_x3d3_sb(POINTARRAY *pa, int precision, int opts, int is_closed, stringbuffer_t *sb)
 {
 	uint32_t i;
 	char x[OUT_DOUBLE_BUFFER_SIZE];

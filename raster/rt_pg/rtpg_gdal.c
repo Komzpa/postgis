@@ -58,22 +58,22 @@ Datum RASTER_GDALWarp(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_fromGDALRaster);
 Datum RASTER_fromGDALRaster(PG_FUNCTION_ARGS)
 {
-	bytea* bytea_data;
-	uint8_t* data;
+	bytea *bytea_data;
+	uint8_t *data;
 	int data_len = 0;
-	VSILFILE* vsifp = NULL;
+	VSILFILE *vsifp = NULL;
 	GDALDatasetH hdsSrc;
 	int srid = -1; /* -1 for NULL */
 
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster;
 
 	/* NULL if NULL */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 
 	/* get data */
-	bytea_data = (bytea*)PG_GETARG_BYTEA_P(0);
-	data = (uint8_t*)VARDATA(bytea_data);
+	bytea_data = (bytea *)PG_GETARG_BYTEA_P(0);
+	data = (uint8_t *)VARDATA(bytea_data);
 	data_len = VARSIZE(bytea_data) - VARHDRSZ;
 
 	/* process srid */
@@ -146,21 +146,21 @@ Datum RASTER_fromGDALRaster(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_asGDALRaster);
 Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster;
 
-	text* formattext = NULL;
-	char* format = NULL;
-	char** options = NULL;
-	text* optiontext = NULL;
-	char* option = NULL;
+	text *formattext = NULL;
+	char *format = NULL;
+	char **options = NULL;
+	text *optiontext = NULL;
+	char *option = NULL;
 	int srid = SRID_UNKNOWN;
-	char* srs = NULL;
+	char *srs = NULL;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -168,16 +168,16 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 	int i = 0;
 	int j = 0;
 
-	uint8_t* gdal = NULL;
+	uint8_t *gdal = NULL;
 	uint64_t gdal_size = 0;
-	bytea* result = NULL;
+	bytea *result = NULL;
 	uint64_t result_size = 0;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_asGDALRaster: Starting");
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -227,7 +227,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 
 		if (n)
 		{
-			options = (char**)palloc(sizeof(char*) * (n + 1));
+			options = (char **)palloc(sizeof(char *) * (n + 1));
 			if (options == NULL)
 			{
 				rt_raster_destroy(raster);
@@ -245,7 +245,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 				switch (etype)
 				{
 				case TEXTOID:
-					optiontext = (text*)DatumGetPointer(e[i]);
+					optiontext = (text *)DatumGetPointer(e[i]);
 					if (NULL == optiontext) break;
 					option = text_to_cstring(optiontext);
 
@@ -257,7 +257,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 
 				if (strlen(option))
 				{
-					options[j] = (char*)palloc(sizeof(char) * (strlen(option) + 1));
+					options[j] = (char *)palloc(sizeof(char) * (strlen(option) + 1));
 					options[j] = option;
 					j++;
 				}
@@ -266,7 +266,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 			if (j > 0)
 			{
 				/* trim allocation */
-				options = repalloc(options, (j + 1) * sizeof(char*));
+				options = repalloc(options, (j + 1) * sizeof(char *));
 
 				/* add NULL to end */
 				options[j] = NULL;
@@ -331,7 +331,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 
 	/* result is a varlena */
 	result_size = gdal_size + VARHDRSZ;
-	result = (bytea*)palloc(result_size);
+	result = (bytea *)palloc(result_size);
 	if (NULL == result)
 	{
 		elog(ERROR, "RASTER_asGDALRaster: Insufficient virtual memory for GDAL raster");
@@ -360,7 +360,7 @@ Datum RASTER_asGDALRaster(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getGDALDrivers);
 Datum RASTER_getGDALDrivers(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	uint32_t drv_count;
@@ -472,43 +472,43 @@ Datum RASTER_getGDALDrivers(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_GDALWarp);
 Datum RASTER_GDALWarp(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrast = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrast = NULL;
 	rt_raster raster = NULL;
 	rt_raster rast = NULL;
 
-	text* algtext = NULL;
-	char* algchar = NULL;
+	text *algtext = NULL;
+	char *algchar = NULL;
 	GDALResampleAlg alg = GRA_NearestNeighbour;
 	double max_err = 0.125;
 
 	int src_srid = SRID_UNKNOWN;
-	char* src_srs = NULL;
+	char *src_srs = NULL;
 	int dst_srid = SRID_UNKNOWN;
-	char* dst_srs = NULL;
+	char *dst_srs = NULL;
 	int no_srid = 0;
 
 	double scale[2] = {0};
-	double* scale_x = NULL;
-	double* scale_y = NULL;
+	double *scale_x = NULL;
+	double *scale_y = NULL;
 
 	double gridw[2] = {0};
-	double* grid_xw = NULL;
-	double* grid_yw = NULL;
+	double *grid_xw = NULL;
+	double *grid_yw = NULL;
 
 	double skew[2] = {0};
-	double* skew_x = NULL;
-	double* skew_y = NULL;
+	double *skew_x = NULL;
+	double *skew_y = NULL;
 
 	int dim[2] = {0};
-	int* dim_x = NULL;
-	int* dim_y = NULL;
+	int *dim_x = NULL;
+	int *dim_y = NULL;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_GDALWarp: Starting");
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, FALSE);

@@ -43,9 +43,9 @@ Datum polygon_to_geometry(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(point_to_geometry);
 Datum point_to_geometry(PG_FUNCTION_ARGS)
 {
-	Point* point;
-	LWPOINT* lwpoint;
-	GSERIALIZED* geom;
+	Point *point;
+	LWPOINT *lwpoint;
+	GSERIALIZED *geom;
 
 	POSTGIS_DEBUG(2, "point_to_geometry called");
 
@@ -68,10 +68,10 @@ Datum point_to_geometry(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geometry_to_point);
 Datum geometry_to_point(PG_FUNCTION_ARGS)
 {
-	Point* point;
-	LWGEOM* lwgeom;
-	LWPOINT* lwpoint;
-	GSERIALIZED* geom;
+	Point *point;
+	LWGEOM *lwgeom;
+	LWPOINT *lwpoint;
+	GSERIALIZED *geom;
 
 	POSTGIS_DEBUG(2, "geometry_to_point called");
 
@@ -87,7 +87,7 @@ Datum geometry_to_point(PG_FUNCTION_ARGS)
 
 	lwpoint = lwgeom_as_lwpoint(lwgeom);
 
-	point = (Point*)palloc(sizeof(Point));
+	point = (Point *)palloc(sizeof(Point));
 	point->x = lwpoint_get_x(lwpoint);
 	point->y = lwpoint_get_y(lwpoint);
 
@@ -100,13 +100,13 @@ Datum geometry_to_point(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geometry_to_path);
 Datum geometry_to_path(PG_FUNCTION_ARGS)
 {
-	PATH* path;
-	LWLINE* lwline;
-	LWGEOM* lwgeom;
-	GSERIALIZED* geom;
-	POINTARRAY* pa;
+	PATH *path;
+	LWLINE *lwline;
+	LWGEOM *lwgeom;
+	GSERIALIZED *geom;
+	POINTARRAY *pa;
 	uint32_t i;
-	const POINT2D* pt;
+	const POINT2D *pt;
 	size_t size;
 
 	POSTGIS_DEBUG(2, "geometry_to_path called");
@@ -123,7 +123,7 @@ Datum geometry_to_path(PG_FUNCTION_ARGS)
 
 	pa = lwline->points;
 	size = offsetof(PATH, p[0]) + sizeof(path->p[0]) * pa->npoints;
-	path = (PATH*)palloc(size);
+	path = (PATH *)palloc(size);
 	SET_VARSIZE(path, size);
 	path->npts = pa->npoints;
 	path->closed = 0;
@@ -145,10 +145,10 @@ Datum geometry_to_path(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(path_to_geometry);
 Datum path_to_geometry(PG_FUNCTION_ARGS)
 {
-	PATH* path;
-	LWLINE* lwline;
-	POINTARRAY* pa;
-	GSERIALIZED* geom;
+	PATH *path;
+	LWLINE *lwline;
+	POINTARRAY *pa;
+	GSERIALIZED *geom;
 	POINT4D pt;
 	Point p;
 	int i;
@@ -179,11 +179,11 @@ Datum path_to_geometry(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(geometry_to_polygon);
 Datum geometry_to_polygon(PG_FUNCTION_ARGS)
 {
-	POLYGON* polygon;
-	LWPOLY* lwpoly;
-	LWGEOM* lwgeom;
-	GSERIALIZED* geom;
-	POINTARRAY* pa;
+	POLYGON *polygon;
+	LWPOLY *lwpoly;
+	LWGEOM *lwgeom;
+	GSERIALIZED *geom;
+	POINTARRAY *pa;
 	GBOX gbox;
 	uint32_t i;
 	size_t size;
@@ -203,7 +203,7 @@ Datum geometry_to_polygon(PG_FUNCTION_ARGS)
 	pa = lwpoly->rings[0];
 
 	size = offsetof(POLYGON, p[0]) + sizeof(polygon->p[0]) * pa->npoints;
-	polygon = (POLYGON*)palloc0(size); /* zero any holes */
+	polygon = (POLYGON *)palloc0(size); /* zero any holes */
 	SET_VARSIZE(polygon, size);
 
 	polygon->npts = pa->npoints;
@@ -216,7 +216,7 @@ Datum geometry_to_polygon(PG_FUNCTION_ARGS)
 
 	for (i = 0; i < pa->npoints; i++)
 	{
-		const POINT2D* pt = getPoint2d_cp(pa, i);
+		const POINT2D *pt = getPoint2d_cp(pa, i);
 		(polygon->p[i]).x = pt->x;
 		(polygon->p[i]).y = pt->y;
 	}
@@ -230,11 +230,11 @@ Datum geometry_to_polygon(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(polygon_to_geometry);
 Datum polygon_to_geometry(PG_FUNCTION_ARGS)
 {
-	POLYGON* polygon;
-	LWPOLY* lwpoly;
-	POINTARRAY* pa;
-	POINTARRAY** ppa;
-	GSERIALIZED* geom;
+	POLYGON *polygon;
+	LWPOLY *lwpoly;
+	POINTARRAY *pa;
+	POINTARRAY **ppa;
+	GSERIALIZED *geom;
 	Point p;
 	int i = 0, unclosed = 0;
 
@@ -260,7 +260,7 @@ Datum polygon_to_geometry(PG_FUNCTION_ARGS)
 		ptarray_append_point(pa, &pt, LW_FALSE);
 	}
 
-	ppa = palloc(sizeof(POINTARRAY*));
+	ppa = palloc(sizeof(POINTARRAY *));
 	ppa[0] = pa;
 	lwpoly = lwpoly_construct(SRID_UNKNOWN, NULL, 1, ppa);
 	geom = geometry_serialize(lwpoly_as_lwgeom(lwpoly));

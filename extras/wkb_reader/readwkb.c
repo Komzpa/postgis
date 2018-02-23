@@ -18,14 +18,14 @@ into wkb.
 */
 
 void
-exit_nicely(PGconn* conn)
+exit_nicely(PGconn *conn)
 {
 	PQfinish(conn);
 	exit(1);
 }
 
 void
-dump_bytes(char* a, int numb)
+dump_bytes(char *a, int numb)
 {
 	int t;
 
@@ -40,10 +40,10 @@ dump_bytes(char* a, int numb)
 // select OID from pg_type where typname = 'wkb';
 
 int
-find_WKB_typeid(PGconn* conn)
+find_WKB_typeid(PGconn *conn)
 {
-	PGresult* dbresult;
-	char* num;
+	PGresult *dbresult;
+	char *num;
 
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
@@ -75,24 +75,24 @@ find_WKB_typeid(PGconn* conn)
 main()
 {
 	char *pghost, *pgport, *pgoptions, *pgtty;
-	char* dbName;
+	char *dbName;
 	int nFields;
 	int row, field;
-	PGconn* conn;
-	PGresult* res;
+	PGconn *conn;
+	PGresult *res;
 	int junk;
-	char* field_name;
+	char *field_name;
 	int field_type;
 	int WKB_OID;
 	char conn_string[255];
 
-	bool* bool_val;
-	int* int_val;
-	float* float_val;
-	double* double_val;
-	char* char_val;
-	char* wkb_val;
-	char* table_name = "wkbreader_test";
+	bool *bool_val;
+	int *int_val;
+	float *float_val;
+	double *double_val;
+	char *char_val;
+	char *wkb_val;
+	char *table_name = "wkbreader_test";
 	char query_str[1000];
 
 	/* make a connection to the database */
@@ -169,7 +169,7 @@ main()
 
 			if (field_type == 16) // bool
 			{
-				bool_val = (bool*)PQgetvalue(res, row, field);
+				bool_val = (bool *)PQgetvalue(res, row, field);
 				if (*bool_val)
 					printf("%s: TRUE\n", field_name);
 				else
@@ -177,27 +177,27 @@ main()
 			}
 			else if (field_type == 23) // int4 (int)
 			{
-				int_val = (int*)PQgetvalue(res, row, field);
+				int_val = (int *)PQgetvalue(res, row, field);
 				printf("%s: %i\n", field_name, *int_val);
 			}
 			else if (field_type == 700) // float4 (float)
 			{
-				float_val = (float*)PQgetvalue(res, row, field);
+				float_val = (float *)PQgetvalue(res, row, field);
 				printf("%s: %g\n", field_name, *float_val);
 			}
 			else if (field_type == 701) // float8 (double)
 			{
-				double_val = (double*)PQgetvalue(res, row, field);
+				double_val = (double *)PQgetvalue(res, row, field);
 				printf("%s: %g\n", field_name, *double_val);
 			}
 			else if ((field_type == 1043) || (field_type == 25)) // varchar
 			{
-				char_val = (char*)PQgetvalue(res, row, field);
+				char_val = (char *)PQgetvalue(res, row, field);
 				printf("%s: %s\n", field_name, char_val);
 			}
 			else if (field_type == WKB_OID) // wkb
 			{
-				char_val = (char*)PQgetvalue(res, row, field);
+				char_val = (char *)PQgetvalue(res, row, field);
 				printf("%s: ", field_name);
 				// skip 4 bytes varlena size
 				decode_wkb(char_val, &junk);

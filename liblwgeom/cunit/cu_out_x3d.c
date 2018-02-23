@@ -18,10 +18,10 @@
 #include "cu_tester.h"
 
 static void
-do_x3d3_test(char* in, char* out, char* srs, int precision, int option)
+do_x3d3_test(char *in, char *out, char *srs, int precision, int option)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_x3d3(g, srs, precision, option, "");
@@ -35,10 +35,10 @@ do_x3d3_test(char* in, char* out, char* srs, int precision, int option)
 }
 
 static void
-do_x3d3_unsupported(char* in, char* out)
+do_x3d3_unsupported(char *in, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_x3d3(g, NULL, 0, 0, "");

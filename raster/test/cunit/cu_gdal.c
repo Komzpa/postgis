@@ -64,8 +64,8 @@ test_gdal_rasterize()
 	const char wkb_hex[] =
 	    "010300000001000000050000000000000080841ec100000000600122410000000080841ec100000000804f22410000000040e81dc1"
 	    "00000000804f22410000000040e81dc100000000600122410000000080841ec10000000060012241";
-	const char* pos = wkb_hex;
-	unsigned char* wkb = NULL;
+	const char *pos = wkb_hex;
+	unsigned char *wkb = NULL;
 	int wkb_len = 0;
 	int i;
 	double scale_x = 100;
@@ -79,7 +79,7 @@ test_gdal_rasterize()
 
 	/* hex to byte */
 	wkb_len = (int)ceil(((double)strlen(wkb_hex)) / 2);
-	wkb = (unsigned char*)rtalloc(sizeof(unsigned char) * wkb_len);
+	wkb = (unsigned char *)rtalloc(sizeof(unsigned char) * wkb_len);
 	for (i = 0; i < wkb_len; i++)
 	{
 		sscanf(pos, "%2hhx", &wkb[i]);
@@ -118,10 +118,10 @@ test_gdal_rasterize()
 	cu_free_raster(raster);
 }
 
-static char*
-lwgeom_to_text(const LWGEOM* lwgeom)
+static char *
+lwgeom_to_text(const LWGEOM *lwgeom)
 {
-	char* wkt;
+	char *wkt;
 	size_t wkt_size;
 
 	wkt = lwgeom_to_wkt(lwgeom, WKT_ISO, DBL_DIG, &wkt_size);
@@ -191,7 +191,7 @@ test_gdal_polygonize()
 	rt_raster rt;
 	int nPols = 0;
 	rt_geomval gv = NULL;
-	char* wkt = NULL;
+	char *wkt = NULL;
 
 	rt = fillRasterToPolygonize(1, -1.0);
 	CU_ASSERT(rt_raster_has_band(rt, 0));
@@ -205,13 +205,13 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 2.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[0].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[0].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((3 1,3 2,2 2,2 3,1 3,1 6,2 6,2 7,3 7,3 8,5 8,5 6,3 6,3 3,4 3,5 3,5 1,3 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((3 3,3 6,6 6,6 3,3 3))");
 	rtdealloc(wkt);
 
@@ -221,19 +221,19 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[2].val, 3.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[2].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[2].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((5 1,5 3,6 3,6 6,5 6,5 8,6 8,6 7,7 7,7 6,8 6,8 3,7 3,7 2,6 2,6 1,5 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[3].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[3].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[3].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
 	rtdealloc(wkt);
 
 	for (i = 0; i < nPols; i++)
-		lwgeom_free((LWGEOM*)gv[i].geom);
+		lwgeom_free((LWGEOM *)gv[i].geom);
 	rtdealloc(gv);
 	cu_free_raster(rt);
 
@@ -260,34 +260,34 @@ test_gdal_polygonize()
 
 #ifdef GDALFPOLYGONIZE
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((3 3,3 6,6 6,6 3,3 3))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[2].val, 2.8, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[2].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[2].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((5 1,5 3,6 3,6 6,5 6,5 8,6 8,6 7,7 7,7 6,8 6,8 3,7 3,7 2,6 2,6 1,5 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[3].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[3].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[3].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
 	rtdealloc(wkt);
 #else
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 0.0, 1.);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[0].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[0].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((3 3,3 6,6 6,6 3,3 3))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 3.0, 1.);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((5 1,5 3,6 3,6 6,5 6,5 8,6 8,6 7,7 7,7 6,8 6,8 3,7 3,7 2,6 2,6 1,5 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[2].val, 0.0, 1.);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[2].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[2].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
@@ -295,7 +295,7 @@ test_gdal_polygonize()
 #endif
 
 	for (i = 0; i < nPols; i++)
-		lwgeom_free((LWGEOM*)gv[i].geom);
+		lwgeom_free((LWGEOM *)gv[i].geom);
 	rtdealloc(gv);
 	cu_free_raster(rt);
 
@@ -324,7 +324,7 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 1.8, FLT_EPSILON);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[3].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[3].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[3].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
@@ -333,25 +333,25 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 2.0, 1.);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[2].val, 0.0, 1.);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[2].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[2].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
 	rtdealloc(wkt);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[0].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[0].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((3 1,3 2,2 2,2 3,1 3,1 6,2 6,2 7,3 7,3 8,5 8,5 6,3 6,3 3,4 3,5 3,5 1,3 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((3 3,3 6,6 6,6 3,3 3))");
 	rtdealloc(wkt);
 
 	for (i = 0; i < nPols; i++)
-		lwgeom_free((LWGEOM*)gv[i].geom);
+		lwgeom_free((LWGEOM *)gv[i].geom);
 	rtdealloc(gv);
 	cu_free_raster(rt);
 
@@ -377,7 +377,7 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 2.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[0].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[0].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((3 1,3 2,2 2,2 3,1 3,1 6,2 6,2 7,3 7,3 8,5 8,5 6,3 6,3 3,4 3,5 3,5 1,3 1))");
 	rtdealloc(wkt);
@@ -388,12 +388,12 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 3.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((5 1,5 3,6 3,6 6,5 6,5 8,6 8,6 7,7 7,7 6,8 6,8 3,7 3,7 2,6 2,6 1,5 1))");
 	rtdealloc(wkt);
 
 	for (i = 0; i < nPols; i++)
-		lwgeom_free((LWGEOM*)gv[i].geom);
+		lwgeom_free((LWGEOM *)gv[i].geom);
 	rtdealloc(gv);
 	cu_free_raster(rt);
 
@@ -419,13 +419,13 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[0].val, 2.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[0].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[0].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((3 1,3 2,2 2,2 3,1 3,1 6,2 6,2 7,3 7,3 8,5 8,5 6,3 6,3 3,4 3,5 3,5 1,3 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[1].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[1].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[1].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((3 3,3 6,6 6,6 3,3 3))");
 	rtdealloc(wkt);
 
@@ -435,19 +435,19 @@ test_gdal_polygonize()
 	CU_ASSERT_DOUBLE_EQUAL(gv[2].val, 3.0, 1.);
 #endif
 
-	wkt = lwgeom_to_text((const LWGEOM*)gv[2].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[2].geom);
 	CU_ASSERT_STRING_EQUAL(wkt, "POLYGON((5 1,5 3,6 3,6 6,5 6,5 8,6 8,6 7,7 7,7 6,8 6,8 3,7 3,7 2,6 2,6 1,5 1))");
 	rtdealloc(wkt);
 
 	CU_ASSERT_DOUBLE_EQUAL(gv[3].val, 0.0, FLT_EPSILON);
-	wkt = lwgeom_to_text((const LWGEOM*)gv[3].geom);
+	wkt = lwgeom_to_text((const LWGEOM *)gv[3].geom);
 	CU_ASSERT_STRING_EQUAL(wkt,
 			       "POLYGON((0 0,0 9,9 9,9 0,0 0),(6 7,6 8,3 8,3 7,2 7,2 6,1 6,1 3,2 3,2 2,3 2,3 1,6 1,6 "
 			       "2,7 2,7 3,8 3,8 6,7 6,7 7,6 7))");
 	rtdealloc(wkt);
 
 	for (i = 0; i < nPols; i++)
-		lwgeom_free((LWGEOM*)gv[i].geom);
+		lwgeom_free((LWGEOM *)gv[i].geom);
 	rtdealloc(gv);
 	cu_free_raster(rt);
 }
@@ -470,7 +470,7 @@ test_raster_to_gdal()
 	    "UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"2163\"]]";
 
 	uint64_t gdalSize;
-	uint8_t* gdal = NULL;
+	uint8_t *gdal = NULL;
 
 	raster = rt_raster_new(width, height);
 	CU_ASSERT(raster != NULL); /* or we're out of virtual memory */

@@ -18,10 +18,10 @@
 #include "cu_tester.h"
 
 static void
-do_geojson_test(char* in, char* out, char* srs, int precision, int has_bbox)
+do_geojson_test(char *in, char *out, char *srs, int precision, int has_bbox)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_geojson(g, srs, precision, has_bbox);
@@ -35,10 +35,10 @@ do_geojson_test(char* in, char* out, char* srs, int precision, int has_bbox)
 }
 
 static void
-do_geojson_unsupported(char* in, char* out)
+do_geojson_unsupported(char *in, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_to_geojson(g, NULL, 0, 0);

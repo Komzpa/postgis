@@ -18,10 +18,10 @@
 #include "cu_tester.h"
 
 static void
-do_geom_test(char* in, char* out)
+do_geom_test(char *in, char *out)
 {
 	LWGEOM *g, *h;
-	char* tmp;
+	char *tmp;
 
 	g = lwgeom_from_wkt(in, LW_PARSER_CHECK_NONE);
 	h = lwgeom_homogenize(g);

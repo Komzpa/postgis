@@ -36,12 +36,12 @@
 	} while (0)
 #endif
 
-const char* get_state_regex(char* st);
-const char* parseaddress_cvsid();
-char* clean_leading_punct(char* s);
+const char *get_state_regex(char *st);
+const char *parseaddress_cvsid();
+char *clean_leading_punct(char *s);
 
-const char*
-get_state_regex(char* st)
+const char *
+get_state_regex(char *st)
 {
 	int i;
 	int cmp;
@@ -61,7 +61,7 @@ get_state_regex(char* st)
 }
 
 int
-clean_trailing_punct(char* s)
+clean_trailing_punct(char *s)
 {
 	int i;
 	int ret = 0;
@@ -75,8 +75,8 @@ clean_trailing_punct(char* s)
 	return ret;
 }
 
-char*
-clean_leading_punct(char* s)
+char *
+clean_leading_punct(char *s)
 {
 	int i;
 
@@ -87,7 +87,7 @@ clean_leading_punct(char* s)
 }
 
 void
-strtoupper(char* s)
+strtoupper(char *s)
 {
 	int i;
 
@@ -96,11 +96,11 @@ strtoupper(char* s)
 }
 
 int
-match(char* pattern, char* s, int* ovect, int options)
+match(char *pattern, char *s, int *ovect, int options)
 {
-	const char* error;
+	const char *error;
 	int erroffset;
-	pcre* re;
+	pcre *re;
 	int rc;
 
 	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
@@ -124,32 +124,32 @@ match(char* pattern, char* s, int* ovect, int options)
 		return NULL; \
 	}
 
-ADDRESS*
-parseaddress(HHash* stH, char* s, int* reterr)
+ADDRESS *
+parseaddress(HHash *stH, char *s, int *reterr)
 {
 
 #include "parseaddress-regex.h"
 
 	int ovect[OVECCOUNT];
 	char c;
-	char* stregx;
-	char* caregx;
-	char* state = NULL;
-	char* regx;
+	char *stregx;
+	char *caregx;
+	char *state = NULL;
+	char *regx;
 	int mi;
 	int i, j;
 	int rc;
 	int comma = 0;
-	ADDRESS* ret;
+	ADDRESS *ret;
 #ifdef USE_HSEARCH
 	ENTRY e, *ep;
 	int err;
 #else
-	char* key;
-	char* val;
+	char *key;
+	char *val;
 #endif
 
-	ret = (ADDRESS*)palloc0(sizeof(ADDRESS));
+	ret = (ADDRESS *)palloc0(sizeof(ADDRESS));
 
 	/* check if we were passed a lat lon */
 	rc = match("^\\s*([-+]?\\d+(\\.\\d*)?)[\\,\\s]+([-+]?\\d+(\\.\\d*)?)\\s*$", s, ovect, 0);
@@ -180,7 +180,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 
 	/* assume country code is US */
 
-	ret->cc = (char*)palloc0(3 * sizeof(char));
+	ret->cc = (char *)palloc0(3 * sizeof(char));
 	strcpy(ret->cc, "US");
 
 	/* get US zipcode components */
@@ -188,11 +188,11 @@ parseaddress(HHash* stH, char* s, int* reterr)
 	rc = match("\\b(\\d{5})[-\\s]{0,1}?(\\d{0,4})?$", s, ovect, 0);
 	if (rc >= 2)
 	{
-		ret->zip = (char*)palloc0((ovect[3] - ovect[2] + 1) * sizeof(char));
+		ret->zip = (char *)palloc0((ovect[3] - ovect[2] + 1) * sizeof(char));
 		strncpy(ret->zip, s + ovect[2], ovect[3] - ovect[2]);
 		if (rc >= 3)
 		{
-			ret->zipplus = (char*)palloc0((ovect[5] - ovect[4] + 1) * sizeof(char));
+			ret->zipplus = (char *)palloc0((ovect[5] - ovect[4] + 1) * sizeof(char));
 			strncpy(ret->zipplus, s + ovect[4], ovect[5] - ovect[4]);
 		}
 		/* truncate the postalcode off the string */
@@ -205,7 +205,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 		rc = match("\\b([a-z]\\d[a-z]\\s?\\d[a-z]\\d)$", s, ovect, PCRE_CASELESS);
 		if (rc >= 1)
 		{
-			ret->zip = (char*)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
+			ret->zip = (char *)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
 			strncpy(ret->zip, s + ovect[0], ovect[1] - ovect[0]);
 			strcpy(ret->cc, "CA");
 			/* truncate the postalcode off the string */
@@ -240,7 +240,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 	rc = match(stregx, s, ovect, PCRE_CASELESS);
 	if (rc > 0)
 	{
-		state = (char*)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
+		state = (char *)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
 		strncpy(state, s + ovect[0], ovect[1] - ovect[0]);
 
 		/* truncate the state/province off the string */
@@ -253,12 +253,12 @@ parseaddress(HHash* stH, char* s, int* reterr)
 		err = hsearch_r(e, FIND, &ep, stH);
 		if (err)
 		{
-			ret->st = (char*)palloc0(3 * sizeof(char));
+			ret->st = (char *)palloc0(3 * sizeof(char));
 			strcpy(ret->st, ep->data);
 		}
 #else
 		key = state;
-		val = (char*)hash_get(stH, key);
+		val = (char *)hash_get(stH, key);
 		if (val) { ret->st = pstrdup(val); }
 #endif
 		else
@@ -321,21 +321,21 @@ parseaddress(HHash* stH, char* s, int* reterr)
 	mi = 0;
 
 	regx = "(?:,\\s*)([^,]+)$";
-	rc = match((char*)regx, s, ovect, 0);
+	rc = match((char *)regx, s, ovect, 0);
 	if (rc <= 0)
 	{
 		/* look for state specific regex */
 		mi++;
-		regx = (char*)get_state_regex(ret->st);
-		if (regx) rc = match((char*)regx, s, ovect, 0);
+		regx = (char *)get_state_regex(ret->st);
+		if (regx) rc = match((char *)regx, s, ovect, 0);
 	}
 	DBG("Checked for comma: %d", rc);
 	if (rc <= 0 && ret->st && strlen(ret->st))
 	{
 		/* look for state specific regex */
 		mi++;
-		regx = (char*)get_state_regex(ret->st);
-		if (regx) rc = match((char*)regx, s, ovect, 0);
+		regx = (char *)get_state_regex(ret->st);
+		if (regx) rc = match((char *)regx, s, ovect, 0);
 	}
 	DBG("Checked for state-city: %d", rc);
 	if (rc <= 0)
@@ -344,7 +344,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 		for (i = 0; i < nreg; i++)
 		{
 			mi++;
-			rc = match((char*)t_regx[i], s, ovect, 0);
+			rc = match((char *)t_regx[i], s, ovect, 0);
 			DBG("    rc=%d, i=%d", rc, i);
 			if (rc > 0) break;
 		}
@@ -354,7 +354,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 	if (rc > 0 && ovect[3] > ovect[2])
 	{
 		/* we have a match so process it */
-		ret->city = (char*)palloc0((ovect[3] - ovect[2] + 1) * sizeof(char));
+		ret->city = (char *)palloc0((ovect[3] - ovect[2] + 1) * sizeof(char));
 		strncpy(ret->city, s + ovect[2], ovect[3] - ovect[2]);
 		/* truncate the state/province off the string */
 		*(s + ovect[2]) = '\0';
@@ -388,7 +388,7 @@ parseaddress(HHash* stH, char* s, int* reterr)
 		rc = match("^((?i)[nsew]?\\d+[-nsew]*\\d*[nsew]?\\b)", s, ovect, 0);
 		if (rc > 0)
 		{
-			ret->num = (char*)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
+			ret->num = (char *)palloc0((ovect[1] - ovect[0] + 1) * sizeof(char));
 			strncpy(ret->num, s, ovect[1] - ovect[0]);
 			ret->street = pstrdup(clean_leading_punct(s + ovect[1]));
 		}
@@ -398,9 +398,9 @@ parseaddress(HHash* stH, char* s, int* reterr)
 }
 
 int
-load_state_hash(HHash* stH)
+load_state_hash(HHash *stH)
 {
-	char* words[][2] = {{"ALABAMA", "AL"},
+	char *words[][2] = {{"ALABAMA", "AL"},
 			    {"ALASKA", "AK"},
 			    {"AMERICAN SAMOA", "AS"},
 			    {"AMER SAMOA", "AS"},
@@ -516,8 +516,8 @@ load_state_hash(HHash* stH)
 	ENTRY e, *ep;
 	int err;
 #else
-	char* key;
-	char* val;
+	char *key;
+	char *val;
 #endif
 	int i, cnt;
 
@@ -550,17 +550,17 @@ load_state_hash(HHash* stH)
 		// DBG("load_hash i=%d", i);
 		key = words[i][0];
 		val = words[i][1];
-		hash_set(stH, key, (void*)val);
+		hash_set(stH, key, (void *)val);
 		key = words[i][1];
 		val = words[i][1];
-		hash_set(stH, key, (void*)val);
+		hash_set(stH, key, (void *)val);
 	}
 #endif
 	return 0;
 }
 
 void
-free_state_hash(HHash* stH)
+free_state_hash(HHash *stH)
 {
 //#if 0
 #ifdef USE_HSEARCH

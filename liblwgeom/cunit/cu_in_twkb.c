@@ -20,8 +20,8 @@
 /*
 ** Global variable to hold TWKB strings
 */
-char* hex_a;
-char* hex_b;
+char *hex_a;
+char *hex_b;
 uint8_t precision = 0;
 uint8_t variant = 0;
 
@@ -52,7 +52,7 @@ clean_twkb_in_suite(void)
 }
 
 static void
-cu_twkb_in(char* wkt)
+cu_twkb_in(char *wkt)
 {
 	LWGEOM_PARSER_RESULT pr;
 	LWGEOM *g_a, *g_b;

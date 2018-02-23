@@ -161,10 +161,10 @@ void _PG_fini(void);
 /*  Memory allocation / error reporting hooks                       */
 /* ---------------------------------------------------------------- */
 
-static void*
+static void *
 rt_pg_alloc(size_t size)
 {
-	void* result;
+	void *result;
 
 	POSTGIS_RT_DEBUGF(5, "rt_pgalloc(%ld) called", (long int)size);
 
@@ -173,10 +173,10 @@ rt_pg_alloc(size_t size)
 	return result;
 }
 
-static void*
-rt_pg_realloc(void* mem, size_t size)
+static void *
+rt_pg_realloc(void *mem, size_t size)
 {
-	void* result;
+	void *result;
 
 	POSTGIS_RT_DEBUGF(5, "rt_pg_realloc(%ld) called", (long int)size);
 
@@ -190,16 +190,16 @@ rt_pg_realloc(void* mem, size_t size)
 }
 
 static void
-rt_pg_free(void* ptr)
+rt_pg_free(void *ptr)
 {
 	POSTGIS_RT_DEBUG(5, "rt_pfree called");
 	pfree(ptr);
 }
 
-static void rt_pg_error(const char* fmt, va_list ap) __attribute__((format(printf, 1, 0)));
+static void rt_pg_error(const char *fmt, va_list ap) __attribute__((format(printf, 1, 0)));
 
 static void
-rt_pg_error(const char* fmt, va_list ap)
+rt_pg_error(const char *fmt, va_list ap)
 {
 	char errmsg[RT_MSG_MAXLEN + 1];
 
@@ -209,10 +209,10 @@ rt_pg_error(const char* fmt, va_list ap)
 	ereport(ERROR, (errmsg_internal("%s", errmsg)));
 }
 
-static void rt_pg_notice(const char* fmt, va_list ap) __attribute__((format(printf, 1, 0)));
+static void rt_pg_notice(const char *fmt, va_list ap) __attribute__((format(printf, 1, 0)));
 
 static void
-rt_pg_notice(const char* fmt, va_list ap)
+rt_pg_notice(const char *fmt, va_list ap)
 {
 	char msg[RT_MSG_MAXLEN + 1];
 
@@ -222,10 +222,10 @@ rt_pg_notice(const char* fmt, va_list ap)
 	ereport(NOTICE, (errmsg_internal("%s", msg)));
 }
 
-static void rt_pg_debug(const char* fmt, va_list ap) __attribute__((format(printf, 1, 0)));
+static void rt_pg_debug(const char *fmt, va_list ap) __attribute__((format(printf, 1, 0)));
 
 static void
-rt_pg_debug(const char* fmt, va_list ap)
+rt_pg_debug(const char *fmt, va_list ap)
 {
 	char msg[RT_MSG_MAXLEN + 1];
 
@@ -239,21 +239,21 @@ rt_pg_debug(const char* fmt, va_list ap)
 /*  PostGIS raster GUCs                                             */
 /* ---------------------------------------------------------------- */
 
-static char* gdal_datapath = NULL;
-extern char* gdal_enabled_drivers;
+static char *gdal_datapath = NULL;
+extern char *gdal_enabled_drivers;
 extern char enable_outdb_rasters;
 
 /* ---------------------------------------------------------------- */
 /*  Useful variables                                                */
 /* ---------------------------------------------------------------- */
 
-static char* env_postgis_gdal_enabled_drivers = NULL;
-static char* boot_postgis_gdal_enabled_drivers = NULL;
-static char* env_postgis_enable_outdb_rasters = NULL;
+static char *env_postgis_gdal_enabled_drivers = NULL;
+static char *boot_postgis_gdal_enabled_drivers = NULL;
+static char *env_postgis_enable_outdb_rasters = NULL;
 
 /* postgis.gdal_datapath */
 static void
-rtpg_assignHookGDALDataPath(const char* newpath, void* extra)
+rtpg_assignHookGDALDataPath(const char *newpath, void *extra)
 {
 	POSTGIS_RT_DEBUGF(4, "newpath = %s", newpath);
 	POSTGIS_RT_DEBUGF(4, "gdaldatapath = %s", gdal_datapath);
@@ -271,15 +271,15 @@ rtpg_assignHookGDALDataPath(const char* newpath, void* extra)
 
 /* postgis.gdal_enabled_drivers */
 static void
-rtpg_assignHookGDALEnabledDrivers(const char* enabled_drivers, void* extra)
+rtpg_assignHookGDALEnabledDrivers(const char *enabled_drivers, void *extra)
 {
 	int enable_all = 0;
 	int disable_all = 0;
 
-	char** enabled_drivers_array = NULL;
+	char **enabled_drivers_array = NULL;
 	uint32_t enabled_drivers_count = 0;
-	bool* enabled_drivers_found = NULL;
-	char* gdal_skip = NULL;
+	bool *enabled_drivers_found = NULL;
+	char *gdal_skip = NULL;
 
 	uint32_t i;
 	uint32_t j;
@@ -418,7 +418,7 @@ rtpg_assignHookGDALEnabledDrivers(const char* enabled_drivers, void* extra)
 
 /* postgis.enable_outdb_rasters */
 static void
-rtpg_assignHookEnableOutDBRasters(bool enable, void* extra)
+rtpg_assignHookEnableOutDBRasters(bool enable, void *extra)
 {
 	/* do nothing for now */
 }
@@ -460,7 +460,7 @@ _PG_init(void)
 	env_postgis_enable_outdb_rasters = getenv("POSTGIS_ENABLE_OUTDB_RASTERS");
 	if (env_postgis_enable_outdb_rasters != NULL)
 	{
-		char* env = rtpg_trim(env_postgis_enable_outdb_rasters);
+		char *env = rtpg_trim(env_postgis_enable_outdb_rasters);
 
 		/* out of memory */
 		if (env == NULL)
@@ -492,18 +492,18 @@ _PG_init(void)
 	}
 	else
 	{
-		DefineCustomStringVariable(
-		    "postgis.gdal_datapath",    /* name */
-		    "Path to GDAL data files.", /* short_desc */
-		    "Physical path to directory containing GDAL data files (sets the GDAL_DATA config option).", /* long_desc
-														  */
-		    &gdal_datapath,              /* valueAddr */
-		    NULL,                        /* bootValue */
-		    PGC_SUSET,                   /* GucContext context */
-		    0,                           /* int flags */
-		    NULL,                        /* GucStringCheckHook check_hook */
-		    rtpg_assignHookGDALDataPath, /* GucStringAssignHook assign_hook */
-		    NULL                         /* GucShowHook show_hook */
+		DefineCustomStringVariable("postgis.gdal_datapath",    /* name */
+					   "Path to GDAL data files.", /* short_desc */
+					   "Physical path to directory containing GDAL data files (sets the GDAL_DATA "
+					   "config option).",           /* long_desc
+									 */
+					   &gdal_datapath,              /* valueAddr */
+					   NULL,                        /* bootValue */
+					   PGC_SUSET,                   /* GucContext context */
+					   0,                           /* int flags */
+					   NULL,                        /* GucStringCheckHook check_hook */
+					   rtpg_assignHookGDALDataPath, /* GucStringAssignHook assign_hook */
+					   NULL                         /* GucShowHook show_hook */
 		);
 	}
 

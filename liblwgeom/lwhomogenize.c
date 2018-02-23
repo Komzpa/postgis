@@ -29,11 +29,11 @@
 typedef struct
 {
 	int cnt[NUMTYPES];
-	LWCOLLECTION* buf[NUMTYPES];
+	LWCOLLECTION *buf[NUMTYPES];
 } HomogenizeBuffer;
 
 static void
-init_homogenizebuffer(HomogenizeBuffer* buffer)
+init_homogenizebuffer(HomogenizeBuffer *buffer)
 {
 	int i;
 	for (i = 0; i < NUMTYPES; i++)
@@ -72,7 +72,7 @@ free_homogenizebuffer(HomogenizeBuffer *buffer)
 ** typed collections.
 */
 static void
-lwcollection_build_buffer(const LWCOLLECTION* col, HomogenizeBuffer* buffer)
+lwcollection_build_buffer(const LWCOLLECTION *col, HomogenizeBuffer *buffer)
 {
 	uint32_t i;
 
@@ -80,7 +80,7 @@ lwcollection_build_buffer(const LWCOLLECTION* col, HomogenizeBuffer* buffer)
 	if (lwgeom_is_empty(lwcollection_as_lwgeom(col))) return;
 	for (i = 0; i < col->ngeoms; i++)
 	{
-		LWGEOM* geom = col->geoms[i];
+		LWGEOM *geom = col->geoms[i];
 		switch (geom->type)
 		{
 		case POINTTYPE:
@@ -94,7 +94,7 @@ lwcollection_build_buffer(const LWCOLLECTION* col, HomogenizeBuffer* buffer)
 			/* Init if necessary */
 			if (!buffer->buf[geom->type])
 			{
-				LWCOLLECTION* bufcol = lwcollection_construct_empty(
+				LWCOLLECTION *bufcol = lwcollection_construct_empty(
 				    COLLECTIONTYPE, col->srid, FLAGS_GET_Z(col->flags), FLAGS_GET_M(col->flags));
 				bufcol->type = lwtype_get_collectiontype(geom->type);
 				buffer->buf[geom->type] = bufcol;
@@ -115,13 +115,13 @@ lwcollection_build_buffer(const LWCOLLECTION* col, HomogenizeBuffer* buffer)
 	return;
 }
 
-static LWGEOM*
-lwcollection_homogenize(const LWCOLLECTION* col)
+static LWGEOM *
+lwcollection_homogenize(const LWCOLLECTION *col)
 {
 	int i;
 	int ntypes = 0;
 	int type = 0;
-	LWGEOM* outgeom = NULL;
+	LWGEOM *outgeom = NULL;
 
 	HomogenizeBuffer buffer;
 
@@ -142,7 +142,7 @@ lwcollection_homogenize(const LWCOLLECTION* col)
 	/* No types? Huh. Return empty. */
 	if (ntypes == 0)
 	{
-		LWCOLLECTION* outcol;
+		LWCOLLECTION *outcol;
 		outcol = lwcollection_construct_empty(
 		    COLLECTIONTYPE, col->srid, FLAGS_GET_Z(col->flags), FLAGS_GET_M(col->flags));
 		outgeom = lwcollection_as_lwgeom(outcol);
@@ -150,7 +150,7 @@ lwcollection_homogenize(const LWCOLLECTION* col)
 	/* One type, return homogeneous collection */
 	else if (ntypes == 1)
 	{
-		LWCOLLECTION* outcol;
+		LWCOLLECTION *outcol;
 		outcol = buffer.buf[type];
 		if (outcol->ngeoms == 1)
 		{
@@ -168,14 +168,14 @@ lwcollection_homogenize(const LWCOLLECTION* col)
 	else if (ntypes > 1)
 	{
 		int j;
-		LWCOLLECTION* outcol;
+		LWCOLLECTION *outcol;
 		outcol = lwcollection_construct_empty(
 		    COLLECTIONTYPE, col->srid, FLAGS_GET_Z(col->flags), FLAGS_GET_M(col->flags));
 		for (j = 0; j < NUMTYPES; j++)
 		{
 			if (buffer.buf[j])
 			{
-				LWCOLLECTION* bcol = buffer.buf[j];
+				LWCOLLECTION *bcol = buffer.buf[j];
 				if (bcol->ngeoms == 1)
 				{
 					lwcollection_add_lwgeom(outcol, bcol->geoms[0]);
@@ -207,10 +207,10 @@ lwcollection_homogenize(const LWCOLLECTION* col)
 **     GEOMETRYCOLLECTION(MULTILINESTRING(), MULTILINESTRING(), POINT())
 **      => GEOMETRYCOLLECTION(MULTILINESTRING(), POINT())
 */
-LWGEOM*
-lwgeom_homogenize(const LWGEOM* geom)
+LWGEOM *
+lwgeom_homogenize(const LWGEOM *geom)
 {
-	LWGEOM* hgeom;
+	LWGEOM *hgeom;
 
 	/* EMPTY Geometry */
 	if (lwgeom_is_empty(geom))
@@ -246,12 +246,12 @@ lwgeom_homogenize(const LWGEOM* geom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	{
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 
 		/* Strip single-entry multi-geometries down to singletons */
 		if (col->ngeoms == 1)
 		{
-			hgeom = lwgeom_clone((LWGEOM*)(col->geoms[0]));
+			hgeom = lwgeom_clone((LWGEOM *)(col->geoms[0]));
 			hgeom->srid = geom->srid;
 			if (geom->bbox) hgeom->bbox = gbox_copy(geom->bbox);
 			return hgeom;
@@ -263,7 +263,7 @@ lwgeom_homogenize(const LWGEOM* geom)
 
 	/* Work on anonymous collections separately */
 	case COLLECTIONTYPE:
-		return lwcollection_homogenize((LWCOLLECTION*)geom);
+		return lwcollection_homogenize((LWCOLLECTION *)geom);
 	}
 
 	/* Unknown type */

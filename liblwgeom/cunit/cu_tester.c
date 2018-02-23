@@ -17,11 +17,11 @@
 #include "../postgis_config.h"
 
 /* Internal funcs */
-static void cu_errorreporter(const char* fmt, va_list ap);
+static void cu_errorreporter(const char *fmt, va_list ap);
 
-static void cu_noticereporter(const char* fmt, va_list ap);
+static void cu_noticereporter(const char *fmt, va_list ap);
 
-static void cu_debuglogger(int level, const char* fmt, va_list ap);
+static void cu_debuglogger(int level, const char *fmt, va_list ap);
 
 /* ADD YOUR SUITE SETUP FUNCTION HERE (1 of 2) */
 extern void print_suite_setup();
@@ -126,18 +126,18 @@ PG_SuiteSetup setupfuncs[] = {algorithms_suite_setup,
 ** CUnit error code on failure.
 */
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
 	int index;
-	char* suite_name;
+	char *suite_name;
 	CU_pSuite suite_to_run;
-	char* test_name;
+	char *test_name;
 	CU_pTest test_to_run = NULL;
 	CU_ErrorCode errCode = 0;
 	CU_pTestRegistry registry;
 	int num_run;
 	int num_failed;
-	PG_SuiteSetup* setupfunc = setupfuncs;
+	PG_SuiteSetup *setupfunc = setupfuncs;
 
 	/* Install the custom error handler */
 	lwgeom_set_handlers(0, 0, 0, cu_errorreporter, cu_noticereporter);
@@ -275,7 +275,7 @@ main(int argc, char* argv[])
  * CAUTION: Not stop execution on lwerror case !!!
  */
 static void
-cu_errorreporter(const char* fmt, va_list ap)
+cu_errorreporter(const char *fmt, va_list ap)
 {
 	vsnprintf(cu_error_msg, MAX_CUNIT_MSG_LENGTH, fmt, ap);
 	cu_error_msg[MAX_CUNIT_MSG_LENGTH] = '\0';
@@ -283,7 +283,7 @@ cu_errorreporter(const char* fmt, va_list ap)
 }
 
 static void
-cu_noticereporter(const char* fmt, va_list ap)
+cu_noticereporter(const char *fmt, va_list ap)
 {
 	char buf[MAX_CUNIT_MSG_LENGTH + 1];
 	vsnprintf(buf, MAX_CUNIT_MSG_LENGTH, fmt, ap);
@@ -292,7 +292,7 @@ cu_noticereporter(const char* fmt, va_list ap)
 }
 
 static void
-cu_debuglogger(int level, const char* fmt, va_list ap)
+cu_debuglogger(int level, const char *fmt, va_list ap)
 {
 	char buf[MAX_CUNIT_MSG_LENGTH + 1];
 	vsnprintf(buf, MAX_CUNIT_MSG_LENGTH, fmt, ap);
@@ -314,11 +314,11 @@ cu_error_msg_reset()
  * - cleans up
  */
 void
-do_fn_test(LWGEOM* (*transfn)(LWGEOM*), char* input_wkt, char* expected_wkt)
+do_fn_test(LWGEOM *(*transfn)(LWGEOM *), char *input_wkt, char *expected_wkt)
 {
-	LWGEOM* input = lwgeom_from_wkt(input_wkt, LW_PARSER_CHECK_NONE);
-	LWGEOM* expected = lwgeom_from_wkt(expected_wkt, LW_PARSER_CHECK_NONE);
-	LWGEOM* observed = transfn(input);
+	LWGEOM *input = lwgeom_from_wkt(input_wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *expected = lwgeom_from_wkt(expected_wkt, LW_PARSER_CHECK_NONE);
+	LWGEOM *observed = transfn(input);
 
 	ASSERT_LWGEOM_EQUAL(observed, expected);
 

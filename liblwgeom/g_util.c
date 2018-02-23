@@ -29,7 +29,7 @@
 /* Structure for the type array */
 struct geomtype_struct
 {
-	char* typename;
+	char *typename;
 	int type;
 	int z;
 	int m;
@@ -158,9 +158,9 @@ gflags(int hasz, int hasm, int geodetic)
  * Return LW_SUCCESS for success.
  */
 int
-geometry_type_from_string(const char* str, uint8_t* type, int* z, int* m)
+geometry_type_from_string(const char *str, uint8_t *type, int *z, int *m)
 {
-	char* tmpstr;
+	char *tmpstr;
 	size_t tmpstartpos, tmpendpos;
 	size_t i;
 

@@ -20,10 +20,10 @@
 #include "cu_tester.h"
 
 static void
-do_encoded_polyline_test(char* in, int precision, char* out)
+do_encoded_polyline_test(char *in, int precision, char *out)
 {
-	LWGEOM* g;
-	char* h;
+	LWGEOM *g;
+	char *h;
 	size_t size;
 
 	g = lwgeom_from_encoded_polyline(in, precision);

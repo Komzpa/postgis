@@ -18,10 +18,10 @@ PG_MODULE_MAGIC;
 Datum standardize_address(PG_FUNCTION_ARGS);
 Datum standardize_address1(PG_FUNCTION_ARGS);
 
-static char*
-text2char(text* in)
+static char *
+text2char(text *in)
 {
-	char* out = palloc(VARSIZE(in));
+	char *out = palloc(VARSIZE(in));
 	memcpy(out, VARDATA(in), VARSIZE(in) - VARHDRSZ);
 	out[VARSIZE(in) - VARHDRSZ] = '\0';
 	return out;
@@ -65,16 +65,16 @@ PG_FUNCTION_INFO_V1(standardize_address);
 Datum standardize_address(PG_FUNCTION_ARGS)
 {
 	TupleDesc tuple_desc;
-	AttInMetadata* attinmeta;
-	STANDARDIZER* std;
-	char* lextab;
-	char* gaztab;
-	char* rultab;
-	char* micro;
-	char* macro;
+	AttInMetadata *attinmeta;
+	STANDARDIZER *std;
+	char *lextab;
+	char *gaztab;
+	char *rultab;
+	char *micro;
+	char *macro;
 	Datum result;
-	STDADDR* stdaddr;
-	char** values;
+	STDADDR *stdaddr;
+	char **values;
 	int k;
 	HeapTuple tuple;
 
@@ -101,7 +101,7 @@ Datum standardize_address(PG_FUNCTION_ARGS)
 
 	DBG("back from fetch_stdaddr");
 
-	values = (char**)palloc(16 * sizeof(char*));
+	values = (char **)palloc(16 * sizeof(char *));
 	for (k = 0; k < 16; k++)
 	{
 		values[k] = NULL;
@@ -147,21 +147,21 @@ PG_FUNCTION_INFO_V1(standardize_address1);
 Datum standardize_address1(PG_FUNCTION_ARGS)
 {
 	TupleDesc tuple_desc;
-	AttInMetadata* attinmeta;
-	STANDARDIZER* std;
-	char* lextab;
-	char* gaztab;
-	char* rultab;
-	char* addr;
-	char* micro;
-	char* macro;
+	AttInMetadata *attinmeta;
+	STANDARDIZER *std;
+	char *lextab;
+	char *gaztab;
+	char *rultab;
+	char *addr;
+	char *micro;
+	char *macro;
 	Datum result;
-	STDADDR* stdaddr;
-	char** values;
+	STDADDR *stdaddr;
+	char **values;
 	int k;
 	HeapTuple tuple;
-	ADDRESS* paddr;
-	HHash* stH;
+	ADDRESS *paddr;
+	HHash *stH;
 	int err;
 
 	DBG("Start standardize_address");
@@ -179,7 +179,7 @@ Datum standardize_address1(PG_FUNCTION_ARGS)
 
 	DBG("Got tupdesc, allocating HHash");
 
-	stH = (HHash*)palloc0(sizeof(HHash));
+	stH = (HHash *)palloc0(sizeof(HHash));
 	if (!stH)
 	{
 		elog(ERROR, "standardize_address: Failed to allocate memory for hash!");
@@ -220,7 +220,7 @@ Datum standardize_address1(PG_FUNCTION_ARGS)
 
 	/* create micro and macro from paddr */
 	micro = pstrdup(paddr->address1);
-	macro = (char*)palloc(k * sizeof(char));
+	macro = (char *)palloc(k * sizeof(char));
 
 	*macro = '\0';
 	if (paddr->city)
@@ -253,7 +253,7 @@ Datum standardize_address1(PG_FUNCTION_ARGS)
 
 	DBG("back from fetch_stdaddr");
 
-	values = (char**)palloc(16 * sizeof(char*));
+	values = (char **)palloc(16 * sizeof(char *));
 	for (k = 0; k < 16; k++)
 	{
 		values[k] = NULL;

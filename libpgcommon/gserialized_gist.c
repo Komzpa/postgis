@@ -24,15 +24,15 @@
 #define FLAGS_NDIMS_GIDX(f) (FLAGS_GET_GEODETIC(f) ? 3 : FLAGS_GET_M(f) ? 4 : FLAGS_GET_Z(f) ? 3 : 2)
 
 /* Generate human readable form for GIDX. */
-char*
-gidx_to_string(GIDX* a)
+char *
+gidx_to_string(GIDX *a)
 {
 	char *str, *rv;
 	int i, ndims;
 
 	if (a == NULL) return pstrdup("<NULLPTR>");
 
-	str = (char*)palloc(128); /* 15*2*4+8==128 */
+	str = (char *)palloc(128); /* 15*2*4+8==128 */
 	rv = str;
 	ndims = GIDX_NDIMS(a);
 
@@ -50,9 +50,9 @@ gidx_to_string(GIDX* a)
 static uint8_t
 gserialized_datum_get_flags(Datum gsdatum)
 {
-	GSERIALIZED* gpart;
+	GSERIALIZED *gpart;
 	POSTGIS_DEBUG(4, "entered function");
-	gpart = (GSERIALIZED*)PG_DETOAST_DATUM_SLICE(gsdatum, 0, 40);
+	gpart = (GSERIALIZED *)PG_DETOAST_DATUM_SLICE(gsdatum, 0, 40);
 	POSTGIS_DEBUGF(4, "got flags %d", gpart->flags);
 	return gpart->flags;
 }
@@ -60,7 +60,7 @@ gserialized_datum_get_flags(Datum gsdatum)
 /* Convert a double-based GBOX into a float-based GIDX,
    ensuring the float box is larger than the double box */
 static int
-gidx_from_gbox_p(GBOX box, GIDX* a)
+gidx_from_gbox_p(GBOX box, GIDX *a)
 {
 	int ndims;
 
@@ -106,7 +106,7 @@ gidx_from_gbox_p(GBOX box, GIDX* a)
 
 /* Convert a gidx to a gbox */
 void
-gbox_from_gidx(GIDX* a, GBOX* gbox, int flags)
+gbox_from_gidx(GIDX *a, GBOX *gbox, int flags)
 {
 	gbox->xmin = (double)GIDX_GET_MIN(a, 0);
 	gbox->xmax = (double)GIDX_GET_MAX(a, 0);
@@ -135,10 +135,10 @@ gbox_from_gidx(GIDX* a, GBOX* gbox, int flags)
  * box, for geometry objects returns cartesian bounding box.
  */
 int
-gserialized_datum_get_gbox_p(Datum gsdatum, GBOX* gbox)
+gserialized_datum_get_gbox_p(Datum gsdatum, GBOX *gbox)
 {
 	char gboxmem[GIDX_MAX_SIZE];
-	GIDX* gidx = (GIDX*)gboxmem;
+	GIDX *gidx = (GIDX *)gboxmem;
 
 	if (LW_FAILURE == gserialized_datum_get_gidx_p(gsdatum, gidx)) return LW_FAILURE;
 
@@ -156,12 +156,12 @@ gserialized_datum_get_gbox_p(Datum gsdatum, GBOX* gbox)
  * to see if input == output. Returns null if there's a problem
  * like mismatched dimensions.
  */
-GSERIALIZED*
-gserialized_set_gidx(GSERIALIZED* g, GIDX* gidx)
+GSERIALIZED *
+gserialized_set_gidx(GSERIALIZED *g, GIDX *gidx)
 {
 	int g_ndims = FLAGS_NDIMS_BOX(g->flags);
 	int box_ndims = GIDX_NDIMS(gidx);
-	GSERIALIZED* g_out = NULL;
+	GSERIALIZED *g_out = NULL;
 	size_t box_size = 2 * g_ndims * sizeof(float);
 
 	/* The dimensionality of the inputs has to match or we are SOL. */
@@ -176,7 +176,7 @@ gserialized_set_gidx(GSERIALIZED* g, GIDX* gidx)
 	else
 	{
 		size_t varsize_new = VARSIZE(g) + box_size;
-		uint8_t* ptr;
+		uint8_t *ptr;
 		g_out = palloc(varsize_new);
 		/* Copy the head of g into place */
 		memcpy(g_out, g, 8);
@@ -198,19 +198,19 @@ gserialized_set_gidx(GSERIALIZED* g, GIDX* gidx)
  * Remove the bounding box from a #GSERIALIZED. Returns a freshly
  * allocated #GSERIALIZED every time.
  */
-GSERIALIZED*
-gserialized_drop_gidx(GSERIALIZED* g)
+GSERIALIZED *
+gserialized_drop_gidx(GSERIALIZED *g)
 {
 	int g_ndims = FLAGS_NDIMS_BOX(g->flags);
 	size_t box_size = 2 * g_ndims * sizeof(float);
 	size_t g_out_size = VARSIZE(g) - box_size;
-	GSERIALIZED* g_out = palloc(g_out_size);
+	GSERIALIZED *g_out = palloc(g_out_size);
 
 	/* Copy the contents while omitting the box */
 	if (FLAGS_GET_BBOX(g->flags))
 	{
-		uint8_t* outptr = (uint8_t*)g_out;
-		uint8_t* inptr = (uint8_t*)g;
+		uint8_t *outptr = (uint8_t *)g_out;
+		uint8_t *inptr = (uint8_t *)g;
 		/* Copy the header (size+type) of g into place */
 		memcpy(outptr, inptr, 8);
 		outptr += 8;
@@ -236,9 +236,9 @@ gserialized_drop_gidx(GSERIALIZED* g)
  * return #LW_FAILURE, otherwise #LW_SUCCESS.
  */
 int
-gserialized_datum_get_gidx_p(Datum gsdatum, GIDX* gidx)
+gserialized_datum_get_gidx_p(Datum gsdatum, GIDX *gidx)
 {
-	GSERIALIZED* gpart;
+	GSERIALIZED *gpart;
 
 	POSTGIS_DEBUG(4, "entered function");
 
@@ -247,7 +247,7 @@ gserialized_datum_get_gidx_p(Datum gsdatum, GIDX* gidx)
 	** of floats necessary to hold the 8 floats of the largest XYZM index
 	** bounding box, so 40 bytes.
 	*/
-	gpart = (GSERIALIZED*)PG_DETOAST_DATUM_SLICE(gsdatum, 0, 40);
+	gpart = (GSERIALIZED *)PG_DETOAST_DATUM_SLICE(gsdatum, 0, 40);
 
 	POSTGIS_DEBUGF(4, "got flags %d", gpart->flags);
 
@@ -272,8 +272,8 @@ gserialized_datum_get_gidx_p(Datum gsdatum, GIDX* gidx)
 	else
 	{
 		/* No, we need to calculate it from the full object. */
-		GSERIALIZED* g = (GSERIALIZED*)PG_DETOAST_DATUM(gsdatum);
-		LWGEOM* lwgeom = lwgeom_from_gserialized(g);
+		GSERIALIZED *g = (GSERIALIZED *)PG_DETOAST_DATUM(gsdatum);
+		LWGEOM *lwgeom = lwgeom_from_gserialized(g);
 		GBOX gbox;
 		if (lwgeom_calculate_gbox(lwgeom, &gbox) == LW_FAILURE)
 		{
@@ -302,7 +302,7 @@ gserialized_datum_get_gidx_p(Datum gsdatum, GIDX* gidx)
 ** return LW_FAILURE, otherwise LW_SUCCESS.
 */
 int
-gserialized_get_gidx_p(const GSERIALIZED* g, GIDX* gidx)
+gserialized_get_gidx_p(const GSERIALIZED *g, GIDX *gidx)
 {
 	POSTGIS_DEBUG(4, "entered function");
 	POSTGIS_DEBUGF(4, "got flags %d", g->flags);
@@ -318,7 +318,7 @@ gserialized_get_gidx_p(const GSERIALIZED* g, GIDX* gidx)
 	else
 	{
 		/* No, we need to calculate it from the full object. */
-		LWGEOM* lwgeom = lwgeom_from_gserialized(g);
+		LWGEOM *lwgeom = lwgeom_from_gserialized(g);
 		GBOX gbox;
 		if (lwgeom_calculate_gbox(lwgeom, &gbox) == LW_FAILURE)
 		{
@@ -338,7 +338,7 @@ gserialized_get_gidx_p(const GSERIALIZED* g, GIDX* gidx)
 ** GIDX expansion, make d units bigger in all dimensions.
 */
 void
-gidx_expand(GIDX* a, float d)
+gidx_expand(GIDX *a, float d)
 {
 	uint32_t i;
 
@@ -354,11 +354,11 @@ gidx_expand(GIDX* a, float d)
 }
 
 /* Allocates a new GIDX on the heap of the requested dimensionality */
-GIDX*
+GIDX *
 gidx_new(int ndims)
 {
 	size_t size = GIDX_SIZE(ndims);
-	GIDX* g = (GIDX*)palloc(size);
+	GIDX *g = (GIDX *)palloc(size);
 	Assert((ndims <= GIDX_MAX_DIM) && (size <= GIDX_MAX_SIZE));
 	POSTGIS_DEBUGF(5, "created new gidx of %d dimensions, size %d", ndims, (int)size);
 	SET_VARSIZE(g, size);

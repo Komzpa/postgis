@@ -49,14 +49,14 @@
 #define STD_CACHE_ITEMS 4
 #define STD_BACKEND_HASH_SIZE 16
 
-static HTAB* StdHash = NULL;
+static HTAB *StdHash = NULL;
 
 typedef struct
 {
-	char* lextab;
-	char* gaztab;
-	char* rultab;
-	STANDARDIZER* std;
+	char *lextab;
+	char *gaztab;
+	char *rultab;
+	STANDARDIZER *std;
 	MemoryContext std_mcxt;
 } StdCacheItem;
 
@@ -70,7 +70,7 @@ typedef struct
 typedef struct
 {
 	MemoryContext context;
-	STANDARDIZER* std;
+	STANDARDIZER *std;
 } StdHashEntry;
 
 typedef struct lex_columns
@@ -87,26 +87,26 @@ typedef struct rules_columns
 } rules_columns_t;
 
 /* Memory context hash table function prototypes */
-uint32 mcxt_ptr_hash_std(const void* key, Size keysize);
+uint32 mcxt_ptr_hash_std(const void *key, Size keysize);
 static void CreateStdHash(void);
-static void AddStdHashEntry(MemoryContext mcxt, STANDARDIZER* std);
-static StdHashEntry* GetStdHashEntry(MemoryContext mcxt);
+static void AddStdHashEntry(MemoryContext mcxt, STANDARDIZER *std);
+static StdHashEntry *GetStdHashEntry(MemoryContext mcxt);
 static void DeleteStdHashEntry(MemoryContext mcxt);
 
-static bool IsInStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab);
-static STANDARDIZER* GetStdFromPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab);
-static void AddToStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab);
-static StdPortalCache* GetStdPortalCache(FunctionCallInfo fcinfo);
+static bool IsInStdPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab);
+static STANDARDIZER *GetStdFromPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab);
+static void AddToStdPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab);
+static StdPortalCache *GetStdPortalCache(FunctionCallInfo fcinfo);
 
 /* standardizer api functions */
 
-static STANDARDIZER* CreateStd(char* lextab, char* gaztab, char* rultab);
-static int parse_rule(char* buf, int* rule);
-static int fetch_lex_columns(SPITupleTable* tuptable, lex_columns_t* lex_cols);
-static int tableNameOk(char* t);
-static int load_lex(LEXICON* lex, char* tabname);
-static int fetch_rules_columns(SPITupleTable* tuptable, rules_columns_t* rules_cols);
-static int load_rules(RULES* rules, char* tabname);
+static STANDARDIZER *CreateStd(char *lextab, char *gaztab, char *rultab);
+static int parse_rule(char *buf, int *rule);
+static int fetch_lex_columns(SPITupleTable *tuptable, lex_columns_t *lex_cols);
+static int tableNameOk(char *t);
+static int load_lex(LEXICON *lex, char *tabname);
+static int fetch_rules_columns(SPITupleTable *tuptable, rules_columns_t *rules_cols);
+static int load_rules(RULES *rules, char *tabname);
 
 static void
 #if POSTGIS_PGSQL_VERSION < 96
@@ -114,11 +114,11 @@ static void
 StdCacheDelete(MemoryContext context)
 {
 #else
-StdCacheDelete(void* ptr)
+StdCacheDelete(void *ptr)
 {
 	MemoryContext context = (MemoryContext)ptr;
 #endif
-	StdHashEntry* she;
+	StdHashEntry *she;
 
 	DBG("Enter: StdCacheDelete");
 	/* lookup the hash entry in the global hash table
@@ -128,7 +128,7 @@ StdCacheDelete(void* ptr)
 	if (!she)
 		elog(ERROR,
 		     "StdCacheDelete: Trying to delete non-existant hash entry object with MemoryContext key (%p)",
-		     (void*)context);
+		     (void *)context);
 
 	DBG("deleting std object (%p) with MemoryContext key (%p)", she->std, context);
 
@@ -192,7 +192,7 @@ static MemoryContextMethods StdCacheContextMethods = {NULL,
 #endif /* POSTGIS_PGSQL_VERSION < 96 */
 
 uint32
-mcxt_ptr_hash_std(const void* key, Size keysize)
+mcxt_ptr_hash_std(const void *key, Size keysize)
 {
 	uint32 hashval;
 	hashval = DatumGetUInt32(hash_any(key, keysize));
@@ -216,17 +216,17 @@ CreateStdHash(void)
 }
 
 static void
-AddStdHashEntry(MemoryContext mcxt, STANDARDIZER* std)
+AddStdHashEntry(MemoryContext mcxt, STANDARDIZER *std)
 {
 	bool found;
-	void** key;
-	StdHashEntry* he;
+	void **key;
+	StdHashEntry *he;
 
 	DBG("Enter: AddStdHashEntry(mcxt=%p, std=%p)", mcxt, std);
 	/* The hash key is the MemoryContext pointer */
-	key = (void*)&mcxt;
+	key = (void *)&mcxt;
 
-	he = (StdHashEntry*)hash_search(StdHash, key, HASH_ENTER, &found);
+	he = (StdHashEntry *)hash_search(StdHash, key, HASH_ENTER, &found);
 	DBG("AddStdHashEntry: he=%p, found=%d", he, found);
 	if (!found)
 	{
@@ -238,55 +238,55 @@ AddStdHashEntry(MemoryContext mcxt, STANDARDIZER* std)
 	}
 	else
 	{
-		elog(ERROR, "AddStdHashEntry: This memory context is already in use! (%p)", (void*)mcxt);
+		elog(ERROR, "AddStdHashEntry: This memory context is already in use! (%p)", (void *)mcxt);
 	}
 }
 
-static StdHashEntry*
+static StdHashEntry *
 GetStdHashEntry(MemoryContext mcxt)
 {
-	void** key;
-	StdHashEntry* he;
+	void **key;
+	StdHashEntry *he;
 
 	DBG("Enter: GetStdHashEntry");
-	key = (void*)&mcxt;
-	he = (StdHashEntry*)hash_search(StdHash, key, HASH_FIND, NULL);
+	key = (void *)&mcxt;
+	he = (StdHashEntry *)hash_search(StdHash, key, HASH_FIND, NULL);
 	return he;
 }
 
 static void
 DeleteStdHashEntry(MemoryContext mcxt)
 {
-	void** key;
-	StdHashEntry* he;
+	void **key;
+	StdHashEntry *he;
 
 	DBG("Enter: DeleteStdHashEntry");
-	key = (void*)&mcxt;
-	he = (StdHashEntry*)hash_search(StdHash, key, HASH_REMOVE, NULL);
+	key = (void *)&mcxt;
+	he = (StdHashEntry *)hash_search(StdHash, key, HASH_REMOVE, NULL);
 	if (!he)
 		elog(ERROR,
 		     "DeleteStdHashEntry: There was an error removing the STD object from this MemoryContext (%p)",
-		     (void*)mcxt);
+		     (void *)mcxt);
 
 	he->std = NULL;
 }
 
 /* public api */
 bool
-IsInStdCache(StdCache STDCache, char* lextab, char* gaztab, char* rultab)
+IsInStdCache(StdCache STDCache, char *lextab, char *gaztab, char *rultab)
 {
-	return IsInStdPortalCache((StdPortalCache*)STDCache, lextab, gaztab, rultab);
+	return IsInStdPortalCache((StdPortalCache *)STDCache, lextab, gaztab, rultab);
 }
 
 static bool
-IsInStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab)
+IsInStdPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab)
 {
 	int i;
 
 	DBG("Enter: IsInStdPortalCache");
 	for (i = 0; i < STD_CACHE_ITEMS; i++)
 	{
-		StdCacheItem* ci = &STDCache->StdCache[i];
+		StdCacheItem *ci = &STDCache->StdCache[i];
 		if (ci->lextab && !strcmp(ci->lextab, lextab) && ci->lextab && !strcmp(ci->gaztab, gaztab) &&
 		    ci->lextab && !strcmp(ci->rultab, rultab))
 			return TRUE;
@@ -296,21 +296,21 @@ IsInStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* r
 }
 
 /* public api */
-STANDARDIZER*
-GetStdFromStdCache(StdCache STDCache, char* lextab, char* gaztab, char* rultab)
+STANDARDIZER *
+GetStdFromStdCache(StdCache STDCache, char *lextab, char *gaztab, char *rultab)
 {
-	return GetStdFromPortalCache((StdPortalCache*)STDCache, lextab, gaztab, rultab);
+	return GetStdFromPortalCache((StdPortalCache *)STDCache, lextab, gaztab, rultab);
 }
 
-static STANDARDIZER*
-GetStdFromPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab)
+static STANDARDIZER *
+GetStdFromPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab)
 {
 	int i;
 
 	DBG("Enter: GetStdFromPortalCache");
 	for (i = 0; i < STD_CACHE_ITEMS; i++)
 	{
-		StdCacheItem* ci = &STDCache->StdCache[i];
+		StdCacheItem *ci = &STDCache->StdCache[i];
 		if (ci->lextab && !strcmp(ci->lextab, lextab) && ci->lextab && !strcmp(ci->gaztab, gaztab) &&
 		    ci->lextab && !strcmp(ci->rultab, rultab))
 			return STDCache->StdCache[i].std;
@@ -320,14 +320,14 @@ GetStdFromPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char
 }
 
 static void
-DeleteNextSlotFromStdCache(StdPortalCache* STDCache)
+DeleteNextSlotFromStdCache(StdPortalCache *STDCache)
 {
 	MemoryContext old_context;
 
 	DBG("Enter: DeleteNextSlotFromStdCache");
 	if (STDCache->StdCache[STDCache->NextSlot].std != NULL)
 	{
-		StdCacheItem* ce = &STDCache->StdCache[STDCache->NextSlot];
+		StdCacheItem *ce = &STDCache->StdCache[STDCache->NextSlot];
 		DBG("Removing STD cache entry ('%s', '%s', '%s') index %d",
 		    ce->lextab,
 		    ce->gaztab,
@@ -352,19 +352,19 @@ DeleteNextSlotFromStdCache(StdPortalCache* STDCache)
 
 /* public api */
 void
-AddToStdCache(StdCache cache, char* lextab, char* gaztab, char* rultab)
+AddToStdCache(StdCache cache, char *lextab, char *gaztab, char *rultab)
 {
-	AddToStdPortalCache((StdPortalCache*)cache, lextab, gaztab, rultab);
+	AddToStdPortalCache((StdPortalCache *)cache, lextab, gaztab, rultab);
 }
 
 static void
-AddToStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* rultab)
+AddToStdPortalCache(StdPortalCache *STDCache, char *lextab, char *gaztab, char *rultab)
 {
 	MemoryContext STDMemoryContext;
 	MemoryContext old_context;
-	STANDARDIZER* std = NULL;
+	STANDARDIZER *std = NULL;
 #if POSTGIS_PGSQL_VERSION >= 96
-	MemoryContextCallback* callback;
+	MemoryContextCallback *callback;
 #endif
 
 	DBG("Enter: AddToStdPortalCache");
@@ -380,7 +380,7 @@ AddToStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* 
 	if (STDCache->StdCache[STDCache->NextSlot].std != NULL)
 	{
 #ifdef DEBUG
-		StdCacheItem* ce = &STDCache->StdCache[STDCache->NextSlot];
+		StdCacheItem *ce = &STDCache->StdCache[STDCache->NextSlot];
 		DBG("Removing item from STD cache ('%s', '%s', '%s') index %d",
 		    ce->lextab,
 		    ce->gaztab,
@@ -403,7 +403,7 @@ AddToStdPortalCache(StdPortalCache* STDCache, char* lextab, char* gaztab, char* 
 	/* being managed, so that the callback object gets cleaned along with */
 	/* the context */
 	callback = MemoryContextAlloc(STDMemoryContext, sizeof(MemoryContextCallback));
-	callback->arg = (void*)(STDMemoryContext);
+	callback->arg = (void *)(STDMemoryContext);
 	callback->func = StdCacheDelete;
 	MemoryContextRegisterResetCallback(STDMemoryContext, callback);
 #endif
@@ -449,10 +449,10 @@ GetStdCache(FunctionCallInfo fcinfo)
 	return (StdCache)GetStdPortalCache(fcinfo);
 }
 
-static StdPortalCache*
+static StdPortalCache *
 GetStdPortalCache(FunctionCallInfo fcinfo)
 {
-	StdPortalCache* STDCache;
+	StdPortalCache *STDCache;
 
 	DBG("Enter: GetStdPortalCache");
 	/* create it if we don't already have one for this portal */
@@ -495,11 +495,11 @@ GetStdPortalCache(FunctionCallInfo fcinfo)
 }
 
 /* public api */
-STANDARDIZER*
-GetStdUsingFCInfo(FunctionCallInfo fcinfo, char* lextab, char* gaztab, char* rultab)
+STANDARDIZER *
+GetStdUsingFCInfo(FunctionCallInfo fcinfo, char *lextab, char *gaztab, char *rultab)
 {
-	STANDARDIZER* std;
-	StdCache* std_cache = NULL;
+	STANDARDIZER *std;
+	StdCache *std_cache = NULL;
 
 	DBG("GetStdUsingFCInfo: calling GetStdCache(fcinfo)");
 	std_cache = GetStdCache(fcinfo);
@@ -518,13 +518,13 @@ GetStdUsingFCInfo(FunctionCallInfo fcinfo, char* lextab, char* gaztab, char* rul
 	return std;
 }
 
-static STANDARDIZER*
-CreateStd(char* lextab, char* gaztab, char* rultab)
+static STANDARDIZER *
+CreateStd(char *lextab, char *gaztab, char *rultab)
 {
-	STANDARDIZER* std;
-	LEXICON* lex;
-	LEXICON* gaz;
-	RULES* rules;
+	STANDARDIZER *std;
+	LEXICON *lex;
+	LEXICON *gaz;
+	RULES *rules;
 	int err;
 	int SPIcode;
 
@@ -603,12 +603,12 @@ CreateStd(char* lextab, char* gaztab, char* rultab)
 }
 
 static int
-parse_rule(char* buf, int* rule)
+parse_rule(char *buf, int *rule)
 {
 	int nr = 0;
-	int* r = rule;
-	char* p = buf;
-	char* q;
+	int *r = rule;
+	char *p = buf;
+	char *q;
 
 	while (1)
 	{
@@ -646,7 +646,7 @@ parse_rule(char* buf, int* rule)
 #define GET_TEXT_FROM_TUPLE(TRGT, WHICH) TRGT = DatumGetCString(SPI_getvalue(tuple, tupdesc, WHICH));
 
 static int
-fetch_lex_columns(SPITupleTable* tuptable, lex_columns_t* lex_cols)
+fetch_lex_columns(SPITupleTable *tuptable, lex_columns_t *lex_cols)
 {
 	int err = 0;
 	FETCH_COL(lex_cols, seq, "seq");
@@ -673,7 +673,7 @@ fetch_lex_columns(SPITupleTable* tuptable, lex_columns_t* lex_cols)
 /* snitize table names, leave '.' for schema */
 
 static int
-tableNameOk(char* t)
+tableNameOk(char *t)
 {
 	while (*t != '\0')
 	{
@@ -684,7 +684,7 @@ tableNameOk(char* t)
 }
 
 static int
-load_lex(LEXICON* lex, char* tab)
+load_lex(LEXICON *lex, char *tab)
 {
 	int ret;
 	SPIPlanPtr SPIplan;
@@ -694,7 +694,7 @@ load_lex(LEXICON* lex, char* tab)
 	struct timeval t1, t2;
 	double elapsed;
 #endif
-	char* sql;
+	char *sql;
 
 	int ntuples;
 	int total_tuples = 0;
@@ -702,8 +702,8 @@ load_lex(LEXICON* lex, char* tab)
 	lex_columns_t lex_columns = {seq : -1, word : -1, stdword : -1, token : -1};
 
 	int seq;
-	char* word;
-	char* stdword;
+	char *word;
+	char *stdword;
 	int token;
 
 	DBG("start load_lex\n");
@@ -772,7 +772,7 @@ load_lex(LEXICON* lex, char* tab)
 			int t;
 			Datum binval;
 			bool isnull;
-			SPITupleTable* tuptable = SPI_tuptable;
+			SPITupleTable *tuptable = SPI_tuptable;
 			TupleDesc tupdesc = SPI_tuptable->tupdesc;
 
 			for (t = 0; t < ntuples; t++)
@@ -801,7 +801,7 @@ load_lex(LEXICON* lex, char* tab)
 }
 
 static int
-fetch_rules_columns(SPITupleTable* tuptable, rules_columns_t* rules_cols)
+fetch_rules_columns(SPITupleTable *tuptable, rules_columns_t *rules_cols)
 {
 	int err = 0;
 	FETCH_COL(rules_cols, rule, "rule");
@@ -820,7 +820,7 @@ fetch_rules_columns(SPITupleTable* tuptable, rules_columns_t* rules_cols)
 }
 
 static int
-load_rules(RULES* rules, char* tab)
+load_rules(RULES *rules, char *tab)
 {
 	int ret;
 	SPIPlanPtr SPIplan;
@@ -830,7 +830,7 @@ load_rules(RULES* rules, char* tab)
 	struct timeval t1, t2;
 	double elapsed;
 #endif
-	char* sql;
+	char *sql;
 
 	int rule_arr[MAX_RULE_LENGTH];
 
@@ -839,7 +839,7 @@ load_rules(RULES* rules, char* tab)
 
 	rules_columns_t rules_columns = {rule : -1};
 
-	char* rule;
+	char *rule;
 
 	DBG("start load_rules\n");
 	SET_TIME(t1);
@@ -896,7 +896,7 @@ load_rules(RULES* rules, char* tab)
 		if (ntuples > 0)
 		{
 			int t;
-			SPITupleTable* tuptable = SPI_tuptable;
+			SPITupleTable *tuptable = SPI_tuptable;
 			TupleDesc tupdesc = SPI_tuptable->tupdesc;
 
 			for (t = 0; t < ntuples; t++)

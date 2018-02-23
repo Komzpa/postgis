@@ -13,7 +13,7 @@
 
 // pointer hash
 
-KHASH_MAP_INIT_STR(ptr, void*);
+KHASH_MAP_INIT_STR(ptr, void *);
 
 /*
  * Hash type.
@@ -52,8 +52,8 @@ typedef khash_t(ptr) hash_t;
 
 #define hash_each(self, block) \
 	{ \
-		const char* key; \
-		void* val; \
+		const char *key; \
+		void *val; \
 		for (khiter_t k = kh_begin(self); k < kh_end(self); ++k) \
 		{ \
 			if (!kh_exist(self, k)) continue; \
@@ -69,7 +69,7 @@ typedef khash_t(ptr) hash_t;
 
 #define hash_each_key(self, block) \
 	{ \
-		const char* key; \
+		const char *key; \
 		for (khiter_t k = kh_begin(self); k < kh_end(self); ++k) \
 		{ \
 			if (!kh_exist(self, k)) continue; \
@@ -84,7 +84,7 @@ typedef khash_t(ptr) hash_t;
 
 #define hash_each_val(self, block) \
 	{ \
-		void* val; \
+		void *val; \
 		for (khiter_t k = kh_begin(self); k < kh_end(self); ++k) \
 		{ \
 			if (!kh_exist(self, k)) continue; \
@@ -95,14 +95,14 @@ typedef khash_t(ptr) hash_t;
 
 // protos
 
-void hash_set(hash_t* self, char* key, void* val);
+void hash_set(hash_t *self, char *key, void *val);
 
-void* hash_get(hash_t* self, char* key);
+void *hash_get(hash_t *self, char *key);
 
-int hash_has(hash_t* self, char* key);
+int hash_has(hash_t *self, char *key);
 
-void hash_del(hash_t* self, char* key);
+void hash_del(hash_t *self, char *key);
 
-void hash_clear(hash_t* self);
+void hash_clear(hash_t *self);
 
 #endif /* HASH */

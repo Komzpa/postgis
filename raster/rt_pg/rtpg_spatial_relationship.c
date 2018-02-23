@@ -74,7 +74,7 @@ PG_FUNCTION_INFO_V1(RASTER_intersects);
 Datum RASTER_intersects(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -99,7 +99,7 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -210,7 +210,7 @@ PG_FUNCTION_INFO_V1(RASTER_overlaps);
 Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -235,7 +235,7 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -344,7 +344,7 @@ PG_FUNCTION_INFO_V1(RASTER_touches);
 Datum RASTER_touches(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -369,7 +369,7 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -478,7 +478,7 @@ PG_FUNCTION_INFO_V1(RASTER_contains);
 Datum RASTER_contains(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -503,7 +503,7 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -612,7 +612,7 @@ PG_FUNCTION_INFO_V1(RASTER_containsProperly);
 Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -637,7 +637,7 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -750,7 +750,7 @@ PG_FUNCTION_INFO_V1(RASTER_covers);
 Datum RASTER_covers(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -775,7 +775,7 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -884,7 +884,7 @@ PG_FUNCTION_INFO_V1(RASTER_coveredby);
 Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -909,7 +909,7 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1019,7 +1019,7 @@ PG_FUNCTION_INFO_V1(RASTER_dwithin);
 Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -1045,7 +1045,7 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1181,7 +1181,7 @@ PG_FUNCTION_INFO_V1(RASTER_dfullywithin);
 Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 	uint32_t bandindex[2] = {0};
@@ -1207,7 +1207,7 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1345,7 +1345,7 @@ PG_FUNCTION_INFO_V1(RASTER_sameAlignment);
 Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 
@@ -1354,7 +1354,7 @@ Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 	uint32_t k;
 	int rtn;
 	int aligned = 0;
-	char* reason = NULL;
+	char *reason = NULL;
 
 	for (i = 0, j = 0; i < set_count; i++)
 	{
@@ -1369,7 +1369,7 @@ Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 			PG_RETURN_NULL();
 		}
 		pgrast[i] =
-		    (rt_pgraster*)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
+		    (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1415,7 +1415,7 @@ PG_FUNCTION_INFO_V1(RASTER_notSameAlignmentReason);
 Datum RASTER_notSameAlignmentReason(PG_FUNCTION_ARGS)
 {
 	const uint32_t set_count = 2;
-	rt_pgraster* pgrast[2];
+	rt_pgraster *pgrast[2];
 	int pgrastpos[2] = {-1, -1};
 	rt_raster rast[2] = {NULL};
 
@@ -1424,8 +1424,8 @@ Datum RASTER_notSameAlignmentReason(PG_FUNCTION_ARGS)
 	uint32_t k;
 	int rtn;
 	int aligned = 0;
-	char* reason = NULL;
-	text* result = NULL;
+	char *reason = NULL;
+	text *result = NULL;
 
 	for (i = 0, j = 0; i < set_count; i++)
 	{
@@ -1440,7 +1440,7 @@ Datum RASTER_notSameAlignmentReason(PG_FUNCTION_ARGS)
 			PG_RETURN_NULL();
 		}
 		pgrast[i] =
-		    (rt_pgraster*)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
+		    (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
 		pgrastpos[i] = j;
 		j++;
 

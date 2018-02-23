@@ -27,10 +27,10 @@
 void pg_install_lwgeom_handlers(void);
 
 /* Argument handling macros */
-#define PG_GETARG_GSERIALIZED_P(varno) ((GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(varno)))
-#define PG_GETARG_GSERIALIZED_P_COPY(varno) ((GSERIALIZED*)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(varno)))
+#define PG_GETARG_GSERIALIZED_P(varno) ((GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(varno)))
+#define PG_GETARG_GSERIALIZED_P_COPY(varno) ((GSERIALIZED *)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(varno)))
 #define PG_GETARG_GSERIALIZED_P_SLICE(varno, start, size) \
-	((GSERIALIZED*)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(varno), start, size))
+	((GSERIALIZED *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(varno), start, size))
 
 /* Debugging macros */
 #if POSTGIS_DEBUG_LEVEL > 0
@@ -68,16 +68,16 @@ void pg_install_lwgeom_handlers(void);
  * GUC name search functions stolen from PostgreSQL to
  * support searching for already-defined GUC variables
  */
-int postgis_guc_name_compare(const char* namea, const char* nameb);
-int postgis_guc_var_compare(const void* a, const void* b);
-int postgis_guc_find_option(const char* name);
+int postgis_guc_name_compare(const char *namea, const char *nameb);
+int postgis_guc_var_compare(const void *a, const void *b);
+int postgis_guc_find_option(const char *name);
 
 /*
  * Standard macro for reporting parser errors to PostgreSQL
  */
 
-extern void pg_parser_errhint(LWGEOM_PARSER_RESULT* lwg_parser_result);
-extern void pg_unparser_errhint(LWGEOM_UNPARSER_RESULT* lwg_unparser_result);
+extern void pg_parser_errhint(LWGEOM_PARSER_RESULT *lwg_parser_result);
+extern void pg_unparser_errhint(LWGEOM_UNPARSER_RESULT *lwg_unparser_result);
 
 #define PG_PARSER_ERROR(lwg_parser_result) \
 	do \
@@ -107,19 +107,19 @@ extern void pg_unparser_errhint(LWGEOM_UNPARSER_RESULT* lwg_unparser_result);
 /**
  * Remove the embedded bounding box
  */
-GSERIALIZED* gserialized_drop_gidx(GSERIALIZED* g);
+GSERIALIZED *gserialized_drop_gidx(GSERIALIZED *g);
 
 /**
  * Utility method to call the serialization and then set the
  * PgSQL varsize header appropriately with the serialized size.
  */
-GSERIALIZED* geometry_serialize(LWGEOM* lwgeom);
+GSERIALIZED *geometry_serialize(LWGEOM *lwgeom);
 
 /**
  * Utility method to call the serialization and then set the
  * PgSQL varsize header appropriately with the serialized size.
  */
-GSERIALIZED* geography_serialize(LWGEOM* lwgeom);
+GSERIALIZED *geography_serialize(LWGEOM *lwgeom);
 
 /**
  * Pull out a gbox bounding box as fast as possible.
@@ -127,7 +127,7 @@ GSERIALIZED* geography_serialize(LWGEOM* lwgeom);
  * If no cached box, calculates box from scratch.
  * Fails on empty.
  */
-int gserialized_datum_get_gbox_p(Datum gsdatum, GBOX* gbox);
+int gserialized_datum_get_gbox_p(Datum gsdatum, GBOX *gbox);
 
 /*
  * For PostgreSQL >= 8.5 redefine the STATRELATT macro to its
@@ -171,8 +171,8 @@ Datum LWGEOM_getBBOX(PG_FUNCTION_ARGS);
 Datum LWGEOM_addBBOX(PG_FUNCTION_ARGS);
 Datum LWGEOM_dropBBOX(PG_FUNCTION_ARGS);
 
-void lwpgerror(const char* fmt, ...);
-void lwpgnotice(const char* fmt, ...);
-void lwpgwarning(const char* fmt, ...);
+void lwpgerror(const char *fmt, ...);
+void lwpgnotice(const char *fmt, ...);
+void lwpgwarning(const char *fmt, ...);
 
 #endif /* !defined _LWGEOM_PG_H */

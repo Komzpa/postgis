@@ -57,7 +57,7 @@
 	if (POSTGIS_DEBUG_LEVEL >= level) do \
 		{ \
 			size_t sz; \
-			char* wkt = lwgeom_to_wkt(geom, WKT_EXTENDED, 15, &sz); \
+			char *wkt = lwgeom_to_wkt(geom, WKT_EXTENDED, 15, &sz); \
 			/* char *wkt = lwgeom_to_hexwkb(geom, WKT_EXTENDED, &sz); */ \
 			LWDEBUGF(level, msg ": %s", wkt); \
 			lwfree(wkt); \
@@ -69,7 +69,7 @@
 	if (POSTGIS_DEBUG_LEVEL >= level) do \
 		{ \
 			size_t sz; \
-			char* wkt = lwgeom_to_wkt(geom, WKT_EXTENDED, 15, &sz); \
+			char *wkt = lwgeom_to_wkt(geom, WKT_EXTENDED, 15, &sz); \
 			/* char *wkt = lwgeom_to_hexwkb(geom, WKT_EXTENDED, &sz); */ \
 			LWDEBUGF(level, fmt ": %s", __VA_ARGS__, wkt); \
 			lwfree(wkt); \
@@ -103,7 +103,7 @@
  * For debugging, use LWDEBUG() or LWDEBUGF().
  * @ingroup logging
  */
-void lwnotice(const char* fmt, ...);
+void lwnotice(const char *fmt, ...);
 
 /**
  * Write a notice out to the error handler.
@@ -113,7 +113,7 @@ void lwnotice(const char* fmt, ...);
  * For debugging, use LWDEBUG() or LWDEBUGF().
  * @ingroup logging
  */
-void lwerror(const char* fmt, ...);
+void lwerror(const char *fmt, ...);
 
 /**
  * Write a debug message out.
@@ -122,6 +122,6 @@ void lwerror(const char* fmt, ...);
  * efficiency.
  * @ingroup logging
  */
-void lwdebug(int level, const char* fmt, ...);
+void lwdebug(int level, const char *fmt, ...);
 
 #endif /* LWGEOM_LOG_H */

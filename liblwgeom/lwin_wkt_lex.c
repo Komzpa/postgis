@@ -195,7 +195,7 @@ typedef unsigned int flex_uint32_t;
 
 #ifndef YY_TYPEDEF_YY_BUFFER_STATE
 #define YY_TYPEDEF_YY_BUFFER_STATE
-typedef struct yy_buffer_state* YY_BUFFER_STATE;
+typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
 #ifndef YY_TYPEDEF_YY_SIZE_T
@@ -231,10 +231,10 @@ extern FILE *wkt_yyin, *wkt_yyout;
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
 {
-	FILE* yy_input_file;
+	FILE *yy_input_file;
 
-	char* yy_ch_buf;  /* input buffer */
-	char* yy_buf_pos; /* current position in input buffer */
+	char *yy_ch_buf;  /* input buffer */
+	char *yy_buf_pos; /* current position in input buffer */
 
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
@@ -294,7 +294,7 @@ struct yy_buffer_state
 /* Stack of input buffers. */
 static size_t yy_buffer_stack_top = 0;       /**< index of top of stack. */
 static size_t yy_buffer_stack_max = 0;       /**< capacity of stack. */
-static YY_BUFFER_STATE* yy_buffer_stack = 0; /**< Stack as an array. */
+static YY_BUFFER_STATE *yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* We provide macros for accessing buffer states in case in the
  * future we want to put the buffer states in a more general
@@ -315,7 +315,7 @@ static yy_size_t yy_n_chars; /* number of characters read into yy_ch_buf */
 yy_size_t wkt_yyleng;
 
 /* Points to current character in buffer. */
-static char* yy_c_buf_p = (char*)0;
+static char *yy_c_buf_p = (char *)0;
 static int yy_init = 0;  /* whether we need to initialize */
 static int yy_start = 0; /* start state number */
 
@@ -324,9 +324,9 @@ static int yy_start = 0; /* start state number */
  */
 static int yy_did_buffer_switch_on_eof;
 
-void wkt_yyrestart(FILE* input_file);
+void wkt_yyrestart(FILE *input_file);
 void wkt_yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
-YY_BUFFER_STATE wkt_yy_create_buffer(FILE* file, int size);
+YY_BUFFER_STATE wkt_yy_create_buffer(FILE *file, int size);
 void wkt_yy_delete_buffer(YY_BUFFER_STATE b);
 void wkt_yy_flush_buffer(YY_BUFFER_STATE b);
 void wkt_yypush_buffer_state(YY_BUFFER_STATE new_buffer);
@@ -334,17 +334,17 @@ void wkt_yypop_buffer_state(void);
 
 static void wkt_yyensure_buffer_stack(void);
 static void wkt_yy_load_buffer_state(void);
-static void wkt_yy_init_buffer(YY_BUFFER_STATE b, FILE* file);
+static void wkt_yy_init_buffer(YY_BUFFER_STATE b, FILE *file);
 
 #define YY_FLUSH_BUFFER wkt_yy_flush_buffer(YY_CURRENT_BUFFER)
 
-YY_BUFFER_STATE wkt_yy_scan_buffer(char* base, yy_size_t size);
-YY_BUFFER_STATE wkt_yy_scan_string(yyconst char* yy_str);
-YY_BUFFER_STATE wkt_yy_scan_bytes(yyconst char* bytes, yy_size_t len);
+YY_BUFFER_STATE wkt_yy_scan_buffer(char *base, yy_size_t size);
+YY_BUFFER_STATE wkt_yy_scan_string(yyconst char *yy_str);
+YY_BUFFER_STATE wkt_yy_scan_bytes(yyconst char *bytes, yy_size_t len);
 
-void* wkt_yyalloc(yy_size_t);
-void* wkt_yyrealloc(void*, yy_size_t);
-void wkt_yyfree(void*);
+void *wkt_yyalloc(yy_size_t);
+void *wkt_yyrealloc(void *, yy_size_t);
+void wkt_yyfree(void *);
 
 #define yy_new_buffer wkt_yy_create_buffer
 
@@ -377,7 +377,7 @@ void wkt_yyfree(void*);
 
 typedef unsigned char YY_CHAR;
 
-FILE *wkt_yyin = (FILE*)0, *wkt_yyout = (FILE*)0;
+FILE *wkt_yyin = (FILE *)0, *wkt_yyout = (FILE *)0;
 
 typedef int yy_state_type;
 
@@ -385,7 +385,7 @@ extern int wkt_yylineno;
 
 int wkt_yylineno = 1;
 
-extern char* wkt_yytext;
+extern char *wkt_yytext;
 #define yytext_ptr wkt_yytext
 
 static yy_state_type yy_get_previous_state(void);
@@ -519,7 +519,7 @@ static yyconst flex_int16_t yy_chk[419] = {
     171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171};
 
 static yy_state_type yy_last_accepting_state;
-static char* yy_last_accepting_cpos;
+static char *yy_last_accepting_cpos;
 
 extern int wkt_yy_flex_debug;
 int wkt_yy_flex_debug = 0;
@@ -531,7 +531,7 @@ int wkt_yy_flex_debug = 0;
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-char* wkt_yytext;
+char *wkt_yytext;
 #line 1 "lwin_wkt_lex.l"
 #line 2 "lwin_wkt_lex.l"
 
@@ -549,7 +549,7 @@ static YY_BUFFER_STATE wkt_yy_buf_state;
  * Set up the lexer!
  */
 void
-wkt_lexer_init(char* src)
+wkt_lexer_init(char *src)
 {
 	wkt_yy_buf_state = wkt_yy_scan_string(src);
 }
@@ -605,7 +605,7 @@ wkt_lexer_unknown()
 #endif
 
 #ifndef YY_EXTRA_TYPE
-#define YY_EXTRA_TYPE void*
+#define YY_EXTRA_TYPE void *
 #endif
 
 static int yy_init_globals(void);
@@ -623,17 +623,17 @@ YY_EXTRA_TYPE wkt_yyget_extra(void);
 
 void wkt_yyset_extra(YY_EXTRA_TYPE user_defined);
 
-FILE* wkt_yyget_in(void);
+FILE *wkt_yyget_in(void);
 
-void wkt_yyset_in(FILE* in_str);
+void wkt_yyset_in(FILE *in_str);
 
-FILE* wkt_yyget_out(void);
+FILE *wkt_yyget_out(void);
 
-void wkt_yyset_out(FILE* out_str);
+void wkt_yyset_out(FILE *out_str);
 
 yy_size_t wkt_yyget_leng(void);
 
-char* wkt_yyget_text(void);
+char *wkt_yyget_text(void);
 
 int wkt_yyget_lineno(void);
 
@@ -652,11 +652,11 @@ extern int wkt_yywrap(void);
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy(char*, yyconst char*, int);
+static void yy_flex_strncpy(char *, yyconst char *, int);
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen(yyconst char*);
+static int yy_flex_strlen(yyconst char *);
 #endif
 
 #ifndef YY_NO_INPUT
@@ -1184,8 +1184,8 @@ YY_DECL
 static int
 yy_get_next_buffer(void)
 {
-	register char* dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
-	register char* source = (yytext_ptr);
+	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+	register char *source = (yytext_ptr);
 	register int number_to_move, i;
 	int ret_val;
 
@@ -1248,9 +1248,9 @@ yy_get_next_buffer(void)
 				else
 					b->yy_buf_size *= 2;
 
-				b->yy_ch_buf = (char*)
+				b->yy_ch_buf = (char *)
 				    /* Include room in for 2 EOB chars. */
-				    wkt_yyrealloc((void*)b->yy_ch_buf, b->yy_buf_size + 2);
+				    wkt_yyrealloc((void *)b->yy_ch_buf, b->yy_buf_size + 2);
 			}
 			else
 				/* Can't grow it, we don't own it. */
@@ -1294,7 +1294,7 @@ yy_get_next_buffer(void)
 		/* Extend the array by 50%, plus the number we really need. */
 		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf =
-		    (char*)wkt_yyrealloc((void*)YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, new_size);
+		    (char *)wkt_yyrealloc((void *)YY_CURRENT_BUFFER_LVALUE->yy_ch_buf, new_size);
 		if (!YY_CURRENT_BUFFER_LVALUE->yy_ch_buf)
 			YY_FATAL_ERROR("out of dynamic memory in yy_get_next_buffer()");
 	}
@@ -1314,7 +1314,7 @@ static yy_state_type
 yy_get_previous_state(void)
 {
 	register yy_state_type yy_current_state;
-	register char* yy_cp;
+	register char *yy_cp;
 
 	yy_current_state = (yy_start);
 
@@ -1346,7 +1346,7 @@ static yy_state_type
 yy_try_NUL_trans(yy_state_type yy_current_state)
 {
 	register int yy_is_jam;
-	register char* yy_cp = (yy_c_buf_p);
+	register char *yy_cp = (yy_c_buf_p);
 
 	register YY_CHAR yy_c = 1;
 	if (yy_accept[yy_current_state])
@@ -1431,8 +1431,8 @@ input(void)
 		}
 	}
 
-	c = *(unsigned char*)(yy_c_buf_p); /* cast for 8-bit char's */
-	*(yy_c_buf_p) = '\0';              /* preserve wkt_yytext */
+	c = *(unsigned char *)(yy_c_buf_p); /* cast for 8-bit char's */
+	*(yy_c_buf_p) = '\0';               /* preserve wkt_yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
 
 	return c;
@@ -1445,7 +1445,7 @@ input(void)
  * @note This function does not reset the start condition to @c INITIAL .
  */
 void
-wkt_yyrestart(FILE* input_file)
+wkt_yyrestart(FILE *input_file)
 {
 
 	if (!YY_CURRENT_BUFFER)
@@ -1509,7 +1509,7 @@ wkt_yy_load_buffer_state(void)
  * @return the allocated buffer state.
  */
 YY_BUFFER_STATE
-wkt_yy_create_buffer(FILE* file, int size)
+wkt_yy_create_buffer(FILE *file, int size)
 {
 	YY_BUFFER_STATE b;
 
@@ -1521,7 +1521,7 @@ wkt_yy_create_buffer(FILE* file, int size)
 	/* yy_ch_buf has to be 2 characters longer than the size given because
 	 * we need to put in 2 end-of-buffer characters.
 	 */
-	b->yy_ch_buf = (char*)wkt_yyalloc(b->yy_buf_size + 2);
+	b->yy_ch_buf = (char *)wkt_yyalloc(b->yy_buf_size + 2);
 	if (!b->yy_ch_buf) YY_FATAL_ERROR("out of dynamic memory in wkt_yy_create_buffer()");
 
 	b->yy_is_our_buffer = 1;
@@ -1544,9 +1544,9 @@ wkt_yy_delete_buffer(YY_BUFFER_STATE b)
 	if (b == YY_CURRENT_BUFFER) /* Not sure if we should pop here. */
 		YY_CURRENT_BUFFER_LVALUE = (YY_BUFFER_STATE)0;
 
-	if (b->yy_is_our_buffer) wkt_yyfree((void*)b->yy_ch_buf);
+	if (b->yy_is_our_buffer) wkt_yyfree((void *)b->yy_ch_buf);
 
-	wkt_yyfree((void*)b);
+	wkt_yyfree((void *)b);
 }
 
 /* Initializes or reinitializes a buffer.
@@ -1554,7 +1554,7 @@ wkt_yy_delete_buffer(YY_BUFFER_STATE b)
  * such as during a wkt_yyrestart() or at EOF.
  */
 static void
-wkt_yy_init_buffer(YY_BUFFER_STATE b, FILE* file)
+wkt_yy_init_buffer(YY_BUFFER_STATE b, FILE *file)
 
 {
 	int oerrno = errno;
@@ -1673,10 +1673,10 @@ wkt_yyensure_buffer_stack(void)
 		 */
 		num_to_alloc = 1;
 		(yy_buffer_stack) =
-		    (struct yy_buffer_state**)wkt_yyalloc(num_to_alloc * sizeof(struct yy_buffer_state*));
+		    (struct yy_buffer_state **)wkt_yyalloc(num_to_alloc * sizeof(struct yy_buffer_state *));
 		if (!(yy_buffer_stack)) YY_FATAL_ERROR("out of dynamic memory in wkt_yyensure_buffer_stack()");
 
-		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
+		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state *));
 
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
@@ -1690,12 +1690,12 @@ wkt_yyensure_buffer_stack(void)
 		int grow_size = 8 /* arbitrary grow size */;
 
 		num_to_alloc = (yy_buffer_stack_max) + grow_size;
-		(yy_buffer_stack) = (struct yy_buffer_state**)wkt_yyrealloc(
-		    (yy_buffer_stack), num_to_alloc * sizeof(struct yy_buffer_state*));
+		(yy_buffer_stack) = (struct yy_buffer_state **)wkt_yyrealloc(
+		    (yy_buffer_stack), num_to_alloc * sizeof(struct yy_buffer_state *));
 		if (!(yy_buffer_stack)) YY_FATAL_ERROR("out of dynamic memory in wkt_yyensure_buffer_stack()");
 
 		/* zero only the new slots.*/
-		memset((yy_buffer_stack) + (yy_buffer_stack_max), 0, grow_size * sizeof(struct yy_buffer_state*));
+		memset((yy_buffer_stack) + (yy_buffer_stack_max), 0, grow_size * sizeof(struct yy_buffer_state *));
 		(yy_buffer_stack_max) = num_to_alloc;
 	}
 }
@@ -1707,7 +1707,7 @@ wkt_yyensure_buffer_stack(void)
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE
-wkt_yy_scan_buffer(char* base, yy_size_t size)
+wkt_yy_scan_buffer(char *base, yy_size_t size)
 {
 	YY_BUFFER_STATE b;
 
@@ -1742,7 +1742,7 @@ wkt_yy_scan_buffer(char* base, yy_size_t size)
  *       wkt_yy_scan_bytes() instead.
  */
 YY_BUFFER_STATE
-wkt_yy_scan_string(yyconst char* yystr)
+wkt_yy_scan_string(yyconst char *yystr)
 {
 	return wkt_yy_scan_bytes(yystr, strlen(yystr));
 }
@@ -1755,16 +1755,16 @@ wkt_yy_scan_string(yyconst char* yystr)
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE
-wkt_yy_scan_bytes(yyconst char* yybytes, yy_size_t _yybytes_len)
+wkt_yy_scan_bytes(yyconst char *yybytes, yy_size_t _yybytes_len)
 {
 	YY_BUFFER_STATE b;
-	char* buf;
+	char *buf;
 	yy_size_t n;
 	yy_size_t i;
 
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
-	buf = (char*)wkt_yyalloc(n);
+	buf = (char *)wkt_yyalloc(n);
 	if (!buf) YY_FATAL_ERROR("out of dynamic memory in wkt_yy_scan_bytes()");
 
 	for (i = 0; i < _yybytes_len; ++i)
@@ -1788,7 +1788,7 @@ wkt_yy_scan_bytes(yyconst char* yybytes, yy_size_t _yybytes_len)
 #endif
 
 static void
-yy_fatal_error(yyconst char* msg)
+yy_fatal_error(yyconst char *msg)
 {
 	(void)fprintf(stderr, "%s\n", msg);
 	exit(YY_EXIT_FAILURE);
@@ -1825,7 +1825,7 @@ wkt_yyget_lineno(void)
 /** Get the input stream.
  *
  */
-FILE*
+FILE *
 wkt_yyget_in(void)
 {
 	return wkt_yyin;
@@ -1834,7 +1834,7 @@ wkt_yyget_in(void)
 /** Get the output stream.
  *
  */
-FILE*
+FILE *
 wkt_yyget_out(void)
 {
 	return wkt_yyout;
@@ -1853,7 +1853,7 @@ wkt_yyget_leng(void)
  *
  */
 
-char*
+char *
 wkt_yyget_text(void)
 {
 	return wkt_yytext;
@@ -1877,13 +1877,13 @@ wkt_yyset_lineno(int line_number)
  * @see wkt_yy_switch_to_buffer
  */
 void
-wkt_yyset_in(FILE* in_str)
+wkt_yyset_in(FILE *in_str)
 {
 	wkt_yyin = in_str;
 }
 
 void
-wkt_yyset_out(FILE* out_str)
+wkt_yyset_out(FILE *out_str)
 {
 	wkt_yyout = out_str;
 }
@@ -1910,7 +1910,7 @@ yy_init_globals(void)
 	(yy_buffer_stack) = 0;
 	(yy_buffer_stack_top) = 0;
 	(yy_buffer_stack_max) = 0;
-	(yy_c_buf_p) = (char*)0;
+	(yy_c_buf_p) = (char *)0;
 	(yy_init) = 0;
 	(yy_start) = 0;
 
@@ -1919,8 +1919,8 @@ yy_init_globals(void)
 	wkt_yyin = stdin;
 	wkt_yyout = stdout;
 #else
-	wkt_yyin = (FILE*)0;
-	wkt_yyout = (FILE*)0;
+	wkt_yyin = (FILE *)0;
+	wkt_yyout = (FILE *)0;
 #endif
 
 	/* For future reference: Set errno on error, since we are called by
@@ -1959,7 +1959,7 @@ wkt_yylex_destroy(void)
 
 #ifndef yytext_ptr
 static void
-yy_flex_strncpy(char* s1, yyconst char* s2, int n)
+yy_flex_strncpy(char *s1, yyconst char *s2, int n)
 {
 	register int i;
 	for (i = 0; i < n; ++i)
@@ -1969,7 +1969,7 @@ yy_flex_strncpy(char* s1, yyconst char* s2, int n)
 
 #ifdef YY_NEED_STRLEN
 static int
-yy_flex_strlen(yyconst char* s)
+yy_flex_strlen(yyconst char *s)
 {
 	register int n;
 	for (n = 0; s[n]; ++n)
@@ -1983,20 +1983,20 @@ yy_flex_strlen(yyconst char* s)
 
 #line 117 "lwin_wkt_lex.l"
 
-void*
+void *
 wkt_yyalloc(yy_size_t size)
 {
-	return (void*)lwalloc(size);
+	return (void *)lwalloc(size);
 }
 
-void*
-wkt_yyrealloc(void* ptr, yy_size_t size)
+void *
+wkt_yyrealloc(void *ptr, yy_size_t size)
 {
-	return (void*)lwrealloc((char*)ptr, size);
+	return (void *)lwrealloc((char *)ptr, size);
 }
 
 void
-wkt_yyfree(void* ptr)
+wkt_yyfree(void *ptr)
 {
-	lwfree((char*)ptr); /* see wkt_yyrealloc() for (char *) cast */
+	lwfree((char *)ptr); /* see wkt_yyrealloc() for (char *) cast */
 }

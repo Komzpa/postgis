@@ -20,9 +20,9 @@
 static void
 test_misc_force_2d(void)
 {
-	LWGEOM* geom;
-	LWGEOM* geom2d;
-	char* wkt_out;
+	LWGEOM *geom;
+	LWGEOM *geom2d;
+	char *wkt_out;
 
 	geom = lwgeom_from_wkt("CIRCULARSTRINGM(-5 0 4,0 5 3,5 0 2,10 -5 1,15 0 0)", LW_PARSER_CHECK_NONE);
 	geom2d = lwgeom_force_2d(geom);
@@ -50,9 +50,9 @@ test_misc_force_2d(void)
 static void
 test_misc_simplify(void)
 {
-	LWGEOM* geom;
-	LWGEOM* geom2d;
-	char* wkt_out;
+	LWGEOM *geom;
+	LWGEOM *geom2d;
+	char *wkt_out;
 
 	geom = lwgeom_from_wkt("LINESTRING(0 0,0 10,0 51,50 20,30 20,7 32)", LW_PARSER_CHECK_NONE);
 	geom2d = lwgeom_simplify(geom, 2, LW_FALSE);
@@ -74,7 +74,7 @@ test_misc_simplify(void)
 static void
 test_misc_count_vertices(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 	int count;
 
 	geom = lwgeom_from_wkt(
@@ -114,7 +114,7 @@ test_misc_count_vertices(void)
 static void
 test_misc_area(void)
 {
-	LWGEOM* geom;
+	LWGEOM *geom;
 	double area;
 
 	geom = lwgeom_from_wkt("LINESTRING EMPTY", LW_PARSER_CHECK_ALL);
@@ -126,14 +126,14 @@ test_misc_area(void)
 static void
 test_misc_wkb(void)
 {
-	static char* wkb =
+	static char *wkb =
 	    "010A0000000200000001080000000700000000000000000000C00000000000000000000000000000F0BF000000000000F0BF000000"
 	    "00000000000000000000000000000000000000F03F000000000000F0BF000000000000004000000000000000000000000000000000"
 	    "000000000000004000000000000000C00000000000000000010200000005000000000000000000F0BF000000000000000000000000"
 	    "00000000000000000000E03F000000000000F03F00000000000000000000000000000000000000000000F03F000000000000F0BF00"
 	    "00000000000000";
-	LWGEOM* geom = lwgeom_from_hexwkb(wkb, LW_PARSER_CHECK_ALL);
-	char* str = lwgeom_to_wkt(geom, WKB_ISO, 8, 0);
+	LWGEOM *geom = lwgeom_from_hexwkb(wkb, LW_PARSER_CHECK_ALL);
+	char *str = lwgeom_to_wkt(geom, WKB_ISO, 8, 0);
 	CU_ASSERT_STRING_EQUAL(
 	    str, "CURVEPOLYGON(CIRCULARSTRING(-2 0,-1 -1,0 0,1 -1,2 0,0 2,-2 0),(-1 0,0 0.5,1 0,0 1,-1 0))");
 	lwfree(str);
@@ -144,10 +144,10 @@ static void
 test_grid(void)
 {
 	gridspec grid;
-	static char* wkt = "MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)))";
-	LWGEOM* geom = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_ALL);
-	LWGEOM* geomgrid;
-	char* str;
+	static char *wkt = "MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0)))";
+	LWGEOM *geom = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_ALL);
+	LWGEOM *geomgrid;
+	char *str;
 
 	grid.ipx = grid.ipy = 0;
 	grid.xsize = grid.ysize = 20;
@@ -161,12 +161,12 @@ test_grid(void)
 }
 
 static void
-do_grid_test(const char* wkt_in, const char* wkt_out, double size)
+do_grid_test(const char *wkt_in, const char *wkt_out, double size)
 {
 	char *wkt_result, *wkt_norm;
 	gridspec grid;
-	LWGEOM* g = lwgeom_from_wkt(wkt_in, LW_PARSER_CHECK_ALL);
-	LWGEOM* go = lwgeom_from_wkt(wkt_out, LW_PARSER_CHECK_ALL);
+	LWGEOM *g = lwgeom_from_wkt(wkt_in, LW_PARSER_CHECK_ALL);
+	LWGEOM *go = lwgeom_from_wkt(wkt_out, LW_PARSER_CHECK_ALL);
 	wkt_norm = lwgeom_to_ewkt(go);
 	memset(&grid, 0, sizeof(gridspec));
 	grid.xsize = grid.ysize = grid.zsize = grid.msize = size;
@@ -203,10 +203,10 @@ test_grid_in_place(void)
 static void
 test_clone(void)
 {
-	static char* wkt =
+	static char *wkt =
 	    "GEOMETRYCOLLECTION(MULTIPOLYGON(((0 0, 10 0, 10 10, 0 10, 0 0))),POINT(1 1),LINESTRING(2 3,4 5))";
-	LWGEOM* geom1 = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_ALL);
-	LWGEOM* geom2;
+	LWGEOM *geom1 = lwgeom_from_wkt(wkt, LW_PARSER_CHECK_ALL);
+	LWGEOM *geom2;
 
 	/* Free in "backwards" order */
 	geom2 = lwgeom_clone(geom1);
@@ -224,7 +224,7 @@ static void
 test_lwmpoint_from_lwgeom(void)
 {
 	/* This cast is so ugly, we only want to do it once.  And not even that. */
-	LWGEOM* (*to_points)(LWGEOM*) = (LWGEOM * (*)(LWGEOM*)) & lwmpoint_from_lwgeom;
+	LWGEOM *(*to_points)(LWGEOM *) = (LWGEOM * (*)(LWGEOM *)) & lwmpoint_from_lwgeom;
 
 	do_fn_test(to_points, "MULTIPOLYGON (EMPTY)", "MULTIPOINT EMPTY");
 	do_fn_test(to_points, "POINT (30 10)", "MULTIPOINT ((30 10))");

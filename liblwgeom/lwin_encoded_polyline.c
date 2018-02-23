@@ -27,11 +27,11 @@
 #include "liblwgeom.h"
 #include "../postgis_config.h"
 
-LWGEOM*
-lwgeom_from_encoded_polyline(const char* encodedpolyline, int precision)
+LWGEOM *
+lwgeom_from_encoded_polyline(const char *encodedpolyline, int precision)
 {
-	LWGEOM* geom = NULL;
-	POINTARRAY* pa = NULL;
+	LWGEOM *geom = NULL;
+	POINTARRAY *pa = NULL;
 	int length = strlen(encodedpolyline);
 	int idx = 0;
 	double scale = pow(10, precision);
@@ -74,7 +74,7 @@ lwgeom_from_encoded_polyline(const char* encodedpolyline, int precision)
 		ptarray_append_point(pa, &pt, LW_FALSE);
 	}
 
-	geom = (LWGEOM*)lwline_construct(4326, NULL, pa);
+	geom = (LWGEOM *)lwline_construct(4326, NULL, pa);
 	lwgeom_add_bbox(geom);
 
 	return geom;

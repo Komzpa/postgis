@@ -31,26 +31,26 @@
 
 /** Force Right-hand-rule on LWGEOM polygons **/
 void
-lwgeom_force_clockwise(LWGEOM* lwgeom)
+lwgeom_force_clockwise(LWGEOM *lwgeom)
 {
-	LWCOLLECTION* coll;
+	LWCOLLECTION *coll;
 	uint32_t i;
 
 	switch (lwgeom->type)
 	{
 	case POLYGONTYPE:
-		lwpoly_force_clockwise((LWPOLY*)lwgeom);
+		lwpoly_force_clockwise((LWPOLY *)lwgeom);
 		return;
 
 	case TRIANGLETYPE:
-		lwtriangle_force_clockwise((LWTRIANGLE*)lwgeom);
+		lwtriangle_force_clockwise((LWTRIANGLE *)lwgeom);
 		return;
 
 	/* Not handle POLYHEDRALSURFACE and TIN
 	   as they are supposed to be well oriented */
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		coll = (LWCOLLECTION*)lwgeom;
+		coll = (LWCOLLECTION *)lwgeom;
 		for (i = 0; i < coll->ngeoms; i++)
 			lwgeom_force_clockwise(coll->geoms[i]);
 		return;
@@ -59,21 +59,21 @@ lwgeom_force_clockwise(LWGEOM* lwgeom)
 
 /** Check clockwise orientation on LWGEOM polygons **/
 int
-lwgeom_is_clockwise(LWGEOM* lwgeom)
+lwgeom_is_clockwise(LWGEOM *lwgeom)
 {
 	switch (lwgeom->type)
 	{
 	case POLYGONTYPE:
-		return lwpoly_is_clockwise((LWPOLY*)lwgeom);
+		return lwpoly_is_clockwise((LWPOLY *)lwgeom);
 
 	case TRIANGLETYPE:
-		return lwtriangle_is_clockwise((LWTRIANGLE*)lwgeom);
+		return lwtriangle_is_clockwise((LWTRIANGLE *)lwgeom);
 
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
 	{
 		uint32_t i;
-		LWCOLLECTION* coll = (LWCOLLECTION*)lwgeom;
+		LWCOLLECTION *coll = (LWCOLLECTION *)lwgeom;
 
 		for (i = 0; i < coll->ngeoms; i++)
 			if (!lwgeom_is_clockwise(coll->geoms[i])) return LW_FALSE;
@@ -85,20 +85,20 @@ lwgeom_is_clockwise(LWGEOM* lwgeom)
 	}
 }
 
-LWGEOM*
-lwgeom_reverse(const LWGEOM* geom)
+LWGEOM *
+lwgeom_reverse(const LWGEOM *geom)
 {
-	LWGEOM* geomout = lwgeom_clone_deep(geom);
+	LWGEOM *geomout = lwgeom_clone_deep(geom);
 	lwgeom_reverse_in_place(geomout);
 	return geomout;
 }
 
 /** Reverse vertex order of LWGEOM **/
 void
-lwgeom_reverse_in_place(LWGEOM* geom)
+lwgeom_reverse_in_place(LWGEOM *geom)
 {
 	uint32_t i;
-	LWCOLLECTION* col;
+	LWCOLLECTION *col;
 	if (!geom) return;
 
 	switch (geom->type)
@@ -112,13 +112,13 @@ lwgeom_reverse_in_place(LWGEOM* geom)
 	case CIRCSTRINGTYPE:
 	case LINETYPE:
 	{
-		LWLINE* line = (LWLINE*)(geom);
+		LWLINE *line = (LWLINE *)(geom);
 		ptarray_reverse_in_place(line->points);
 		return;
 	}
 	case POLYGONTYPE:
 	{
-		LWPOLY* poly = (LWPOLY*)(geom);
+		LWPOLY *poly = (LWPOLY *)(geom);
 		if (!poly->rings) return;
 		uint32_t r;
 		for (r = 0; r < poly->nrings; r++)
@@ -135,7 +135,7 @@ lwgeom_reverse_in_place(LWGEOM* geom)
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
 	{
-		col = (LWCOLLECTION*)(geom);
+		col = (LWCOLLECTION *)(geom);
 		if (!col->geoms) return;
 		for (i = 0; i < col->ngeoms; i++)
 			lwgeom_reverse_in_place(col->geoms[i]);
@@ -149,211 +149,211 @@ lwgeom_reverse_in_place(LWGEOM* geom)
 	}
 }
 
-LWPOINT*
-lwgeom_as_lwpoint(const LWGEOM* lwgeom)
+LWPOINT *
+lwgeom_as_lwpoint(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == POINTTYPE)
-		return (LWPOINT*)lwgeom;
+		return (LWPOINT *)lwgeom;
 	else
 		return NULL;
 }
 
-LWLINE*
-lwgeom_as_lwline(const LWGEOM* lwgeom)
+LWLINE *
+lwgeom_as_lwline(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == LINETYPE)
-		return (LWLINE*)lwgeom;
+		return (LWLINE *)lwgeom;
 	else
 		return NULL;
 }
 
-LWCIRCSTRING*
-lwgeom_as_lwcircstring(const LWGEOM* lwgeom)
+LWCIRCSTRING *
+lwgeom_as_lwcircstring(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == CIRCSTRINGTYPE)
-		return (LWCIRCSTRING*)lwgeom;
+		return (LWCIRCSTRING *)lwgeom;
 	else
 		return NULL;
 }
 
-LWCOMPOUND*
-lwgeom_as_lwcompound(const LWGEOM* lwgeom)
+LWCOMPOUND *
+lwgeom_as_lwcompound(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == COMPOUNDTYPE)
-		return (LWCOMPOUND*)lwgeom;
+		return (LWCOMPOUND *)lwgeom;
 	else
 		return NULL;
 }
 
-LWCURVEPOLY*
-lwgeom_as_lwcurvepoly(const LWGEOM* lwgeom)
+LWCURVEPOLY *
+lwgeom_as_lwcurvepoly(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == CURVEPOLYTYPE)
-		return (LWCURVEPOLY*)lwgeom;
+		return (LWCURVEPOLY *)lwgeom;
 	else
 		return NULL;
 }
 
-LWPOLY*
-lwgeom_as_lwpoly(const LWGEOM* lwgeom)
+LWPOLY *
+lwgeom_as_lwpoly(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == POLYGONTYPE)
-		return (LWPOLY*)lwgeom;
+		return (LWPOLY *)lwgeom;
 	else
 		return NULL;
 }
 
-LWTRIANGLE*
-lwgeom_as_lwtriangle(const LWGEOM* lwgeom)
+LWTRIANGLE *
+lwgeom_as_lwtriangle(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == TRIANGLETYPE)
-		return (LWTRIANGLE*)lwgeom;
+		return (LWTRIANGLE *)lwgeom;
 	else
 		return NULL;
 }
 
-LWCOLLECTION*
-lwgeom_as_lwcollection(const LWGEOM* lwgeom)
+LWCOLLECTION *
+lwgeom_as_lwcollection(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom_is_collection(lwgeom))
-		return (LWCOLLECTION*)lwgeom;
+		return (LWCOLLECTION *)lwgeom;
 	else
 		return NULL;
 }
 
-LWMPOINT*
-lwgeom_as_lwmpoint(const LWGEOM* lwgeom)
+LWMPOINT *
+lwgeom_as_lwmpoint(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == MULTIPOINTTYPE)
-		return (LWMPOINT*)lwgeom;
+		return (LWMPOINT *)lwgeom;
 	else
 		return NULL;
 }
 
-LWMLINE*
-lwgeom_as_lwmline(const LWGEOM* lwgeom)
+LWMLINE *
+lwgeom_as_lwmline(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == MULTILINETYPE)
-		return (LWMLINE*)lwgeom;
+		return (LWMLINE *)lwgeom;
 	else
 		return NULL;
 }
 
-LWMPOLY*
-lwgeom_as_lwmpoly(const LWGEOM* lwgeom)
+LWMPOLY *
+lwgeom_as_lwmpoly(const LWGEOM *lwgeom)
 {
 	if (lwgeom == NULL) return NULL;
 	if (lwgeom->type == MULTIPOLYGONTYPE)
-		return (LWMPOLY*)lwgeom;
+		return (LWMPOLY *)lwgeom;
 	else
 		return NULL;
 }
 
-LWPSURFACE*
-lwgeom_as_lwpsurface(const LWGEOM* lwgeom)
+LWPSURFACE *
+lwgeom_as_lwpsurface(const LWGEOM *lwgeom)
 {
 	if (lwgeom->type == POLYHEDRALSURFACETYPE)
-		return (LWPSURFACE*)lwgeom;
+		return (LWPSURFACE *)lwgeom;
 	else
 		return NULL;
 }
 
-LWTIN*
-lwgeom_as_lwtin(const LWGEOM* lwgeom)
+LWTIN *
+lwgeom_as_lwtin(const LWGEOM *lwgeom)
 {
 	if (lwgeom->type == TINTYPE)
-		return (LWTIN*)lwgeom;
+		return (LWTIN *)lwgeom;
 	else
 		return NULL;
 }
 
-LWGEOM*
-lwtin_as_lwgeom(const LWTIN* obj)
+LWGEOM *
+lwtin_as_lwgeom(const LWTIN *obj)
 {
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
 
-LWGEOM*
-lwpsurface_as_lwgeom(const LWPSURFACE* obj)
+LWGEOM *
+lwpsurface_as_lwgeom(const LWPSURFACE *obj)
 {
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
 
-LWGEOM*
-lwmpoly_as_lwgeom(const LWMPOLY* obj)
+LWGEOM *
+lwmpoly_as_lwgeom(const LWMPOLY *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwmline_as_lwgeom(const LWMLINE* obj)
+LWGEOM *
+lwmline_as_lwgeom(const LWMLINE *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwmpoint_as_lwgeom(const LWMPOINT* obj)
+LWGEOM *
+lwmpoint_as_lwgeom(const LWMPOINT *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwcollection_as_lwgeom(const LWCOLLECTION* obj)
+LWGEOM *
+lwcollection_as_lwgeom(const LWCOLLECTION *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwcircstring_as_lwgeom(const LWCIRCSTRING* obj)
+LWGEOM *
+lwcircstring_as_lwgeom(const LWCIRCSTRING *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwcurvepoly_as_lwgeom(const LWCURVEPOLY* obj)
+LWGEOM *
+lwcurvepoly_as_lwgeom(const LWCURVEPOLY *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwcompound_as_lwgeom(const LWCOMPOUND* obj)
+LWGEOM *
+lwcompound_as_lwgeom(const LWCOMPOUND *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwpoly_as_lwgeom(const LWPOLY* obj)
+LWGEOM *
+lwpoly_as_lwgeom(const LWPOLY *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwtriangle_as_lwgeom(const LWTRIANGLE* obj)
+LWGEOM *
+lwtriangle_as_lwgeom(const LWTRIANGLE *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwline_as_lwgeom(const LWLINE* obj)
+LWGEOM *
+lwline_as_lwgeom(const LWLINE *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
-LWGEOM*
-lwpoint_as_lwgeom(const LWPOINT* obj)
+LWGEOM *
+lwpoint_as_lwgeom(const LWPOINT *obj)
 {
 	if (obj == NULL) return NULL;
-	return (LWGEOM*)obj;
+	return (LWGEOM *)obj;
 }
 
 /**
@@ -386,12 +386,12 @@ lwtype_multitype(uint8_t type)
 /**
  * Create a new LWGEOM of the appropriate MULTI* type.
  */
-LWGEOM*
-lwgeom_as_multi(const LWGEOM* lwgeom)
+LWGEOM *
+lwgeom_as_multi(const LWGEOM *lwgeom)
 {
-	LWGEOM** ogeoms;
-	LWGEOM* ogeom = NULL;
-	GBOX* box = NULL;
+	LWGEOM **ogeoms;
+	LWGEOM *ogeom = NULL;
+	GBOX *box = NULL;
 	int type;
 
 	type = lwgeom->type;
@@ -400,12 +400,12 @@ lwgeom_as_multi(const LWGEOM* lwgeom)
 
 	if (lwgeom_is_empty(lwgeom))
 	{
-		ogeom = (LWGEOM*)lwcollection_construct_empty(
+		ogeom = (LWGEOM *)lwcollection_construct_empty(
 		    MULTITYPE[type], lwgeom->srid, FLAGS_GET_Z(lwgeom->flags), FLAGS_GET_M(lwgeom->flags));
 	}
 	else
 	{
-		ogeoms = lwalloc(sizeof(LWGEOM*));
+		ogeoms = lwalloc(sizeof(LWGEOM *));
 		ogeoms[0] = lwgeom_clone(lwgeom);
 
 		/* Sub-geometries are not allowed to have bboxes or SRIDs, move the bbox to the collection */
@@ -413,7 +413,7 @@ lwgeom_as_multi(const LWGEOM* lwgeom)
 		ogeoms[0]->bbox = NULL;
 		ogeoms[0]->srid = SRID_UNKNOWN;
 
-		ogeom = (LWGEOM*)lwcollection_construct(MULTITYPE[type], lwgeom->srid, box, 1, ogeoms);
+		ogeom = (LWGEOM *)lwcollection_construct(MULTITYPE[type], lwgeom->srid, box, 1, ogeoms);
 	}
 
 	return ogeom;
@@ -422,10 +422,10 @@ lwgeom_as_multi(const LWGEOM* lwgeom)
 /**
  * Create a new LWGEOM of the appropriate CURVE* type.
  */
-LWGEOM*
-lwgeom_as_curve(const LWGEOM* lwgeom)
+LWGEOM *
+lwgeom_as_curve(const LWGEOM *lwgeom)
 {
-	LWGEOM* ogeom;
+	LWGEOM *ogeom;
 	int type = lwgeom->type;
 	/*
 	int hasz = FLAGS_GET_Z(lwgeom->flags);
@@ -437,10 +437,10 @@ lwgeom_as_curve(const LWGEOM* lwgeom)
 	{
 	case LINETYPE:
 		/* turn to COMPOUNDCURVE */
-		ogeom = (LWGEOM*)lwcompound_construct_from_lwline((LWLINE*)lwgeom);
+		ogeom = (LWGEOM *)lwcompound_construct_from_lwline((LWLINE *)lwgeom);
 		break;
 	case POLYGONTYPE:
-		ogeom = (LWGEOM*)lwcurvepoly_construct_from_lwpoly(lwgeom_as_lwpoly(lwgeom));
+		ogeom = (LWGEOM *)lwcurvepoly_construct_from_lwpoly(lwgeom_as_lwpoly(lwgeom));
 		break;
 	case MULTILINETYPE:
 		/* turn to MULTICURVE */
@@ -470,7 +470,7 @@ lwgeom_as_curve(const LWGEOM* lwgeom)
  * on top of subcomponents.
  */
 void
-lwgeom_release(LWGEOM* lwgeom)
+lwgeom_release(LWGEOM *lwgeom)
 {
 	if (!lwgeom) lwerror("lwgeom_release: someone called on 0x0");
 
@@ -489,23 +489,23 @@ lwgeom_release(LWGEOM* lwgeom)
  *
  * @see ptarray_clone
  */
-LWGEOM*
-lwgeom_clone(const LWGEOM* lwgeom)
+LWGEOM *
+lwgeom_clone(const LWGEOM *lwgeom)
 {
 	LWDEBUGF(2, "lwgeom_clone called with %p, %s", lwgeom, lwtype_name(lwgeom->type));
 
 	switch (lwgeom->type)
 	{
 	case POINTTYPE:
-		return (LWGEOM*)lwpoint_clone((LWPOINT*)lwgeom);
+		return (LWGEOM *)lwpoint_clone((LWPOINT *)lwgeom);
 	case LINETYPE:
-		return (LWGEOM*)lwline_clone((LWLINE*)lwgeom);
+		return (LWGEOM *)lwline_clone((LWLINE *)lwgeom);
 	case CIRCSTRINGTYPE:
-		return (LWGEOM*)lwcircstring_clone((LWCIRCSTRING*)lwgeom);
+		return (LWGEOM *)lwcircstring_clone((LWCIRCSTRING *)lwgeom);
 	case POLYGONTYPE:
-		return (LWGEOM*)lwpoly_clone((LWPOLY*)lwgeom);
+		return (LWGEOM *)lwpoly_clone((LWPOLY *)lwgeom);
 	case TRIANGLETYPE:
-		return (LWGEOM*)lwtriangle_clone((LWTRIANGLE*)lwgeom);
+		return (LWGEOM *)lwtriangle_clone((LWTRIANGLE *)lwgeom);
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
 	case MULTICURVETYPE:
@@ -516,7 +516,7 @@ lwgeom_clone(const LWGEOM* lwgeom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return (LWGEOM*)lwcollection_clone((LWCOLLECTION*)lwgeom);
+		return (LWGEOM *)lwcollection_clone((LWCOLLECTION *)lwgeom);
 	default:
 		lwerror("lwgeom_clone: Unknown geometry type: %s", lwtype_name(lwgeom->type));
 		return NULL;
@@ -526,8 +526,8 @@ lwgeom_clone(const LWGEOM* lwgeom)
 /**
  * Deep-clone an #LWGEOM object. #POINTARRAY <em>are</em> copied.
  */
-LWGEOM*
-lwgeom_clone_deep(const LWGEOM* lwgeom)
+LWGEOM *
+lwgeom_clone_deep(const LWGEOM *lwgeom)
 {
 	LWDEBUGF(2, "lwgeom_clone called with %p, %s", lwgeom, lwtype_name(lwgeom->type));
 
@@ -537,9 +537,9 @@ lwgeom_clone_deep(const LWGEOM* lwgeom)
 	case LINETYPE:
 	case CIRCSTRINGTYPE:
 	case TRIANGLETYPE:
-		return (LWGEOM*)lwline_clone_deep((LWLINE*)lwgeom);
+		return (LWGEOM *)lwline_clone_deep((LWLINE *)lwgeom);
 	case POLYGONTYPE:
-		return (LWGEOM*)lwpoly_clone_deep((LWPOLY*)lwgeom);
+		return (LWGEOM *)lwpoly_clone_deep((LWPOLY *)lwgeom);
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
 	case MULTICURVETYPE:
@@ -550,7 +550,7 @@ lwgeom_clone_deep(const LWGEOM* lwgeom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return (LWGEOM*)lwcollection_clone_deep((LWCOLLECTION*)lwgeom);
+		return (LWGEOM *)lwcollection_clone_deep((LWCOLLECTION *)lwgeom);
 	default:
 		lwerror("lwgeom_clone_deep: Unknown geometry type: %s", lwtype_name(lwgeom->type));
 		return NULL;
@@ -560,10 +560,10 @@ lwgeom_clone_deep(const LWGEOM* lwgeom)
 /**
  * Return an alloced string
  */
-char*
-lwgeom_to_ewkt(const LWGEOM* lwgeom)
+char *
+lwgeom_to_ewkt(const LWGEOM *lwgeom)
 {
-	char* wkt = NULL;
+	char *wkt = NULL;
 	size_t wkt_size = 0;
 
 	wkt = lwgeom_to_wkt(lwgeom, WKT_EXTENDED, 12, &wkt_size);
@@ -584,7 +584,7 @@ lwgeom_to_ewkt(const LWGEOM* lwgeom)
  *	@param lwgeom2
  */
 char
-lwgeom_same(const LWGEOM* lwgeom1, const LWGEOM* lwgeom2)
+lwgeom_same(const LWGEOM *lwgeom1, const LWGEOM *lwgeom2)
 {
 	LWDEBUGF(2, "lwgeom_same(%s, %s) called", lwtype_name(lwgeom1->type), lwtype_name(lwgeom2->type));
 
@@ -618,15 +618,15 @@ lwgeom_same(const LWGEOM* lwgeom1, const LWGEOM* lwgeom2)
 	switch (lwgeom1->type)
 	{
 	case POINTTYPE:
-		return lwpoint_same((LWPOINT*)lwgeom1, (LWPOINT*)lwgeom2);
+		return lwpoint_same((LWPOINT *)lwgeom1, (LWPOINT *)lwgeom2);
 	case LINETYPE:
-		return lwline_same((LWLINE*)lwgeom1, (LWLINE*)lwgeom2);
+		return lwline_same((LWLINE *)lwgeom1, (LWLINE *)lwgeom2);
 	case POLYGONTYPE:
-		return lwpoly_same((LWPOLY*)lwgeom1, (LWPOLY*)lwgeom2);
+		return lwpoly_same((LWPOLY *)lwgeom1, (LWPOLY *)lwgeom2);
 	case TRIANGLETYPE:
-		return lwtriangle_same((LWTRIANGLE*)lwgeom1, (LWTRIANGLE*)lwgeom2);
+		return lwtriangle_same((LWTRIANGLE *)lwgeom1, (LWTRIANGLE *)lwgeom2);
 	case CIRCSTRINGTYPE:
-		return lwcircstring_same((LWCIRCSTRING*)lwgeom1, (LWCIRCSTRING*)lwgeom2);
+		return lwcircstring_same((LWCIRCSTRING *)lwgeom1, (LWCIRCSTRING *)lwgeom2);
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
@@ -637,7 +637,7 @@ lwgeom_same(const LWGEOM* lwgeom1, const LWGEOM* lwgeom2)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_same((LWCOLLECTION*)lwgeom1, (LWCOLLECTION*)lwgeom2);
+		return lwcollection_same((LWCOLLECTION *)lwgeom1, (LWCOLLECTION *)lwgeom2);
 	default:
 		lwerror("lwgeom_same: unsupported geometry type: %s", lwtype_name(lwgeom1->type));
 		return LW_FALSE;
@@ -645,9 +645,9 @@ lwgeom_same(const LWGEOM* lwgeom1, const LWGEOM* lwgeom2)
 }
 
 int
-lwpoint_inside_circle(const LWPOINT* p, double cx, double cy, double rad)
+lwpoint_inside_circle(const LWPOINT *p, double cx, double cy, double rad)
 {
-	const POINT2D* pt;
+	const POINT2D *pt;
 	POINT2D center;
 
 	if (!p || !p->point) return LW_FALSE;
@@ -663,7 +663,7 @@ lwpoint_inside_circle(const LWPOINT* p, double cx, double cy, double rad)
 }
 
 void
-lwgeom_drop_bbox(LWGEOM* lwgeom)
+lwgeom_drop_bbox(LWGEOM *lwgeom)
 {
 	if (lwgeom->bbox) lwfree(lwgeom->bbox);
 	lwgeom->bbox = NULL;
@@ -676,7 +676,7 @@ lwgeom_drop_bbox(LWGEOM* lwgeom)
  * else compute it.
  */
 void
-lwgeom_add_bbox(LWGEOM* lwgeom)
+lwgeom_add_bbox(LWGEOM *lwgeom)
 {
 	/* an empty LWGEOM has no bbox */
 	if (lwgeom_is_empty(lwgeom)) return;
@@ -688,14 +688,14 @@ lwgeom_add_bbox(LWGEOM* lwgeom)
 }
 
 void
-lwgeom_refresh_bbox(LWGEOM* lwgeom)
+lwgeom_refresh_bbox(LWGEOM *lwgeom)
 {
 	lwgeom_drop_bbox(lwgeom);
 	lwgeom_add_bbox(lwgeom);
 }
 
 void
-lwgeom_add_bbox_deep(LWGEOM* lwgeom, GBOX* gbox)
+lwgeom_add_bbox_deep(LWGEOM *lwgeom, GBOX *gbox)
 {
 	if (lwgeom_is_empty(lwgeom)) return;
 
@@ -714,7 +714,7 @@ lwgeom_add_bbox_deep(LWGEOM* lwgeom, GBOX* gbox)
 	if (lwgeom_is_collection(lwgeom))
 	{
 		uint32_t i;
-		LWCOLLECTION* lwcol = (LWCOLLECTION*)lwgeom;
+		LWCOLLECTION *lwcol = (LWCOLLECTION *)lwgeom;
 
 		for (i = 0; i < lwcol->ngeoms; i++)
 		{
@@ -723,11 +723,11 @@ lwgeom_add_bbox_deep(LWGEOM* lwgeom, GBOX* gbox)
 	}
 }
 
-const GBOX*
-lwgeom_get_bbox(const LWGEOM* lwg)
+const GBOX *
+lwgeom_get_bbox(const LWGEOM *lwg)
 {
 	/* add it if not already there */
-	lwgeom_add_bbox((LWGEOM*)lwg);
+	lwgeom_add_bbox((LWGEOM *)lwg);
 	return lwg->bbox;
 }
 
@@ -736,7 +736,7 @@ lwgeom_get_bbox(const LWGEOM* lwg)
  * geodetic box, depending on how it is flagged.
  */
 int
-lwgeom_calculate_gbox(const LWGEOM* lwgeom, GBOX* gbox)
+lwgeom_calculate_gbox(const LWGEOM *lwgeom, GBOX *gbox)
 {
 	gbox->flags = lwgeom->flags;
 	if (FLAGS_GET_GEODETIC(lwgeom->flags))
@@ -746,67 +746,67 @@ lwgeom_calculate_gbox(const LWGEOM* lwgeom, GBOX* gbox)
 }
 
 void
-lwgeom_drop_srid(LWGEOM* lwgeom)
+lwgeom_drop_srid(LWGEOM *lwgeom)
 {
 	lwgeom->srid = SRID_UNKNOWN; /* TODO: To be changed to SRID_UNKNOWN */
 }
 
-LWGEOM*
-lwgeom_segmentize2d(const LWGEOM* lwgeom, double dist)
+LWGEOM *
+lwgeom_segmentize2d(const LWGEOM *lwgeom, double dist)
 {
 	switch (lwgeom->type)
 	{
 	case LINETYPE:
-		return (LWGEOM*)lwline_segmentize2d((LWLINE*)lwgeom, dist);
+		return (LWGEOM *)lwline_segmentize2d((LWLINE *)lwgeom, dist);
 	case POLYGONTYPE:
-		return (LWGEOM*)lwpoly_segmentize2d((LWPOLY*)lwgeom, dist);
+		return (LWGEOM *)lwpoly_segmentize2d((LWPOLY *)lwgeom, dist);
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		return (LWGEOM*)lwcollection_segmentize2d((LWCOLLECTION*)lwgeom, dist);
+		return (LWGEOM *)lwcollection_segmentize2d((LWCOLLECTION *)lwgeom, dist);
 
 	default:
 		return lwgeom_clone(lwgeom);
 	}
 }
 
-LWGEOM*
-lwgeom_force_2d(const LWGEOM* geom)
+LWGEOM *
+lwgeom_force_2d(const LWGEOM *geom)
 {
 	return lwgeom_force_dims(geom, 0, 0);
 }
 
-LWGEOM*
-lwgeom_force_3dz(const LWGEOM* geom)
+LWGEOM *
+lwgeom_force_3dz(const LWGEOM *geom)
 {
 	return lwgeom_force_dims(geom, 1, 0);
 }
 
-LWGEOM*
-lwgeom_force_3dm(const LWGEOM* geom)
+LWGEOM *
+lwgeom_force_3dm(const LWGEOM *geom)
 {
 	return lwgeom_force_dims(geom, 0, 1);
 }
 
-LWGEOM*
-lwgeom_force_4d(const LWGEOM* geom)
+LWGEOM *
+lwgeom_force_4d(const LWGEOM *geom)
 {
 	return lwgeom_force_dims(geom, 1, 1);
 }
 
-LWGEOM*
-lwgeom_force_dims(const LWGEOM* geom, int hasz, int hasm)
+LWGEOM *
+lwgeom_force_dims(const LWGEOM *geom, int hasz, int hasm)
 {
 	switch (geom->type)
 	{
 	case POINTTYPE:
-		return lwpoint_as_lwgeom(lwpoint_force_dims((LWPOINT*)geom, hasz, hasm));
+		return lwpoint_as_lwgeom(lwpoint_force_dims((LWPOINT *)geom, hasz, hasm));
 	case CIRCSTRINGTYPE:
 	case LINETYPE:
 	case TRIANGLETYPE:
-		return lwline_as_lwgeom(lwline_force_dims((LWLINE*)geom, hasz, hasm));
+		return lwline_as_lwgeom(lwline_force_dims((LWLINE *)geom, hasz, hasm));
 	case POLYGONTYPE:
-		return lwpoly_as_lwgeom(lwpoly_force_dims((LWPOLY*)geom, hasz, hasm));
+		return lwpoly_as_lwgeom(lwpoly_force_dims((LWPOLY *)geom, hasz, hasm));
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
 	case MULTICURVETYPE:
@@ -817,19 +817,19 @@ lwgeom_force_dims(const LWGEOM* geom, int hasz, int hasm)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_as_lwgeom(lwcollection_force_dims((LWCOLLECTION*)geom, hasz, hasm));
+		return lwcollection_as_lwgeom(lwcollection_force_dims((LWCOLLECTION *)geom, hasz, hasm));
 	default:
 		lwerror("lwgeom_force_2d: unsupported geom type: %s", lwtype_name(geom->type));
 		return NULL;
 	}
 }
 
-LWGEOM*
-lwgeom_force_sfs(LWGEOM* geom, int version)
+LWGEOM *
+lwgeom_force_sfs(LWGEOM *geom, int version)
 {
-	LWCOLLECTION* col;
+	LWCOLLECTION *col;
 	uint32_t i;
-	LWGEOM* g;
+	LWGEOM *g;
 
 	/* SFS 1.2 version */
 	if (version == 120)
@@ -845,14 +845,14 @@ lwgeom_force_sfs(LWGEOM* geom, int version)
 			return lwgeom_stroke(geom, 32);
 
 		case COLLECTIONTYPE:
-			col = (LWCOLLECTION*)geom;
+			col = (LWCOLLECTION *)geom;
 			for (i = 0; i < col->ngeoms; i++)
-				col->geoms[i] = lwgeom_force_sfs((LWGEOM*)col->geoms[i], version);
+				col->geoms[i] = lwgeom_force_sfs((LWGEOM *)col->geoms[i], version);
 
-			return lwcollection_as_lwgeom((LWCOLLECTION*)geom);
+			return lwcollection_as_lwgeom((LWCOLLECTION *)geom);
 
 		default:
-			return (LWGEOM*)geom;
+			return (LWGEOM *)geom;
 		}
 	}
 
@@ -869,80 +869,80 @@ lwgeom_force_sfs(LWGEOM* geom, int version)
 
 	/* SFS 1.2 types */
 	case TRIANGLETYPE:
-		g = lwpoly_as_lwgeom(lwpoly_from_lwlines((LWLINE*)geom, 0, NULL));
+		g = lwpoly_as_lwgeom(lwpoly_from_lwlines((LWLINE *)geom, 0, NULL));
 		lwgeom_free(geom);
 		return g;
 
 	case TINTYPE:
-		col = (LWCOLLECTION*)geom;
+		col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 		{
-			g = lwpoly_as_lwgeom(lwpoly_from_lwlines((LWLINE*)col->geoms[i], 0, NULL));
+			g = lwpoly_as_lwgeom(lwpoly_from_lwlines((LWLINE *)col->geoms[i], 0, NULL));
 			lwgeom_free(col->geoms[i]);
 			col->geoms[i] = g;
 		}
 		col->type = COLLECTIONTYPE;
-		return lwmpoly_as_lwgeom((LWMPOLY*)geom);
+		return lwmpoly_as_lwgeom((LWMPOLY *)geom);
 
 	case POLYHEDRALSURFACETYPE:
 		geom->type = COLLECTIONTYPE;
-		return (LWGEOM*)geom;
+		return (LWGEOM *)geom;
 
 	/* Collection */
 	case COLLECTIONTYPE:
-		col = (LWCOLLECTION*)geom;
+		col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
-			col->geoms[i] = lwgeom_force_sfs((LWGEOM*)col->geoms[i], version);
+			col->geoms[i] = lwgeom_force_sfs((LWGEOM *)col->geoms[i], version);
 
-		return lwcollection_as_lwgeom((LWCOLLECTION*)geom);
+		return lwcollection_as_lwgeom((LWCOLLECTION *)geom);
 
 	default:
-		return (LWGEOM*)geom;
+		return (LWGEOM *)geom;
 	}
 }
 
 int32_t
-lwgeom_get_srid(const LWGEOM* geom)
+lwgeom_get_srid(const LWGEOM *geom)
 {
 	if (!geom) return SRID_UNKNOWN;
 	return geom->srid;
 }
 
 uint32_t
-lwgeom_get_type(const LWGEOM* geom)
+lwgeom_get_type(const LWGEOM *geom)
 {
 	if (!geom) return 0;
 	return geom->type;
 }
 
 int
-lwgeom_has_z(const LWGEOM* geom)
+lwgeom_has_z(const LWGEOM *geom)
 {
 	if (!geom) return LW_FALSE;
 	return FLAGS_GET_Z(geom->flags);
 }
 
 int
-lwgeom_has_m(const LWGEOM* geom)
+lwgeom_has_m(const LWGEOM *geom)
 {
 	if (!geom) return LW_FALSE;
 	return FLAGS_GET_M(geom->flags);
 }
 
 int
-lwgeom_ndims(const LWGEOM* geom)
+lwgeom_ndims(const LWGEOM *geom)
 {
 	if (!geom) return 0;
 	return FLAGS_NDIMS(geom->flags);
 }
 
 void
-lwgeom_set_geodetic(LWGEOM* geom, int value)
+lwgeom_set_geodetic(LWGEOM *geom, int value)
 {
-	LWPOINT* pt;
-	LWLINE* ln;
-	LWPOLY* ply;
-	LWCOLLECTION* col;
+	LWPOINT *pt;
+	LWLINE *ln;
+	LWPOLY *ply;
+	LWCOLLECTION *col;
 	uint32_t i;
 
 	FLAGS_SET_GEODETIC(geom->flags, value);
@@ -951,15 +951,15 @@ lwgeom_set_geodetic(LWGEOM* geom, int value)
 	switch (geom->type)
 	{
 	case POINTTYPE:
-		pt = (LWPOINT*)geom;
+		pt = (LWPOINT *)geom;
 		if (pt->point) FLAGS_SET_GEODETIC(pt->point->flags, value);
 		break;
 	case LINETYPE:
-		ln = (LWLINE*)geom;
+		ln = (LWLINE *)geom;
 		if (ln->points) FLAGS_SET_GEODETIC(ln->points->flags, value);
 		break;
 	case POLYGONTYPE:
-		ply = (LWPOLY*)geom;
+		ply = (LWPOLY *)geom;
 		for (i = 0; i < ply->nrings; i++)
 			FLAGS_SET_GEODETIC(ply->rings[i]->flags, value);
 		break;
@@ -967,7 +967,7 @@ lwgeom_set_geodetic(LWGEOM* geom, int value)
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		col = (LWCOLLECTION*)geom;
+		col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			lwgeom_set_geodetic(col->geoms[i], value);
 		break;
@@ -978,32 +978,32 @@ lwgeom_set_geodetic(LWGEOM* geom, int value)
 }
 
 void
-lwgeom_longitude_shift(LWGEOM* lwgeom)
+lwgeom_longitude_shift(LWGEOM *lwgeom)
 {
 	uint32_t i;
 	switch (lwgeom->type)
 	{
-		LWPOINT* point;
-		LWLINE* line;
-		LWPOLY* poly;
-		LWTRIANGLE* triangle;
-		LWCOLLECTION* coll;
+		LWPOINT *point;
+		LWLINE *line;
+		LWPOLY *poly;
+		LWTRIANGLE *triangle;
+		LWCOLLECTION *coll;
 
 	case POINTTYPE:
-		point = (LWPOINT*)lwgeom;
+		point = (LWPOINT *)lwgeom;
 		ptarray_longitude_shift(point->point);
 		return;
 	case LINETYPE:
-		line = (LWLINE*)lwgeom;
+		line = (LWLINE *)lwgeom;
 		ptarray_longitude_shift(line->points);
 		return;
 	case POLYGONTYPE:
-		poly = (LWPOLY*)lwgeom;
+		poly = (LWPOLY *)lwgeom;
 		for (i = 0; i < poly->nrings; i++)
 			ptarray_longitude_shift(poly->rings[i]);
 		return;
 	case TRIANGLETYPE:
-		triangle = (LWTRIANGLE*)lwgeom;
+		triangle = (LWTRIANGLE *)lwgeom;
 		ptarray_longitude_shift(triangle->points);
 		return;
 	case MULTIPOINTTYPE:
@@ -1012,7 +1012,7 @@ lwgeom_longitude_shift(LWGEOM* lwgeom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		coll = (LWCOLLECTION*)lwgeom;
+		coll = (LWCOLLECTION *)lwgeom;
 		for (i = 0; i < coll->ngeoms; i++)
 			lwgeom_longitude_shift(coll->geoms[i]);
 		return;
@@ -1022,7 +1022,7 @@ lwgeom_longitude_shift(LWGEOM* lwgeom)
 }
 
 int
-lwgeom_is_closed(const LWGEOM* geom)
+lwgeom_is_closed(const LWGEOM *geom)
 {
 	int type = geom->type;
 
@@ -1032,23 +1032,23 @@ lwgeom_is_closed(const LWGEOM* geom)
 	switch (type)
 	{
 	case LINETYPE:
-		return lwline_is_closed((LWLINE*)geom);
+		return lwline_is_closed((LWLINE *)geom);
 	case POLYGONTYPE:
-		return lwpoly_is_closed((LWPOLY*)geom);
+		return lwpoly_is_closed((LWPOLY *)geom);
 	case CIRCSTRINGTYPE:
-		return lwcircstring_is_closed((LWCIRCSTRING*)geom);
+		return lwcircstring_is_closed((LWCIRCSTRING *)geom);
 	case COMPOUNDTYPE:
-		return lwcompound_is_closed((LWCOMPOUND*)geom);
+		return lwcompound_is_closed((LWCOMPOUND *)geom);
 	case TINTYPE:
-		return lwtin_is_closed((LWTIN*)geom);
+		return lwtin_is_closed((LWTIN *)geom);
 	case POLYHEDRALSURFACETYPE:
-		return lwpsurface_is_closed((LWPSURFACE*)geom);
+		return lwpsurface_is_closed((LWPSURFACE *)geom);
 	}
 
 	/* Recurse into collections and see if anything is not closed */
 	if (lwgeom_is_collection(geom))
 	{
-		LWCOLLECTION* col = lwgeom_as_lwcollection(geom);
+		LWCOLLECTION *col = lwgeom_as_lwcollection(geom);
 		uint32_t i;
 		int closed;
 		for (i = 0; i < col->ngeoms; i++)
@@ -1064,7 +1064,7 @@ lwgeom_is_closed(const LWGEOM* geom)
 }
 
 int
-lwgeom_is_collection(const LWGEOM* geom)
+lwgeom_is_collection(const LWGEOM *geom)
 {
 	if (!geom) return LW_FALSE;
 	return lwtype_is_collection(geom->type);
@@ -1123,7 +1123,7 @@ lwtype_get_collectiontype(uint8_t type)
 }
 
 void
-lwgeom_free(LWGEOM* lwgeom)
+lwgeom_free(LWGEOM *lwgeom)
 {
 
 	/* There's nothing here to free... */
@@ -1134,41 +1134,41 @@ lwgeom_free(LWGEOM* lwgeom)
 	switch (lwgeom->type)
 	{
 	case POINTTYPE:
-		lwpoint_free((LWPOINT*)lwgeom);
+		lwpoint_free((LWPOINT *)lwgeom);
 		break;
 	case LINETYPE:
-		lwline_free((LWLINE*)lwgeom);
+		lwline_free((LWLINE *)lwgeom);
 		break;
 	case POLYGONTYPE:
-		lwpoly_free((LWPOLY*)lwgeom);
+		lwpoly_free((LWPOLY *)lwgeom);
 		break;
 	case CIRCSTRINGTYPE:
-		lwcircstring_free((LWCIRCSTRING*)lwgeom);
+		lwcircstring_free((LWCIRCSTRING *)lwgeom);
 		break;
 	case TRIANGLETYPE:
-		lwtriangle_free((LWTRIANGLE*)lwgeom);
+		lwtriangle_free((LWTRIANGLE *)lwgeom);
 		break;
 	case MULTIPOINTTYPE:
-		lwmpoint_free((LWMPOINT*)lwgeom);
+		lwmpoint_free((LWMPOINT *)lwgeom);
 		break;
 	case MULTILINETYPE:
-		lwmline_free((LWMLINE*)lwgeom);
+		lwmline_free((LWMLINE *)lwgeom);
 		break;
 	case MULTIPOLYGONTYPE:
-		lwmpoly_free((LWMPOLY*)lwgeom);
+		lwmpoly_free((LWMPOLY *)lwgeom);
 		break;
 	case POLYHEDRALSURFACETYPE:
-		lwpsurface_free((LWPSURFACE*)lwgeom);
+		lwpsurface_free((LWPSURFACE *)lwgeom);
 		break;
 	case TINTYPE:
-		lwtin_free((LWTIN*)lwgeom);
+		lwtin_free((LWTIN *)lwgeom);
 		break;
 	case CURVEPOLYTYPE:
 	case COMPOUNDTYPE:
 	case MULTICURVETYPE:
 	case MULTISURFACETYPE:
 	case COLLECTIONTYPE:
-		lwcollection_free((LWCOLLECTION*)lwgeom);
+		lwcollection_free((LWCOLLECTION *)lwgeom);
 		break;
 	default:
 		lwerror("lwgeom_free called with unknown type (%d) %s", lwgeom->type, lwtype_name(lwgeom->type));
@@ -1177,7 +1177,7 @@ lwgeom_free(LWGEOM* lwgeom)
 }
 
 int
-lwgeom_needs_bbox(const LWGEOM* geom)
+lwgeom_needs_bbox(const LWGEOM *geom)
 {
 	assert(geom);
 	if (geom->type == POINTTYPE) { return LW_FALSE; }
@@ -1190,14 +1190,14 @@ lwgeom_needs_bbox(const LWGEOM* geom)
 	}
 	else if (geom->type == MULTIPOINTTYPE)
 	{
-		if (((LWCOLLECTION*)geom)->ngeoms == 1)
+		if (((LWCOLLECTION *)geom)->ngeoms == 1)
 			return LW_FALSE;
 		else
 			return LW_TRUE;
 	}
 	else if (geom->type == MULTILINETYPE)
 	{
-		if (((LWCOLLECTION*)geom)->ngeoms == 1 && lwgeom_count_vertices(geom) <= 2)
+		if (((LWCOLLECTION *)geom)->ngeoms == 1 && lwgeom_count_vertices(geom) <= 2)
 			return LW_FALSE;
 		else
 			return LW_TRUE;
@@ -1213,7 +1213,7 @@ lwgeom_needs_bbox(const LWGEOM* geom)
  * TODO: Make sure the internal functions don't overflow
  */
 uint32_t
-lwgeom_count_vertices(const LWGEOM* geom)
+lwgeom_count_vertices(const LWGEOM *geom)
 {
 	int result = 0;
 
@@ -1233,10 +1233,10 @@ lwgeom_count_vertices(const LWGEOM* geom)
 	case TRIANGLETYPE:
 	case CIRCSTRINGTYPE:
 	case LINETYPE:
-		result = lwline_count_vertices((LWLINE*)geom);
+		result = lwline_count_vertices((LWLINE *)geom);
 		break;
 	case POLYGONTYPE:
-		result = lwpoly_count_vertices((LWPOLY*)geom);
+		result = lwpoly_count_vertices((LWPOLY *)geom);
 		break;
 	case COMPOUNDTYPE:
 	case CURVEPOLYTYPE:
@@ -1248,7 +1248,7 @@ lwgeom_count_vertices(const LWGEOM* geom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		result = lwcollection_count_vertices((LWCOLLECTION*)geom);
+		result = lwcollection_count_vertices((LWCOLLECTION *)geom);
 		break;
 	default:
 		lwerror("%s: unsupported input geometry type: %s", __func__, lwtype_name(geom->type));
@@ -1264,7 +1264,7 @@ lwgeom_count_vertices(const LWGEOM* geom)
  * of a collection.
  */
 int
-lwgeom_dimension(const LWGEOM* geom)
+lwgeom_dimension(const LWGEOM *geom)
 {
 
 	/* Null? Zero. */
@@ -1296,14 +1296,14 @@ lwgeom_dimension(const LWGEOM* geom)
 	case POLYHEDRALSURFACETYPE:
 	{
 		/* A closed polyhedral surface contains a volume. */
-		int closed = lwpsurface_is_closed((LWPSURFACE*)geom);
+		int closed = lwpsurface_is_closed((LWPSURFACE *)geom);
 		return (closed ? 3 : 2);
 	}
 	case COLLECTIONTYPE:
 	{
 		int maxdim = 0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 		{
 			int dim = lwgeom_dimension(col->geoms[i]);
@@ -1321,7 +1321,7 @@ lwgeom_dimension(const LWGEOM* geom)
  * Count rings in an #LWGEOM.
  */
 uint32_t
-lwgeom_count_rings(const LWGEOM* geom)
+lwgeom_count_rings(const LWGEOM *geom)
 {
 	int result = 0;
 
@@ -1343,10 +1343,10 @@ lwgeom_count_rings(const LWGEOM* geom)
 		result = 1;
 		break;
 	case POLYGONTYPE:
-		result = ((LWPOLY*)geom)->nrings;
+		result = ((LWPOLY *)geom)->nrings;
 		break;
 	case CURVEPOLYTYPE:
-		result = ((LWCURVEPOLY*)geom)->nrings;
+		result = ((LWCURVEPOLY *)geom)->nrings;
 		break;
 	case MULTISURFACETYPE:
 	case MULTIPOLYGONTYPE:
@@ -1354,7 +1354,7 @@ lwgeom_count_rings(const LWGEOM* geom)
 	case TINTYPE:
 	case COLLECTIONTYPE:
 	{
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		uint32_t i = 0;
 		for (i = 0; i < col->ngeoms; i++)
 			result += lwgeom_count_rings(col->geoms[i]);
@@ -1369,7 +1369,7 @@ lwgeom_count_rings(const LWGEOM* geom)
 }
 
 int
-lwgeom_is_empty(const LWGEOM* geom)
+lwgeom_is_empty(const LWGEOM *geom)
 {
 	int result = LW_FALSE;
 	LWDEBUGF(4, "lwgeom_is_empty: got type %s", lwtype_name(geom->type));
@@ -1377,19 +1377,19 @@ lwgeom_is_empty(const LWGEOM* geom)
 	switch (geom->type)
 	{
 	case POINTTYPE:
-		return lwpoint_is_empty((LWPOINT*)geom);
+		return lwpoint_is_empty((LWPOINT *)geom);
 		break;
 	case LINETYPE:
-		return lwline_is_empty((LWLINE*)geom);
+		return lwline_is_empty((LWLINE *)geom);
 		break;
 	case CIRCSTRINGTYPE:
-		return lwcircstring_is_empty((LWCIRCSTRING*)geom);
+		return lwcircstring_is_empty((LWCIRCSTRING *)geom);
 		break;
 	case POLYGONTYPE:
-		return lwpoly_is_empty((LWPOLY*)geom);
+		return lwpoly_is_empty((LWPOLY *)geom);
 		break;
 	case TRIANGLETYPE:
-		return lwtriangle_is_empty((LWTRIANGLE*)geom);
+		return lwtriangle_is_empty((LWTRIANGLE *)geom);
 		break;
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
@@ -1401,7 +1401,7 @@ lwgeom_is_empty(const LWGEOM* geom)
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_is_empty((LWCOLLECTION*)geom);
+		return lwcollection_is_empty((LWCOLLECTION *)geom);
 		break;
 	default:
 		lwerror("lwgeom_is_empty: unsupported input geometry type: %s", lwtype_name(geom->type));
@@ -1411,7 +1411,7 @@ lwgeom_is_empty(const LWGEOM* geom)
 }
 
 int
-lwgeom_has_srid(const LWGEOM* geom)
+lwgeom_has_srid(const LWGEOM *geom)
 {
 	if (geom->srid != SRID_UNKNOWN) return LW_TRUE;
 
@@ -1419,7 +1419,7 @@ lwgeom_has_srid(const LWGEOM* geom)
 }
 
 static int
-lwcollection_dimensionality(const LWCOLLECTION* col)
+lwcollection_dimensionality(const LWCOLLECTION *col)
 {
 	uint32_t i;
 	int dimensionality = 0;
@@ -1432,7 +1432,7 @@ lwcollection_dimensionality(const LWCOLLECTION* col)
 }
 
 extern int
-lwgeom_dimensionality(const LWGEOM* geom)
+lwgeom_dimensionality(const LWGEOM *geom)
 {
 	int dim;
 
@@ -1466,7 +1466,7 @@ lwgeom_dimensionality(const LWGEOM* geom)
 		break;
 
 	case COLLECTIONTYPE:
-		return lwcollection_dimensionality((const LWCOLLECTION*)geom);
+		return lwcollection_dimensionality((const LWCOLLECTION *)geom);
 		break;
 	default:
 		lwerror("lwgeom_dimensionality: unsupported input geometry type: %s", lwtype_name(geom->type));
@@ -1475,19 +1475,19 @@ lwgeom_dimensionality(const LWGEOM* geom)
 	return 0;
 }
 
-extern LWGEOM*
-lwgeom_remove_repeated_points(const LWGEOM* in, double tolerance)
+extern LWGEOM *
+lwgeom_remove_repeated_points(const LWGEOM *in, double tolerance)
 {
-	LWGEOM* out = lwgeom_clone_deep(in);
+	LWGEOM *out = lwgeom_clone_deep(in);
 	lwgeom_remove_repeated_points_in_place(out, tolerance);
 	return out;
 }
 
 void
-lwgeom_swap_ordinates(LWGEOM* in, LWORD o1, LWORD o2)
+lwgeom_swap_ordinates(LWGEOM *in, LWORD o1, LWORD o2)
 {
-	LWCOLLECTION* col;
-	LWPOLY* poly;
+	LWCOLLECTION *col;
+	LWPOLY *poly;
 	uint32_t i;
 
 	if ((!in) || lwgeom_is_empty(in)) return;
@@ -1511,7 +1511,7 @@ lwgeom_swap_ordinates(LWGEOM* in, LWORD o1, LWORD o2)
 		break;
 
 	case POLYGONTYPE:
-		poly = (LWPOLY*)in;
+		poly = (LWPOLY *)in;
 		for (i = 0; i < poly->nrings; i++)
 		{
 			ptarray_swap_ordinates(poly->rings[i], o1, o2);
@@ -1532,7 +1532,7 @@ lwgeom_swap_ordinates(LWGEOM* in, LWORD o1, LWORD o2)
 	case MULTICURVETYPE:
 	case POLYHEDRALSURFACETYPE:
 	case TINTYPE:
-		col = (LWCOLLECTION*)in;
+		col = (LWCOLLECTION *)in;
 		for (i = 0; i < col->ngeoms; i++)
 		{
 			lwgeom_swap_ordinates(col->geoms[i], o1, o2);
@@ -1549,7 +1549,7 @@ lwgeom_swap_ordinates(LWGEOM* in, LWORD o1, LWORD o2)
 }
 
 void
-lwgeom_set_srid(LWGEOM* geom, int32_t srid)
+lwgeom_set_srid(LWGEOM *geom, int32_t srid)
 {
 	uint32_t i;
 
@@ -1560,7 +1560,7 @@ lwgeom_set_srid(LWGEOM* geom, int32_t srid)
 	if (lwgeom_is_collection(geom))
 	{
 		/* All the children are set to the same SRID value */
-		LWCOLLECTION* col = lwgeom_as_lwcollection(geom);
+		LWCOLLECTION *col = lwgeom_as_lwcollection(geom);
 		for (i = 0; i < col->ngeoms; i++)
 		{
 			lwgeom_set_srid(col->geoms[i], srid);
@@ -1571,7 +1571,7 @@ lwgeom_set_srid(LWGEOM* geom, int32_t srid)
 /**************************************************************/
 
 void
-lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
+lwgeom_remove_repeated_points_in_place(LWGEOM *geom, double tolerance)
 {
 	switch (geom->type)
 	{
@@ -1580,8 +1580,8 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 		return;
 	case LINETYPE:
 	{
-		LWLINE* g = (LWLINE*)(geom);
-		POINTARRAY* pa = g->points;
+		LWLINE *g = (LWLINE *)(geom);
+		POINTARRAY *pa = g->points;
 		ptarray_remove_repeated_points_in_place(pa, tolerance, 2);
 		/* Invalid output */
 		if (pa->npoints == 1 && pa->maxpoints > 1)
@@ -1595,10 +1595,10 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 	case POLYGONTYPE:
 	{
 		uint32_t i, j = 0;
-		LWPOLY* g = (LWPOLY*)(geom);
+		LWPOLY *g = (LWPOLY *)(geom);
 		for (i = 0; i < g->nrings; i++)
 		{
-			POINTARRAY* pa = g->rings[i];
+			POINTARRAY *pa = g->rings[i];
 			int minpoints = 4;
 			/* Skip zero'ed out rings */
 			if (!pa) continue;
@@ -1620,9 +1620,9 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 		static uint32_t out_stack_size = 32;
 		double tolsq = tolerance * tolerance;
 		uint32_t i, j, n = 0;
-		LWMPOINT* mpt = (LWMPOINT*)(geom);
-		LWPOINT** out;
-		LWPOINT* out_stack[out_stack_size];
+		LWMPOINT *mpt = (LWMPOINT *)(geom);
+		LWPOINT **out;
+		LWPOINT *out_stack[out_stack_size];
 		int use_heap = (mpt->ngeoms > out_stack_size);
 
 		/* No-op on empty */
@@ -1632,7 +1632,7 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 		/* geoms array because we're reading out of it still */
 		/* so we use a side array */
 		if (use_heap)
-			out = lwalloc(sizeof(LWMPOINT*) * mpt->ngeoms);
+			out = lwalloc(sizeof(LWMPOINT *) * mpt->ngeoms);
 		else
 			out = out_stack;
 
@@ -1640,12 +1640,12 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 		for (i = 0; i < mpt->ngeoms; i++)
 		{
 			int seen = 0;
-			LWPOINT* p1 = mpt->geoms[i];
-			const POINT2D* pt1 = getPoint2d_cp(p1->point, 0);
+			LWPOINT *p1 = mpt->geoms[i];
+			const POINT2D *pt1 = getPoint2d_cp(p1->point, 0);
 			for (j = 0; j < n; j++)
 			{
-				LWPOINT* p2 = out[j];
-				const POINT2D* pt2 = getPoint2d_cp(p2->point, 0);
+				LWPOINT *p2 = out[j];
+				const POINT2D *pt2 = getPoint2d_cp(p2->point, 0);
 				if (distance2d_sqr_pt_pt(pt1, pt2) <= tolsq)
 				{
 					seen = 1;
@@ -1662,7 +1662,7 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 
 		/* Copy remaining points back into the input */
 		/* array */
-		memcpy(mpt->geoms, out, sizeof(LWPOINT*) * n);
+		memcpy(mpt->geoms, out, sizeof(LWPOINT *) * n);
 		mpt->ngeoms = n;
 		if (use_heap) lwfree(out);
 		return;
@@ -1684,10 +1684,10 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 	case COMPOUNDTYPE:
 	{
 		uint32_t i, j = 0;
-		LWCOLLECTION* col = (LWCOLLECTION*)(geom);
+		LWCOLLECTION *col = (LWCOLLECTION *)(geom);
 		for (i = 0; i < col->ngeoms; i++)
 		{
-			LWGEOM* g = col->geoms[i];
+			LWGEOM *g = col->geoms[i];
 			if (!g) continue;
 			lwgeom_remove_repeated_points_in_place(g, tolerance);
 			/* Drop zero'ed out geometries */
@@ -1714,7 +1714,7 @@ lwgeom_remove_repeated_points_in_place(LWGEOM* geom, double tolerance)
 /**************************************************************/
 
 void
-lwgeom_simplify_in_place(LWGEOM* geom, double epsilon, int preserve_collapsed)
+lwgeom_simplify_in_place(LWGEOM *geom, double epsilon, int preserve_collapsed)
 {
 	switch (geom->type)
 	{
@@ -1723,8 +1723,8 @@ lwgeom_simplify_in_place(LWGEOM* geom, double epsilon, int preserve_collapsed)
 		return;
 	case LINETYPE:
 	{
-		LWLINE* g = (LWLINE*)(geom);
-		POINTARRAY* pa = g->points;
+		LWLINE *g = (LWLINE *)(geom);
+		POINTARRAY *pa = g->points;
 		ptarray_simplify_in_place(pa, epsilon, 2);
 		/* Invalid output */
 		if (pa->npoints == 1 && pa->maxpoints > 1)
@@ -1751,10 +1751,10 @@ lwgeom_simplify_in_place(LWGEOM* geom, double epsilon, int preserve_collapsed)
 	case POLYGONTYPE:
 	{
 		uint32_t i, j = 0;
-		LWPOLY* g = (LWPOLY*)(geom);
+		LWPOLY *g = (LWPOLY *)(geom);
 		for (i = 0; i < g->nrings; i++)
 		{
-			POINTARRAY* pa = g->rings[i];
+			POINTARRAY *pa = g->rings[i];
 			/* Only stop collapse on first ring */
 			int minpoints = (preserve_collapsed && i == 0) ? 4 : 0;
 			/* Skip zero'ed out rings */
@@ -1779,10 +1779,10 @@ lwgeom_simplify_in_place(LWGEOM* geom, double epsilon, int preserve_collapsed)
 	case COLLECTIONTYPE:
 	{
 		uint32_t i, j = 0;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 		{
-			LWGEOM* g = col->geoms[i];
+			LWGEOM *g = col->geoms[i];
 			if (!g) continue;
 			lwgeom_simplify_in_place(g, epsilon, preserve_collapsed);
 			/* Drop zero'ed out geometries */
@@ -1806,10 +1806,10 @@ lwgeom_simplify_in_place(LWGEOM* geom, double epsilon, int preserve_collapsed)
 	return;
 }
 
-LWGEOM*
-lwgeom_simplify(const LWGEOM* igeom, double dist, int preserve_collapsed)
+LWGEOM *
+lwgeom_simplify(const LWGEOM *igeom, double dist, int preserve_collapsed)
 {
-	LWGEOM* lwgeom_out = lwgeom_clone_deep(igeom);
+	LWGEOM *lwgeom_out = lwgeom_clone_deep(igeom);
 	lwgeom_simplify_in_place(lwgeom_out, dist, preserve_collapsed);
 	if (lwgeom_is_empty(lwgeom_out))
 	{
@@ -1822,21 +1822,21 @@ lwgeom_simplify(const LWGEOM* igeom, double dist, int preserve_collapsed)
 /**************************************************************/
 
 double
-lwgeom_area(const LWGEOM* geom)
+lwgeom_area(const LWGEOM *geom)
 {
 	int type = geom->type;
 
 	if (type == POLYGONTYPE)
-		return lwpoly_area((LWPOLY*)geom);
+		return lwpoly_area((LWPOLY *)geom);
 	else if (type == CURVEPOLYTYPE)
-		return lwcurvepoly_area((LWCURVEPOLY*)geom);
+		return lwcurvepoly_area((LWCURVEPOLY *)geom);
 	else if (type == TRIANGLETYPE)
-		return lwtriangle_area((LWTRIANGLE*)geom);
+		return lwtriangle_area((LWTRIANGLE *)geom);
 	else if (lwgeom_is_collection(geom))
 	{
 		double area = 0.0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			area += lwgeom_area(col->geoms[i]);
 		return area;
@@ -1846,20 +1846,20 @@ lwgeom_area(const LWGEOM* geom)
 }
 
 double
-lwgeom_perimeter(const LWGEOM* geom)
+lwgeom_perimeter(const LWGEOM *geom)
 {
 	int type = geom->type;
 	if (type == POLYGONTYPE)
-		return lwpoly_perimeter((LWPOLY*)geom);
+		return lwpoly_perimeter((LWPOLY *)geom);
 	else if (type == CURVEPOLYTYPE)
-		return lwcurvepoly_perimeter((LWCURVEPOLY*)geom);
+		return lwcurvepoly_perimeter((LWCURVEPOLY *)geom);
 	else if (type == TRIANGLETYPE)
-		return lwtriangle_perimeter((LWTRIANGLE*)geom);
+		return lwtriangle_perimeter((LWTRIANGLE *)geom);
 	else if (lwgeom_is_collection(geom))
 	{
 		double perimeter = 0.0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			perimeter += lwgeom_perimeter(col->geoms[i]);
 		return perimeter;
@@ -1869,20 +1869,20 @@ lwgeom_perimeter(const LWGEOM* geom)
 }
 
 double
-lwgeom_perimeter_2d(const LWGEOM* geom)
+lwgeom_perimeter_2d(const LWGEOM *geom)
 {
 	int type = geom->type;
 	if (type == POLYGONTYPE)
-		return lwpoly_perimeter_2d((LWPOLY*)geom);
+		return lwpoly_perimeter_2d((LWPOLY *)geom);
 	else if (type == CURVEPOLYTYPE)
-		return lwcurvepoly_perimeter_2d((LWCURVEPOLY*)geom);
+		return lwcurvepoly_perimeter_2d((LWCURVEPOLY *)geom);
 	else if (type == TRIANGLETYPE)
-		return lwtriangle_perimeter_2d((LWTRIANGLE*)geom);
+		return lwtriangle_perimeter_2d((LWTRIANGLE *)geom);
 	else if (lwgeom_is_collection(geom))
 	{
 		double perimeter = 0.0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			perimeter += lwgeom_perimeter_2d(col->geoms[i]);
 		return perimeter;
@@ -1892,20 +1892,20 @@ lwgeom_perimeter_2d(const LWGEOM* geom)
 }
 
 double
-lwgeom_length(const LWGEOM* geom)
+lwgeom_length(const LWGEOM *geom)
 {
 	int type = geom->type;
 	if (type == LINETYPE)
-		return lwline_length((LWLINE*)geom);
+		return lwline_length((LWLINE *)geom);
 	else if (type == CIRCSTRINGTYPE)
-		return lwcircstring_length((LWCIRCSTRING*)geom);
+		return lwcircstring_length((LWCIRCSTRING *)geom);
 	else if (type == COMPOUNDTYPE)
-		return lwcompound_length((LWCOMPOUND*)geom);
+		return lwcompound_length((LWCOMPOUND *)geom);
 	else if (lwgeom_is_collection(geom))
 	{
 		double length = 0.0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			length += lwgeom_length(col->geoms[i]);
 		return length;
@@ -1915,20 +1915,20 @@ lwgeom_length(const LWGEOM* geom)
 }
 
 double
-lwgeom_length_2d(const LWGEOM* geom)
+lwgeom_length_2d(const LWGEOM *geom)
 {
 	int type = geom->type;
 	if (type == LINETYPE)
-		return lwline_length_2d((LWLINE*)geom);
+		return lwline_length_2d((LWLINE *)geom);
 	else if (type == CIRCSTRINGTYPE)
-		return lwcircstring_length_2d((LWCIRCSTRING*)geom);
+		return lwcircstring_length_2d((LWCIRCSTRING *)geom);
 	else if (type == COMPOUNDTYPE)
-		return lwcompound_length_2d((LWCOMPOUND*)geom);
+		return lwcompound_length_2d((LWCOMPOUND *)geom);
 	else if (lwgeom_is_collection(geom))
 	{
 		double length = 0.0;
 		uint32_t i;
-		LWCOLLECTION* col = (LWCOLLECTION*)geom;
+		LWCOLLECTION *col = (LWCOLLECTION *)geom;
 		for (i = 0; i < col->ngeoms; i++)
 			length += lwgeom_length_2d(col->geoms[i]);
 		return length;
@@ -1938,7 +1938,7 @@ lwgeom_length_2d(const LWGEOM* geom)
 }
 
 void
-lwgeom_affine(LWGEOM* geom, const AFFINE* affine)
+lwgeom_affine(LWGEOM *geom, const AFFINE *affine)
 {
 	int type = geom->type;
 	uint32_t i;
@@ -1951,20 +1951,20 @@ lwgeom_affine(LWGEOM* geom, const AFFINE* affine)
 	case CIRCSTRINGTYPE:
 	case TRIANGLETYPE:
 	{
-		LWLINE* l = (LWLINE*)geom;
+		LWLINE *l = (LWLINE *)geom;
 		ptarray_affine(l->points, affine);
 		break;
 	}
 	case POLYGONTYPE:
 	{
-		LWPOLY* p = (LWPOLY*)geom;
+		LWPOLY *p = (LWPOLY *)geom;
 		for (i = 0; i < p->nrings; i++)
 			ptarray_affine(p->rings[i], affine);
 		break;
 	}
 	case CURVEPOLYTYPE:
 	{
-		LWCURVEPOLY* c = (LWCURVEPOLY*)geom;
+		LWCURVEPOLY *c = (LWCURVEPOLY *)geom;
 		for (i = 0; i < c->nrings; i++)
 			lwgeom_affine(c->rings[i], affine);
 		break;
@@ -1973,7 +1973,7 @@ lwgeom_affine(LWGEOM* geom, const AFFINE* affine)
 	{
 		if (lwgeom_is_collection(geom))
 		{
-			LWCOLLECTION* c = (LWCOLLECTION*)geom;
+			LWCOLLECTION *c = (LWCOLLECTION *)geom;
 			for (i = 0; i < c->ngeoms; i++)
 			{
 				lwgeom_affine(c->geoms[i], affine);
@@ -1988,7 +1988,7 @@ lwgeom_affine(LWGEOM* geom, const AFFINE* affine)
 }
 
 void
-lwgeom_scale(LWGEOM* geom, const POINT4D* factor)
+lwgeom_scale(LWGEOM *geom, const POINT4D *factor)
 {
 	int type = geom->type;
 	uint32_t i;
@@ -2001,20 +2001,20 @@ lwgeom_scale(LWGEOM* geom, const POINT4D* factor)
 	case CIRCSTRINGTYPE:
 	case TRIANGLETYPE:
 	{
-		LWLINE* l = (LWLINE*)geom;
+		LWLINE *l = (LWLINE *)geom;
 		ptarray_scale(l->points, factor);
 		break;
 	}
 	case POLYGONTYPE:
 	{
-		LWPOLY* p = (LWPOLY*)geom;
+		LWPOLY *p = (LWPOLY *)geom;
 		for (i = 0; i < p->nrings; i++)
 			ptarray_scale(p->rings[i], factor);
 		break;
 	}
 	case CURVEPOLYTYPE:
 	{
-		LWCURVEPOLY* c = (LWCURVEPOLY*)geom;
+		LWCURVEPOLY *c = (LWCURVEPOLY *)geom;
 		for (i = 0; i < c->nrings; i++)
 			lwgeom_scale(c->rings[i], factor);
 		break;
@@ -2023,7 +2023,7 @@ lwgeom_scale(LWGEOM* geom, const POINT4D* factor)
 	{
 		if (lwgeom_is_collection(geom))
 		{
-			LWCOLLECTION* c = (LWCOLLECTION*)geom;
+			LWCOLLECTION *c = (LWCOLLECTION *)geom;
 			for (i = 0; i < c->ngeoms; i++)
 			{
 				lwgeom_scale(c->geoms[i], factor);
@@ -2052,7 +2052,7 @@ lwgeom_scale(LWGEOM* geom, const POINT4D* factor)
 	}
 }
 
-LWGEOM*
+LWGEOM *
 lwgeom_construct_empty(uint8_t type, int srid, char hasz, char hasm)
 {
 	switch (type)
@@ -2082,27 +2082,27 @@ lwgeom_construct_empty(uint8_t type, int srid, char hasz, char hasm)
 }
 
 int
-lwgeom_startpoint(const LWGEOM* lwgeom, POINT4D* pt)
+lwgeom_startpoint(const LWGEOM *lwgeom, POINT4D *pt)
 {
 	if (!lwgeom) return LW_FAILURE;
 
 	switch (lwgeom->type)
 	{
 	case POINTTYPE:
-		return ptarray_startpoint(((LWPOINT*)lwgeom)->point, pt);
+		return ptarray_startpoint(((LWPOINT *)lwgeom)->point, pt);
 	case TRIANGLETYPE:
 	case CIRCSTRINGTYPE:
 	case LINETYPE:
-		return ptarray_startpoint(((LWLINE*)lwgeom)->points, pt);
+		return ptarray_startpoint(((LWLINE *)lwgeom)->points, pt);
 	case POLYGONTYPE:
-		return lwpoly_startpoint((LWPOLY*)lwgeom, pt);
+		return lwpoly_startpoint((LWPOLY *)lwgeom, pt);
 	case CURVEPOLYTYPE:
 	case COMPOUNDTYPE:
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_startpoint((LWCOLLECTION*)lwgeom, pt);
+		return lwcollection_startpoint((LWCOLLECTION *)lwgeom, pt);
 	default:
 		lwerror("int: unsupported geometry type: %s", lwtype_name(lwgeom->type));
 		return LW_FAILURE;
@@ -2110,21 +2110,21 @@ lwgeom_startpoint(const LWGEOM* lwgeom, POINT4D* pt)
 }
 
 void
-lwgeom_grid_in_place(LWGEOM* geom, const gridspec* grid)
+lwgeom_grid_in_place(LWGEOM *geom, const gridspec *grid)
 {
 	if (!geom) return;
 	switch (geom->type)
 	{
 	case POINTTYPE:
 	{
-		LWPOINT* pt = (LWPOINT*)(geom);
+		LWPOINT *pt = (LWPOINT *)(geom);
 		ptarray_grid_in_place(pt->point, grid);
 		return;
 	}
 	case CIRCSTRINGTYPE:
 	case LINETYPE:
 	{
-		LWLINE* ln = (LWLINE*)(geom);
+		LWLINE *ln = (LWLINE *)(geom);
 		ptarray_grid_in_place(ln->points, grid);
 		/* For invalid line, return an EMPTY */
 		if (ln->points->npoints < 2) ln->points->npoints = 0;
@@ -2132,12 +2132,12 @@ lwgeom_grid_in_place(LWGEOM* geom, const gridspec* grid)
 	}
 	case POLYGONTYPE:
 	{
-		LWPOLY* ply = (LWPOLY*)(geom);
+		LWPOLY *ply = (LWPOLY *)(geom);
 		if (!ply->rings) return;
 
 		/* Check first the external ring */
 		uint32_t i = 0;
-		POINTARRAY* pa = ply->rings[0];
+		POINTARRAY *pa = ply->rings[0];
 		ptarray_grid_in_place(pa, grid);
 		if (pa->npoints < 4)
 		{
@@ -2154,7 +2154,7 @@ lwgeom_grid_in_place(LWGEOM* geom, const gridspec* grid)
 		uint32_t j = 1;
 		for (i = 1; i < ply->nrings; i++)
 		{
-			POINTARRAY* pa = ply->rings[i];
+			POINTARRAY *pa = ply->rings[i];
 			ptarray_grid_in_place(pa, grid);
 
 			/* Skip bad rings */
@@ -2174,12 +2174,12 @@ lwgeom_grid_in_place(LWGEOM* geom, const gridspec* grid)
 	case COLLECTIONTYPE:
 	case COMPOUNDTYPE:
 	{
-		LWCOLLECTION* col = (LWCOLLECTION*)(geom);
+		LWCOLLECTION *col = (LWCOLLECTION *)(geom);
 		uint32_t i, j = 0;
 		if (!col->geoms) return;
 		for (i = 0; i < col->ngeoms; i++)
 		{
-			LWGEOM* g = col->geoms[i];
+			LWGEOM *g = col->geoms[i];
 			lwgeom_grid_in_place(g, grid);
 			/* Empty geoms need to be freed */
 			/* before we move on */
@@ -2201,27 +2201,27 @@ lwgeom_grid_in_place(LWGEOM* geom, const gridspec* grid)
 	}
 }
 
-LWGEOM*
-lwgeom_grid(const LWGEOM* lwgeom, const gridspec* grid)
+LWGEOM *
+lwgeom_grid(const LWGEOM *lwgeom, const gridspec *grid)
 {
-	LWGEOM* lwgeom_out = lwgeom_clone_deep(lwgeom);
+	LWGEOM *lwgeom_out = lwgeom_clone_deep(lwgeom);
 	lwgeom_grid_in_place(lwgeom_out, grid);
 	return lwgeom_out;
 }
 
 /* Prototype for recursion */
-static int lwgeom_subdivide_recursive(const LWGEOM* geom,
+static int lwgeom_subdivide_recursive(const LWGEOM *geom,
 				      uint32_t maxvertices,
 				      uint32_t depth,
-				      LWCOLLECTION* col,
-				      const GBOX* clip);
+				      LWCOLLECTION *col,
+				      const GBOX *clip);
 
 static int
-lwgeom_subdivide_recursive(const LWGEOM* geom,
+lwgeom_subdivide_recursive(const LWGEOM *geom,
 			   uint32_t maxvertices,
 			   uint32_t depth,
-			   LWCOLLECTION* col,
-			   const GBOX* clip)
+			   LWCOLLECTION *col,
+			   const GBOX *clip)
 {
 	const uint32_t maxdepth = 50;
 	uint32_t nvertices = 0;
@@ -2250,7 +2250,7 @@ lwgeom_subdivide_recursive(const LWGEOM* geom,
 	/* Always just recurse into collections */
 	if (lwgeom_is_collection(geom) && geom->type != MULTIPOINTTYPE)
 	{
-		LWCOLLECTION* incol = (LWCOLLECTION*)geom;
+		LWCOLLECTION *incol = (LWCOLLECTION *)geom;
 		int n = 0;
 		for (i = 0; i < incol->ngeoms; i++)
 		{
@@ -2322,12 +2322,12 @@ lwgeom_subdivide_recursive(const LWGEOM* geom,
 	return n;
 }
 
-LWCOLLECTION*
-lwgeom_subdivide(const LWGEOM* geom, uint32_t maxvertices)
+LWCOLLECTION *
+lwgeom_subdivide(const LWGEOM *geom, uint32_t maxvertices)
 {
 	static uint32_t startdepth = 0;
 	static uint32_t minmaxvertices = 8;
-	LWCOLLECTION* col;
+	LWCOLLECTION *col;
 	GBOX clip;
 
 	col = lwcollection_construct_empty(COLLECTIONTYPE, geom->srid, lwgeom_has_z(geom), lwgeom_has_m(geom));
@@ -2342,12 +2342,12 @@ lwgeom_subdivide(const LWGEOM* geom, uint32_t maxvertices)
 
 	clip = *(lwgeom_get_bbox(geom));
 	lwgeom_subdivide_recursive(geom, maxvertices, startdepth, col, &clip);
-	lwgeom_set_srid((LWGEOM*)col, geom->srid);
+	lwgeom_set_srid((LWGEOM *)col, geom->srid);
 	return col;
 }
 
 int
-lwgeom_is_trajectory(const LWGEOM* geom)
+lwgeom_is_trajectory(const LWGEOM *geom)
 {
 	int type = geom->type;
 
@@ -2356,5 +2356,5 @@ lwgeom_is_trajectory(const LWGEOM* geom)
 		lwnotice("Geometry is not a LINESTRING");
 		return LW_FALSE;
 	}
-	return lwline_is_trajectory((LWLINE*)geom);
+	return lwline_is_trajectory((LWLINE *)geom);
 }

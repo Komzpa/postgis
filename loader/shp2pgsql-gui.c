@@ -30,8 +30,8 @@
 #define GUI_RCSID "shp2pgsql-gui $Revision$"
 #define SHAPEFIELDMAXWIDTH 60
 
-static void pgui_log_va(const char* fmt, va_list ap);
-static void pgui_seterr_va(const char* fmt, va_list ap);
+static void pgui_log_va(const char *fmt, va_list ap);
+static void pgui_seterr_va(const char *fmt, va_list ap);
 
 static void update_conn_ui_from_conn_config(void);
 
@@ -47,101 +47,101 @@ static void update_conn_ui_from_conn_config(void);
 */
 
 /* Main window */
-static GtkWidget* window_main = NULL;
+static GtkWidget *window_main = NULL;
 
-static GtkWidget* textview_log = NULL;
-static GtkTextBuffer* textbuffer_log = NULL;
+static GtkWidget *textview_log = NULL;
+static GtkTextBuffer *textbuffer_log = NULL;
 
 /* Main import window (listview) */
-GtkListStore* import_file_list_store;
-GtkWidget* import_tree;
-GtkCellRenderer* import_filename_renderer;
-GtkCellRenderer* import_schema_renderer;
-GtkCellRenderer* import_table_renderer;
-GtkCellRenderer* import_geom_column_renderer;
-GtkCellRenderer* import_srid_renderer;
-GtkCellRenderer* import_mode_renderer;
-GtkCellRenderer* import_remove_renderer;
+GtkListStore *import_file_list_store;
+GtkWidget *import_tree;
+GtkCellRenderer *import_filename_renderer;
+GtkCellRenderer *import_schema_renderer;
+GtkCellRenderer *import_table_renderer;
+GtkCellRenderer *import_geom_column_renderer;
+GtkCellRenderer *import_srid_renderer;
+GtkCellRenderer *import_mode_renderer;
+GtkCellRenderer *import_remove_renderer;
 
-GtkTreeViewColumn* import_filename_column;
-GtkTreeViewColumn* import_schema_column;
-GtkTreeViewColumn* import_table_column;
-GtkTreeViewColumn* import_geom_column;
-GtkTreeViewColumn* import_srid_column;
-GtkTreeViewColumn* import_mode_column;
-GtkTreeViewColumn* import_remove_column;
+GtkTreeViewColumn *import_filename_column;
+GtkTreeViewColumn *import_schema_column;
+GtkTreeViewColumn *import_table_column;
+GtkTreeViewColumn *import_geom_column;
+GtkTreeViewColumn *import_srid_column;
+GtkTreeViewColumn *import_mode_column;
+GtkTreeViewColumn *import_remove_column;
 
-static GtkWidget* add_file_button = NULL;
+static GtkWidget *add_file_button = NULL;
 
-GtkWidget* loader_mode_combo = NULL;
-GtkListStore* loader_mode_combo_list;
+GtkWidget *loader_mode_combo = NULL;
+GtkListStore *loader_mode_combo_list;
 
 /* Main export window (listview) */
-GtkListStore* export_table_list_store;
-GtkWidget* export_tree;
-GtkWidget* export_geom_column_combo;
-GtkCellRenderer* export_schema_renderer;
-GtkCellRenderer* export_table_renderer;
-GtkCellRenderer* export_geom_column_renderer;
-GtkCellRenderer* export_filename_renderer;
-GtkCellRenderer* export_remove_renderer;
+GtkListStore *export_table_list_store;
+GtkWidget *export_tree;
+GtkWidget *export_geom_column_combo;
+GtkCellRenderer *export_schema_renderer;
+GtkCellRenderer *export_table_renderer;
+GtkCellRenderer *export_geom_column_renderer;
+GtkCellRenderer *export_filename_renderer;
+GtkCellRenderer *export_remove_renderer;
 
-GtkTreeViewColumn* export_schema_column;
-GtkTreeViewColumn* export_table_column;
-GtkTreeViewColumn* export_geom_column;
-GtkTreeViewColumn* export_filename_column;
-GtkTreeViewColumn* export_remove_column;
+GtkTreeViewColumn *export_schema_column;
+GtkTreeViewColumn *export_table_column;
+GtkTreeViewColumn *export_geom_column;
+GtkTreeViewColumn *export_filename_column;
+GtkTreeViewColumn *export_remove_column;
 
-static GtkWidget* add_table_button = NULL;
+static GtkWidget *add_table_button = NULL;
 
 /* PostgreSQL database connection window */
-static GtkWidget* window_conn = NULL;
+static GtkWidget *window_conn = NULL;
 
-static GtkWidget* entry_pg_user = NULL;
-static GtkWidget* entry_pg_pass = NULL;
-static GtkWidget* entry_pg_host = NULL;
-static GtkWidget* entry_pg_port = NULL;
-static GtkWidget* entry_pg_db = NULL;
+static GtkWidget *entry_pg_user = NULL;
+static GtkWidget *entry_pg_pass = NULL;
+static GtkWidget *entry_pg_host = NULL;
+static GtkWidget *entry_pg_port = NULL;
+static GtkWidget *entry_pg_db = NULL;
 
 /* Loader options window */
-static GtkWidget* dialog_loader_options = NULL;
-static GtkWidget* entry_options_encoding = NULL;
-static GtkWidget* checkbutton_loader_options_preservecase = NULL;
-static GtkWidget* checkbutton_loader_options_forceint = NULL;
-static GtkWidget* checkbutton_loader_options_autoindex = NULL;
-static GtkWidget* checkbutton_loader_options_dbfonly = NULL;
-static GtkWidget* checkbutton_loader_options_dumpformat = NULL;
-static GtkWidget* checkbutton_loader_options_geography = NULL;
-static GtkWidget* checkbutton_loader_options_simplegeoms = NULL;
+static GtkWidget *dialog_loader_options = NULL;
+static GtkWidget *entry_options_encoding = NULL;
+static GtkWidget *checkbutton_loader_options_preservecase = NULL;
+static GtkWidget *checkbutton_loader_options_forceint = NULL;
+static GtkWidget *checkbutton_loader_options_autoindex = NULL;
+static GtkWidget *checkbutton_loader_options_dbfonly = NULL;
+static GtkWidget *checkbutton_loader_options_dumpformat = NULL;
+static GtkWidget *checkbutton_loader_options_geography = NULL;
+static GtkWidget *checkbutton_loader_options_simplegeoms = NULL;
 
 /* Dumper options window */
-static GtkWidget* dialog_dumper_options = NULL;
-static GtkWidget* checkbutton_dumper_options_includegid = NULL;
-static GtkWidget* checkbutton_dumper_options_keep_fieldname_case = NULL;
-static GtkWidget* checkbutton_dumper_options_unescapedattrs = NULL;
+static GtkWidget *dialog_dumper_options = NULL;
+static GtkWidget *checkbutton_dumper_options_includegid = NULL;
+static GtkWidget *checkbutton_dumper_options_keep_fieldname_case = NULL;
+static GtkWidget *checkbutton_dumper_options_unescapedattrs = NULL;
 
 /* About dialog */
-static GtkWidget* dialog_about = NULL;
+static GtkWidget *dialog_about = NULL;
 
 /* File chooser */
-static GtkWidget* dialog_filechooser = NULL;
-static GtkWidget* dialog_folderchooser = NULL;
+static GtkWidget *dialog_filechooser = NULL;
+static GtkWidget *dialog_folderchooser = NULL;
 
 /* Progress dialog */
-static GtkWidget* dialog_progress = NULL;
-static GtkWidget* progress = NULL;
-static GtkWidget* label_progress = NULL;
+static GtkWidget *dialog_progress = NULL;
+static GtkWidget *progress = NULL;
+static GtkWidget *label_progress = NULL;
 
 /* Table chooser dialog */
-static GtkWidget* dialog_tablechooser = NULL;
-GtkListStore* chooser_filtered_table_list_store;
-GtkListStore* chooser_table_list_store;
-GtkWidget* chooser_tree;
-GtkCellRenderer* chooser_schema_renderer;
-GtkCellRenderer* chooser_table_renderer;
-GtkTreeViewColumn* chooser_schema_column;
-GtkTreeViewColumn* chooser_table_column;
-static GtkWidget* checkbutton_chooser_geoonly = NULL;
+static GtkWidget *dialog_tablechooser = NULL;
+GtkListStore *chooser_filtered_table_list_store;
+GtkListStore *chooser_table_list_store;
+GtkWidget *chooser_tree;
+GtkCellRenderer *chooser_schema_renderer;
+GtkCellRenderer *chooser_table_renderer;
+GtkTreeViewColumn *chooser_schema_column;
+GtkTreeViewColumn *chooser_table_column;
+static GtkWidget *checkbutton_chooser_geoonly = NULL;
 
 /* Other items */
 static int valid_connection = 0;
@@ -206,21 +206,21 @@ enum
 /* Other */
 #define GUIMSG_LINE_MAXLEN 256
 static char pgui_errmsg[GUIMSG_LINE_MAXLEN + 1];
-static PGconn* pg_connection = NULL;
-static SHPCONNECTIONCONFIG* conn = NULL;
-static SHPLOADERCONFIG* global_loader_config = NULL;
-static SHPDUMPERCONFIG* global_dumper_config = NULL;
+static PGconn *pg_connection = NULL;
+static SHPCONNECTIONCONFIG *conn = NULL;
+static SHPLOADERCONFIG *global_loader_config = NULL;
+static SHPDUMPERCONFIG *global_dumper_config = NULL;
 
 static volatile int is_running = FALSE;
 
 /* Local prototypes */
-static void pgui_sanitize_connection_string(char* connection_string);
+static void pgui_sanitize_connection_string(char *connection_string);
 
 /*
 ** Write a message to the Import Log text area.
 */
 void
-pgui_log_va(const char* fmt, va_list ap)
+pgui_log_va(const char *fmt, va_list ap)
 {
 	char msg[GUIMSG_LINE_MAXLEN + 1];
 	GtkTextIter iter;
@@ -244,7 +244,7 @@ pgui_log_va(const char* fmt, va_list ap)
 ** Write a message to the Import Log text area.
 */
 static void
-pgui_logf(const char* fmt, ...)
+pgui_logf(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -257,14 +257,14 @@ pgui_logf(const char* fmt, ...)
 
 /* Write an error message */
 void
-pgui_seterr_va(const char* fmt, va_list ap)
+pgui_seterr_va(const char *fmt, va_list ap)
 {
 	if (-1 == vsnprintf(pgui_errmsg, GUIMSG_LINE_MAXLEN, fmt, ap)) return;
 	pgui_errmsg[GUIMSG_LINE_MAXLEN] = '\0';
 }
 
 static void
-pgui_seterr(const char* fmt, ...)
+pgui_seterr(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -302,9 +302,9 @@ pgui_raise_error_dialogue(void)
 ** Run a SQL command against the current connection.
 */
 static int
-pgui_exec(const char* sql)
+pgui_exec(const char *sql)
 {
-	PGresult* res = NULL;
+	PGresult *res = NULL;
 	ExecStatusType status;
 	char sql_trunc[256];
 
@@ -340,9 +340,9 @@ pgui_exec(const char* sql)
 ** Start the COPY process.
 */
 static int
-pgui_copy_start(const char* sql)
+pgui_copy_start(const char *sql)
 {
-	PGresult* res = NULL;
+	PGresult *res = NULL;
 	ExecStatusType status;
 	char sql_trunc[256];
 
@@ -371,7 +371,7 @@ pgui_copy_start(const char* sql)
 ** Send a line (row) of data into the COPY procedure.
 */
 static int
-pgui_copy_write(const char* line)
+pgui_copy_write(const char *line)
 {
 	char line_trunc[256];
 
@@ -401,7 +401,7 @@ pgui_copy_write(const char* line)
 static int
 pgui_copy_end(const int rollback)
 {
-	char* errmsg = NULL;
+	char *errmsg = NULL;
 
 	/* We need a connection to do anything. */
 	if (!pg_connection) return 0;
@@ -428,7 +428,7 @@ update_filename_field_width(void)
 {
 	GtkTreeIter iter;
 	gboolean is_valid;
-	gchar* filename;
+	gchar *filename;
 	int max_width;
 
 	/* Loop through the list store to find the maximum length of an entry */
@@ -463,8 +463,8 @@ update_filename_field_width(void)
 static int
 connection_test(void)
 {
-	char* connection_string = NULL;
-	char* connection_sanitized = NULL;
+	char *connection_string = NULL;
+	char *connection_sanitized = NULL;
 
 	if (!(connection_string = ShpDumperGetConnectionStringFromConn(conn)))
 	{
@@ -501,7 +501,7 @@ connection_test(void)
 /* Delete event handler for popups that simply returns TRUE to prevent GTK from
    destroying the window and then hides it manually */
 static gint
-pgui_event_popup_delete(GtkWidget* widget, GdkEvent* event, gpointer data)
+pgui_event_popup_delete(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	gtk_widget_hide(GTK_WIDGET(widget));
 	return TRUE;
@@ -510,7 +510,7 @@ pgui_event_popup_delete(GtkWidget* widget, GdkEvent* event, gpointer data)
 /* === Progress window functions === */
 
 static void
-pgui_action_progress_cancel(GtkDialog* dialog, gint response_id, gpointer user_data)
+pgui_action_progress_cancel(GtkDialog *dialog, gint response_id, gpointer user_data)
 {
 	/* Stop the current import */
 	is_running = FALSE;
@@ -519,7 +519,7 @@ pgui_action_progress_cancel(GtkDialog* dialog, gint response_id, gpointer user_d
 }
 
 static gint
-pgui_action_progress_delete(GtkWidget* widget, GdkEvent* event, gpointer data)
+pgui_action_progress_delete(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	/* Stop the current import */
 	is_running = FALSE;
@@ -531,9 +531,9 @@ pgui_action_progress_delete(GtkWidget* widget, GdkEvent* event, gpointer data)
 
 /* Update the specified SHPLOADERCONFIG with the global settings from the Options dialog */
 static void
-update_loader_config_globals_from_options_ui(SHPLOADERCONFIG* config)
+update_loader_config_globals_from_options_ui(SHPLOADERCONFIG *config)
 {
-	const char* entry_encoding = gtk_entry_get_text(GTK_ENTRY(entry_options_encoding));
+	const char *entry_encoding = gtk_entry_get_text(GTK_ENTRY(entry_options_encoding));
 	gboolean preservecase =
 	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton_loader_options_preservecase));
 	gboolean forceint = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton_loader_options_forceint));
@@ -642,7 +642,7 @@ pgui_set_loader_configs_from_options_ui()
 	GtkTreeIter iter;
 	gboolean is_valid;
 	gpointer gptr;
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 
 	/* First update the global (template) configuration */
 	update_loader_config_globals_from_options_ui(global_loader_config);
@@ -654,7 +654,7 @@ pgui_set_loader_configs_from_options_ui()
 	{
 		/* Get the SHPLOADERCONFIG for this file entry */
 		gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-		loader_file_config = (SHPLOADERCONFIG*)gptr;
+		loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 		/* Update it */
 		update_loader_config_globals_from_options_ui(loader_file_config);
@@ -674,7 +674,7 @@ update_table_chooser_from_database()
 {
 	PGresult *result, *geocol_result;
 	GtkTreeIter iter, geocol_iter;
-	GtkListStore* dumper_geocol_combo_list;
+	GtkListStore *dumper_geocol_combo_list;
 	char *connection_string, *sql_form, *query, *schema, *table, *geocol_query, *geocol_name = NULL;
 	int hasgeo, i, j;
 
@@ -734,7 +734,7 @@ update_table_chooser_from_database()
 
 				gtk_list_store_insert_before(dumper_geocol_combo_list,
 							     &geocol_iter,
-							     (GtkTreeIter*)TABLECHOOSER_GEOCOL_COMBO_TEXT);
+							     (GtkTreeIter *)TABLECHOOSER_GEOCOL_COMBO_TEXT);
 				gtk_list_store_set(dumper_geocol_combo_list,
 						   &geocol_iter,
 						   TABLECHOOSER_GEOCOL_COMBO_TEXT,
@@ -748,7 +748,7 @@ update_table_chooser_from_database()
 			geocol_name = NULL;
 
 			gtk_list_store_insert_before(
-			    dumper_geocol_combo_list, &geocol_iter, (GtkTreeIter*)TABLECHOOSER_GEOCOL_COMBO_TEXT);
+			    dumper_geocol_combo_list, &geocol_iter, (GtkTreeIter *)TABLECHOOSER_GEOCOL_COMBO_TEXT);
 			gtk_list_store_set(
 			    dumper_geocol_combo_list, &geocol_iter, TABLECHOOSER_GEOCOL_COMBO_TEXT, _("(None)"), -1);
 		}
@@ -788,7 +788,7 @@ update_table_chooser_from_database()
 
 /* GtkTreeModelFilter visibility function */
 static gboolean
-table_chooser_visibility_func(GtkTreeModel* model, GtkTreeIter* iter, gpointer data)
+table_chooser_visibility_func(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
 	/* First determine whether the hasgeo tickbox is selected or not */
 	gboolean geoonly = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton_chooser_geoonly));
@@ -814,7 +814,7 @@ table_chooser_visibility_func(GtkTreeModel* model, GtkTreeIter* iter, gpointer d
 
 /* Update the specified SHPDUMPERCONFIG with the global settings from the Options dialog */
 static void
-update_dumper_config_globals_from_options_ui(SHPDUMPERCONFIG* config)
+update_dumper_config_globals_from_options_ui(SHPDUMPERCONFIG *config)
 {
 	gboolean includegid = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton_dumper_options_includegid));
 	gboolean keep_fieldname_case =
@@ -864,7 +864,7 @@ pgui_set_dumper_configs_from_options_ui()
 	GtkTreeIter iter;
 	gboolean is_valid;
 	gpointer gptr;
-	SHPDUMPERCONFIG* dumper_table_config;
+	SHPDUMPERCONFIG *dumper_table_config;
 
 	/* First update the global (template) configuration */
 	update_dumper_config_globals_from_options_ui(global_dumper_config);
@@ -876,7 +876,7 @@ pgui_set_dumper_configs_from_options_ui()
 	{
 		/* Get the SHPDUMPERCONFIG for this file entry */
 		gtk_tree_model_get(GTK_TREE_MODEL(export_table_list_store), &iter, EXPORT_POINTER_COLUMN, &gptr, -1);
-		dumper_table_config = (SHPDUMPERCONFIG*)gptr;
+		dumper_table_config = (SHPDUMPERCONFIG *)gptr;
 
 		/* Update it */
 		update_dumper_config_globals_from_options_ui(dumper_table_config);
@@ -890,7 +890,7 @@ pgui_set_dumper_configs_from_options_ui()
 
 /* Signal handler for ticking/unticking the "only show geo columns" box */
 static void
-pgui_action_chooser_toggle_show_geocolumn(GtkToggleButton* togglebutton, gpointer user_data)
+pgui_action_chooser_toggle_show_geocolumn(GtkToggleButton *togglebutton, gpointer user_data)
 {
 	/* Simply update the listview filter */
 	gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(chooser_filtered_table_list_store));
@@ -899,7 +899,7 @@ pgui_action_chooser_toggle_show_geocolumn(GtkToggleButton* togglebutton, gpointe
 }
 
 static void
-pgui_action_dumper_options_open(GtkWidget* widget, gpointer data)
+pgui_action_dumper_options_open(GtkWidget *widget, gpointer data)
 {
 	update_options_ui_from_dumper_config_globals();
 	gtk_widget_show_all(dialog_dumper_options);
@@ -907,7 +907,7 @@ pgui_action_dumper_options_open(GtkWidget* widget, gpointer data)
 }
 
 static void
-pgui_action_dumper_options_close(GtkWidget* widget, gint response, gpointer data)
+pgui_action_dumper_options_close(GtkWidget *widget, gint response, gpointer data)
 {
 	/* Only update the configuration if the user hit OK */
 	if (response == GTK_RESPONSE_OK) pgui_set_dumper_configs_from_options_ui();
@@ -921,10 +921,10 @@ pgui_action_dumper_options_close(GtkWidget* widget, gint response, gpointer data
 /* === Main window functions === */
 
 /* Given a filename, generate a new loader configuration */
-static SHPLOADERCONFIG*
-create_new_file_config(const char* filename)
+static SHPLOADERCONFIG *
+create_new_file_config(const char *filename)
 {
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 	char *table_start, *table_end;
 	int i;
 
@@ -980,7 +980,7 @@ create_new_file_config(const char* filename)
 
 /* Given the loader configuration, add a new row representing this file to the listview */
 static void
-add_loader_file_config_to_list(SHPLOADERCONFIG* loader_file_config)
+add_loader_file_config_to_list(SHPLOADERCONFIG *loader_file_config)
 {
 	GtkTreeIter iter;
 #define MAXLEN 16
@@ -1021,7 +1021,7 @@ add_loader_file_config_to_list(SHPLOADERCONFIG* loader_file_config)
 
 /* Free up the specified SHPLOADERCONFIG */
 static void
-free_loader_config(SHPLOADERCONFIG* config)
+free_loader_config(SHPLOADERCONFIG *config)
 {
 
 	if (config->table) free(config->table);
@@ -1043,10 +1043,10 @@ free_loader_config(SHPLOADERCONFIG* config)
 }
 
 /* Given a table selection, generate a new configuration */
-static SHPDUMPERCONFIG*
-create_new_table_config(GtkTreeIter* iter)
+static SHPDUMPERCONFIG *
+create_new_table_config(GtkTreeIter *iter)
 {
-	SHPDUMPERCONFIG* dumper_table_config;
+	SHPDUMPERCONFIG *dumper_table_config;
 	gchar *schema, *table, *geocol;
 	gint hasgeo;
 
@@ -1087,12 +1087,12 @@ create_new_table_config(GtkTreeIter* iter)
 arguments
 are optional, and enable the user to specify additional information to the view, e.g. geo column multi-choice. */
 static void
-add_dumper_table_config_to_list(SHPDUMPERCONFIG* dumper_table_config,
-				GtkListStore* chooser_liststore,
-				GtkTreeIter* chooser_iter)
+add_dumper_table_config_to_list(SHPDUMPERCONFIG *dumper_table_config,
+				GtkListStore *chooser_liststore,
+				GtkTreeIter *chooser_iter)
 {
 	GtkTreeIter iter;
-	GtkListStore* geocol_liststore;
+	GtkListStore *geocol_liststore;
 
 	gtk_list_store_insert_before(export_table_list_store, &iter, NULL);
 	gtk_list_store_set(export_table_list_store,
@@ -1128,7 +1128,7 @@ add_dumper_table_config_to_list(SHPDUMPERCONFIG* dumper_table_config,
 
 /* Free up the specified SHPDUMPERCONFIG */
 static void
-free_dumper_config(SHPDUMPERCONFIG* config)
+free_dumper_config(SHPDUMPERCONFIG *config)
 {
 
 	if (config->table) free(config->table);
@@ -1146,7 +1146,7 @@ free_dumper_config(SHPDUMPERCONFIG* config)
 /* Validate a single DBF column type against a PostgreSQL type: return either TRUE or FALSE depending
    upon whether or not the type is (broadly) compatible */
 static int
-validate_shape_column_against_pg_column(int dbf_fieldtype, char* pg_fieldtype)
+validate_shape_column_against_pg_column(int dbf_fieldtype, char *pg_fieldtype)
 {
 	switch (dbf_fieldtype)
 	{
@@ -1184,10 +1184,10 @@ validate_shape_column_against_pg_column(int dbf_fieldtype, char* pg_fieldtype)
 /* Validate column compatibility for the given loader configuration against the table/column
    list returned in result */
 static int
-validate_remote_loader_columns(SHPLOADERCONFIG* config, PGresult* result)
+validate_remote_loader_columns(SHPLOADERCONFIG *config, PGresult *result)
 {
 	ExecStatusType status;
-	SHPLOADERSTATE* state;
+	SHPLOADERSTATE *state;
 	int ntuples;
 	char *pg_fieldname, *pg_fieldtype;
 	int ret, i, j, found, response = SHPLOADEROK;
@@ -1301,7 +1301,7 @@ validate_remote_loader_columns(SHPLOADERCONFIG* config, PGresult* result)
 
 /* Terminate the main loop and exit the application. */
 static void
-pgui_quit(GtkWidget* widget, gpointer data)
+pgui_quit(GtkWidget *widget, gpointer data)
 {
 	gtk_main_quit();
 }
@@ -1315,7 +1315,7 @@ pgui_action_about_open()
 }
 
 static void
-pgui_action_cancel(GtkWidget* widget, gpointer data)
+pgui_action_cancel(GtkWidget *widget, gpointer data)
 {
 	if (!is_running)
 		pgui_quit(widget, data); /* quit if we're not running */
@@ -1324,7 +1324,7 @@ pgui_action_cancel(GtkWidget* widget, gpointer data)
 }
 
 static void
-pgui_action_loader_options_open(GtkWidget* widget, gpointer data)
+pgui_action_loader_options_open(GtkWidget *widget, gpointer data)
 {
 	update_options_ui_from_loader_config_globals();
 	gtk_widget_show_all(dialog_loader_options);
@@ -1332,7 +1332,7 @@ pgui_action_loader_options_open(GtkWidget* widget, gpointer data)
 }
 
 static void
-pgui_action_loader_options_close(GtkWidget* widget, gint response, gpointer data)
+pgui_action_loader_options_close(GtkWidget *widget, gint response, gpointer data)
 {
 	/* Only update the configuration if the user hit OK */
 	if (response == GTK_RESPONSE_OK) pgui_set_loader_configs_from_options_ui();
@@ -1344,11 +1344,11 @@ pgui_action_loader_options_close(GtkWidget* widget, gint response, gpointer data
 }
 
 static void
-pgui_action_open_file_dialog(GtkWidget* widget, gpointer data)
+pgui_action_open_file_dialog(GtkWidget *widget, gpointer data)
 {
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 	GSList *filename_list, *filename_item;
-	gchar* filename;
+	gchar *filename;
 
 	/* Make sure we deselect any files from the last time */
 	gtk_file_chooser_unselect_all(GTK_FILE_CHOOSER(dialog_filechooser));
@@ -1380,14 +1380,14 @@ pgui_action_open_file_dialog(GtkWidget* widget, gpointer data)
 }
 
 static void
-pgui_action_open_table_dialog(GtkWidget* widget, gpointer data)
+pgui_action_open_table_dialog(GtkWidget *widget, gpointer data)
 {
-	SHPDUMPERCONFIG* dumper_table_config;
-	GtkTreeSelection* chooser_selection;
-	GtkTreeModel* model;
+	SHPDUMPERCONFIG *dumper_table_config;
+	GtkTreeSelection *chooser_selection;
+	GtkTreeModel *model;
 	GList *selected_rows_list, *selected_row;
 	GtkTreeIter iter;
-	GtkTreePath* tree_path;
+	GtkTreePath *tree_path;
 
 	/* Make sure we can connect to the database first */
 	if (!connection_test())
@@ -1418,7 +1418,7 @@ pgui_action_open_table_dialog(GtkWidget* widget, gpointer data)
 		while (selected_row)
 		{
 			/* Get the tree iter */
-			tree_path = (GtkTreePath*)g_list_nth_data(selected_row, 0);
+			tree_path = (GtkTreePath *)g_list_nth_data(selected_row, 0);
 			gtk_tree_model_get_iter(model, &iter, tree_path);
 
 			/* Get the config and add it to the list */
@@ -1442,16 +1442,16 @@ pgui_action_open_table_dialog(GtkWidget* widget, gpointer data)
  * removes the row from the table.
  */
 static void
-pgui_action_handle_table_remove(GtkCellRendererToggle* renderer, gchar* path, gpointer user_data)
+pgui_action_handle_table_remove(GtkCellRendererToggle *renderer, gchar *path, gpointer user_data)
 {
 	GtkTreeIter iter;
-	SHPDUMPERCONFIG* dumper_table_config;
+	SHPDUMPERCONFIG *dumper_table_config;
 	gpointer gptr;
 
 	/* Grab the SHPDUMPERCONFIG from the EXPORT_POINTER_COLUMN for the list store */
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(export_table_list_store), &iter, path);
 	gtk_tree_model_get(GTK_TREE_MODEL(export_table_list_store), &iter, EXPORT_POINTER_COLUMN, &gptr, -1);
-	dumper_table_config = (SHPDUMPERCONFIG*)gptr;
+	dumper_table_config = (SHPDUMPERCONFIG *)gptr;
 
 	/* Free the configuration from memory */
 	free_dumper_config(dumper_table_config);
@@ -1461,16 +1461,16 @@ pgui_action_handle_table_remove(GtkCellRendererToggle* renderer, gchar* path, gp
 }
 
 static void
-pgui_action_import(GtkWidget* widget, gpointer data)
+pgui_action_import(GtkWidget *widget, gpointer data)
 {
-	SHPLOADERCONFIG* loader_file_config;
-	SHPLOADERSTATE* state;
+	SHPLOADERCONFIG *loader_file_config;
+	SHPLOADERSTATE *state;
 	gint is_valid;
 	gpointer gptr;
 	GtkTreeIter iter;
 	char *sql_form, *query, *connection_string, *progress_shapefile = NULL;
 	char progress_text[GUIMSG_LINE_MAXLEN + 1];
-	PGresult* result;
+	PGresult *result;
 
 	int ret, i = 0;
 	char *header, *footer, *record;
@@ -1516,7 +1516,7 @@ pgui_action_import(GtkWidget* widget, gpointer data)
 	{
 		/* Grab the SHPLOADERCONFIG for this row */
 		gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-		loader_file_config = (SHPLOADERCONFIG*)gptr;
+		loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 		/* For each entry, we execute a remote query in order to determine the column names
 		   and types for the remote table if they actually exist */
@@ -1554,7 +1554,7 @@ pgui_action_import(GtkWidget* widget, gpointer data)
 	{
 		/* Grab the SHPLOADERCONFIG for this row */
 		gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-		loader_file_config = (SHPLOADERCONFIG*)gptr;
+		loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 		pgui_logf("\n==============================");
 		pgui_logf(
@@ -1822,16 +1822,16 @@ pgui_action_import(GtkWidget* widget, gpointer data)
 }
 
 static void
-pgui_action_export(GtkWidget* widget, gpointer data)
+pgui_action_export(GtkWidget *widget, gpointer data)
 {
-	SHPDUMPERCONFIG* dumper_table_config;
-	SHPDUMPERSTATE* state;
+	SHPDUMPERCONFIG *dumper_table_config;
+	SHPDUMPERSTATE *state;
 	gint is_valid;
 	gpointer gptr;
 	GtkTreeIter iter;
 	char *output_shapefile, *orig_shapefile;
 	char progress_text[GUIMSG_LINE_MAXLEN + 1];
-	gchar* folder_path;
+	gchar *folder_path;
 
 	int ret, success = FALSE, i = 0;
 
@@ -1877,7 +1877,7 @@ pgui_action_export(GtkWidget* widget, gpointer data)
 	{
 		/* Grab the SHPDUMPERCONFIG for this row */
 		gtk_tree_model_get(GTK_TREE_MODEL(export_table_list_store), &iter, EXPORT_POINTER_COLUMN, &gptr, -1);
-		dumper_table_config = (SHPDUMPERCONFIG*)gptr;
+		dumper_table_config = (SHPDUMPERCONFIG *)gptr;
 
 		pgui_logf("\n==============================");
 		pgui_logf("Exporting with configuration: %s, %s, %s",
@@ -2041,12 +2041,12 @@ pgui_action_export(GtkWidget* widget, gpointer data)
 
 /* Creates a single file row in the list table given the URI of a file */
 static void
-process_single_uri(char* uri)
+process_single_uri(char *uri)
 {
-	SHPLOADERCONFIG* loader_file_config;
-	char* filename = NULL;
-	char* hostname;
-	GError* error = NULL;
+	SHPLOADERCONFIG *loader_file_config;
+	char *filename = NULL;
+	char *hostname;
+	GError *error = NULL;
 
 	if (uri == NULL)
 	{
@@ -2074,7 +2074,7 @@ process_single_uri(char* uri)
 
 /* Update the SHPLOADERCONFIG to the values currently contained within the iter  */
 static void
-update_loader_file_config_from_listview_iter(GtkTreeIter* iter, SHPLOADERCONFIG* loader_file_config)
+update_loader_file_config_from_listview_iter(GtkTreeIter *iter, SHPLOADERCONFIG *loader_file_config)
 {
 	gchar *schema, *table, *geo_col, *srid;
 
@@ -2119,11 +2119,11 @@ update_loader_file_config_from_listview_iter(GtkTreeIter* iter, SHPLOADERCONFIG*
  * and extract a list of filenames from it.
  */
 static void
-pgui_action_handle_file_drop(GtkWidget* widget,
-			     GdkDragContext* dc,
+pgui_action_handle_file_drop(GtkWidget *widget,
+			     GdkDragContext *dc,
 			     gint x,
 			     gint y,
-			     GtkSelectionData* selection_data,
+			     GtkSelectionData *selection_data,
 			     guint info,
 			     guint t,
 			     gpointer data)
@@ -2136,7 +2136,7 @@ pgui_action_handle_file_drop(GtkWidget* widget,
 		return;
 	}
 
-	p = (char*)selection_data->data;
+	p = (char *)selection_data->data;
 	while (p)
 	{
 		/* Only process non-comments */
@@ -2169,21 +2169,21 @@ pgui_action_handle_file_drop(GtkWidget* widget,
  * This function is a signal handler for the load mode combo boxes.
  */
 static void
-pgui_action_handle_tree_combo(GtkCellRendererCombo* combo,
-			      gchar* path_string,
-			      GtkTreeIter* new_iter,
+pgui_action_handle_tree_combo(GtkCellRendererCombo *combo,
+			      gchar *path_string,
+			      GtkTreeIter *new_iter,
 			      gpointer user_data)
 {
 	GtkTreeIter iter;
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 	char opt;
-	gchar* combo_text;
+	gchar *combo_text;
 	gpointer gptr;
 
 	/* Grab the SHPLOADERCONFIG from the IMPORT_POINTER_COLUMN for the list store */
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(import_file_list_store), &iter, path_string);
 	gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-	loader_file_config = (SHPLOADERCONFIG*)gptr;
+	loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 	/* Now grab the row selected within the combo box */
 	gtk_tree_model_get(GTK_TREE_MODEL(loader_mode_combo_list), new_iter, LOADER_MODE_COMBO_OPTION_CHAR, &opt, -1);
@@ -2231,12 +2231,12 @@ pgui_action_handle_tree_combo(GtkCellRendererCombo* combo,
  * are applied and the various validations called.
  */
 static void
-pgui_action_handle_loader_edit(GtkCellRendererText* renderer, gchar* path, gchar* new_text, gpointer column)
+pgui_action_handle_loader_edit(GtkCellRendererText *renderer, gchar *path, gchar *new_text, gpointer column)
 {
 	GtkTreeIter iter;
 	gpointer gptr;
 	gint columnindex;
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 #define MAXLEN 16
 	char srid[MAXLEN + 1];
 
@@ -2244,13 +2244,13 @@ pgui_action_handle_loader_edit(GtkCellRendererText* renderer, gchar* path, gchar
 	if (strlen(new_text) == 0) return;
 
 	/* Update the model with the current edit change */
-	columnindex = *(gint*)column;
+	columnindex = *(gint *)column;
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(import_file_list_store), &iter, path);
 	gtk_list_store_set(import_file_list_store, &iter, columnindex, new_text, -1);
 
 	/* Grab the SHPLOADERCONFIG from the IMPORT_POINTER_COLUMN for the list store */
 	gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-	loader_file_config = (SHPLOADERCONFIG*)gptr;
+	loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 	/* Update the configuration from the current UI data */
 	update_loader_file_config_from_listview_iter(&iter, loader_file_config);
@@ -2283,16 +2283,16 @@ pgui_action_handle_loader_edit(GtkCellRendererText* renderer, gchar* path, gchar
  * removes the row from the table.
  */
 static void
-pgui_action_handle_file_remove(GtkCellRendererToggle* renderer, gchar* path, gpointer user_data)
+pgui_action_handle_file_remove(GtkCellRendererToggle *renderer, gchar *path, gpointer user_data)
 {
 	GtkTreeIter iter;
-	SHPLOADERCONFIG* loader_file_config;
+	SHPLOADERCONFIG *loader_file_config;
 	gpointer gptr;
 
 	/* Grab the SHPLOADERCONFIG from the IMPORT_POINTER_COLUMN for the list store */
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(import_file_list_store), &iter, path);
 	gtk_tree_model_get(GTK_TREE_MODEL(import_file_list_store), &iter, IMPORT_POINTER_COLUMN, &gptr, -1);
-	loader_file_config = (SHPLOADERCONFIG*)gptr;
+	loader_file_config = (SHPLOADERCONFIG *)gptr;
 
 	/* Free the configuration from memory */
 	free_loader_config(loader_file_config);
@@ -2308,7 +2308,7 @@ pgui_action_handle_file_remove(GtkCellRendererToggle* renderer, gchar* path, gpo
 
 /* Update the SHPDUMPERCONFIG to the values currently contained within the iter  */
 static void
-update_dumper_table_config_from_listview_iter(GtkTreeIter* iter, SHPDUMPERCONFIG* dumper_table_config)
+update_dumper_table_config_from_listview_iter(GtkTreeIter *iter, SHPDUMPERCONFIG *dumper_table_config)
 {
 	gchar *schema, *table, *geo_col, *filename;
 
@@ -2349,15 +2349,15 @@ update_dumper_table_config_from_listview_iter(GtkTreeIter* iter, SHPDUMPERCONFIG
 }
 
 static void
-pgui_action_handle_table_geocol_combo(GtkCellRendererCombo* combo,
-				      gchar* path_string,
-				      GtkTreeIter* new_iter,
+pgui_action_handle_table_geocol_combo(GtkCellRendererCombo *combo,
+				      gchar *path_string,
+				      GtkTreeIter *new_iter,
 				      gpointer user_data)
 {
-	SHPDUMPERCONFIG* dumper_table_config;
-	gchar* geocol_name;
+	SHPDUMPERCONFIG *dumper_table_config;
+	gchar *geocol_name;
 	GtkTreeIter iter;
-	GtkListStore* model;
+	GtkListStore *model;
 	gpointer gptr;
 
 	/* Get the existing geo column name */
@@ -2377,7 +2377,7 @@ pgui_action_handle_table_geocol_combo(GtkCellRendererCombo* combo,
 
 	/* Otherwise update the geo column name in the config and the model */
 	gtk_tree_model_get(GTK_TREE_MODEL(model), new_iter, TABLECHOOSER_GEOCOL_COMBO_TEXT, &geocol_name, -1);
-	dumper_table_config = (SHPDUMPERCONFIG*)gptr;
+	dumper_table_config = (SHPDUMPERCONFIG *)gptr;
 
 	if (dumper_table_config->geo_col_name)
 	{
@@ -2392,24 +2392,24 @@ pgui_action_handle_table_geocol_combo(GtkCellRendererCombo* combo,
 }
 
 static void
-pgui_action_handle_dumper_edit(GtkCellRendererText* renderer, gchar* path, gchar* new_text, gpointer column)
+pgui_action_handle_dumper_edit(GtkCellRendererText *renderer, gchar *path, gchar *new_text, gpointer column)
 {
 	GtkTreeIter iter;
 	gpointer gptr;
 	gint columnindex;
-	SHPDUMPERCONFIG* dumper_table_config;
+	SHPDUMPERCONFIG *dumper_table_config;
 
 	/* Empty doesn't fly */
 	if (strlen(new_text) == 0) return;
 
 	/* Update the model with the current edit change */
-	columnindex = *(gint*)column;
+	columnindex = *(gint *)column;
 	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(export_table_list_store), &iter, path);
 	gtk_list_store_set(export_table_list_store, &iter, columnindex, new_text, -1);
 
 	/* Grab the SHPDUMPERCONFIG from the EXPORT_POINTER_COLUMN for the list store */
 	gtk_tree_model_get(GTK_TREE_MODEL(export_table_list_store), &iter, EXPORT_POINTER_COLUMN, &gptr, -1);
-	dumper_table_config = (SHPDUMPERCONFIG*)gptr;
+	dumper_table_config = (SHPDUMPERCONFIG *)gptr;
 
 	/* Update the configuration from the current UI data */
 	update_dumper_table_config_from_listview_iter(&iter, dumper_table_config);
@@ -2468,7 +2468,7 @@ update_conn_ui_from_conn_config(void)
 static void
 update_conn_config_from_conn_ui(void)
 {
-	const char* text;
+	const char *text;
 
 	text = gtk_entry_get_text(GTK_ENTRY(entry_pg_user));
 	if (conn->username) free(conn->username);
@@ -2517,7 +2517,7 @@ update_conn_config_from_conn_ui(void)
  * Open the connection details dialog
  */
 static void
-pgui_action_connection_details(GtkWidget* widget, gpointer data)
+pgui_action_connection_details(GtkWidget *widget, gpointer data)
 {
 	/* Update the UI with the current options */
 	update_conn_ui_from_conn_config();
@@ -2548,9 +2548,9 @@ pgui_validate_connection()
 }
 
 static void
-pgui_sanitize_connection_string(char* connection_string)
+pgui_sanitize_connection_string(char *connection_string)
 {
-	char* ptr = strstr(connection_string, "password");
+	char *ptr = strstr(connection_string, "password");
 	if (ptr)
 	{
 		ptr += 10;
@@ -2570,7 +2570,7 @@ pgui_sanitize_connection_string(char* connection_string)
  * parameters.  This is the button signal handler to do so.
  */
 static void
-pgui_action_connection_okay(GtkWidget* widget, gpointer data)
+pgui_action_connection_okay(GtkWidget *widget, gpointer data)
 {
 	/* Update the configuration structure from the form */
 	update_conn_config_from_conn_ui();
@@ -2604,7 +2604,7 @@ pgui_action_connection_okay(GtkWidget* widget, gpointer data)
 static void
 pgui_create_about_dialog(void)
 {
-	const char* authors[] = {"Paul Ramsey <pramsey@cleverelephant.ca>",
+	const char *authors[] = {"Paul Ramsey <pramsey@cleverelephant.ca>",
 				 "Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>",
 				 "Mark Leslie <mark.s.leslie@gmail.com>",
 				 NULL};
@@ -2619,7 +2619,7 @@ pgui_create_about_dialog(void)
 static void
 pgui_create_filechooser_dialog(void)
 {
-	GtkFileFilter* file_filter_shape;
+	GtkFileFilter *file_filter_shape;
 
 	/* Create the dialog */
 	dialog_filechooser = gtk_file_chooser_dialog_new(_("Select a Shape File"),
@@ -2652,7 +2652,7 @@ pgui_create_filechooser_dialog(void)
 static void
 pgui_create_folderchooser_dialog(void)
 {
-	GtkFileFilter* file_filter_shape;
+	GtkFileFilter *file_filter_shape;
 
 	/* Create the dialog */
 	dialog_folderchooser = gtk_file_chooser_dialog_new(_("Select an output folder"),
@@ -2729,10 +2729,10 @@ pgui_create_progress_dialog()
 }
 
 static void
-pgui_create_options_dialog_add_label(GtkWidget* table, const char* str, gfloat alignment, int row)
+pgui_create_options_dialog_add_label(GtkWidget *table, const char *str, gfloat alignment, int row)
 {
-	GtkWidget* align = gtk_alignment_new(alignment, 0.5, 0.0, 1.0);
-	GtkWidget* label = gtk_label_new(str);
+	GtkWidget *align = gtk_alignment_new(alignment, 0.5, 0.0, 1.0);
+	GtkWidget *label = gtk_label_new(str);
 	gtk_table_attach_defaults(GTK_TABLE(table), align, 1, 3, row, row + 1);
 	gtk_container_add(GTK_CONTAINER(align), label);
 }
@@ -2740,8 +2740,8 @@ pgui_create_options_dialog_add_label(GtkWidget* table, const char* str, gfloat a
 static void
 pgui_create_loader_options_dialog()
 {
-	GtkWidget* table_options;
-	GtkWidget* align_options_center;
+	GtkWidget *table_options;
+	GtkWidget *align_options_center;
 	static int text_width = 12;
 
 	dialog_loader_options = gtk_dialog_new_with_buttons(_("Import Options"),
@@ -2821,8 +2821,8 @@ pgui_create_loader_options_dialog()
 static void
 pgui_create_dumper_options_dialog()
 {
-	GtkWidget* table_options;
-	GtkWidget* align_options_center;
+	GtkWidget *table_options;
+	GtkWidget *align_options_center;
 
 	dialog_dumper_options = gtk_dialog_new_with_buttons(_("Export Options"),
 							    GTK_WINDOW(window_main),
@@ -2877,7 +2877,7 @@ pgui_create_tablechooser_dialog()
 {
 	GtkWidget *vbox_tree, *table_progress;
 	GtkWidget *sw, *label;
-	GtkTreeSelection* chooser_selection;
+	GtkTreeSelection *chooser_selection;
 
 	/* Create the main top level window with a 10px border */
 	dialog_tablechooser = gtk_dialog_new_with_buttons(_("Table selection"),
@@ -2899,7 +2899,7 @@ pgui_create_tablechooser_dialog()
 	/* Because we want to do selective filtering on the treeview content, we now implement a GtkTreeModel
 	   filter on top of the original tree model */
 	chooser_filtered_table_list_store =
-	    (GtkListStore*)gtk_tree_model_filter_new(GTK_TREE_MODEL(chooser_table_list_store), NULL);
+	    (GtkListStore *)gtk_tree_model_filter_new(GTK_TREE_MODEL(chooser_table_list_store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(chooser_filtered_table_list_store),
 					       (GtkTreeModelFilterVisibleFunc)table_chooser_visibility_func,
 					       NULL,
@@ -2965,12 +2965,12 @@ pgui_create_tablechooser_dialog()
  * up all the pretty signals.
  */
 static void
-pgui_create_import_file_table(GtkWidget* import_list_frame)
+pgui_create_import_file_table(GtkWidget *import_list_frame)
 {
-	GtkWidget* vbox_tree;
-	GtkWidget* sw;
+	GtkWidget *vbox_tree;
+	GtkWidget *sw;
 	GtkTreeIter iter;
-	gint* column_indexes;
+	gint *column_indexes;
 
 	gtk_container_set_border_width(GTK_CONTAINER(import_list_frame), 0);
 
@@ -3152,11 +3152,11 @@ pgui_create_import_file_table(GtkWidget* import_list_frame)
  * up all the pretty signals.
  */
 static void
-pgui_create_export_table_table(GtkWidget* export_list_frame)
+pgui_create_export_table_table(GtkWidget *export_list_frame)
 {
-	GtkWidget* vbox_tree;
-	GtkWidget* sw;
-	gint* column_indexes;
+	GtkWidget *vbox_tree;
+	GtkWidget *sw;
+	gint *column_indexes;
 
 	gtk_container_set_border_width(GTK_CONTAINER(export_list_frame), 0);
 
@@ -3291,16 +3291,16 @@ pgui_create_connection_window()
 	static int text_width = 12;
 
 	/* Vbox container */
-	GtkWidget* vbox;
+	GtkWidget *vbox;
 
 	/* Reusable label handle */
-	GtkWidget* label;
+	GtkWidget *label;
 
 	/* PgSQL section */
 	GtkWidget *frame_pg, *table_pg;
 
 	/* OK button */
-	GtkWidget* button_okay;
+	GtkWidget *button_okay;
 
 	/* Create the main top level window with a 10px border */
 	window_conn = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -3372,17 +3372,17 @@ pgui_create_connection_window()
 }
 
 static void
-pgui_create_main_window(const SHPCONNECTIONCONFIG* conn)
+pgui_create_main_window(const SHPCONNECTIONCONFIG *conn)
 {
 	/* Main widgets */
 	GtkWidget *vbox_main, *vbox_loader, *vbox_dumper;
 
 	/* PgSQL section */
 	GtkWidget *frame_pg, *import_list_frame, *export_list_frame, *frame_log;
-	GtkWidget* button_pg_conn;
+	GtkWidget *button_pg_conn;
 
 	/* Notebook */
-	GtkWidget* notebook;
+	GtkWidget *notebook;
 
 	/* Button section */
 	GtkWidget *loader_hbox_buttons, *loader_button_options, *loader_button_import, *loader_button_cancel,
@@ -3391,7 +3391,7 @@ pgui_create_main_window(const SHPCONNECTIONCONFIG* conn)
 	    *dumper_button_about;
 
 	/* Log section */
-	GtkWidget* scrolledwindow_log;
+	GtkWidget *scrolledwindow_log;
 
 	/* Create the main top level window with a 10px border */
 	window_main = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -3553,7 +3553,7 @@ usage()
 }
 
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
 	int c;
 

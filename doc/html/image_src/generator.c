@@ -44,12 +44,12 @@
 #define MAX_DIGS_DOUBLE (SHOW_DIGS_DOUBLE + 2) /* +2 for dot and sign */
 
 // Some global styling variables
-char* imageSize = "200x200";
+char *imageSize = "200x200";
 
-int getStyleName(char** styleName, char* line);
+int getStyleName(char **styleName, char *line);
 
 static void
-checked_system(const char* cmd)
+checked_system(const char *cmd)
 {
 	int ret = system(cmd);
 	if (WEXITSTATUS(ret) != 0)
@@ -66,12 +66,12 @@ checked_system(const char* cmd)
  * @return the numbers of character written to *output
  */
 static size_t
-pointarrayToString(char* output, POINTARRAY* pa)
+pointarrayToString(char *output, POINTARRAY *pa)
 {
 	char x[OUT_DOUBLE_BUFFER_SIZE];
 	char y[OUT_DOUBLE_BUFFER_SIZE];
 	int i;
-	char* ptr = output;
+	char *ptr = output;
 
 	for (i = 0; i < pa->npoints; i++)
 	{
@@ -98,18 +98,18 @@ pointarrayToString(char* output, POINTARRAY* pa)
  * @return the numbers of character written to *output
  */
 static size_t
-drawPoint(char* output, LWPOINT* lwp, LAYERSTYLE* styles)
+drawPoint(char *output, LWPOINT *lwp, LAYERSTYLE *styles)
 {
 	char x[OUT_DOUBLE_BUFFER_SIZE];
 	char y1[OUT_DOUBLE_BUFFER_SIZE];
 	char y2[OUT_DOUBLE_BUFFER_SIZE];
-	char* ptr = output;
-	POINTARRAY* pa = lwp->point;
+	char *ptr = output;
+	POINTARRAY *pa = lwp->point;
 	POINT2D p;
 	getPoint2d_p(pa, 0, &p);
 
 	LWDEBUGF(4, "%s", "drawPoint called");
-	LWDEBUGF(4, "point = %s", lwgeom_to_ewkt((LWGEOM*)lwp));
+	LWDEBUGF(4, "point = %s", lwgeom_to_ewkt((LWGEOM *)lwp));
 
 	lwprint_double(p.x, 10, x, OUT_DOUBLE_BUFFER_SIZE);
 	lwprint_double(p.y, 10, y1, OUT_DOUBLE_BUFFER_SIZE);
@@ -132,12 +132,12 @@ drawPoint(char* output, LWPOINT* lwp, LAYERSTYLE* styles)
  * @return the numbers of character written to *output
  */
 static size_t
-drawLineString(char* output, LWLINE* lwl, LAYERSTYLE* style)
+drawLineString(char *output, LWLINE *lwl, LAYERSTYLE *style)
 {
-	char* ptr = output;
+	char *ptr = output;
 
 	LWDEBUGF(4, "%s", "drawLineString called");
-	LWDEBUGF(4, "line = %s", lwgeom_to_ewkt((LWGEOM*)lwl));
+	LWDEBUGF(4, "line = %s", lwgeom_to_ewkt((LWGEOM *)lwl));
 
 	ptr += sprintf(ptr, "-fill none -stroke %s -strokewidth %d ", style->lineColor, style->lineWidth);
 	ptr += sprintf(ptr, "-draw \"stroke-linecap round stroke-linejoin round path 'M ");
@@ -157,13 +157,13 @@ drawLineString(char* output, LWLINE* lwl, LAYERSTYLE* style)
  * @return the numbers of character written to *output
  */
 static size_t
-drawPolygon(char* output, LWPOLY* lwp, LAYERSTYLE* style)
+drawPolygon(char *output, LWPOLY *lwp, LAYERSTYLE *style)
 {
-	char* ptr = output;
+	char *ptr = output;
 	int i;
 
 	LWDEBUGF(4, "%s", "drawPolygon called");
-	LWDEBUGF(4, "poly = %s", lwgeom_to_ewkt((LWGEOM*)lwp));
+	LWDEBUGF(4, "poly = %s", lwgeom_to_ewkt((LWGEOM *)lwp));
 
 	ptr += sprintf(ptr,
 		       "-fill %s -stroke %s -strokewidth %d ",
@@ -192,30 +192,30 @@ drawPolygon(char* output, LWPOLY* lwp, LAYERSTYLE* style)
  * @return the numbers of character written to *output
  */
 static size_t
-drawGeometry(char* output, LWGEOM* lwgeom, LAYERSTYLE* styles)
+drawGeometry(char *output, LWGEOM *lwgeom, LAYERSTYLE *styles)
 {
-	char* ptr = output;
+	char *ptr = output;
 	int i;
 	int type = lwgeom->type;
 
 	switch (type)
 	{
 	case POINTTYPE:
-		ptr += drawPoint(ptr, (LWPOINT*)lwgeom, styles);
+		ptr += drawPoint(ptr, (LWPOINT *)lwgeom, styles);
 		break;
 	case LINETYPE:
-		ptr += drawLineString(ptr, (LWLINE*)lwgeom, styles);
+		ptr += drawLineString(ptr, (LWLINE *)lwgeom, styles);
 		break;
 	case POLYGONTYPE:
-		ptr += drawPolygon(ptr, (LWPOLY*)lwgeom, styles);
+		ptr += drawPolygon(ptr, (LWPOLY *)lwgeom, styles);
 		break;
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		for (i = 0; i < ((LWCOLLECTION*)lwgeom)->ngeoms; i++)
+		for (i = 0; i < ((LWCOLLECTION *)lwgeom)->ngeoms; i++)
 		{
-			ptr += drawGeometry(ptr, lwcollection_getsubgeom((LWCOLLECTION*)lwgeom, i), styles);
+			ptr += drawGeometry(ptr, lwcollection_getsubgeom((LWCOLLECTION *)lwgeom, i), styles);
 		}
 		break;
 	}
@@ -271,9 +271,9 @@ addHighlight(int layerNumber)
  * @param filename the current working image.
  */
 static void
-optimizeImage(char* filename)
+optimizeImage(char *filename)
 {
-	char* str;
+	char *str;
 	str = malloc((18 + (2 * strlen(filename)) + 1) * sizeof(char));
 	sprintf(str, "convert %s -depth 8 %s", filename, filename);
 	LWDEBUGF(4, "%s", str);
@@ -285,9 +285,9 @@ optimizeImage(char* filename)
  * Flattens all the temporary processing png files into a single image
  */
 static void
-flattenLayers(char* filename)
+flattenLayers(char *filename)
 {
-	char* str = malloc((48 + strlen(filename) + 1) * sizeof(char));
+	char *str = malloc((48 + strlen(filename) + 1) * sizeof(char));
 	sprintf(str, "convert tmp[0-9].png -background white -flatten %s", filename);
 
 	LWDEBUGF(4, "%s", str);
@@ -308,9 +308,9 @@ flattenLayers(char* filename)
 
 // TODO: comments
 int
-getStyleName(char** styleName, char* line)
+getStyleName(char **styleName, char *line)
 {
-	char* ptr = strrchr(line, ';');
+	char *ptr = strrchr(line, ';');
 	if (ptr == NULL)
 	{
 		*styleName = malloc(8);
@@ -333,15 +333,15 @@ getStyleName(char** styleName, char* line)
  * Future work may entail reading the styles from a .properties file.
  */
 int
-main(int argc, const char* argv[])
+main(int argc, const char *argv[])
 {
-	FILE* pfile;
-	LWGEOM* lwgeom;
+	FILE *pfile;
+	LWGEOM *lwgeom;
 	char line[2048];
-	char* filename;
+	char *filename;
 	int layerCount;
-	LAYERSTYLE* styles;
-	char* image_path = "../images/";
+	LAYERSTYLE *styles;
+	char *image_path = "../images/";
 
 	getStyles(&styles);
 
@@ -369,9 +369,9 @@ main(int argc, const char* argv[])
 	{
 
 		char output[32768];
-		char* ptr = output;
-		char* styleName;
-		LAYERSTYLE* style;
+		char *ptr = output;
+		char *styleName;
+		LAYERSTYLE *style;
 		int useDefaultStyle;
 
 		ptr += sprintf(ptr, "convert -size %s xc:none ", imageSize);
@@ -386,7 +386,7 @@ main(int argc, const char* argv[])
 		}
 		else
 			lwgeom = lwgeom_from_wkt(line + strlen(styleName) + 1, LW_PARSER_CHECK_NONE);
-		LWDEBUGF(4, "geom = %s", lwgeom_to_ewkt((LWGEOM*)lwgeom));
+		LWDEBUGF(4, "geom = %s", lwgeom_to_ewkt((LWGEOM *)lwgeom));
 
 		style = getStyle(styles, styleName);
 		if (!style)

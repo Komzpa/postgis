@@ -98,7 +98,7 @@ rt_util_clamp_to_32F(double value)
  * @return valid GDAL resampling algorithm
  */
 GDALResampleAlg
-rt_util_gdal_resample_alg(const char* algname)
+rt_util_gdal_resample_alg(const char *algname)
 {
 	assert(algname != NULL && strlen(algname) > 0);
 
@@ -191,8 +191,8 @@ rt_util_gdal_datatype_to_pixtype(GDALDataType gdt)
 /*
 	get GDAL runtime version information
 */
-const char*
-rt_util_gdal_version(const char* request)
+const char *
+rt_util_gdal_version(const char *request)
 {
 	if (NULL == request || !strlen(request))
 		return GDALVersionInfo("RELEASE_NAME");
@@ -204,7 +204,7 @@ rt_util_gdal_version(const char* request)
 	computed extent type
 */
 rt_extenttype
-rt_util_extent_type(const char* name)
+rt_util_extent_type(const char *name)
 {
 	assert(name != NULL && strlen(name) > 0);
 
@@ -225,11 +225,11 @@ rt_util_extent_type(const char* name)
 /*
 	convert the spatial reference string from a GDAL recognized format to either WKT or Proj4
 */
-char*
-rt_util_gdal_convert_sr(const char* srs, int proj4)
+char *
+rt_util_gdal_convert_sr(const char *srs, int proj4)
 {
 	OGRSpatialReferenceH hsrs;
-	char* rtn = NULL;
+	char *rtn = NULL;
 
 	assert(srs != NULL);
 
@@ -261,7 +261,7 @@ rt_util_gdal_convert_sr(const char* srs, int proj4)
 	is the spatial reference string supported by GDAL
 */
 int
-rt_util_gdal_supported_sr(const char* srs)
+rt_util_gdal_supported_sr(const char *srs)
 {
 	OGRSpatialReferenceH hsrs;
 	OGRErr rtn = OGRERR_NONE;
@@ -289,9 +289,9 @@ rt_util_gdal_supported_sr(const char* srs)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_util_gdal_sr_auth_info(GDALDatasetH hds, char** authname, char** authcode)
+rt_util_gdal_sr_auth_info(GDALDatasetH hds, char **authname, char **authcode)
 {
-	const char* srs = NULL;
+	const char *srs = NULL;
 
 	assert(authname != NULL);
 	assert(authcode != NULL);
@@ -306,8 +306,8 @@ rt_util_gdal_sr_auth_info(GDALDatasetH hds, char** authname, char** authcode)
 
 		if (OSRSetFromUserInput(hSRS, srs) == OGRERR_NONE)
 		{
-			const char* pszAuthorityName = OSRGetAuthorityName(hSRS, NULL);
-			const char* pszAuthorityCode = OSRGetAuthorityCode(hSRS, NULL);
+			const char *pszAuthorityName = OSRGetAuthorityName(hSRS, NULL);
+			const char *pszAuthorityCode = OSRGetAuthorityCode(hSRS, NULL);
 
 			if (pszAuthorityName != NULL && pszAuthorityCode != NULL)
 			{
@@ -378,7 +378,7 @@ rt_util_gdal_register_all(int force_register_all)
 	is the driver registered?
 */
 int
-rt_util_gdal_driver_registered(const char* drv)
+rt_util_gdal_driver_registered(const char *drv)
 {
 	int count = GDALGetDriverCount();
 	int i = 0;
@@ -398,13 +398,13 @@ rt_util_gdal_driver_registered(const char* drv)
 }
 
 /* variable for PostgreSQL GUC: postgis.gdal_enabled_drivers */
-char* gdal_enabled_drivers = NULL;
+char *gdal_enabled_drivers = NULL;
 
 /*
 	wrapper for GDALOpen and GDALOpenShared
 */
 GDALDatasetH
-rt_util_gdal_open(const char* fn, GDALAccess fn_access, int shared)
+rt_util_gdal_open(const char *fn, GDALAccess fn_access, int shared)
 {
 	assert(NULL != fn);
 
@@ -433,7 +433,7 @@ rt_util_gdal_open(const char* fn, GDALAccess fn_access, int shared)
 }
 
 void
-rt_util_from_ogr_envelope(OGREnvelope env, rt_envelope* ext)
+rt_util_from_ogr_envelope(OGREnvelope env, rt_envelope *ext)
 {
 	assert(ext != NULL);
 
@@ -447,7 +447,7 @@ rt_util_from_ogr_envelope(OGREnvelope env, rt_envelope* ext)
 }
 
 void
-rt_util_to_ogr_envelope(rt_envelope ext, OGREnvelope* env)
+rt_util_to_ogr_envelope(rt_envelope ext, OGREnvelope *env)
 {
 	assert(env != NULL);
 
@@ -457,15 +457,15 @@ rt_util_to_ogr_envelope(rt_envelope ext, OGREnvelope* env)
 	env->MaxY = ext.MaxY;
 }
 
-LWPOLY*
+LWPOLY *
 rt_util_envelope_to_lwpoly(rt_envelope env)
 {
-	LWPOLY* npoly = NULL;
-	POINTARRAY** rings = NULL;
-	POINTARRAY* pts = NULL;
+	LWPOLY *npoly = NULL;
+	POINTARRAY **rings = NULL;
+	POINTARRAY *pts = NULL;
 	POINT4D p4d;
 
-	rings = (POINTARRAY**)rtalloc(sizeof(POINTARRAY*));
+	rings = (POINTARRAY **)rtalloc(sizeof(POINTARRAY *));
 	if (!rings)
 	{
 		rterror("rt_util_envelope_to_lwpoly: Out of memory building envelope's geometry");
@@ -512,7 +512,7 @@ rt_util_envelope_to_lwpoly(rt_envelope env)
 }
 
 int
-rt_util_same_geotransform_matrix(double* gt1, double* gt2)
+rt_util_same_geotransform_matrix(double *gt1, double *gt2)
 {
 	int k = 0;
 

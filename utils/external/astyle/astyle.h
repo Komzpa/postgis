@@ -212,11 +212,11 @@ class ASSourceIterator
 class ASPeekStream
 {
       private:
-	ASSourceIterator* sourceIterator;
+	ASSourceIterator *sourceIterator;
 	bool needReset; // reset sourceIterator to the original position
 
       public:
-	explicit ASPeekStream(ASSourceIterator* sourceIterator_)
+	explicit ASPeekStream(ASSourceIterator *sourceIterator_)
 	{
 		sourceIterator = sourceIterator_;
 		needReset = false;
@@ -243,17 +243,17 @@ class ASPeekStream
 class ASResource
 {
       public:
-	void buildAssignmentOperators(vector<const string*>* assignmentOperators);
-	void buildCastOperators(vector<const string*>* castOperators);
-	void buildHeaders(vector<const string*>* headers, int fileType, bool beautifier = false);
-	void buildIndentableMacros(vector<const pair<const string, const string>*>* indentableMacros);
-	void buildIndentableHeaders(vector<const string*>* indentableHeaders);
-	void buildNonAssignmentOperators(vector<const string*>* nonAssignmentOperators);
-	void buildNonParenHeaders(vector<const string*>* nonParenHeaders, int fileType, bool beautifier = false);
-	void buildOperators(vector<const string*>* operators, int fileType);
-	void buildPreBlockStatements(vector<const string*>* preBlockStatements, int fileType);
-	void buildPreCommandHeaders(vector<const string*>* preCommandHeaders, int fileType);
-	void buildPreDefinitionHeaders(vector<const string*>* preDefinitionHeaders, int fileType);
+	void buildAssignmentOperators(vector<const string *> *assignmentOperators);
+	void buildCastOperators(vector<const string *> *castOperators);
+	void buildHeaders(vector<const string *> *headers, int fileType, bool beautifier = false);
+	void buildIndentableMacros(vector<const pair<const string, const string> *> *indentableMacros);
+	void buildIndentableHeaders(vector<const string *> *indentableHeaders);
+	void buildNonAssignmentOperators(vector<const string *> *nonAssignmentOperators);
+	void buildNonParenHeaders(vector<const string *> *nonParenHeaders, int fileType, bool beautifier = false);
+	void buildOperators(vector<const string *> *operators, int fileType);
+	void buildPreBlockStatements(vector<const string *> *preBlockStatements, int fileType);
+	void buildPreCommandHeaders(vector<const string *> *preCommandHeaders, int fileType);
+	void buildPreDefinitionHeaders(vector<const string *> *preDefinitionHeaders, int fileType);
 
       public:
 	static const string AS_IF, AS_ELSE;
@@ -321,16 +321,16 @@ class ASBase : protected ASResource
 	bool isWhiteSpace(char ch) const { return (ch == ' ' || ch == '\t'); }
 
       protected: // functions definitions are at the end of ASResource.cpp
-	const string* findHeader(const string& line, int i, const vector<const string*>* possibleHeaders) const;
-	bool findKeyword(const string& line, int i, const string& keyword) const;
-	const string* findOperator(const string& line, int i, const vector<const string*>* possibleOperators) const;
-	string getCurrentWord(const string& line, size_t index) const;
+	const string *findHeader(const string &line, int i, const vector<const string *> *possibleHeaders) const;
+	bool findKeyword(const string &line, int i, const string &keyword) const;
+	const string *findOperator(const string &line, int i, const vector<const string *> *possibleOperators) const;
+	string getCurrentWord(const string &line, size_t index) const;
 	bool isDigit(char ch) const;
 	bool isLegalNameChar(char ch) const;
-	bool isCharPotentialHeader(const string& line, size_t i) const;
+	bool isCharPotentialHeader(const string &line, size_t i) const;
 	bool isCharPotentialOperator(char ch) const;
-	bool isDigitSeparator(const string& line, int i) const;
-	char peekNextChar(const string& line, int i) const;
+	bool isDigitSeparator(const string &line, int i) const;
+	char peekNextChar(const string &line, int i) const;
 
 }; // Class ASBase
 
@@ -343,8 +343,8 @@ class ASBeautifier : protected ASBase
       public:
 	ASBeautifier();
 	virtual ~ASBeautifier();
-	virtual void init(ASSourceIterator* iter);
-	virtual string beautify(const string& originalLine);
+	virtual void init(ASSourceIterator *iter);
+	virtual string beautify(const string &originalLine);
 	void setCaseIndent(bool state);
 	void setClassIndent(bool state);
 	void setContinuationIndentation(int indent = 1);
@@ -374,7 +374,7 @@ class ASBeautifier : protected ASBase
 	int getIndentLength() const;
 	int getTabLength() const;
 	string getIndentString() const;
-	string getNextWord(const string& line, size_t currPos) const;
+	string getNextWord(const string &line, size_t currPos) const;
 	bool getAlignMethodColon() const;
 	bool getBraceIndent() const;
 	bool getBlockIndent() const;
@@ -390,14 +390,14 @@ class ASBeautifier : protected ASBase
 
       protected:
 	void deleteBeautifierVectors();
-	int getNextProgramCharDistance(const string& line, int i) const;
-	int indexOf(const vector<const string*>& container, const string* element) const;
+	int getNextProgramCharDistance(const string &line, int i) const;
+	int indexOf(const vector<const string *> &container, const string *element) const;
 	void setBlockIndent(bool state);
 	void setBraceIndent(bool state);
 	void setBraceIndentVtk(bool state);
-	string extractPreprocessorStatement(const string& line) const;
-	string trim(const string& str) const;
-	string rtrim(const string& str) const;
+	string extractPreprocessorStatement(const string &line) const;
+	string trim(const string &str) const;
+	string rtrim(const string &str) const;
 
 	// variables set by ASFormatter - must be updated in activeBeautifierStack
 	int inLineNumber;
@@ -416,79 +416,80 @@ class ASBeautifier : protected ASBase
 	bool isInIndentablePreproc;
 
       private:                                   // functions
-	ASBeautifier(const ASBeautifier& other); // inline functions
-	ASBeautifier& operator=(ASBeautifier&);  // not to be implemented
+	ASBeautifier(const ASBeautifier &other); // inline functions
+	ASBeautifier &operator=(ASBeautifier &); // not to be implemented
 
-	void adjustObjCMethodDefinitionIndentation(const string& line_);
-	void adjustObjCMethodCallIndentation(const string& line_);
+	void adjustObjCMethodDefinitionIndentation(const string &line_);
+	void adjustObjCMethodCallIndentation(const string &line_);
 	void adjustParsedLineIndentation(size_t iPrelim, bool isInExtraHeaderIndent);
 	void computePreliminaryIndentation();
-	void parseCurrentLine(const string& line);
+	void parseCurrentLine(const string &line);
 	void popLastContinuationIndent();
-	void processPreprocessor(const string& preproc, const string& line);
-	void registerContinuationIndent(const string& line,
+	void processPreprocessor(const string &preproc, const string &line);
+	void registerContinuationIndent(const string &line,
 					int i,
 					int spaceIndentCount_,
 					int tabIncrementIn,
 					int minIndent,
 					bool updateParenStack);
-	void registerContinuationIndentColon(const string& line, int i, int tabIncrementIn);
+	void registerContinuationIndentColon(const string &line, int i, int tabIncrementIn);
 	void initVectors();
-	void initTempStacksContainer(vector<vector<const string*>*>*& container, vector<vector<const string*>*>* value);
+	void initTempStacksContainer(vector<vector<const string *> *> *&container,
+				     vector<vector<const string *> *> *value);
 	void clearObjCMethodDefinitionAlignment();
-	void deleteBeautifierContainer(vector<ASBeautifier*>*& container);
-	void deleteTempStacksContainer(vector<vector<const string*>*>*& container);
+	void deleteBeautifierContainer(vector<ASBeautifier *> *&container);
+	void deleteTempStacksContainer(vector<vector<const string *> *> *&container);
 	int adjustIndentCountForBreakElseIfComments() const;
-	int computeObjCColonAlignment(const string& line, int colonAlignPosition) const;
+	int computeObjCColonAlignment(const string &line, int colonAlignPosition) const;
 	int convertTabToSpaces(int i, int tabIncrementIn) const;
-	int findObjCColonAlignment(const string& line) const;
-	int getContinuationIndentAssign(const string& line, size_t currPos) const;
-	int getContinuationIndentComma(const string& line, size_t currPos) const;
-	int getObjCFollowingKeyword(const string& line, int bracePos) const;
-	bool isIndentedPreprocessor(const string& line, size_t currPos) const;
-	bool isLineEndComment(const string& line, int startPos) const;
-	bool isPreprocessorConditionalCplusplus(const string& line) const;
-	bool isInPreprocessorUnterminatedComment(const string& line);
+	int findObjCColonAlignment(const string &line) const;
+	int getContinuationIndentAssign(const string &line, size_t currPos) const;
+	int getContinuationIndentComma(const string &line, size_t currPos) const;
+	int getObjCFollowingKeyword(const string &line, int bracePos) const;
+	bool isIndentedPreprocessor(const string &line, size_t currPos) const;
+	bool isLineEndComment(const string &line, int startPos) const;
+	bool isPreprocessorConditionalCplusplus(const string &line) const;
+	bool isInPreprocessorUnterminatedComment(const string &line);
 	bool isTopLevel() const;
-	bool statementEndsWithComma(const string& line, int index) const;
-	const string& getIndentedLineReturn(const string& newLine, const string& originalLine) const;
-	string getIndentedSpaceEquivalent(const string& line_) const;
+	bool statementEndsWithComma(const string &line, int index) const;
+	const string &getIndentedLineReturn(const string &newLine, const string &originalLine) const;
+	string getIndentedSpaceEquivalent(const string &line_) const;
 	string preLineWS(int lineIndentCount, int lineSpaceIndentCount) const;
-	template <typename T> void deleteContainer(T& container);
-	template <typename T> void initContainer(T& container, T value);
-	vector<vector<const string*>*>* copyTempStacks(const ASBeautifier& other) const;
+	template <typename T> void deleteContainer(T &container);
+	template <typename T> void initContainer(T &container, T value);
+	vector<vector<const string *> *> *copyTempStacks(const ASBeautifier &other) const;
 	pair<int, int> computePreprocessorIndent();
 
       private: // variables
 	int beautifierFileType;
-	vector<const string*>* headers;
-	vector<const string*>* nonParenHeaders;
-	vector<const string*>* preBlockStatements;
-	vector<const string*>* preCommandHeaders;
-	vector<const string*>* assignmentOperators;
-	vector<const string*>* nonAssignmentOperators;
-	vector<const string*>* indentableHeaders;
+	vector<const string *> *headers;
+	vector<const string *> *nonParenHeaders;
+	vector<const string *> *preBlockStatements;
+	vector<const string *> *preCommandHeaders;
+	vector<const string *> *assignmentOperators;
+	vector<const string *> *nonAssignmentOperators;
+	vector<const string *> *indentableHeaders;
 
-	vector<ASBeautifier*>* waitingBeautifierStack;
-	vector<ASBeautifier*>* activeBeautifierStack;
-	vector<int>* waitingBeautifierStackLengthStack;
-	vector<int>* activeBeautifierStackLengthStack;
-	vector<const string*>* headerStack;
-	vector<vector<const string*>*>* tempStacks;
-	vector<int>* parenDepthStack;
-	vector<bool>* blockStatementStack;
-	vector<bool>* parenStatementStack;
-	vector<bool>* braceBlockStateStack;
-	vector<int>* continuationIndentStack;
-	vector<int>* continuationIndentStackSizeStack;
-	vector<int>* parenIndentStack;
-	vector<pair<int, int>>* preprocIndentStack;
+	vector<ASBeautifier *> *waitingBeautifierStack;
+	vector<ASBeautifier *> *activeBeautifierStack;
+	vector<int> *waitingBeautifierStackLengthStack;
+	vector<int> *activeBeautifierStackLengthStack;
+	vector<const string *> *headerStack;
+	vector<vector<const string *> *> *tempStacks;
+	vector<int> *parenDepthStack;
+	vector<bool> *blockStatementStack;
+	vector<bool> *parenStatementStack;
+	vector<bool> *braceBlockStateStack;
+	vector<int> *continuationIndentStack;
+	vector<int> *continuationIndentStackSizeStack;
+	vector<int> *parenIndentStack;
+	vector<pair<int, int>> *preprocIndentStack;
 
-	ASSourceIterator* sourceIterator;
-	const string* currentHeader;
-	const string* previousLastLineHeader;
-	const string* probationHeader;
-	const string* lastLineHeader;
+	ASSourceIterator *sourceIterator;
+	const string *currentHeader;
+	const string *previousLastLineHeader;
+	const string *probationHeader;
+	const string *lastLineHeader;
 	string indentString;
 	string verbatimDelimiter;
 	bool isInQuote;
@@ -595,21 +596,30 @@ class ASEnhancer : protected ASBase
       public: // functions
 	ASEnhancer();
 	virtual ~ASEnhancer();
-	void
-	init(int, int, int, bool, bool, bool, bool, bool, bool, bool, vector<const pair<const string, const string>*>*);
-	void enhance(string& line, bool isInNamespace, bool isInPreprocessor, bool isInSQL);
+	void init(int,
+		  int,
+		  int,
+		  bool,
+		  bool,
+		  bool,
+		  bool,
+		  bool,
+		  bool,
+		  bool,
+		  vector<const pair<const string, const string> *> *);
+	void enhance(string &line, bool isInNamespace, bool isInPreprocessor, bool isInSQL);
 
       private: // functions
-	void convertForceTabIndentToSpaces(string& line) const;
-	void convertSpaceIndentToForceTab(string& line) const;
-	size_t findCaseColon(const string& line, size_t caseIndex) const;
-	int indentLine(string& line, int indent) const;
-	bool isBeginDeclareSectionSQL(const string& line, size_t index) const;
-	bool isEndDeclareSectionSQL(const string& line, size_t index) const;
-	bool isOneLineBlockReached(const string& line, int startChar) const;
-	void parseCurrentLine(string& line, bool isInPreprocessor, bool isInSQL);
-	size_t processSwitchBlock(string& line, size_t index);
-	int unindentLine(string& line, int unindent) const;
+	void convertForceTabIndentToSpaces(string &line) const;
+	void convertSpaceIndentToForceTab(string &line) const;
+	size_t findCaseColon(const string &line, size_t caseIndex) const;
+	int indentLine(string &line, int indent) const;
+	bool isBeginDeclareSectionSQL(const string &line, size_t index) const;
+	bool isEndDeclareSectionSQL(const string &line, size_t index) const;
+	bool isOneLineBlockReached(const string &line, int startChar) const;
+	void parseCurrentLine(string &line, bool isInPreprocessor, bool isInSQL);
+	size_t processSwitchBlock(string &line, size_t index);
+	int unindentLine(string &line, int unindent) const;
 
       private:
 	// options from command line or options file
@@ -653,7 +663,7 @@ class ASEnhancer : protected ASBase
 	// event table variables
 	bool nextLineIsEventIndent; // begin event table indent is reached
 	bool isInEventTable;        // need to indent an event table
-	vector<const pair<const string, const string>*>* indentableMacros;
+	vector<const pair<const string, const string> *> *indentableMacros;
 
 	// SQL variables
 	bool nextLineIsDeclareIndent; // begin declare section indent is reached
@@ -670,7 +680,7 @@ class ASFormatter : public ASBeautifier
       public: // functions
 	ASFormatter();
 	virtual ~ASFormatter();
-	virtual void init(ASSourceIterator* si);
+	virtual void init(ASSourceIterator *si);
 	virtual bool hasMoreLines() const;
 	virtual string nextLine();
 	LineEndFormat getLineEndFormat() const;
@@ -733,16 +743,16 @@ class ASFormatter : public ASBeautifier
 	void setRemoveBracketsMode(bool state);
 	void setBreakClosingHeaderBracketsMode(bool state);
 
-      private:                                // functions
-	ASFormatter(const ASFormatter& copy); // not to be implemented
-	ASFormatter& operator=(ASFormatter&); // not to be implemented
-	template <typename T> void deleteContainer(T& container);
-	template <typename T> void initContainer(T& container, T value);
+      private:                                 // functions
+	ASFormatter(const ASFormatter &copy);  // not to be implemented
+	ASFormatter &operator=(ASFormatter &); // not to be implemented
+	template <typename T> void deleteContainer(T &container);
+	template <typename T> void initContainer(T &container, T value);
 	char peekNextChar() const;
 	BraceType getBraceType();
 	bool adjustChecksumIn(int adjustment);
-	bool computeChecksumIn(const string& currentLine_);
-	bool computeChecksumOut(const string& beautifiedLine);
+	bool computeChecksumIn(const string &currentLine_);
+	bool computeChecksumOut(const string &beautifiedLine);
 	bool addBracesToStatement();
 	bool removeBracesFromStatement();
 	bool commentAndHeaderFollows();
@@ -755,11 +765,11 @@ class ASFormatter : public ASBeautifier
 	bool isBeforeMultipleLineEndComments(int startPos) const;
 	bool isBraceType(BraceType a, BraceType b) const;
 	bool isClassInitializer() const;
-	bool isClosingHeader(const string* header) const;
+	bool isClosingHeader(const string *header) const;
 	bool isCurrentBraceBroken() const;
 	bool isDereferenceOrAddressOf() const;
-	bool isExecSQL(const string& line, size_t index) const;
-	bool isEmptyLine(const string& line) const;
+	bool isExecSQL(const string &line, size_t index) const;
+	bool isEmptyLine(const string &line) const;
 	bool isExternC() const;
 	bool isMultiStatementLine() const;
 	bool isNextWordSharpNonParenHeader(int startChar) const;
@@ -768,12 +778,12 @@ class ASFormatter : public ASBeautifier
 	bool isOkToSplitFormattedLine();
 	bool isPointerOrReference() const;
 	bool isPointerOrReferenceCentered() const;
-	bool isPointerOrReferenceVariable(const string& word) const;
-	bool isPointerToPointer(const string& line, int currPos) const;
-	bool isSharpStyleWithParen(const string* header) const;
-	bool isStructAccessModified(const string& firstLine, size_t index) const;
-	bool isIndentablePreprocessorBlock(const string& firstLine, size_t index);
-	bool isNDefPreprocStatement(const string& nextLine_, const string& preproc) const;
+	bool isPointerOrReferenceVariable(const string &word) const;
+	bool isPointerToPointer(const string &line, int currPos) const;
+	bool isSharpStyleWithParen(const string *header) const;
+	bool isStructAccessModified(const string &firstLine, size_t index) const;
+	bool isIndentablePreprocessorBlock(const string &firstLine, size_t index);
+	bool isNDefPreprocStatement(const string &nextLine_, const string &preproc) const;
 	bool isUnaryOperator() const;
 	bool isUniformInitializerBrace() const;
 	bool isImmediatelyPostCast() const;
@@ -786,24 +796,24 @@ class ASFormatter : public ASBeautifier
 	int findObjCColonAlignment() const;
 	int getCurrentLineCommentAdjustment();
 	int getNextLineCommentAdjustment();
-	int isOneLineBlockReached(const string& line, int startChar) const;
+	int isOneLineBlockReached(const string &line, int startChar) const;
 	void adjustComments();
 	void appendChar(char ch, bool canBreakLine);
 	void appendCharInsideComments();
 	void appendClosingHeader();
-	void appendOperator(const string& sequence, bool canBreakLine = true);
-	void appendSequence(const string& sequence, bool canBreakLine = true);
+	void appendOperator(const string &sequence, bool canBreakLine = true);
+	void appendSequence(const string &sequence, bool canBreakLine = true);
 	void appendSpacePad();
 	void appendSpaceAfter();
 	void breakLine(bool isSplitLine = false);
 	void buildLanguageVectors();
 	void updateFormattedLineSplitPoints(char appendedChar);
-	void updateFormattedLineSplitPointsOperator(const string& sequence);
+	void updateFormattedLineSplitPointsOperator(const string &sequence);
 	void checkIfTemplateOpener();
 	void clearFormattedLineSplitPoints();
 	void convertTabToSpaces();
-	void deleteContainer(vector<BraceType>*& container);
-	void findReturnTypeSplitPoint(const string& firstLine);
+	void deleteContainer(vector<BraceType> *&container);
+	void findReturnTypeSplitPoint(const string &firstLine);
 	void formatArrayRunIn();
 	void formatRunIn();
 	void formatArrayBraces(BraceType braceType, bool isOpeningArrayBrace);
@@ -824,13 +834,13 @@ class ASFormatter : public ASBeautifier
 	void fixOptionVariableConflicts();
 	void goForward(int i);
 	void isLineBreakBeforeClosingHeader();
-	void initContainer(vector<BraceType>*& container, vector<BraceType>* value);
+	void initContainer(vector<BraceType> *&container, vector<BraceType> *value);
 	void initNewLine();
 	void padObjCMethodColon();
 	void padObjCMethodPrefix();
 	void padObjCParamType();
 	void padObjCReturnType();
-	void padOperators(const string* newOperator);
+	void padOperators(const string *newOperator);
 	void padParens();
 	void processPreprocessor();
 	void resetEndOfStatement();
@@ -840,39 +850,39 @@ class ASFormatter : public ASBeautifier
 	void trimContinuationLine();
 	void updateFormattedLineSplitPointsPointerOrReference(size_t index);
 	size_t findFormattedLineSplitPoint() const;
-	size_t findNextChar(const string& line, char searchChar, int searchStart = 0) const;
-	const string* checkForHeaderFollowingComment(const string& firstLine) const;
-	const string* getFollowingOperator() const;
-	string getPreviousWord(const string& line, int currPos) const;
-	string peekNextText(const string& firstLine,
+	size_t findNextChar(const string &line, char searchChar, int searchStart = 0) const;
+	const string *checkForHeaderFollowingComment(const string &firstLine) const;
+	const string *getFollowingOperator() const;
+	string getPreviousWord(const string &line, int currPos) const;
+	string peekNextText(const string &firstLine,
 			    bool endOnEmptyLine = false,
 			    shared_ptr<ASPeekStream> streamArg = nullptr) const;
 
       private: // variables
 	int formatterFileType;
-	vector<const string*>* headers;
-	vector<const string*>* nonParenHeaders;
-	vector<const string*>* preDefinitionHeaders;
-	vector<const string*>* preCommandHeaders;
-	vector<const string*>* operators;
-	vector<const string*>* assignmentOperators;
-	vector<const string*>* castOperators;
-	vector<const pair<const string, const string>*>* indentableMacros; // for ASEnhancer
+	vector<const string *> *headers;
+	vector<const string *> *nonParenHeaders;
+	vector<const string *> *preDefinitionHeaders;
+	vector<const string *> *preCommandHeaders;
+	vector<const string *> *operators;
+	vector<const string *> *assignmentOperators;
+	vector<const string *> *castOperators;
+	vector<const pair<const string, const string> *> *indentableMacros; // for ASEnhancer
 
-	ASSourceIterator* sourceIterator;
-	ASEnhancer* enhancer;
+	ASSourceIterator *sourceIterator;
+	ASEnhancer *enhancer;
 
-	vector<const string*>* preBraceHeaderStack;
-	vector<BraceType>* braceTypeStack;
-	vector<int>* parenStack;
-	vector<bool>* structStack;
-	vector<bool>* questionMarkStack;
+	vector<const string *> *preBraceHeaderStack;
+	vector<BraceType> *braceTypeStack;
+	vector<int> *parenStack;
+	vector<bool> *structStack;
+	vector<bool> *questionMarkStack;
 
 	string currentLine;
 	string formattedLine;
 	string readyFormattedLine;
 	string verbatimDelimiter;
-	const string* currentHeader;
+	const string *currentHeader;
 	char currentChar;
 	char previousChar;
 	char previousNonWSChar;
@@ -1068,19 +1078,19 @@ class ASFormatter : public ASBeautifier
 	void appendCurrentChar(bool canBreakLine = true) { appendChar(currentChar, canBreakLine); }
 
 	// check if a specific sequence exists in the current placement of the current line
-	bool isSequenceReached(const char* sequence) const
+	bool isSequenceReached(const char *sequence) const
 	{
 		return currentLine.compare(charNum, strlen(sequence), sequence) == 0;
 	}
 
 	// call ASBase::findHeader for the current character
-	const string* findHeader(const vector<const string*>* headers_)
+	const string *findHeader(const vector<const string *> *headers_)
 	{
 		return ASBase::findHeader(currentLine, charNum, headers_);
 	}
 
 	// call ASBase::findOperator for the current character
-	const string* findOperator(const vector<const string*>* operators_)
+	const string *findOperator(const vector<const string *> *operators_)
 	{
 		return ASBase::findOperator(currentLine, charNum, operators_);
 	}
@@ -1090,8 +1100,8 @@ class ASFormatter : public ASBeautifier
 // astyle namespace global declarations
 //-----------------------------------------------------------------------------
 // sort comparison functions for ASResource
-bool sortOnLength(const string* a, const string* b);
-bool sortOnName(const string* a, const string* b);
+bool sortOnLength(const string *a, const string *b);
+bool sortOnName(const string *a, const string *b);
 
 } // namespace astyle
 

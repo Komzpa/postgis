@@ -117,21 +117,21 @@ Datum gserialized_gidx_gidx_same(PG_FUNCTION_ARGS);
 /*
 ** GIDX true/false test function type
 */
-typedef bool (*gidx_predicate)(GIDX* a, GIDX* b);
+typedef bool (*gidx_predicate)(GIDX *a, GIDX *b);
 
 /* Allocate a new copy of GIDX */
-GIDX*
-gidx_copy(GIDX* b)
+GIDX *
+gidx_copy(GIDX *b)
 {
-	GIDX* c = (GIDX*)palloc(VARSIZE(b));
+	GIDX *c = (GIDX *)palloc(VARSIZE(b));
 	POSTGIS_DEBUGF(5, "copied gidx (%p) to gidx (%p)", b, c);
-	memcpy((void*)c, (void*)b, VARSIZE(b));
+	memcpy((void *)c, (void *)b, VARSIZE(b));
 	return c;
 }
 
 /* Ensure all minimums are below maximums. */
 static inline void
-gidx_validate(GIDX* b)
+gidx_validate(GIDX *b)
 {
 	uint32_t i;
 	Assert(b);
@@ -153,7 +153,7 @@ gidx_validate(GIDX* b)
    geometry or other-wise unindexable geometry (like one with NaN
    or Inf bounds) */
 inline bool
-gidx_is_unknown(const GIDX* a)
+gidx_is_unknown(const GIDX *a)
 {
 	size_t size = VARSIZE(a) - VARHDRSZ;
 	/* "unknown" gidx objects have a too-small size of one float */
@@ -162,7 +162,7 @@ gidx_is_unknown(const GIDX* a)
 }
 
 static inline void
-gidx_set_unknown(GIDX* a)
+gidx_set_unknown(GIDX *a)
 {
 	SET_VARSIZE(a, VARHDRSZ);
 }
@@ -170,7 +170,7 @@ gidx_set_unknown(GIDX* a)
 /* Enlarge b_union to contain b_new. If b_new contains more
    dimensions than b_union, expand b_union to contain those dimensions. */
 void
-gidx_merge(GIDX** b_union, GIDX* b_new)
+gidx_merge(GIDX **b_union, GIDX *b_new)
 {
 	int i, dims_union, dims_new;
 	Assert(b_union);
@@ -195,7 +195,7 @@ gidx_merge(GIDX** b_union, GIDX* b_new)
 	if (dims_new > dims_union)
 	{
 		POSTGIS_DEBUGF(5, "reallocating b_union from %d dims to %d dims", dims_union, dims_new);
-		*b_union = (GIDX*)repalloc(*b_union, GIDX_SIZE(dims_new));
+		*b_union = (GIDX *)repalloc(*b_union, GIDX_SIZE(dims_new));
 		SET_VARSIZE(*b_union, VARSIZE(b_new));
 		dims_union = dims_new;
 	}
@@ -214,7 +214,7 @@ gidx_merge(GIDX** b_union, GIDX* b_new)
 
 /* Calculate the volume (in n-d units) of the GIDX */
 static float
-gidx_volume(GIDX* a)
+gidx_volume(GIDX *a)
 {
 	float result;
 	uint32_t i;
@@ -232,7 +232,7 @@ gidx_volume(GIDX* a)
 
 /* Calculate the edge of the GIDX */
 static float
-gidx_edge(GIDX* a)
+gidx_edge(GIDX *a)
 {
 	float result;
 	uint32_t i;
@@ -246,11 +246,11 @@ gidx_edge(GIDX* a)
 
 /* Ensure the first argument has the higher dimensionality. */
 static void
-gidx_dimensionality_check(GIDX** a, GIDX** b)
+gidx_dimensionality_check(GIDX **a, GIDX **b)
 {
 	if (GIDX_NDIMS(*a) < GIDX_NDIMS(*b))
 	{
-		GIDX* tmp = *b;
+		GIDX *tmp = *b;
 		*b = *a;
 		*a = tmp;
 	}
@@ -258,7 +258,7 @@ gidx_dimensionality_check(GIDX** a, GIDX** b)
 
 /* Calculate the volume of the union of the boxes. Avoids creating an intermediate box. */
 static float
-gidx_union_volume(GIDX* a, GIDX* b)
+gidx_union_volume(GIDX *a, GIDX *b)
 {
 	float result;
 	int i;
@@ -306,7 +306,7 @@ gidx_union_volume(GIDX* a, GIDX* b)
 
 /* Calculate the edge of the union of the boxes. Avoids creating an intermediate box. */
 static float
-gidx_union_edge(GIDX* a, GIDX* b)
+gidx_union_edge(GIDX *a, GIDX *b)
 {
 	float result;
 	int i;
@@ -354,7 +354,7 @@ gidx_union_edge(GIDX* a, GIDX* b)
 
 /* Calculate the volume of the intersection of the boxes. */
 static float
-gidx_inter_volume(GIDX* a, GIDX* b)
+gidx_inter_volume(GIDX *a, GIDX *b)
 {
 	uint32_t i;
 	float result;
@@ -404,7 +404,7 @@ gidx_inter_volume(GIDX* a, GIDX* b)
 ** Empty boxes never overlap.
 */
 static bool
-gidx_overlaps(GIDX* a, GIDX* b)
+gidx_overlaps(GIDX *a, GIDX *b)
 {
 	int i;
 	int ndims_b;
@@ -435,7 +435,7 @@ gidx_overlaps(GIDX* a, GIDX* b)
 ** Box(A) CONTAINS Box(B) IFF (pt(A)LL < pt(B)LL) && (pt(A)UR > pt(B)UR)
 */
 bool
-gidx_contains(GIDX* a, GIDX* b)
+gidx_contains(GIDX *a, GIDX *b)
 {
 	int i, dims_a, dims_b;
 
@@ -477,7 +477,7 @@ gidx_contains(GIDX* a, GIDX* b)
 ** Box(A) EQUALS Box(B) IFF (pt(A)LL == pt(B)LL) && (pt(A)UR == pt(B)UR)
 */
 static bool
-gidx_equals(GIDX* a, GIDX* b)
+gidx_equals(GIDX *a, GIDX *b)
 {
 	uint32_t i;
 
@@ -518,8 +518,8 @@ gserialized_datum_predicate(Datum gs1, Datum gs2, gidx_predicate predicate)
 	/* Put aside some stack memory and use it for GIDX pointers. */
 	char boxmem1[GIDX_MAX_SIZE];
 	char boxmem2[GIDX_MAX_SIZE];
-	GIDX* gidx1 = (GIDX*)boxmem1;
-	GIDX* gidx2 = (GIDX*)boxmem2;
+	GIDX *gidx1 = (GIDX *)boxmem1;
+	GIDX *gidx2 = (GIDX *)boxmem2;
 
 	POSTGIS_DEBUG(3, "entered function");
 
@@ -536,11 +536,11 @@ gserialized_datum_predicate(Datum gs1, Datum gs2, gidx_predicate predicate)
 
 #if POSTGIS_PGSQL_VERSION > 94
 static int
-gserialized_datum_predicate_gidx_geom(GIDX* gidx1, Datum gs2, gidx_predicate predicate)
+gserialized_datum_predicate_gidx_geom(GIDX *gidx1, Datum gs2, gidx_predicate predicate)
 {
 	/* Put aside some stack memory and use it for GIDX pointers. */
 	char boxmem2[GIDX_MAX_SIZE];
-	GIDX* gidx2 = (GIDX*)boxmem2;
+	GIDX *gidx2 = (GIDX *)boxmem2;
 
 	POSTGIS_DEBUG(3, "entered function");
 
@@ -555,11 +555,11 @@ gserialized_datum_predicate_gidx_geom(GIDX* gidx1, Datum gs2, gidx_predicate pre
 }
 
 static int
-gserialized_datum_predicate_geom_gidx(Datum gs1, GIDX* gidx2, gidx_predicate predicate)
+gserialized_datum_predicate_geom_gidx(Datum gs1, GIDX *gidx2, gidx_predicate predicate)
 {
 	/* Put aside some stack memory and use it for GIDX pointers. */
 	char boxmem2[GIDX_MAX_SIZE];
-	GIDX* gidx1 = (GIDX*)boxmem2;
+	GIDX *gidx1 = (GIDX *)boxmem2;
 
 	POSTGIS_DEBUG(3, "entered function");
 
@@ -579,7 +579,7 @@ gserialized_datum_predicate_geom_gidx(Datum gs1, GIDX* gidx2, gidx_predicate pre
  */
 #if POSTGIS_PGSQL_VERSION < 95
 static double
-gidx_distance_leaf_centroid(const GIDX* a, const GIDX* b)
+gidx_distance_leaf_centroid(const GIDX *a, const GIDX *b)
 {
 	int ndims, i;
 	double sum = 0;
@@ -621,7 +621,7 @@ gidx_distance_leaf_centroid(const GIDX* a, const GIDX* b)
  * Calculate the box->box distance.
  */
 static double
-gidx_distance(const GIDX* a, const GIDX* b, int m_is_time)
+gidx_distance(const GIDX *a, const GIDX *b, int m_is_time)
 {
 	int ndims, i;
 	double sum = 0;
@@ -671,7 +671,7 @@ gidx_distance(const GIDX* a, const GIDX* b, int m_is_time)
 
 #if POSTGIS_PGSQL_VERSION < 95
 static double
-gidx_distance_node_centroid(const GIDX* node, const GIDX* query)
+gidx_distance_node_centroid(const GIDX *node, const GIDX *query)
 {
 	int i;
 	double sum = 0;
@@ -716,7 +716,7 @@ gidx_distance_node_centroid(const GIDX* node, const GIDX* query)
 }
 #else  /* POSTGIS_PGSQL_VERSION >= 95 */
 static double
-gidx_distance_m(const GIDX* a, const GIDX* b)
+gidx_distance_m(const GIDX *a, const GIDX *b)
 {
 	int mdim_a, mdim_b;
 	double d, amin, amax, bmin, bmax;
@@ -754,11 +754,11 @@ gidx_distance_m(const GIDX* a, const GIDX* b)
 /**
  * Return a #GSERIALIZED with an expanded bounding box.
  */
-GSERIALIZED*
-gserialized_expand(GSERIALIZED* g, double distance)
+GSERIALIZED *
+gserialized_expand(GSERIALIZED *g, double distance)
 {
 	char boxmem[GIDX_MAX_SIZE];
-	GIDX* gidx = (GIDX*)boxmem;
+	GIDX *gidx = (GIDX *)boxmem;
 	float fdistance = (float)distance;
 
 	/* Get our bounding box out of the geography, return right away if
@@ -783,9 +783,9 @@ PG_FUNCTION_INFO_V1(gserialized_distance_nd);
 Datum gserialized_distance_nd(PG_FUNCTION_ARGS)
 {
 	char b1mem[GIDX_MAX_SIZE];
-	GIDX* b1 = (GIDX*)b1mem;
+	GIDX *b1 = (GIDX *)b1mem;
 	char b2mem[GIDX_MAX_SIZE];
-	GIDX* b2 = (GIDX*)b2mem;
+	GIDX *b2 = (GIDX *)b2mem;
 
 #if POSTGIS_PGSQL_VERSION < 95
 
@@ -806,11 +806,11 @@ Datum gserialized_distance_nd(PG_FUNCTION_ARGS)
 #else  /* POSTGIS_PGSQL_VERSION >= 96 */
 
 	/* Feature-to-feature distance */
-	GSERIALIZED* geom1 = PG_GETARG_GSERIALIZED_P(0);
-	GSERIALIZED* geom2 = PG_GETARG_GSERIALIZED_P(1);
-	LWGEOM* lw1 = lwgeom_from_gserialized(geom1);
-	LWGEOM* lw2 = lwgeom_from_gserialized(geom2);
-	LWGEOM* closest;
+	GSERIALIZED *geom1 = PG_GETARG_GSERIALIZED_P(0);
+	GSERIALIZED *geom2 = PG_GETARG_GSERIALIZED_P(1);
+	LWGEOM *lw1 = lwgeom_from_gserialized(geom1);
+	LWGEOM *lw2 = lwgeom_from_gserialized(geom2);
+	LWGEOM *closest;
 	double distance;
 
 	/* Find an exact shortest line w/ the dimensions we support */
@@ -837,12 +837,12 @@ Datum gserialized_distance_nd(PG_FUNCTION_ARGS)
 		if (lwgeom_get_type(lw1) == POINTTYPE)
 		{
 			POINT4D p;
-			lwpoint_getPoint4d_p((LWPOINT*)lw1, &p);
+			lwpoint_getPoint4d_p((LWPOINT *)lw1, &p);
 			m1 = p.m;
 		}
 		else if (lwgeom_get_type(lw1) == LINETYPE)
 		{
-			LWPOINT* lwp1 = lwline_get_lwpoint(lwgeom_as_lwline(closest), 0);
+			LWPOINT *lwp1 = lwline_get_lwpoint(lwgeom_as_lwline(closest), 0);
 			m1 = lwgeom_interpolate_point(lw1, lwp1);
 			lwpoint_free(lwp1);
 		}
@@ -854,12 +854,12 @@ Datum gserialized_distance_nd(PG_FUNCTION_ARGS)
 		if (lwgeom_get_type(lw2) == POINTTYPE)
 		{
 			POINT4D p;
-			lwpoint_getPoint4d_p((LWPOINT*)lw2, &p);
+			lwpoint_getPoint4d_p((LWPOINT *)lw2, &p);
 			m2 = p.m;
 		}
 		else if (lwgeom_get_type(lw2) == LINETYPE)
 		{
-			LWPOINT* lwp2 = lwline_get_lwpoint(lwgeom_as_lwline(closest), 1);
+			LWPOINT *lwp2 = lwline_get_lwpoint(lwgeom_as_lwline(closest), 1);
 			m2 = lwgeom_interpolate_point(lw2, lwp2);
 			lwpoint_free(lwp2);
 		}
@@ -911,7 +911,7 @@ Datum gserialized_within(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_geom_within);
 Datum gserialized_gidx_geom_within(PG_FUNCTION_ARGS)
 {
-	GIDX* gidx = (GIDX*)PG_GETARG_POINTER(0);
+	GIDX *gidx = (GIDX *)PG_GETARG_POINTER(0);
 
 	if (gserialized_datum_predicate_geom_gidx(PG_GETARG_DATUM(1), gidx, gidx_contains) == LW_TRUE)
 		PG_RETURN_BOOL(true);
@@ -926,7 +926,7 @@ Datum gserialized_gidx_geom_within(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_gidx_within);
 Datum gserialized_gidx_gidx_within(PG_FUNCTION_ARGS)
 {
-	if (gidx_contains((GIDX*)PG_GETARG_POINTER(1), (GIDX*)PG_GETARG_POINTER(0))) PG_RETURN_BOOL(true);
+	if (gidx_contains((GIDX *)PG_GETARG_POINTER(1), (GIDX *)PG_GETARG_POINTER(0))) PG_RETURN_BOOL(true);
 
 	PG_RETURN_BOOL(false);
 }
@@ -953,7 +953,7 @@ Datum gserialized_contains(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_geom_contains);
 Datum gserialized_gidx_geom_contains(PG_FUNCTION_ARGS)
 {
-	GIDX* gidx = (GIDX*)PG_GETARG_POINTER(0);
+	GIDX *gidx = (GIDX *)PG_GETARG_POINTER(0);
 
 	if (gserialized_datum_predicate_gidx_geom(gidx, PG_GETARG_DATUM(1), gidx_contains) == LW_TRUE)
 		PG_RETURN_BOOL(true);
@@ -968,7 +968,7 @@ Datum gserialized_gidx_geom_contains(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_gidx_contains);
 Datum gserialized_gidx_gidx_contains(PG_FUNCTION_ARGS)
 {
-	if (gidx_contains((GIDX*)PG_GETARG_POINTER(0), (GIDX*)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
+	if (gidx_contains((GIDX *)PG_GETARG_POINTER(0), (GIDX *)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
 
 	PG_RETURN_BOOL(false);
 }
@@ -976,7 +976,7 @@ Datum gserialized_gidx_gidx_contains(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_geom_same);
 Datum gserialized_gidx_geom_same(PG_FUNCTION_ARGS)
 {
-	GIDX* gidx = (GIDX*)PG_GETARG_POINTER(0);
+	GIDX *gidx = (GIDX *)PG_GETARG_POINTER(0);
 
 	if (gserialized_datum_predicate_gidx_geom(gidx, PG_GETARG_DATUM(1), gidx_equals) == LW_TRUE)
 		PG_RETURN_BOOL(true);
@@ -987,7 +987,7 @@ Datum gserialized_gidx_geom_same(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_gidx_same);
 Datum gserialized_gidx_gidx_same(PG_FUNCTION_ARGS)
 {
-	if (gidx_equals((GIDX*)PG_GETARG_POINTER(0), (GIDX*)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
+	if (gidx_equals((GIDX *)PG_GETARG_POINTER(0), (GIDX *)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
 
 	PG_RETURN_BOOL(false);
 }
@@ -1013,7 +1013,7 @@ Datum gserialized_overlaps(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_geog_overlaps);
 Datum gserialized_gidx_geog_overlaps(PG_FUNCTION_ARGS)
 {
-	GIDX* gidx = (GIDX*)PG_GETARG_POINTER(0);
+	GIDX *gidx = (GIDX *)PG_GETARG_POINTER(0);
 
 	if (gserialized_datum_predicate_gidx_geom(gidx, PG_GETARG_DATUM(1), gidx_overlaps) == LW_TRUE)
 		PG_RETURN_BOOL(true);
@@ -1024,7 +1024,7 @@ Datum gserialized_gidx_geog_overlaps(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_geom_overlaps);
 Datum gserialized_gidx_geom_overlaps(PG_FUNCTION_ARGS)
 {
-	GIDX* gidx = (GIDX*)PG_GETARG_POINTER(0);
+	GIDX *gidx = (GIDX *)PG_GETARG_POINTER(0);
 
 	if (gserialized_datum_predicate_gidx_geom(gidx, PG_GETARG_DATUM(1), gidx_overlaps) == LW_TRUE)
 		PG_RETURN_BOOL(true);
@@ -1035,7 +1035,7 @@ Datum gserialized_gidx_geom_overlaps(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gidx_gidx_overlaps);
 Datum gserialized_gidx_gidx_overlaps(PG_FUNCTION_ARGS)
 {
-	if (gidx_overlaps((GIDX*)PG_GETARG_POINTER(0), (GIDX*)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
+	if (gidx_overlaps((GIDX *)PG_GETARG_POINTER(0), (GIDX *)PG_GETARG_POINTER(1))) PG_RETURN_BOOL(true);
 
 	PG_RETURN_BOOL(false);
 }
@@ -1054,10 +1054,10 @@ Datum gserialized_gidx_gidx_overlaps(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_compress);
 Datum gserialized_gist_compress(PG_FUNCTION_ARGS)
 {
-	GISTENTRY* entry_in = (GISTENTRY*)PG_GETARG_POINTER(0);
-	GISTENTRY* entry_out = NULL;
+	GISTENTRY *entry_in = (GISTENTRY *)PG_GETARG_POINTER(0);
+	GISTENTRY *entry_out = NULL;
 	char gidxmem[GIDX_MAX_SIZE];
-	GIDX* bbox_out = (GIDX*)gidxmem;
+	GIDX *bbox_out = (GIDX *)gidxmem;
 	int result = LW_SUCCESS;
 	uint32_t i;
 
@@ -1153,7 +1153,7 @@ Datum gserialized_gist_decompress(PG_FUNCTION_ARGS)
 ** GiST support function. Called from gserialized_gist_consistent below.
 */
 static inline bool
-gserialized_gist_consistent_leaf(GIDX* key, GIDX* query, StrategyNumber strategy)
+gserialized_gist_consistent_leaf(GIDX *key, GIDX *query, StrategyNumber strategy)
 {
 	bool retval;
 
@@ -1186,7 +1186,7 @@ gserialized_gist_consistent_leaf(GIDX* key, GIDX* query, StrategyNumber strategy
 ** GiST support function. Called from gserialized_gist_consistent below.
 */
 static inline bool
-gserialized_gist_consistent_internal(GIDX* key, GIDX* query, StrategyNumber strategy)
+gserialized_gist_consistent_internal(GIDX *key, GIDX *query, StrategyNumber strategy)
 {
 	bool retval;
 
@@ -1225,15 +1225,15 @@ gserialized_gist_consistent_internal(GIDX* key, GIDX* query, StrategyNumber stra
 PG_FUNCTION_INFO_V1(gserialized_gist_consistent);
 Datum gserialized_gist_consistent(PG_FUNCTION_ARGS)
 {
-	GISTENTRY* entry = (GISTENTRY*)PG_GETARG_POINTER(0);
+	GISTENTRY *entry = (GISTENTRY *)PG_GETARG_POINTER(0);
 	StrategyNumber strategy = (StrategyNumber)PG_GETARG_UINT16(2);
 	bool result;
 	char gidxmem[GIDX_MAX_SIZE];
-	GIDX* query_gbox_index = (GIDX*)gidxmem;
+	GIDX *query_gbox_index = (GIDX *)gidxmem;
 
 	/* PostgreSQL 8.4 and later require the RECHECK flag to be set here,
 	   rather than being supplied as part of the operator class definition */
-	bool* recheck = (bool*)PG_GETARG_POINTER(4);
+	bool *recheck = (bool *)PG_GETARG_POINTER(4);
 
 	/* We set recheck to false to avoid repeatedly pulling every "possibly matched" geometry
 	   out during index scans. For cases when the geometries are large, rechecking
@@ -1265,11 +1265,14 @@ Datum gserialized_gist_consistent(PG_FUNCTION_ARGS)
 
 	/* Treat leaf node tests different from internal nodes */
 	if (GIST_LEAF(entry))
-	{ result = gserialized_gist_consistent_leaf((GIDX*)DatumGetPointer(entry->key), query_gbox_index, strategy); }
+	{
+		result =
+		    gserialized_gist_consistent_leaf((GIDX *)DatumGetPointer(entry->key), query_gbox_index, strategy);
+	}
 	else
 	{
 		result = gserialized_gist_consistent_internal(
-		    (GIDX*)DatumGetPointer(entry->key), query_gbox_index, strategy);
+		    (GIDX *)DatumGetPointer(entry->key), query_gbox_index, strategy);
 	}
 
 	PG_RETURN_BOOL(result);
@@ -1317,16 +1320,16 @@ pack_float(const float value, const int realm)
 PG_FUNCTION_INFO_V1(gserialized_gist_penalty);
 Datum gserialized_gist_penalty(PG_FUNCTION_ARGS)
 {
-	GISTENTRY* origentry = (GISTENTRY*)PG_GETARG_POINTER(0);
-	GISTENTRY* newentry = (GISTENTRY*)PG_GETARG_POINTER(1);
-	float* result = (float*)PG_GETARG_POINTER(2);
+	GISTENTRY *origentry = (GISTENTRY *)PG_GETARG_POINTER(0);
+	GISTENTRY *newentry = (GISTENTRY *)PG_GETARG_POINTER(1);
+	float *result = (float *)PG_GETARG_POINTER(2);
 	GIDX *gbox_index_orig, *gbox_index_new;
 	float size_union, size_orig, edge_union, edge_orig;
 
 	POSTGIS_DEBUG(4, "[GIST] 'penalty' function called");
 
-	gbox_index_orig = (GIDX*)DatumGetPointer(origentry->key);
-	gbox_index_new = (GIDX*)DatumGetPointer(newentry->key);
+	gbox_index_orig = (GIDX *)DatumGetPointer(origentry->key);
+	gbox_index_new = (GIDX *)DatumGetPointer(newentry->key);
 
 	/* Drop out if we're dealing with null inputs. Shouldn't happen. */
 	if ((gbox_index_orig == NULL) && (gbox_index_new == NULL))
@@ -1378,8 +1381,8 @@ Datum gserialized_gist_penalty(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_union);
 Datum gserialized_gist_union(PG_FUNCTION_ARGS)
 {
-	GistEntryVector* entryvec = (GistEntryVector*)PG_GETARG_POINTER(0);
-	int* sizep = (int*)PG_GETARG_POINTER(1); /* Size of the return value */
+	GistEntryVector *entryvec = (GistEntryVector *)PG_GETARG_POINTER(0);
+	int *sizep = (int *)PG_GETARG_POINTER(1); /* Size of the return value */
 	int numranges, i;
 	GIDX *box_cur, *box_union;
 
@@ -1387,13 +1390,13 @@ Datum gserialized_gist_union(PG_FUNCTION_ARGS)
 
 	numranges = entryvec->n;
 
-	box_cur = (GIDX*)DatumGetPointer(entryvec->vector[0].key);
+	box_cur = (GIDX *)DatumGetPointer(entryvec->vector[0].key);
 
 	box_union = gidx_copy(box_cur);
 
 	for (i = 1; i < numranges; i++)
 	{
-		box_cur = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+		box_cur = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 		gidx_merge(&box_union, box_cur);
 	}
 
@@ -1410,9 +1413,9 @@ Datum gserialized_gist_union(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_same);
 Datum gserialized_gist_same(PG_FUNCTION_ARGS)
 {
-	GIDX* b1 = (GIDX*)PG_GETARG_POINTER(0);
-	GIDX* b2 = (GIDX*)PG_GETARG_POINTER(1);
-	bool* result = (bool*)PG_GETARG_POINTER(2);
+	GIDX *b1 = (GIDX *)PG_GETARG_POINTER(0);
+	GIDX *b2 = (GIDX *)PG_GETARG_POINTER(1);
+	bool *result = (bool *)PG_GETARG_POINTER(2);
 
 	POSTGIS_DEBUG(4, "[GIST] 'same' function called");
 
@@ -1424,15 +1427,15 @@ Datum gserialized_gist_same(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_geog_distance);
 Datum gserialized_gist_geog_distance(PG_FUNCTION_ARGS)
 {
-	GISTENTRY* entry = (GISTENTRY*)PG_GETARG_POINTER(0);
+	GISTENTRY *entry = (GISTENTRY *)PG_GETARG_POINTER(0);
 	Datum query_datum = PG_GETARG_DATUM(1);
 	StrategyNumber strategy = (StrategyNumber)PG_GETARG_UINT16(2);
 #if POSTGIS_PGSQL_VERSION >= 95
-	bool* recheck = (bool*)PG_GETARG_POINTER(4);
+	bool *recheck = (bool *)PG_GETARG_POINTER(4);
 #endif
 	char query_box_mem[GIDX_MAX_SIZE];
-	GIDX* query_box = (GIDX*)query_box_mem;
-	GIDX* entry_box;
+	GIDX *query_box = (GIDX *)query_box_mem;
+	GIDX *entry_box;
 	double distance;
 
 	POSTGIS_DEBUGF(3, "[GIST] '%s' function called", __func__);
@@ -1457,7 +1460,7 @@ Datum gserialized_gist_geog_distance(PG_FUNCTION_ARGS)
 #endif
 
 	/* Get the entry box */
-	entry_box = (GIDX*)DatumGetPointer(entry->key);
+	entry_box = (GIDX *)DatumGetPointer(entry->key);
 
 	/* Return distances from key-based tests should always be */
 	/* the minimum possible distance, box-to-box */
@@ -1489,13 +1492,13 @@ Datum gserialized_gist_geog_distance(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gserialized_gist_distance);
 Datum gserialized_gist_distance(PG_FUNCTION_ARGS)
 {
-	GISTENTRY* entry = (GISTENTRY*)PG_GETARG_POINTER(0);
+	GISTENTRY *entry = (GISTENTRY *)PG_GETARG_POINTER(0);
 	StrategyNumber strategy = (StrategyNumber)PG_GETARG_UINT16(2);
 	char query_box_mem[GIDX_MAX_SIZE];
-	GIDX* query_box = (GIDX*)query_box_mem;
-	GIDX* entry_box;
+	GIDX *query_box = (GIDX *)query_box_mem;
+	GIDX *entry_box;
 #if POSTGIS_PGSQL_VERSION >= 95
-	bool* recheck = (bool*)PG_GETARG_POINTER(4);
+	bool *recheck = (bool *)PG_GETARG_POINTER(4);
 #endif
 
 	double distance;
@@ -1518,7 +1521,7 @@ Datum gserialized_gist_distance(PG_FUNCTION_ARGS)
 	}
 
 	/* Get the entry box */
-	entry_box = (GIDX*)DatumGetPointer(entry->key);
+	entry_box = (GIDX *)DatumGetPointer(entry->key);
 
 #if POSTGIS_PGSQL_VERSION >= 95
 
@@ -1555,12 +1558,12 @@ Datum gserialized_gist_distance(PG_FUNCTION_ARGS)
 ** picksplit function.
 */
 static void
-gserialized_gist_picksplit_addlist(OffsetNumber* list, GIDX** box_union, GIDX* box_current, int* pos, int num)
+gserialized_gist_picksplit_addlist(OffsetNumber *list, GIDX **box_union, GIDX *box_current, int *pos, int num)
 {
 	if (*pos)
 		gidx_merge(box_union, box_current);
 	else
-		memcpy((void*)(*box_union), (void*)box_current, VARSIZE(box_current));
+		memcpy((void *)(*box_union), (void *)box_current, VARSIZE(box_current));
 	list[*pos] = num;
 	(*pos)++;
 }
@@ -1580,7 +1583,7 @@ gserialized_gist_picksplit_badratio(int x, int y)
 }
 
 static bool
-gserialized_gist_picksplit_badratios(int* pos, int dims)
+gserialized_gist_picksplit_badratios(int *pos, int dims)
 {
 	int i;
 	for (i = 0; i < dims; i++)
@@ -1595,11 +1598,11 @@ gserialized_gist_picksplit_badratios(int* pos, int dims)
 ** or another, we simply split the overflowing node in half.
 */
 static void
-gserialized_gist_picksplit_fallback(GistEntryVector* entryvec, GIST_SPLITVEC* v)
+gserialized_gist_picksplit_fallback(GistEntryVector *entryvec, GIST_SPLITVEC *v)
 {
 	OffsetNumber i, maxoff;
-	GIDX* unionL = NULL;
-	GIDX* unionR = NULL;
+	GIDX *unionL = NULL;
+	GIDX *unionR = NULL;
 	int nbytes;
 
 	POSTGIS_DEBUG(4, "[GIST] in fallback picksplit function");
@@ -1607,13 +1610,13 @@ gserialized_gist_picksplit_fallback(GistEntryVector* entryvec, GIST_SPLITVEC* v)
 	maxoff = entryvec->n - 1;
 
 	nbytes = (maxoff + 2) * sizeof(OffsetNumber);
-	v->spl_left = (OffsetNumber*)palloc(nbytes);
-	v->spl_right = (OffsetNumber*)palloc(nbytes);
+	v->spl_left = (OffsetNumber *)palloc(nbytes);
+	v->spl_right = (OffsetNumber *)palloc(nbytes);
 	v->spl_nleft = v->spl_nright = 0;
 
 	for (i = FirstOffsetNumber; i <= maxoff; i = OffsetNumberNext(i))
 	{
-		GIDX* cur = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+		GIDX *cur = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 
 		if (i <= (maxoff - FirstOffsetNumber + 1) / 2)
 		{
@@ -1637,24 +1640,24 @@ gserialized_gist_picksplit_fallback(GistEntryVector* entryvec, GIST_SPLITVEC* v)
 		}
 	}
 
-	if (v->spl_ldatum_exists) gidx_merge(&unionL, (GIDX*)DatumGetPointer(v->spl_ldatum));
+	if (v->spl_ldatum_exists) gidx_merge(&unionL, (GIDX *)DatumGetPointer(v->spl_ldatum));
 
 	v->spl_ldatum = PointerGetDatum(unionL);
 
-	if (v->spl_rdatum_exists) gidx_merge(&unionR, (GIDX*)DatumGetPointer(v->spl_rdatum));
+	if (v->spl_rdatum_exists) gidx_merge(&unionR, (GIDX *)DatumGetPointer(v->spl_rdatum));
 
 	v->spl_rdatum = PointerGetDatum(unionR);
 	v->spl_ldatum_exists = v->spl_rdatum_exists = false;
 }
 
 static void
-gserialized_gist_picksplit_constructsplit(GIST_SPLITVEC* v,
-					  OffsetNumber* list1,
+gserialized_gist_picksplit_constructsplit(GIST_SPLITVEC *v,
+					  OffsetNumber *list1,
 					  int nlist1,
-					  GIDX** union1,
-					  OffsetNumber* list2,
+					  GIDX **union1,
+					  OffsetNumber *list2,
 					  int nlist2,
-					  GIDX** union2)
+					  GIDX **union2)
 {
 	bool firstToLeft = true;
 
@@ -1664,16 +1667,16 @@ gserialized_gist_picksplit_constructsplit(GIST_SPLITVEC* v,
 	{
 		if (v->spl_ldatum_exists && v->spl_rdatum_exists)
 		{
-			GIDX* LRl = gidx_copy(*union1);
-			GIDX* LRr = gidx_copy(*union2);
-			GIDX* RLl = gidx_copy(*union2);
-			GIDX* RLr = gidx_copy(*union1);
+			GIDX *LRl = gidx_copy(*union1);
+			GIDX *LRr = gidx_copy(*union2);
+			GIDX *RLl = gidx_copy(*union2);
+			GIDX *RLr = gidx_copy(*union1);
 			double sizeLR, sizeRL;
 
-			gidx_merge(&LRl, (GIDX*)DatumGetPointer(v->spl_ldatum));
-			gidx_merge(&LRr, (GIDX*)DatumGetPointer(v->spl_rdatum));
-			gidx_merge(&RLl, (GIDX*)DatumGetPointer(v->spl_ldatum));
-			gidx_merge(&RLr, (GIDX*)DatumGetPointer(v->spl_rdatum));
+			gidx_merge(&LRl, (GIDX *)DatumGetPointer(v->spl_ldatum));
+			gidx_merge(&LRr, (GIDX *)DatumGetPointer(v->spl_rdatum));
+			gidx_merge(&RLl, (GIDX *)DatumGetPointer(v->spl_ldatum));
+			gidx_merge(&RLr, (GIDX *)DatumGetPointer(v->spl_rdatum));
 
 			sizeLR = gidx_inter_volume(LRl, LRr);
 			sizeRL = gidx_inter_volume(RLl, RLr);
@@ -1719,9 +1722,9 @@ gserialized_gist_picksplit_constructsplit(GIST_SPLITVEC* v,
 		v->spl_right = list2;
 		v->spl_nleft = nlist1;
 		v->spl_nright = nlist2;
-		if (v->spl_ldatum_exists) gidx_merge(union1, (GIDX*)DatumGetPointer(v->spl_ldatum));
+		if (v->spl_ldatum_exists) gidx_merge(union1, (GIDX *)DatumGetPointer(v->spl_ldatum));
 		v->spl_ldatum = PointerGetDatum(*union1);
-		if (v->spl_rdatum_exists) gidx_merge(union2, (GIDX*)DatumGetPointer(v->spl_rdatum));
+		if (v->spl_rdatum_exists) gidx_merge(union2, (GIDX *)DatumGetPointer(v->spl_rdatum));
 		v->spl_rdatum = PointerGetDatum(*union2);
 	}
 	else
@@ -1730,9 +1733,9 @@ gserialized_gist_picksplit_constructsplit(GIST_SPLITVEC* v,
 		v->spl_right = list1;
 		v->spl_nleft = nlist2;
 		v->spl_nright = nlist1;
-		if (v->spl_ldatum_exists) gidx_merge(union2, (GIDX*)DatumGetPointer(v->spl_ldatum));
+		if (v->spl_ldatum_exists) gidx_merge(union2, (GIDX *)DatumGetPointer(v->spl_ldatum));
 		v->spl_ldatum = PointerGetDatum(*union2);
-		if (v->spl_rdatum_exists) gidx_merge(union1, (GIDX*)DatumGetPointer(v->spl_rdatum));
+		if (v->spl_rdatum_exists) gidx_merge(union1, (GIDX *)DatumGetPointer(v->spl_rdatum));
 		v->spl_rdatum = PointerGetDatum(*union1);
 	}
 
@@ -1753,18 +1756,18 @@ PG_FUNCTION_INFO_V1(gserialized_gist_picksplit);
 Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 {
 
-	GistEntryVector* entryvec = (GistEntryVector*)PG_GETARG_POINTER(0);
+	GistEntryVector *entryvec = (GistEntryVector *)PG_GETARG_POINTER(0);
 
-	GIST_SPLITVEC* v = (GIST_SPLITVEC*)PG_GETARG_POINTER(1);
+	GIST_SPLITVEC *v = (GIST_SPLITVEC *)PG_GETARG_POINTER(1);
 	OffsetNumber i;
 	/* One union box for each half of the space. */
-	GIDX** box_union;
+	GIDX **box_union;
 	/* One offset number list for each half of the space. */
-	OffsetNumber** list;
+	OffsetNumber **list;
 	/* One position index for each half of the space. */
-	int* pos;
-	GIDX* box_pageunion;
-	GIDX* box_current;
+	int *pos;
+	GIDX *box_pageunion;
+	GIDX *box_current;
 	int direction = -1;
 	bool all_entries_equal = true;
 	OffsetNumber max_offset;
@@ -1778,13 +1781,13 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 	*/
 
 	max_offset = entryvec->n - 1;
-	box_current = (GIDX*)DatumGetPointer(entryvec->vector[FirstOffsetNumber].key);
+	box_current = (GIDX *)DatumGetPointer(entryvec->vector[FirstOffsetNumber].key);
 	box_pageunion = gidx_copy(box_current);
 
 	/* Calculate the containing box (box_pageunion) for the whole page we are going to split. */
 	for (i = OffsetNumberNext(FirstOffsetNumber); i <= max_offset; i = OffsetNumberNext(i))
 	{
-		box_current = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+		box_current = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 
 		if (all_entries_equal == true && !gidx_equals(box_pageunion, box_current)) all_entries_equal = false;
 
@@ -1806,12 +1809,12 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 	ndims_pageunion = GIDX_NDIMS(box_pageunion);
 	POSTGIS_DEBUGF(4, "[GIST] ndims_pageunion == %d", ndims_pageunion);
 	pos = palloc(2 * ndims_pageunion * sizeof(int));
-	list = palloc(2 * ndims_pageunion * sizeof(OffsetNumber*));
-	box_union = palloc(2 * ndims_pageunion * sizeof(GIDX*));
+	list = palloc(2 * ndims_pageunion * sizeof(OffsetNumber *));
+	box_union = palloc(2 * ndims_pageunion * sizeof(GIDX *));
 	for (d = 0; d < ndims_pageunion; d++)
 	{
-		list[BELOW(d)] = (OffsetNumber*)palloc(nbytes);
-		list[ABOVE(d)] = (OffsetNumber*)palloc(nbytes);
+		list[BELOW(d)] = (OffsetNumber *)palloc(nbytes);
+		list[ABOVE(d)] = (OffsetNumber *)palloc(nbytes);
 		box_union[BELOW(d)] = gidx_new(ndims_pageunion);
 		box_union[ABOVE(d)] = gidx_new(ndims_pageunion);
 		pos[BELOW(d)] = 0;
@@ -1826,7 +1829,7 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 	POSTGIS_DEBUG(4, "[GIST] 'picksplit' calculating best split axis");
 	for (i = FirstOffsetNumber; i <= max_offset; i = OffsetNumberNext(i))
 	{
-		box_current = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+		box_current = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 
 		for (d = 0; d < ndims_pageunion; d++)
 		{
@@ -1857,7 +1860,7 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 		** Instead we split on center points and see if we do better.
 		** First calculate the average center point for each axis.
 		*/
-		double* avgCenter = palloc(ndims_pageunion * sizeof(double));
+		double *avgCenter = palloc(ndims_pageunion * sizeof(double));
 
 		for (d = 0; d < ndims_pageunion; d++)
 		{
@@ -1868,7 +1871,7 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 
 		for (i = FirstOffsetNumber; i <= max_offset; i = OffsetNumberNext(i))
 		{
-			box_current = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+			box_current = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 			for (d = 0; d < ndims_pageunion; d++)
 			{
 				avgCenter[d] += (GIDX_GET_MAX(box_current, d) + GIDX_GET_MIN(box_current, d)) / 2.0;
@@ -1885,7 +1888,7 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 		for (i = FirstOffsetNumber; i <= max_offset; i = OffsetNumberNext(i))
 		{
 			double center;
-			box_current = (GIDX*)DatumGetPointer(entryvec->vector[i].key);
+			box_current = (GIDX *)DatumGetPointer(entryvec->vector[i].key);
 
 			for (d = 0; d < ndims_pageunion; d++)
 			{
@@ -1954,8 +1957,8 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 						  pos[ABOVE(direction)],
 						  &(box_union[ABOVE(direction)]));
 
-	POSTGIS_DEBUGF(4, "[GIST] spl_ldatum: %s", gidx_to_string((GIDX*)v->spl_ldatum));
-	POSTGIS_DEBUGF(4, "[GIST] spl_rdatum: %s", gidx_to_string((GIDX*)v->spl_rdatum));
+	POSTGIS_DEBUGF(4, "[GIST] spl_ldatum: %s", gidx_to_string((GIDX *)v->spl_ldatum));
+	POSTGIS_DEBUGF(4, "[GIST] spl_rdatum: %s", gidx_to_string((GIDX *)v->spl_rdatum));
 
 	POSTGIS_DEBUGF(
 	    4,
@@ -1963,10 +1966,10 @@ Datum gserialized_gist_picksplit(PG_FUNCTION_ARGS)
 	    direction,
 	    GIDX_GET_MIN(box_pageunion, direction),
 	    GIDX_GET_MAX(box_pageunion, direction),
-	    GIDX_GET_MIN((GIDX*)v->spl_ldatum, direction),
-	    GIDX_GET_MAX((GIDX*)v->spl_ldatum, direction),
-	    GIDX_GET_MIN((GIDX*)v->spl_rdatum, direction),
-	    GIDX_GET_MAX((GIDX*)v->spl_rdatum, direction));
+	    GIDX_GET_MIN((GIDX *)v->spl_ldatum, direction),
+	    GIDX_GET_MAX((GIDX *)v->spl_ldatum, direction),
+	    GIDX_GET_MIN((GIDX *)v->spl_rdatum, direction),
+	    GIDX_GET_MAX((GIDX *)v->spl_rdatum, direction));
 
 	PG_RETURN_POINTER(v);
 }
@@ -1985,7 +1988,7 @@ Datum gidx_in(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(gidx_out);
 Datum gidx_out(PG_FUNCTION_ARGS)
 {
-	GIDX* box = (GIDX*)PG_GETARG_POINTER(0);
-	char* result = gidx_to_string(box);
+	GIDX *box = (GIDX *)PG_GETARG_POINTER(0);
+	char *result = gidx_to_string(box);
 	PG_RETURN_CSTRING(result);
 }

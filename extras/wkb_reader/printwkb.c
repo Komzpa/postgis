@@ -19,10 +19,10 @@
 
 //#define DEBUG 1
 
-void decode_wkb_collection(char* wkb, int* size);
+void decode_wkb_collection(char *wkb, int *size);
 
 void
-swap_char(char* a, char* b)
+swap_char(char *a, char *b)
 {
 	char c;
 
@@ -32,7 +32,7 @@ swap_char(char* a, char* b)
 }
 
 void
-flip_endian_double(char* d)
+flip_endian_double(char *d)
 {
 	swap_char(d + 7, d);
 	swap_char(d + 6, d + 1);
@@ -41,14 +41,14 @@ flip_endian_double(char* d)
 }
 
 void
-flip_endian_int32(char* i)
+flip_endian_int32(char *i)
 {
 	swap_char(i + 3, i);
 	swap_char(i + 2, i + 1);
 }
 
 void
-decode_wkb_collection(char* wkb, int* size)
+decode_wkb_collection(char *wkb, int *size)
 {
 	int offset = 0;
 	bool flipbytes;
@@ -72,7 +72,7 @@ decode_wkb_collection(char* wkb, int* size)
 	}
 
 	memcpy(&numb_sub, wkb + 5, 4);
-	if (flipbytes) flip_endian_int32((char*)&numb_sub);
+	if (flipbytes) flip_endian_int32((char *)&numb_sub);
 
 	printf("GEOMETRYCOLLECTION(\n");
 	offset = 9;
@@ -97,7 +97,7 @@ decode_wkb_collection(char* wkb, int* size)
 // dump wkb to screen (for debugging)
 // assume endian is constant though out structure
 void
-decode_wkb(char* wkb, int* size)
+decode_wkb(char *wkb, int *size)
 {
 
 	bool flipbytes;
@@ -137,7 +137,7 @@ decode_wkb(char* wkb, int* size)
 	printf("info about wkb:\n");
 #endif
 	memcpy(&type, wkb + 1, 4);
-	if (flipbytes) flip_endian_int32((char*)&type);
+	if (flipbytes) flip_endian_int32((char *)&type);
 
 	is3d = 0;
 
@@ -159,9 +159,9 @@ decode_wkb(char* wkb, int* size)
 			memcpy(&z, &wkb[5 + 16], 8);
 			if (flipbytes)
 			{
-				flip_endian_double((char*)&x);
-				flip_endian_double((char*)&y);
-				flip_endian_double((char*)&z);
+				flip_endian_double((char *)&x);
+				flip_endian_double((char *)&y);
+				flip_endian_double((char *)&z);
 			}
 			printf("%g %g %g)", x, y, z);
 		}
@@ -171,8 +171,8 @@ decode_wkb(char* wkb, int* size)
 			memcpy(&y, &wkb[5 + 8], 8);
 			if (flipbytes)
 			{
-				flip_endian_double((char*)&x);
-				flip_endian_double((char*)&y);
+				flip_endian_double((char *)&x);
+				flip_endian_double((char *)&y);
 			}
 			printf("%g %g)", x, y);
 		}
@@ -187,7 +187,7 @@ decode_wkb(char* wkb, int* size)
 	{
 		printf("LINESTRING(");
 		memcpy(&n1, &wkb[5], 4);
-		if (flipbytes) flip_endian_int32((char*)&n1);
+		if (flipbytes) flip_endian_int32((char *)&n1);
 		//	printf("  --- has %i sub points\n",n1);
 		first_one = TRUE;
 		for (t = 0; t < n1; t++)
@@ -204,9 +204,9 @@ decode_wkb(char* wkb, int* size)
 				memcpy(&z, &wkb[9 + t * 24 + 16], 8);
 				if (flipbytes)
 				{
-					flip_endian_double((char*)&x);
-					flip_endian_double((char*)&y);
-					flip_endian_double((char*)&z);
+					flip_endian_double((char *)&x);
+					flip_endian_double((char *)&y);
+					flip_endian_double((char *)&z);
 				}
 				printf("%g %g %g", x, y, z);
 			}
@@ -216,8 +216,8 @@ decode_wkb(char* wkb, int* size)
 				memcpy(&y, &wkb[9 + t * 16 + 8], 8);
 				if (flipbytes)
 				{
-					flip_endian_double((char*)&x);
-					flip_endian_double((char*)&y);
+					flip_endian_double((char *)&x);
+					flip_endian_double((char *)&y);
 				}
 				printf("%g %g", x, y);
 			}
@@ -235,7 +235,7 @@ decode_wkb(char* wkb, int* size)
 		*size = 9;
 		printf("POLYGON(");
 		memcpy(&n1, &wkb[5], 4);
-		if (flipbytes) flip_endian_int32((char*)&n1);
+		if (flipbytes) flip_endian_int32((char *)&n1);
 		// printf("  --- has %i rings\n",n1);
 		*size += 4 * n1;
 		offset = 9;
@@ -243,7 +243,7 @@ decode_wkb(char* wkb, int* size)
 		for (u = 0; u < n1; u++)
 		{
 			memcpy(&n2, &wkb[offset], 4);
-			if (flipbytes) flip_endian_int32((char*)&n2);
+			if (flipbytes) flip_endian_int32((char *)&n2);
 			//	printf(" ring %i: has %i points\n",u,n2);
 
 			if (first_one) { first_one = FALSE; }
@@ -268,9 +268,9 @@ decode_wkb(char* wkb, int* size)
 					memcpy(&z, &wkb[offset + 4 + v * 24 + 16], 8);
 					if (flipbytes)
 					{
-						flip_endian_double((char*)&x);
-						flip_endian_double((char*)&y);
-						flip_endian_double((char*)&z);
+						flip_endian_double((char *)&x);
+						flip_endian_double((char *)&y);
+						flip_endian_double((char *)&z);
 					}
 					printf("%g %g %g", x, y, z);
 				}
@@ -280,8 +280,8 @@ decode_wkb(char* wkb, int* size)
 					memcpy(&y, &wkb[offset + 4 + v * 16 + 8], 8);
 					if (flipbytes)
 					{
-						flip_endian_double((char*)&x);
-						flip_endian_double((char*)&y);
+						flip_endian_double((char *)&x);
+						flip_endian_double((char *)&y);
 					}
 					printf("%g %g", x, y);
 				}
@@ -307,7 +307,7 @@ decode_wkb(char* wkb, int* size)
 	{
 		printf("MULTIPOINT(");
 		memcpy(&n1, &wkb[5], 4);
-		if (flipbytes) flip_endian_int32((char*)&n1);
+		if (flipbytes) flip_endian_int32((char *)&n1);
 		//	printf(" -- has %i points\n",n1);
 		if (is3d)
 			*size = 9 + n1 * 29;
@@ -328,9 +328,9 @@ decode_wkb(char* wkb, int* size)
 				memcpy(&z, &wkb[9 + t * 29 + 16 + 5], 8);
 				if (flipbytes)
 				{
-					flip_endian_double((char*)&x);
-					flip_endian_double((char*)&y);
-					flip_endian_double((char*)&z);
+					flip_endian_double((char *)&x);
+					flip_endian_double((char *)&y);
+					flip_endian_double((char *)&z);
 				}
 				printf("%g %g %g", x, y, z);
 			}
@@ -340,8 +340,8 @@ decode_wkb(char* wkb, int* size)
 				memcpy(&y, &wkb[9 + t * 21 + 8 + 5], 8);
 				if (flipbytes)
 				{
-					flip_endian_double((char*)&x);
-					flip_endian_double((char*)&y);
+					flip_endian_double((char *)&x);
+					flip_endian_double((char *)&y);
 				}
 				printf("%g %g", x, y);
 			}
@@ -354,7 +354,7 @@ decode_wkb(char* wkb, int* size)
 		*size = 9;
 		printf("MULTILINESTRING(");
 		memcpy(&n2, &wkb[5], 4);
-		if (flipbytes) flip_endian_int32((char*)&n2);
+		if (flipbytes) flip_endian_int32((char *)&n2);
 		//	printf(" -- has %i sub-lines\n",n2);
 		*size += 9 * n2;
 		offset = 9;
@@ -368,7 +368,7 @@ decode_wkb(char* wkb, int* size)
 			}
 			printf("(");
 			memcpy(&n1, &wkb[5 + offset], 4);
-			if (flipbytes) flip_endian_int32((char*)&n1);
+			if (flipbytes) flip_endian_int32((char *)&n1);
 			//	printf("  --- has %i sub points\n",n1);
 			first_one = TRUE;
 			for (t = 0; t < n1; t++)
@@ -386,9 +386,9 @@ decode_wkb(char* wkb, int* size)
 					memcpy(&z, &wkb[offset + 9 + t * 24 + 16], 8);
 					if (flipbytes)
 					{
-						flip_endian_double((char*)&x);
-						flip_endian_double((char*)&y);
-						flip_endian_double((char*)&z);
+						flip_endian_double((char *)&x);
+						flip_endian_double((char *)&y);
+						flip_endian_double((char *)&z);
 					}
 					printf("%g %g %g", x, y, z);
 				}
@@ -398,8 +398,8 @@ decode_wkb(char* wkb, int* size)
 					memcpy(&y, &wkb[offset + 9 + t * 16 + 8], 8);
 					if (flipbytes)
 					{
-						flip_endian_double((char*)&x);
-						flip_endian_double((char*)&y);
+						flip_endian_double((char *)&x);
+						flip_endian_double((char *)&y);
 					}
 					printf("%g %g", x, y);
 				}
@@ -424,7 +424,7 @@ decode_wkb(char* wkb, int* size)
 		*size = 9;
 		printf("MULTIPOLYGON(");
 		memcpy(&n3, &wkb[5], 4);
-		if (flipbytes) flip_endian_int32((char*)&n3);
+		if (flipbytes) flip_endian_int32((char *)&n3);
 		// printf(" -- has %i sub-poly\n",n3);
 		*size += 9 * n3;
 		offset1 = 9; // where polygon starts
@@ -441,7 +441,7 @@ decode_wkb(char* wkb, int* size)
 			total_points = 0;
 			memcpy(&n1, &wkb[offset1 + 5], 4); //# rings
 			*size += 4 * n1;
-			if (flipbytes) flip_endian_int32((char*)&n1);
+			if (flipbytes) flip_endian_int32((char *)&n1);
 			// printf("This polygon has %i rings\n",n1);
 			offset = offset1 + 9; // where linear rings are
 			first_one = TRUE;
@@ -454,7 +454,7 @@ decode_wkb(char* wkb, int* size)
 				}
 				printf("(");
 				memcpy(&n2, &wkb[offset], 4);
-				if (flipbytes) flip_endian_int32((char*)&n2); // pts in linear ring
+				if (flipbytes) flip_endian_int32((char *)&n2); // pts in linear ring
 				//	printf(" ring %i: has %i points\n",u,n2);
 				total_points += n2;
 				first_one2 = TRUE;
@@ -472,9 +472,9 @@ decode_wkb(char* wkb, int* size)
 						memcpy(&z, &wkb[offset + 4 + v * 24 + 16], 8);
 						if (flipbytes)
 						{
-							flip_endian_double((char*)&x);
-							flip_endian_double((char*)&y);
-							flip_endian_double((char*)&z);
+							flip_endian_double((char *)&x);
+							flip_endian_double((char *)&y);
+							flip_endian_double((char *)&z);
 						}
 						printf("%g %g %g", x, y, z);
 					}
@@ -484,8 +484,8 @@ decode_wkb(char* wkb, int* size)
 						memcpy(&y, &wkb[offset + 4 + v * 16 + 8], 8);
 						if (flipbytes)
 						{
-							flip_endian_double((char*)&x);
-							flip_endian_double((char*)&y);
+							flip_endian_double((char *)&x);
+							flip_endian_double((char *)&y);
 						}
 						printf("%g %g", x, y);
 					}

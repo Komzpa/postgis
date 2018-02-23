@@ -37,12 +37,12 @@
 typedef struct
 {
 	int type;
-	GSERIALIZED* geom1;
-	GSERIALIZED* geom2;
+	GSERIALIZED *geom1;
+	GSERIALIZED *geom2;
 	size_t geom1_size;
 	size_t geom2_size;
-	LWGEOM* lwgeom1;
-	LWGEOM* lwgeom2;
+	LWGEOM *lwgeom1;
+	LWGEOM *lwgeom2;
 	int32 argnum;
 } GeomCache;
 
@@ -92,20 +92,20 @@ typedef struct struct_PROJ4PortalCache
 typedef struct
 {
 	int entry_number; /* What kind of structure is this? */
-	int (*GeomIndexBuilder)(const LWGEOM* lwgeom,
-				GeomCache* cache); /* Build an index/tree and add it to your cache */
-	int (*GeomIndexFreer)(GeomCache* cache);   /* Free the index/tree in your cache */
-	GeomCache* (*GeomCacheAllocator)(
+	int (*GeomIndexBuilder)(const LWGEOM *lwgeom,
+				GeomCache *cache); /* Build an index/tree and add it to your cache */
+	int (*GeomIndexFreer)(GeomCache *cache);   /* Free the index/tree in your cache */
+	GeomCache *(*GeomCacheAllocator)(
 	    void); /* Allocate the kind of cache object you use (GeomCache+some extra space) */
 } GeomCacheMethods;
 
 /*
  * Cache retrieval functions
  */
-PROJ4PortalCache* GetPROJ4SRSCache(FunctionCallInfoData* fcinfo);
-GeomCache* GetGeomCache(FunctionCallInfoData* fcinfo,
-			const GeomCacheMethods* cache_methods,
-			const GSERIALIZED* g1,
-			const GSERIALIZED* g2);
+PROJ4PortalCache *GetPROJ4SRSCache(FunctionCallInfoData *fcinfo);
+GeomCache *GetGeomCache(FunctionCallInfoData *fcinfo,
+			const GeomCacheMethods *cache_methods,
+			const GSERIALIZED *g1,
+			const GSERIALIZED *g2);
 
 #endif /* LWGEOM_CACHE_H_ */

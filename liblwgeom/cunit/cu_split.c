@@ -19,9 +19,9 @@
 static void
 test_lwline_split_by_point_to(void)
 {
-	LWLINE* line;
-	LWPOINT* point;
-	LWMLINE* coll;
+	LWLINE *line;
+	LWPOINT *point;
+	LWMLINE *coll;
 	int ret;
 
 	/* Because i don't trust that much prior tests...  ;) */
@@ -63,7 +63,7 @@ test_lwline_split_by_point_to(void)
 	CU_ASSERT_EQUAL(coll->ngeoms, 4);
 	lwpoint_free(point);
 
-	lwcollection_free((LWCOLLECTION*)coll);
+	lwcollection_free((LWCOLLECTION *)coll);
 	lwline_free(line);
 }
 
@@ -226,7 +226,7 @@ test_lwgeom_split(void)
 	ret = lwgeom_split(geom, blade);
 	CU_ASSERT(ret != NULL);
 	{
-		LWCOLLECTION* split = lwgeom_as_lwcollection(ret);
+		LWCOLLECTION *split = lwgeom_as_lwcollection(ret);
 		LWLINE *l1, *l2;
 		POINT2D pt;
 		CU_ASSERT(split != NULL);

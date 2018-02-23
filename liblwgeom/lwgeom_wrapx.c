@@ -30,16 +30,16 @@
 #include <string.h>
 #include <assert.h>
 
-LWGEOM* lwgeom_wrapx(const LWGEOM* lwgeom_in, double cutx, double amount);
-static LWCOLLECTION* lwcollection_wrapx(const LWCOLLECTION* lwcoll_in, double cutx, double amount);
+LWGEOM *lwgeom_wrapx(const LWGEOM *lwgeom_in, double cutx, double amount);
+static LWCOLLECTION *lwcollection_wrapx(const LWCOLLECTION *lwcoll_in, double cutx, double amount);
 
-static LWGEOM*
-lwgeom_split_wrapx(const LWGEOM* geom_in, double cutx, double amount)
+static LWGEOM *
+lwgeom_split_wrapx(const LWGEOM *geom_in, double cutx, double amount)
 {
 	LWGEOM *blade, *split;
-	POINTARRAY* bladepa;
+	POINTARRAY *bladepa;
 	POINT4D pt;
-	const GBOX* box_in;
+	const GBOX *box_in;
 	AFFINE affine = {
 	    1,
 	    0,
@@ -107,18 +107,18 @@ lwgeom_split_wrapx(const LWGEOM* geom_in, double cutx, double amount)
 	LWDEBUGG(2, split, "split geometry");
 
 	/* iterate over components, translate if needed */
-	const LWCOLLECTION* col = lwgeom_as_lwcollection(split);
+	const LWCOLLECTION *col = lwgeom_as_lwcollection(split);
 	if (!col)
 	{
 		/* not split, this is unexpected */
 		lwnotice("WARNING: unexpected lack of split in lwgeom_split_wrapx");
 		return lwgeom_clone_deep(geom_in);
 	}
-	LWCOLLECTION* col_out = lwcollection_wrapx(col, cutx, amount);
+	LWCOLLECTION *col_out = lwcollection_wrapx(col, cutx, amount);
 	lwgeom_free(split);
 
 	/* unary-union the result (homogenize too ?) */
-	LWGEOM* out = lwgeom_unaryunion(lwcollection_as_lwgeom(col_out));
+	LWGEOM *out = lwgeom_unaryunion(lwcollection_as_lwgeom(col_out));
 	LWDEBUGF(2, "col_out:%p, unaryunion_out:%p", col_out, out);
 	LWDEBUGG(2, out, "unary-unioned");
 
@@ -127,15 +127,15 @@ lwgeom_split_wrapx(const LWGEOM* geom_in, double cutx, double amount)
 	return out;
 }
 
-static LWCOLLECTION*
-lwcollection_wrapx(const LWCOLLECTION* lwcoll_in, double cutx, double amount)
+static LWCOLLECTION *
+lwcollection_wrapx(const LWCOLLECTION *lwcoll_in, double cutx, double amount)
 {
-	LWGEOM** wrap_geoms;
-	LWCOLLECTION* out;
+	LWGEOM **wrap_geoms;
+	LWCOLLECTION *out;
 	uint32_t i;
 	int outtype = lwcoll_in->type;
 
-	wrap_geoms = lwalloc(lwcoll_in->ngeoms * sizeof(LWGEOM*));
+	wrap_geoms = lwalloc(lwcoll_in->ngeoms * sizeof(LWGEOM *));
 	if (!wrap_geoms)
 	{
 		lwerror("Out of virtual memory");
@@ -173,8 +173,8 @@ lwcollection_wrapx(const LWCOLLECTION* lwcoll_in, double cutx, double amount)
 }
 
 /* exported */
-LWGEOM*
-lwgeom_wrapx(const LWGEOM* lwgeom_in, double cutx, double amount)
+LWGEOM *
+lwgeom_wrapx(const LWGEOM *lwgeom_in, double cutx, double amount)
 {
 	/* Nothing to wrap in an empty geom */
 	if (lwgeom_is_empty(lwgeom_in))
@@ -199,7 +199,7 @@ lwgeom_wrapx(const LWGEOM* lwgeom_in, double cutx, double amount)
 
 	case POINTTYPE:
 	{
-		const LWPOINT* pt = lwgeom_as_lwpoint(lwgeom_clone_deep(lwgeom_in));
+		const LWPOINT *pt = lwgeom_as_lwpoint(lwgeom_clone_deep(lwgeom_in));
 		POINT4D pt4d;
 		getPoint4d_p(pt->point, 0, &pt4d);
 
@@ -218,7 +218,7 @@ lwgeom_wrapx(const LWGEOM* lwgeom_in, double cutx, double amount)
 	case MULTILINETYPE:
 	case COLLECTIONTYPE:
 		LWDEBUG(2, "collection-wrapping multi");
-		return lwcollection_as_lwgeom(lwcollection_wrapx((const LWCOLLECTION*)lwgeom_in, cutx, amount));
+		return lwcollection_as_lwgeom(lwcollection_wrapx((const LWCOLLECTION *)lwgeom_in, cutx, amount));
 
 	default:
 		lwerror("Wrapping of %s geometries is unsupported", lwtype_name(lwgeom_in->type));

@@ -19,11 +19,11 @@
 #include "cu_tester.h"
 
 static void
-do_geojson_test(const char* exp, char* in, char* exp_srs)
+do_geojson_test(const char *exp, char *in, char *exp_srs)
 {
-	LWGEOM* g;
-	char* h = NULL;
-	char* srs = NULL;
+	LWGEOM *g;
+	char *h = NULL;
+	char *srs = NULL;
 	size_t size;
 
 	g = lwgeom_from_geojson(in, &srs);

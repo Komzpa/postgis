@@ -20,16 +20,16 @@
 #include "liblwgeom_internal.h"
 #include "cu_tester.h"
 
-static LWGEOM*
-lwgeom_from_text(const char* str)
+static LWGEOM *
+lwgeom_from_text(const char *str)
 {
 	LWGEOM_PARSER_RESULT r;
-	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char*)str, LW_PARSER_CHECK_NONE)) return NULL;
+	if (LW_FAILURE == lwgeom_parse_wkt(&r, (char *)str, LW_PARSER_CHECK_NONE)) return NULL;
 	return r.geom;
 }
 
-static char*
-lwgeom_to_text(const LWGEOM* geom)
+static char *
+lwgeom_to_text(const LWGEOM *geom)
 {
 	return lwgeom_to_wkt(geom, WKT_ISO, 8, NULL);
 }
@@ -37,8 +37,8 @@ lwgeom_to_text(const LWGEOM* geom)
 static void
 test_ptarray_append_point(void)
 {
-	LWLINE* line;
-	char* wkt;
+	LWLINE *line;
+	char *wkt;
 	POINT4D p;
 
 	line = lwgeom_as_lwline(lwgeom_from_text("LINESTRING(0 0,1 1)"));
@@ -60,8 +60,8 @@ test_ptarray_append_point(void)
 static void
 test_ptarray_insert_point(void)
 {
-	LWLINE* line;
-	char* wkt;
+	LWLINE *line;
+	char *wkt;
 	POINT4D p;
 
 	line = lwgeom_as_lwline(lwgeom_from_text("LINESTRING EMPTY"));
@@ -108,7 +108,7 @@ test_ptarray_append_ptarray(void)
 {
 	LWLINE *line1, *line2;
 	int ret;
-	char* wkt;
+	char *wkt;
 
 	/* Empty first line */
 	line1 = lwgeom_as_lwline(lwgeom_from_text("LINESTRING EMPTY"));
@@ -219,7 +219,7 @@ test_ptarray_append_ptarray(void)
 static void
 test_ptarray_locate_point(void)
 {
-	LWLINE* line;
+	LWLINE *line;
 	double loc, dist;
 	POINT4D p, l;
 
@@ -281,8 +281,8 @@ test_ptarray_locate_point(void)
 static void
 test_ptarray_isccw(void)
 {
-	LWLINE* line;
-	LWPOLY* poly;
+	LWLINE *line;
+	LWPOLY *poly;
 	int ccw;
 
 	/* clockwise rectangle */
@@ -334,7 +334,7 @@ test_ptarray_isccw(void)
 static void
 test_ptarray_signed_area()
 {
-	LWLINE* line;
+	LWLINE *line;
 	double area;
 
 	/* parallelogram */
@@ -362,8 +362,8 @@ test_ptarray_contains_point()
 {
 	/* int ptarray_contains_point(const POINTARRAY *pa, const POINT2D *pt, int *winding_number) */
 
-	LWLINE* lwline;
-	POINTARRAY* pa;
+	LWLINE *lwline;
+	POINTARRAY *pa;
 	POINT2D pt;
 	int rv;
 
@@ -452,8 +452,8 @@ test_ptarrayarc_contains_point()
 {
 	/* int ptarrayarc_contains_point(const POINTARRAY *pa, const POINT2D *pt) */
 
-	LWLINE* lwline;
-	POINTARRAY* pa;
+	LWLINE *lwline;
+	POINTARRAY *pa;
 	POINT2D pt;
 	int rv;
 
@@ -589,11 +589,11 @@ test_ptarrayarc_contains_point()
 static void
 test_ptarray_scale()
 {
-	LWLINE* line;
-	POINTARRAY* pa;
+	LWLINE *line;
+	POINTARRAY *pa;
 	POINT4D factor;
-	const char* wkt;
-	char* wktout;
+	const char *wkt;
+	char *wktout;
 
 	wkt = "LINESTRING ZM (0 1 2 3,1 2 3 0,-2 -3 0 -1,-3 0 -1 -2)";
 	line = lwgeom_as_lwline(lwgeom_from_text(wkt));

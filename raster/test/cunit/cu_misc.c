@@ -115,12 +115,12 @@ test_hsv_to_rgb()
 static void
 test_util_gdal_open()
 {
-	extern char* gdal_enabled_drivers;
+	extern char *gdal_enabled_drivers;
 
 	GDALDatasetH ds;
 
-	char* disable_all = GDAL_DISABLE_ALL;
-	char* enabled = "GTiff JPEG PNG";
+	char *disable_all = GDAL_DISABLE_ALL;
+	char *enabled = "GTiff JPEG PNG";
 	// char *enabled_vsi = "GTiff JPEG PNG VSICURL";
 
 	rt_util_gdal_register_all(1);

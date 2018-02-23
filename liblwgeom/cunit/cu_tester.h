@@ -54,8 +54,8 @@ typedef void (*PG_SuiteSetup)(void);
 	{ \
 		if (!lwgeom_same(o, e)) \
 		{ \
-			char* wkt_o = lwgeom_to_ewkt(o); \
-			char* wkt_e = lwgeom_to_ewkt(e); \
+			char *wkt_o = lwgeom_to_ewkt(o); \
+			char *wkt_e = lwgeom_to_ewkt(e); \
 			fprintf( \
 			    stderr, "[%s:%d]\n Expected: %s\n Obtained: %s\n", __FILE__, __LINE__, (wkt_o), (wkt_e)); \
 			lwfree(wkt_o); \
@@ -104,4 +104,4 @@ typedef void (*PG_SuiteSetup)(void);
 	} while (0);
 
 /* Utility functions */
-void do_fn_test(LWGEOM* (*transfn)(LWGEOM*), char* input_wkt, char* expected_wkt);
+void do_fn_test(LWGEOM *(*transfn)(LWGEOM *), char *input_wkt, char *expected_wkt);

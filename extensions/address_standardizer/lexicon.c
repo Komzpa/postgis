@@ -46,19 +46,19 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #endif
 
 /* -- local prototypes -- */
-static unsigned calc_hash(char*);
-static ENTRY** create_hash_table(ERR_PARAM*);
-static int add_dict_entry(ERR_PARAM*, ENTRY**, char*, int, SYMB, char*);
+static unsigned calc_hash(char *);
+static ENTRY **create_hash_table(ERR_PARAM *);
+static int add_dict_entry(ERR_PARAM *, ENTRY **, char *, int, SYMB, char *);
 
 #ifndef BUILD_API
-static char* convert_field(char*, char*);
-static int read_lexicon(ERR_PARAM*, ENTRY**, FILE*);
+static char *convert_field(char *, char *);
+static int read_lexicon(ERR_PARAM *, ENTRY **, FILE *);
 #endif
 
-LEXICON* lex_init(ERR_PARAM* err_p);
-static int append_new_def(ERR_PARAM*, ENTRY*, SYMB, char*, int);
-static unsigned elf_hash(char*);
-void print_lexicon(ENTRY** hash_table);
+LEXICON *lex_init(ERR_PARAM *err_p);
+static int append_new_def(ERR_PARAM *, ENTRY *, SYMB, char *, int);
+static unsigned elf_hash(char *);
+void print_lexicon(ENTRY **hash_table);
 
 #ifdef BUILD_API
 
@@ -70,10 +70,10 @@ typedef struct LEXICON_s {
 
 */
 
-LEXICON*
-lex_init(ERR_PARAM* err_p)
+LEXICON *
+lex_init(ERR_PARAM *err_p)
 {
-	LEXICON* lex;
+	LEXICON *lex;
 
 	PAGC_CALLOC_STRUC(lex, LEXICON, 1, err_p, NULL);
 
@@ -90,13 +90,13 @@ lex_init(ERR_PARAM* err_p)
 }
 
 int
-lex_add_entry(LEXICON* lex, int seq, char* word, char* stdword, SYMB token)
+lex_add_entry(LEXICON *lex, int seq, char *word, char *stdword, SYMB token)
 {
 	return add_dict_entry(lex->err_p, lex->hash_table, word, seq - 1, token, stdword);
 }
 
 void
-lex_free(LEXICON* lex)
+lex_free(LEXICON *lex)
 {
 	if (lex == NULL) return;
 	destroy_lexicon(lex->hash_table);
@@ -115,13 +115,13 @@ calls util.c (open_aux_file) lexicon.c (read_lexicon, create_hash_table)
 uses macro LOG_MESS
 stdio.h (fclose)
 -----------------------------------------------------------------------*/
-ENTRY**
-create_lexicon(PAGC_GLOBAL* glo_p, const char* lex_name, const char* gaz_name)
+ENTRY **
+create_lexicon(PAGC_GLOBAL *glo_p, const char *lex_name, const char *gaz_name)
 {
 	/* -- called by init_stand_process to read in the Lexicon and set up the
 	   definitions in memory for hash table access -- */
 	FILE *gaz_file, *dict_file;
-	ENTRY** hash_table;
+	ENTRY **hash_table;
 
 	if ((hash_table = create_hash_table(glo_p->process_errors)) == NULL) { return NULL; }
 	/* 2009-08-13 : support multiple lexicons */
@@ -155,7 +155,7 @@ stdio.h (fgets,feof,sscanf)
 uses macro BLANK_STRING
 -------------------------------------------------------*/
 static int
-read_lexicon(ERR_PARAM* err_p, ENTRY** hash_table, FILE* CFile)
+read_lexicon(ERR_PARAM *err_p, ENTRY **hash_table, FILE *CFile)
 {
 	char record_buffer[MAXSTRLEN];
 	char lookup_str[MAXTEXT];
@@ -163,7 +163,7 @@ read_lexicon(ERR_PARAM* err_p, ENTRY** hash_table, FILE* CFile)
 	int cur_token;
 	int num_def;
 	char standard_str[MAXTEXT];
-	char* next_str;
+	char *next_str;
 
 	while (!feof(CFile))
 	{
@@ -196,12 +196,12 @@ called by lexicon.c (read_lexicon)
 ctype.h (isspace)
 uses macro BLANK_STRING
 -------------------------------------------------------*/
-static char*
-convert_field(char* buf, char* inp)
+static char *
+convert_field(char *buf, char *inp)
 {
 	char c;
-	char* d = buf;
-	char* s = inp;
+	char *d = buf;
+	char *s = inp;
 
 	BLANK_STRING(d);
 	/* -- space at the beginning of a line will stop the read -- */
@@ -229,7 +229,7 @@ calls lexicon.c (destroy_def_list)
 uses macro FREE_AND_NULL
 -------------------------------------------------------*/
 void
-destroy_lexicon(ENTRY** hash_table)
+destroy_lexicon(ENTRY **hash_table)
 {
 	/* -- called by Clean-Up - */
 	unsigned __i__;
@@ -257,10 +257,10 @@ called by destroy_lexicon and tokenize.c (remove_default_defs)
 uses macro FREE_AND_NULL
 ------------------------------------------------------------*/
 void
-destroy_def_list(DEF* start_def)
+destroy_def_list(DEF *start_def)
 {
-	DEF* cur_def;
-	DEF* next_def = NULL;
+	DEF *cur_def;
+	DEF *next_def = NULL;
 
 	for (cur_def = start_def; cur_def != NULL; cur_def = next_def)
 	{
@@ -277,11 +277,11 @@ called by lexicon.c (add_dict_entry)
 calls lexicon.c (calc_hash)
 string.h (strcmp)
 -------------------------------------------------------*/
-ENTRY*
-find_entry(ENTRY** hash_table, char* lookup_str)
+ENTRY *
+find_entry(ENTRY **hash_table, char *lookup_str)
 {
 	/* -- called to create a lexeme -- */
-	ENTRY* __E__;
+	ENTRY *__E__;
 	unsigned __hash_index__; /* -- 2006-11-20 : to return hash table pointer -- */
 
 	__hash_index__ = calc_hash(lookup_str);
@@ -298,7 +298,7 @@ lexicon.c (elf_hash)
 called by lexicon.c (calc_hash)
 -------------------------------------------------------*/
 static unsigned
-elf_hash(char* key_str)
+elf_hash(char *key_str)
 {
 	unsigned h, g, c;
 
@@ -320,7 +320,7 @@ calls lexicon.c (elf_hash)
 -------------------------------------------------------*/
 
 static unsigned
-calc_hash(char* key_str)
+calc_hash(char *key_str)
 {
 	unsigned h;
 
@@ -335,12 +335,12 @@ return NULL if error
 called by create_lexicon
 uses macro PAGC_CALLOC_STRUC
 -------------------------------------------------------*/
-static ENTRY**
-create_hash_table(ERR_PARAM* err_p)
+static ENTRY **
+create_hash_table(ERR_PARAM *err_p)
 {
 	unsigned __i__;
-	ENTRY** __hash_table__;
-	PAGC_CALLOC_STRUC(__hash_table__, ENTRY*, LEXICON_HTABSIZE, err_p, NULL);
+	ENTRY **__hash_table__;
+	PAGC_CALLOC_STRUC(__hash_table__, ENTRY *, LEXICON_HTABSIZE, err_p, NULL);
 	for (__i__ = 0; __i__ < LEXICON_HTABSIZE; __i__++)
 	{
 		__hash_table__[__i__] = NULL;
@@ -356,9 +356,9 @@ uses macro PAGC_ALLOC_STRUC , PAGC_STORE_STR, RET_ERR
 return ERR_FAIL if error
 -------------------------------------------------------*/
 static int
-add_dict_entry(ERR_PARAM* err_p, ENTRY** hash_table, char* lookup_str, int def_num, SYMB t, char* standard_str)
+add_dict_entry(ERR_PARAM *err_p, ENTRY **hash_table, char *lookup_str, int def_num, SYMB t, char *standard_str)
 {
-	ENTRY* E;
+	ENTRY *E;
 
 	E = find_entry(hash_table, lookup_str);
 	if (E == NULL)
@@ -392,7 +392,7 @@ returns FALSE if entry is already there
 returns ERR_FAIL on allocation error
 -------------------------------------------------------*/
 static int
-append_new_def(ERR_PARAM* err_p, ENTRY* E, SYMB t, char* text, int def_num)
+append_new_def(ERR_PARAM *err_p, ENTRY *E, SYMB t, char *text, int def_num)
 {
 
 	DEF *D, *pd, *cd;
@@ -420,12 +420,12 @@ Pflag is TRUE for default entries
 returns NULL for allocation error
 uses macro PAGC_ALLOC_STRUC, PAGC_STORE_STR
 -------------------------------------------------------------------- */
-DEF*
-create_def(SYMB s, char* standard_str, int def_num, int PFlag, ERR_PARAM* err_p)
+DEF *
+create_def(SYMB s, char *standard_str, int def_num, int PFlag, ERR_PARAM *err_p)
 {
 	/* -- allocate the memory and set up the definition structure with the
 	   standard form -- */
-	DEF* cur_def;
+	DEF *cur_def;
 
 	/* -- initialization-time allocation -- */
 	PAGC_ALLOC_STRUC(cur_def, DEF, err_p, NULL);
@@ -449,10 +449,10 @@ lexicon.c (print_lexicon)
 not called by useful for debugging. It will print out the lexicon.
 --------------------------------------------------------------------*/
 void
-print_lexicon(ENTRY** hash_table)
+print_lexicon(ENTRY **hash_table)
 {
 	unsigned i;
-	ENTRY* E;
+	ENTRY *E;
 
 	if (!hash_table) return;
 
@@ -461,7 +461,7 @@ print_lexicon(ENTRY** hash_table)
 		E = hash_table[i];
 		while (E)
 		{
-			DEF* D = E->DefList;
+			DEF *D = E->DefList;
 			printf("'%s'\n", E->Lookup);
 			while (D)
 			{

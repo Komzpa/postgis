@@ -32,8 +32,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #include <string.h>
 #include "pagc_api.h"
 
-static FILE* open_error_log(const char*, DS_Handle, ERR_PARAM*);
-static int turn_off_error_log(ERR_PARAM*);
+static FILE *open_error_log(const char *, DS_Handle, ERR_PARAM *);
+static int turn_off_error_log(ERR_PARAM *);
 
 #define PRINT_ERROR(TEMP, MSG) DBG(TEMP, MSG);
 
@@ -51,13 +51,13 @@ err_param.c (init_errors) :
 calls : err_param.c (open_error_log), stdlib.h (malloc, free) ,
 stdio.h (fprintf, fflush) stdlib.h (malloc,free)
 --------------------------------------------------------------*/
-ERR_PARAM*
-init_errors(PAGC_GLOBAL* pagc_glo_p, const char* log_name)
+ERR_PARAM *
+init_errors(PAGC_GLOBAL *pagc_glo_p, const char *log_name)
 {
-	ERR_PARAM* err_p;
-	ERR_REC* err_mem;
+	ERR_PARAM *err_p;
+	ERR_REC *err_mem;
 
-	err_p = (ERR_PARAM*)malloc(sizeof(ERR_PARAM));
+	err_p = (ERR_PARAM *)malloc(sizeof(ERR_PARAM));
 	if (err_p == NULL)
 	{
 #ifndef NO_STDERR_OUTPUT
@@ -90,7 +90,7 @@ err_param.c (close_errors)
 uses macros BLANK_STRING, FREE_AND_NULL, and PRINT_ERROR
 --------------------------------------------------------------*/
 void
-close_errors(ERR_PARAM* err_p)
+close_errors(ERR_PARAM *err_p)
 {
 	int is_fatal_error;
 	char err_out_buf[MAXSTRLEN];
@@ -124,9 +124,9 @@ called by err_param.c (empty_errors)
 stdio.h (fclose)
 --------------------------------------------------------------*/
 static int
-turn_off_error_log(ERR_PARAM* err_p)
+turn_off_error_log(ERR_PARAM *err_p)
 {
-	ERR_REC* err_mem;
+	ERR_REC *err_mem;
 
 	if ((err_p == NULL) || (err_p->stream == NULL)) { return FALSE; }
 	fclose(err_p->stream);
@@ -142,10 +142,10 @@ returns FALSE when all errors have been reported.
 TRUE otherwise
 ------------------------------------------------------------*/
 int
-empty_errors(ERR_PARAM* err_p, int* is_fatal, char* err_dest)
+empty_errors(ERR_PARAM *err_p, int *is_fatal, char *err_dest)
 {
 
-	ERR_REC* err_mem;
+	ERR_REC *err_mem;
 
 	if (err_p == NULL) { return FALSE; }
 
@@ -175,14 +175,14 @@ called by init_errors
 calls : stdlib.h (free) stdio.h (fopen)
 uses macros OPEN_ALLOCATED_NAME, FREE_AND_NULL
 --------------------------------------------------- */
-static FILE*
-open_error_log(const char* client_log_name, DS_Handle _file_sys_p, ERR_PARAM* err_p)
+static FILE *
+open_error_log(const char *client_log_name, DS_Handle _file_sys_p, ERR_PARAM *err_p)
 {
 #ifdef BUILD_API
 	return NULL;
 #else
-	char* alloc_log_name;
-	FILE* error_file;
+	char *alloc_log_name;
+	FILE *error_file;
 
 	if (client_log_name != NULL)
 	{
@@ -201,10 +201,10 @@ called after the error is written to the error_buf
 stdlib.h (malloc) stdio.h (fprintf,fflush) string.h (strcpy)
 ------------------------------------------------------------ */
 void
-register_error(ERR_PARAM* err_p)
+register_error(ERR_PARAM *err_p)
 {
 	int i;
-	ERR_REC* err_mem;
+	ERR_REC *err_mem;
 
 	/* -- check if there is anything in the error_buf -- */
 	if (err_p->error_buf[0] == SENTINEL) { return; }
@@ -259,7 +259,7 @@ register_error(ERR_PARAM* err_p)
 2006-11-02 add new arg
 ===========================================*/
 void
-send_fields_to_error(ERR_PARAM* err_p, char** s_fields)
+send_fields_to_error(ERR_PARAM *err_p, char **s_fields)
 {
 
 	send_fields_to_stream(s_fields, /* 2006-11-02 */

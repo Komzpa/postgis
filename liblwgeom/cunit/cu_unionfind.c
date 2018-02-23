@@ -18,7 +18,7 @@
 static void
 test_unionfind_create(void)
 {
-	UNIONFIND* uf = UF_create(10);
+	UNIONFIND *uf = UF_create(10);
 
 	uint32_t expected_initial_ids[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	uint32_t expected_initial_sizes[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -34,7 +34,7 @@ test_unionfind_create(void)
 static void
 test_unionfind_union(void)
 {
-	UNIONFIND* uf = UF_create(10);
+	UNIONFIND *uf = UF_create(10);
 
 	UF_union(uf, 0, 7); /* both have size = 1, so 7 becomes 0 */
 	UF_union(uf, 3, 2); /* both have size = 1, so 3 becomes 2 */
@@ -61,7 +61,7 @@ test_unionfind_ordered_by_cluster(void)
 	/* Manually create UF at desired final state */
 	UNIONFIND uf = {.N = 10, .num_clusters = 5, .clusters = final_clusters, .cluster_sizes = final_sizes};
 
-	uint32_t* ids_by_cluster = UF_ordered_by_cluster(&uf);
+	uint32_t *ids_by_cluster = UF_ordered_by_cluster(&uf);
 
 	char encountered_cluster[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -84,7 +84,7 @@ test_unionfind_ordered_by_cluster(void)
 static void
 test_unionfind_path_compression(void)
 {
-	UNIONFIND* uf = UF_create(5);
+	UNIONFIND *uf = UF_create(5);
 	uint32_t i;
 
 	uf->clusters[1] = 0;
@@ -108,7 +108,7 @@ test_unionfind_path_compression(void)
 static void
 test_unionfind_collapse_cluster_ids(void)
 {
-	UNIONFIND* uf = UF_create(10);
+	UNIONFIND *uf = UF_create(10);
 
 	uf->clusters[0] = 8;
 	uf->clusters[1] = 5;
@@ -137,7 +137,7 @@ test_unionfind_collapse_cluster_ids(void)
 	 * 8 -> 2
 	 */
 	uint32_t expected_collapsed_ids[] = {2, 0, 0, 0, 1, 0, 2, 1, 2, 1};
-	uint32_t* collapsed_ids = UF_get_collapsed_cluster_ids(uf, NULL);
+	uint32_t *collapsed_ids = UF_get_collapsed_cluster_ids(uf, NULL);
 
 	ASSERT_INTARRAY_EQUAL(collapsed_ids, expected_collapsed_ids, 10);
 

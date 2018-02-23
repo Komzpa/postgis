@@ -64,7 +64,7 @@ Datum RASTER_setBandIndex(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_getBandPixelType);
 Datum RASTER_getBandPixelType(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	rt_pixtype pixtype;
@@ -72,7 +72,7 @@ Datum RASTER_getBandPixelType(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* Index is 1-based */
 	bandindex = PG_GETARG_INT32(1);
@@ -119,19 +119,19 @@ Datum RASTER_getBandPixelType(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getBandPixelTypeName);
 Datum RASTER_getBandPixelTypeName(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	rt_pixtype pixtype;
 	int32_t bandindex;
 	const size_t name_size = 8; /* size of type name */
 	size_t size = 0;
-	char* ptr = NULL;
-	text* result = NULL;
+	char *ptr = NULL;
+	text *result = NULL;
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* Index is 1-based */
 	bandindex = PG_GETARG_INT32(1);
@@ -170,7 +170,7 @@ Datum RASTER_getBandPixelTypeName(PG_FUNCTION_ARGS)
 	 */
 
 	memset(VARDATA(result), 0, name_size);
-	ptr = (char*)result + VARHDRSZ;
+	ptr = (char *)result + VARHDRSZ;
 	strcpy(ptr, rt_pixtype_name(pixtype));
 
 	size = VARHDRSZ + strlen(ptr);
@@ -189,7 +189,7 @@ Datum RASTER_getBandPixelTypeName(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getBandNoDataValue);
 Datum RASTER_getBandNoDataValue(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex;
@@ -197,7 +197,7 @@ Datum RASTER_getBandNoDataValue(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* Index is 1-based */
 	bandindex = PG_GETARG_INT32(1);
@@ -247,7 +247,7 @@ Datum RASTER_getBandNoDataValue(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_bandIsNoData);
 Datum RASTER_bandIsNoData(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex;
@@ -264,7 +264,7 @@ Datum RASTER_bandIsNoData(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -302,12 +302,12 @@ Datum RASTER_bandIsNoData(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_getBandPath);
 Datum RASTER_getBandPath(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex;
-	const char* bandpath;
-	text* result;
+	const char *bandpath;
+	text *result;
 
 	/* Index is 1-based */
 	bandindex = PG_GETARG_INT32(1);
@@ -319,7 +319,7 @@ Datum RASTER_getBandPath(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -364,7 +364,7 @@ Datum RASTER_getBandPath(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_bandmetadata);
 Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 	int call_cntr;
 	int max_calls;
@@ -372,15 +372,15 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 	struct bandmetadata
 	{
 		uint32_t bandnum;
-		char* pixeltype;
+		char *pixeltype;
 		bool hasnodata;
 		double nodataval;
 		bool isoutdb;
-		char* bandpath;
+		char *bandpath;
 		uint8_t extbandnum;
 	};
-	struct bandmetadata* bmd = NULL;
-	struct bandmetadata* bmd2 = NULL;
+	struct bandmetadata *bmd = NULL;
+	struct bandmetadata *bmd2 = NULL;
 
 	HeapTuple tuple;
 	Datum result;
@@ -389,14 +389,14 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -406,8 +406,8 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 
 		uint32_t numBands;
 		uint32_t idx = 1;
-		uint32_t* bandNums = NULL;
-		const char* chartmp = NULL;
+		uint32_t *bandNums = NULL;
+		const char *chartmp = NULL;
 		size_t charlen;
 		uint8_t extbandnum;
 
@@ -425,7 +425,7 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		/* raster */
 		raster = rt_raster_deserialize(pgraster, FALSE);
@@ -510,7 +510,7 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 		else if (j < n)
 			bandNums = repalloc(bandNums, sizeof(uint32_t) * j);
 
-		bmd = (struct bandmetadata*)palloc(sizeof(struct bandmetadata) * j);
+		bmd = (struct bandmetadata *)palloc(sizeof(struct bandmetadata) * j);
 
 		for (i = 0; i < j; i++)
 		{
@@ -656,8 +656,8 @@ Datum RASTER_bandmetadata(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_setBandNoDataValue);
 Datum RASTER_setBandNoDataValue(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	double nodata;
@@ -667,7 +667,7 @@ Datum RASTER_setBandNoDataValue(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	/* Check index is not NULL or smaller than 1 */
 	if (PG_ARGISNULL(1))
@@ -738,14 +738,14 @@ Datum RASTER_setBandNoDataValue(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_setBandIsNoData);
 Datum RASTER_setBandIsNoData(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -804,12 +804,12 @@ Datum RASTER_setBandIsNoData(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_setBandPath);
 Datum RASTER_setBandPath(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int32_t bandindex = 1;
-	const char* outdbpathchar = NULL;
+	const char *outdbpathchar = NULL;
 	int32_t outdbindex = 1;
 	bool forceset = FALSE;
 	rt_band newband = NULL;
@@ -818,7 +818,7 @@ Datum RASTER_setBandPath(PG_FUNCTION_ARGS)
 	double nodataval = 0.;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)

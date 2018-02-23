@@ -20,8 +20,8 @@
 /*
 ** Globals used by tests
 */
-char* s;
-char* r;
+char *s;
+char *r;
 
 /*
 ** The suite initialization function.
@@ -49,12 +49,12 @@ clean_wkt_in_suite(void)
  * as an output WKT using the supplied variant.
  * If there is an error, return that.
  */
-static char*
-cu_wkt_in(char* wkt, uint8_t variant)
+static char *
+cu_wkt_in(char *wkt, uint8_t variant)
 {
 	LWGEOM_PARSER_RESULT p;
 	int rv = 0;
-	char* s = 0;
+	char *s = 0;
 
 	rv = lwgeom_parse_wkt(&p, wkt, 0);
 	if (p.errcode)
@@ -349,7 +349,7 @@ test_wkt_in_errlocation(void)
 {
 	LWGEOM_PARSER_RESULT p;
 	int rv = 0;
-	char* wkt = 0;
+	char *wkt = 0;
 
 	wkt = "LINESTRING((0 0 0,1 1)";
 	lwgeom_parser_result_init(&p);

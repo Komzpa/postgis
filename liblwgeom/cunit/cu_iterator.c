@@ -14,7 +14,7 @@
 
 #include "../liblwgeom_internal.h"
 
-char* inputs[] = {
+char *inputs[] = {
     "POINT (17 253)",
     "POINT Z (17 253 018)",
     "TRIANGLE ((0 0, 10 0, 10 10, 0 0))",
@@ -47,11 +47,11 @@ char* inputs[] = {
     "190,50 160,120 160)), ((120 190,10 190,50 160,120 190)))"};
 
 static uint32_t
-count_points_using_iterator(LWGEOM* g)
+count_points_using_iterator(LWGEOM *g)
 {
 	POINT4D p;
 	uint32_t count = 0;
-	LWPOINTITERATOR* it = lwpointiterator_create(g);
+	LWPOINTITERATOR *it = lwpointiterator_create(g);
 
 	while (lwpointiterator_has_next(it))
 	{
@@ -67,13 +67,13 @@ count_points_using_iterator(LWGEOM* g)
 static void
 test_point_count(void)
 {
-	char* types_visited = lwalloc(NUMTYPES * sizeof(char));
+	char *types_visited = lwalloc(NUMTYPES * sizeof(char));
 	memset(types_visited, LW_FALSE, NUMTYPES * sizeof(char));
 
 	uint32_t i;
-	for (i = 0; i < sizeof(inputs) / sizeof(char*); i++)
+	for (i = 0; i < sizeof(inputs) / sizeof(char *); i++)
 	{
-		LWGEOM* input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
+		LWGEOM *input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
 		types_visited[lwgeom_get_type(input)] = LW_TRUE;
 
 		uint32_t itercount = count_points_using_iterator(input);
@@ -95,8 +95,8 @@ test_point_count(void)
 static void
 test_cannot_modify_read_only(void)
 {
-	LWGEOM* input = lwgeom_from_wkt(inputs[0], LW_PARSER_CHECK_NONE);
-	LWPOINTITERATOR* it = lwpointiterator_create(input);
+	LWGEOM *input = lwgeom_from_wkt(inputs[0], LW_PARSER_CHECK_NONE);
+	LWPOINTITERATOR *it = lwpointiterator_create(input);
 
 	POINT4D p;
 	p.x = 3.2;
@@ -114,11 +114,11 @@ test_modification(void)
 	uint32_t i;
 	uint32_t j = 0;
 
-	for (i = 0; i < sizeof(inputs) / sizeof(char*); i++)
+	for (i = 0; i < sizeof(inputs) / sizeof(char *); i++)
 	{
-		LWGEOM* input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
-		LWPOINTITERATOR* it1 = lwpointiterator_create_rw(input);
-		LWPOINTITERATOR* it2 = lwpointiterator_create(input);
+		LWGEOM *input = lwgeom_from_wkt(inputs[i], LW_PARSER_CHECK_NONE);
+		LWPOINTITERATOR *it1 = lwpointiterator_create_rw(input);
+		LWPOINTITERATOR *it2 = lwpointiterator_create(input);
 		;
 
 		while (lwpointiterator_has_next(it1))
@@ -152,12 +152,12 @@ test_modification(void)
 static void
 test_no_memory_leaked_when_iterator_is_partially_used(void)
 {
-	LWGEOM* g = lwgeom_from_wkt(
+	LWGEOM *g = lwgeom_from_wkt(
 	    "GEOMETRYCOLLECTION (POINT (3 7), GEOMETRYCOLLECTION(LINESTRING (2 8, 4 3), POLYGON EMPTY, MULTIPOINT ((2 "
 	    "8), (17 3), EMPTY)))",
 	    LW_PARSER_CHECK_NONE);
 
-	LWPOINTITERATOR* it = lwpointiterator_create(g);
+	LWPOINTITERATOR *it = lwpointiterator_create(g);
 	lwpointiterator_next(it, NULL);
 	lwpointiterator_next(it, NULL);
 
@@ -169,12 +169,12 @@ static void
 test_mixed_rw_access(void)
 {
 	uint32_t i = 0;
-	LWGEOM* g = lwgeom_from_wkt(
+	LWGEOM *g = lwgeom_from_wkt(
 	    "GEOMETRYCOLLECTION (POINT (3 7), GEOMETRYCOLLECTION(LINESTRING (2 8, 4 3), POLYGON EMPTY, MULTIPOINT ((2 "
 	    "8), (17 3), EMPTY)))",
 	    LW_PARSER_CHECK_NONE);
-	LWPOINTITERATOR* it1 = lwpointiterator_create_rw(g);
-	LWPOINTITERATOR* it2 = lwpointiterator_create(g);
+	LWPOINTITERATOR *it1 = lwpointiterator_create_rw(g);
+	LWPOINTITERATOR *it2 = lwpointiterator_create(g);
 
 	/* Flip the coordinates of the 3rd point */
 	while (lwpointiterator_has_next(it1))
@@ -221,7 +221,7 @@ static void
 test_ordering(void)
 {
 	uint32_t i = 0;
-	LWGEOM* g = lwgeom_from_wkt(
+	LWGEOM *g = lwgeom_from_wkt(
 	    "GEOMETRYCOLLECTION (POLYGON ((0 0, 0 10, 10 10, 0 10, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1)), MULTIPOINT((4 4), "
 	    "(3 3)))",
 	    LW_PARSER_CHECK_NONE);
@@ -239,7 +239,7 @@ test_ordering(void)
 			    {.x = 4, .y = 4},
 			    {.x = 3, .y = 3}};
 
-	LWPOINTITERATOR* it = lwpointiterator_create(g);
+	LWPOINTITERATOR *it = lwpointiterator_create(g);
 	POINT4D p;
 
 	for (i = 0; lwpointiterator_has_next(it); i++)

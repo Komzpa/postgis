@@ -101,8 +101,8 @@ using std::time_t;
 #endif // #ifdef _WIN32
 
 // define pointers to callback error handler and memory allocation
-typedef void(STDCALL* fpError)(int errorNumber, const char* errorMessage);
-typedef char*(STDCALL* fpAlloc)(unsigned long memoryNeeded);
+typedef void(STDCALL *fpError)(int errorNumber, const char *errorMessage);
+typedef char *(STDCALL *fpAlloc)(unsigned long memoryNeeded);
 
 #endif // #ifdef ASTYLE_LIB
 
@@ -126,7 +126,7 @@ template <typename T> class ASStreamIterator : public ASSourceIterator
 	bool checkForEmptyLine;
 
 	// function declarations
-	explicit ASStreamIterator(T* in);
+	explicit ASStreamIterator(T *in);
 	virtual ~ASStreamIterator();
 	bool getLineEndChange(int lineEndFormat) const;
 	int getStreamLength() const;
@@ -137,22 +137,22 @@ template <typename T> class ASStreamIterator : public ASSourceIterator
 	streamoff tellg();
 
       private:
-	ASStreamIterator(const ASStreamIterator& copy); // copy constructor not to be implemented
-	ASStreamIterator& operator=(ASStreamIterator&); // assignment operator not to be implemented
-	T* inStream;                                    // pointer to the input stream
-	string buffer;                                  // current input line
-	string prevBuffer;                              // previous input line
-	string outputEOL;                               // next output end of line char
-	int eolWindows;                                 // number of Windows line endings, CRLF
-	int eolLinux;                                   // number of Linux line endings, LF
-	int eolMacOld;                                  // number of old Mac line endings. CR
-	streamoff streamLength;                         // length of the input file stream
-	streamoff peekStart;                            // starting position for peekNextLine
-	bool prevLineDeleted;                           // the previous input line was deleted
+	ASStreamIterator(const ASStreamIterator &copy);  // copy constructor not to be implemented
+	ASStreamIterator &operator=(ASStreamIterator &); // assignment operator not to be implemented
+	T *inStream;                                     // pointer to the input stream
+	string buffer;                                   // current input line
+	string prevBuffer;                               // previous input line
+	string outputEOL;                                // next output end of line char
+	int eolWindows;                                  // number of Windows line endings, CRLF
+	int eolLinux;                                    // number of Linux line endings, LF
+	int eolMacOld;                                   // number of old Mac line endings. CR
+	streamoff streamLength;                          // length of the input file stream
+	streamoff peekStart;                             // starting position for peekNextLine
+	bool prevLineDeleted;                            // the previous input line was deleted
 
       public: // inline functions
-	bool compareToInputBuffer(const string& nextLine_) const { return (nextLine_ == prevBuffer); }
-	const string& getOutputEOL() const { return outputEOL; }
+	bool compareToInputBuffer(const string &nextLine_) const { return (nextLine_ == prevBuffer); }
+	const string &getOutputEOL() const { return outputEOL; }
 	streamoff getPeekStart() const { return peekStart; }
 	bool hasMoreLines() const { return !inStream->eof(); }
 };
@@ -199,11 +199,11 @@ class ASEncoding
       public:
 	bool getBigEndian() const;
 	int swap16bit(int value) const;
-	size_t utf16len(const utf16* utf16In) const;
-	size_t utf8LengthFromUtf16(const char* utf16In, size_t inLen, bool isBigEndian) const;
-	size_t utf8ToUtf16(char* utf8In, size_t inLen, bool isBigEndian, char* utf16Out) const;
-	size_t utf16LengthFromUtf8(const char* utf8In, size_t len) const;
-	size_t utf16ToUtf8(char* utf16In, size_t inLen, bool isBigEndian, bool firstBlock, char* utf8Out) const;
+	size_t utf16len(const utf16 *utf16In) const;
+	size_t utf8LengthFromUtf16(const char *utf16In, size_t inLen, bool isBigEndian) const;
+	size_t utf8ToUtf16(char *utf8In, size_t inLen, bool isBigEndian, char *utf16Out) const;
+	size_t utf16LengthFromUtf8(const char *utf8In, size_t len) const;
+	size_t utf16ToUtf8(char *utf16In, size_t inLen, bool isBigEndian, bool firstBlock, char *utf8Out) const;
 };
 
 //----------------------------------------------------------------------------
@@ -216,33 +216,33 @@ class ASOptions
 {
       public:
 #ifdef ASTYLE_LIB
-	ASOptions(ASFormatter& formatterArg);
+	ASOptions(ASFormatter &formatterArg);
 #else
-	ASOptions(ASFormatter& formatterArg, ASConsole& consoleArg);
+	ASOptions(ASFormatter &formatterArg, ASConsole &consoleArg);
 #endif
 	string getOptionErrors() const;
-	void importOptions(stringstream& in, vector<string>& optionsVector);
-	bool parseOptions(vector<string>& optionsVector, const string& errorInfo);
+	void importOptions(stringstream &in, vector<string> &optionsVector);
+	bool parseOptions(vector<string> &optionsVector, const string &errorInfo);
 
       private:
 	// variables
-	ASFormatter& formatter;
+	ASFormatter &formatter;
 	stringstream optionErrors; // option error messages
 #ifndef ASTYLE_LIB
-	ASConsole& console; // DO NOT USE for ASTYLE_LIB
+	ASConsole &console; // DO NOT USE for ASTYLE_LIB
 #endif
 
 	// functions
-	ASOptions(const ASOptions&);      // copy constructor not to be implemented
-	ASOptions& operator=(ASOptions&); // assignment operator not to be implemented
-	string getParam(const string& arg, const char* op);
-	string getParam(const string& arg, const char* op1, const char* op2);
-	bool isOption(const string& arg, const char* op);
-	bool isOption(const string& arg, const char* op1, const char* op2);
-	void isOptionError(const string& arg, const string& errorInfo);
-	bool isParamOption(const string& arg, const char* option);
-	bool isParamOption(const string& arg, const char* option1, const char* option2);
-	void parseOption(const string& arg, const string& errorInfo);
+	ASOptions(const ASOptions &);      // copy constructor not to be implemented
+	ASOptions &operator=(ASOptions &); // assignment operator not to be implemented
+	string getParam(const string &arg, const char *op);
+	string getParam(const string &arg, const char *op1, const char *op2);
+	bool isOption(const string &arg, const char *op);
+	bool isOption(const string &arg, const char *op1, const char *op2);
+	void isOptionError(const string &arg, const string &errorInfo);
+	bool isParamOption(const string &arg, const char *option);
+	bool isParamOption(const string &arg, const char *option1, const char *option2);
+	void parseOption(const string &arg, const string &errorInfo);
 };
 
 #ifndef ASTYLE_LIB
@@ -254,10 +254,10 @@ class ASOptions
 class ASConsole
 {
       private:                  // variables
-	ASFormatter& formatter; // reference to the ASFormatter object
+	ASFormatter &formatter; // reference to the ASFormatter object
 	ASEncoding encode;      // file encoding conversion
 	ASLocalizer localizer;  // language translation
-	ostream* errorStream;   // direct error messages to cerr or cout
+	ostream *errorStream;   // direct error messages to cerr or cout
 	// command line options
 	bool isRecursive;                // recursive option
 	bool isDryRun;                   // dry-run option
@@ -298,17 +298,17 @@ class ASConsole
 	vector<string> fileName;             // files to be processed including path
 
       public: // functions
-	explicit ASConsole(ASFormatter& formatterArg);
+	explicit ASConsole(ASFormatter &formatterArg);
 	~ASConsole();
-	void convertLineEnds(ostringstream& out, int lineEnd);
-	FileEncoding detectEncoding(const char* data, size_t dataSize) const;
+	void convertLineEnds(ostringstream &out, int lineEnd);
+	FileEncoding detectEncoding(const char *data, size_t dataSize) const;
 	void error() const;
-	void error(const char* why, const char* what) const;
+	void error(const char *why, const char *what) const;
 	void formatCinToCout();
-	vector<string> getArgvOptions(int argc, char** argv) const;
-	bool fileExists(const char* file) const;
+	vector<string> getArgvOptions(int argc, char **argv) const;
+	bool fileExists(const char *file) const;
 	bool fileNameVectorIsEmpty() const;
-	ostream* getErrorStream() const;
+	ostream *getErrorStream() const;
 	bool getFilesAreIdentical() const;
 	int getFilesFormatted() const;
 	bool getIgnoreExcludeErrors() const;
@@ -323,17 +323,17 @@ class ASConsole
 	bool getPreserveDate() const;
 	string getLanguageID() const;
 	string getNumberFormat(int num, size_t lcid = 0) const;
-	string getNumberFormat(int num, const char* groupingArg, const char* separator) const;
+	string getNumberFormat(int num, const char *groupingArg, const char *separator) const;
 	string getOptionFileName() const;
 	string getOrigSuffix() const;
 	string getProjectOptionFileName() const;
 	string getStdPathIn() const;
 	string getStdPathOut() const;
-	void getTargetFilenames(string& targetFilename_, vector<string>& targetFilenameVector) const;
+	void getTargetFilenames(string &targetFilename_, vector<string> &targetFilenameVector) const;
 	void processFiles();
-	void processOptions(const vector<string>& argvOptions);
+	void processOptions(const vector<string> &argvOptions);
 	void setBypassBrowserOpen(bool state);
-	void setErrorStream(ostream* errStreamPtr);
+	void setErrorStream(ostream *errStreamPtr);
 	void setIgnoreExcludeErrors(bool state);
 	void setIgnoreExcludeErrorsAndDisplay(bool state);
 	void setIsDryRun(bool state);
@@ -342,15 +342,15 @@ class ASConsole
 	void setIsRecursive(bool state);
 	void setIsVerbose(bool state);
 	void setNoBackup(bool state);
-	void setOptionFileName(const string& name);
-	void setOrigSuffix(const string& suffix);
+	void setOptionFileName(const string &name);
+	void setOrigSuffix(const string &suffix);
 	void setPreserveDate(bool state);
-	void setProjectOptionFileName(const string& optfilepath);
-	void setStdPathIn(const string& path);
-	void setStdPathOut(const string& path);
-	void standardizePath(string& path, bool removeBeginningSeparator = false) const;
-	bool stringEndsWith(const string& str, const string& suffix) const;
-	void updateExcludeVector(const string& suffixParam);
+	void setProjectOptionFileName(const string &optfilepath);
+	void setStdPathIn(const string &path);
+	void setStdPathOut(const string &path);
+	void standardizePath(string &path, bool removeBeginningSeparator = false) const;
+	bool stringEndsWith(const string &str, const string &suffix) const;
+	void updateExcludeVector(const string &suffixParam);
 	vector<string> getExcludeVector() const;
 	vector<bool> getExcludeHitsVector() const;
 	vector<string> getFileNameVector() const;
@@ -359,38 +359,38 @@ class ASConsole
 	vector<string> getFileOptionsVector() const;
 	vector<string> getFileName() const;
 
-      private:                            // functions
-	ASConsole(const ASConsole&);      // copy constructor not to be implemented
-	ASConsole& operator=(ASConsole&); // assignment operator not to be implemented
-	void correctMixedLineEnds(ostringstream& out);
-	void formatFile(const string& fileName_);
-	string getParentDirectory(const string& absPath) const;
-	string findProjectOptionFilePath(const string& fileName_) const;
-	string getCurrentDirectory(const string& fileName_) const;
-	void getFileNames(const string& directory, const vector<string>& wildcards);
-	void getFilePaths(const string& filePath);
-	string getFullPathName(const string& relativePath) const;
-	string getParam(const string& arg, const char* op);
-	bool isHomeOrInvalidAbsPath(const string& absPath) const;
+      private:                             // functions
+	ASConsole(const ASConsole &);      // copy constructor not to be implemented
+	ASConsole &operator=(ASConsole &); // assignment operator not to be implemented
+	void correctMixedLineEnds(ostringstream &out);
+	void formatFile(const string &fileName_);
+	string getParentDirectory(const string &absPath) const;
+	string findProjectOptionFilePath(const string &fileName_) const;
+	string getCurrentDirectory(const string &fileName_) const;
+	void getFileNames(const string &directory, const vector<string> &wildcards);
+	void getFilePaths(const string &filePath);
+	string getFullPathName(const string &relativePath) const;
+	string getParam(const string &arg, const char *op);
+	bool isHomeOrInvalidAbsPath(const string &absPath) const;
 	void initializeOutputEOL(LineEndFormat lineEndFormat);
-	bool isOption(const string& arg, const char* op);
-	bool isOption(const string& arg, const char* a, const char* b);
-	bool isParamOption(const string& arg, const char* option);
-	bool isPathExclued(const string& subPath);
-	void launchDefaultBrowser(const char* filePathIn = nullptr) const;
+	bool isOption(const string &arg, const char *op);
+	bool isOption(const string &arg, const char *a, const char *b);
+	bool isParamOption(const string &arg, const char *option);
+	bool isPathExclued(const string &subPath);
+	void launchDefaultBrowser(const char *filePathIn = nullptr) const;
 	void printHelp() const;
-	void printMsg(const char* msg, const string& data) const;
+	void printMsg(const char *msg, const string &data) const;
 	void printSeparatingLine() const;
 	void printVerboseHeader() const;
 	void printVerboseStats(clock_t startTime) const;
-	FileEncoding readFile(const string& fileName_, stringstream& in) const;
-	void removeFile(const char* fileName_, const char* errMsg) const;
-	void renameFile(const char* oldFileName, const char* newFileName, const char* errMsg) const;
-	void setOutputEOL(LineEndFormat lineEndFormat, const string& currentEOL);
+	FileEncoding readFile(const string &fileName_, stringstream &in) const;
+	void removeFile(const char *fileName_, const char *errMsg) const;
+	void renameFile(const char *oldFileName, const char *newFileName, const char *errMsg) const;
+	void setOutputEOL(LineEndFormat lineEndFormat, const string &currentEOL);
 	void sleep(int seconds) const;
-	int waitForRemove(const char* newFileName) const;
-	int wildcmp(const char* wild, const char* data) const;
-	void writeFile(const string& fileName_, FileEncoding encoding, ostringstream& out) const;
+	int waitForRemove(const char *newFileName) const;
+	int wildcmp(const char *wild, const char *data) const;
+	void writeFile(const string &fileName_, FileEncoding encoding, ostringstream &out) const;
 #ifdef _WIN32
 	void displayLastError();
 #endif
@@ -407,12 +407,12 @@ class ASLibrary
 	ASLibrary() {}
 	virtual ~ASLibrary() {}
 	// virtual functions are mocked in testing
-	char16_t* formatUtf16(const char16_t*, const char16_t*, fpError, fpAlloc) const;
-	virtual char16_t* convertUtf8ToUtf16(const char* utf8In, fpAlloc fpMemoryAlloc) const;
-	virtual char* convertUtf16ToUtf8(const char16_t* utf16In) const;
+	char16_t *formatUtf16(const char16_t *, const char16_t *, fpError, fpAlloc) const;
+	virtual char16_t *convertUtf8ToUtf16(const char *utf8In, fpAlloc fpMemoryAlloc) const;
+	virtual char *convertUtf16ToUtf8(const char16_t *utf16In) const;
 
       private:
-	static char* STDCALL tempMemoryAllocation(unsigned long memoryNeeded);
+	static char *STDCALL tempMemoryAllocation(unsigned long memoryNeeded);
 
       private:
 	ASEncoding encode; // file encoding conversion
@@ -429,11 +429,11 @@ class ASLibrary
 // they are called externally and are NOT part of the namespace
 //----------------------------------------------------------------------------
 #ifdef ASTYLE_JNI
-void STDCALL javaErrorHandler(int errorNumber, const char* errorMessage);
-char* STDCALL javaMemoryAlloc(unsigned long memoryNeeded);
+void STDCALL javaErrorHandler(int errorNumber, const char *errorMessage);
+char *STDCALL javaMemoryAlloc(unsigned long memoryNeeded);
 // the following function names are constructed from method names in the calling java program
-extern "C" EXPORT jstring STDCALL Java_AStyleInterface_AStyleGetVersion(JNIEnv* env, jclass);
-extern "C" EXPORT jstring STDCALL Java_AStyleInterface_AStyleMain(JNIEnv* env,
+extern "C" EXPORT jstring STDCALL Java_AStyleInterface_AStyleGetVersion(JNIEnv *env, jclass);
+extern "C" EXPORT jstring STDCALL Java_AStyleInterface_AStyleMain(JNIEnv *env,
 								  jobject obj,
 								  jstring textInJava,
 								  jstring optionsJava);
@@ -444,8 +444,8 @@ extern "C" EXPORT jstring STDCALL Java_AStyleInterface_AStyleMain(JNIEnv* env,
 // they are called externally and are NOT part of the namespace
 //----------------------------------------------------------------------------
 #ifdef ASTYLE_LIB
-extern "C" EXPORT char16_t* STDCALL AStyleMainUtf16(const char16_t* pSourceIn,
-						    const char16_t* pOptions,
+extern "C" EXPORT char16_t *STDCALL AStyleMainUtf16(const char16_t *pSourceIn,
+						    const char16_t *pOptions,
 						    fpError fpErrorHandler,
 						    fpAlloc fpMemoryAlloc);
 #endif // ASTYLE_LIB
@@ -455,11 +455,11 @@ extern "C" EXPORT char16_t* STDCALL AStyleMainUtf16(const char16_t* pSourceIn,
 // they are called externally and are NOT part of the namespace
 //-----------------------------------------------------------------------------
 #ifdef ASTYLE_LIB
-extern "C" EXPORT char* STDCALL AStyleMain(const char* pSourceIn,
-					   const char* pOptions,
+extern "C" EXPORT char *STDCALL AStyleMain(const char *pSourceIn,
+					   const char *pOptions,
 					   fpError fpErrorHandler,
 					   fpAlloc fpMemoryAlloc);
-extern "C" EXPORT const char* STDCALL AStyleGetVersion(void);
+extern "C" EXPORT const char *STDCALL AStyleGetVersion(void);
 #endif // ASTYLE_LIB
 
 //-----------------------------------------------------------------------------

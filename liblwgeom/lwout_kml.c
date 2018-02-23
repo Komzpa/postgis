@@ -26,24 +26,24 @@
 #include "liblwgeom_internal.h"
 #include "stringbuffer.h"
 
-static int lwgeom_to_kml2_sb(const LWGEOM* geom, int precision, const char* prefix, stringbuffer_t* sb);
-static int lwpoint_to_kml2_sb(const LWPOINT* point, int precision, const char* prefix, stringbuffer_t* sb);
-static int lwline_to_kml2_sb(const LWLINE* line, int precision, const char* prefix, stringbuffer_t* sb);
-static int lwpoly_to_kml2_sb(const LWPOLY* poly, int precision, const char* prefix, stringbuffer_t* sb);
-static int lwcollection_to_kml2_sb(const LWCOLLECTION* col, int precision, const char* prefix, stringbuffer_t* sb);
-static int ptarray_to_kml2_sb(const POINTARRAY* pa, int precision, stringbuffer_t* sb);
+static int lwgeom_to_kml2_sb(const LWGEOM *geom, int precision, const char *prefix, stringbuffer_t *sb);
+static int lwpoint_to_kml2_sb(const LWPOINT *point, int precision, const char *prefix, stringbuffer_t *sb);
+static int lwline_to_kml2_sb(const LWLINE *line, int precision, const char *prefix, stringbuffer_t *sb);
+static int lwpoly_to_kml2_sb(const LWPOLY *poly, int precision, const char *prefix, stringbuffer_t *sb);
+static int lwcollection_to_kml2_sb(const LWCOLLECTION *col, int precision, const char *prefix, stringbuffer_t *sb);
+static int ptarray_to_kml2_sb(const POINTARRAY *pa, int precision, stringbuffer_t *sb);
 
 /*
  * KML 2.2.0
  */
 
 /* takes a GEOMETRY and returns a KML representation */
-char*
-lwgeom_to_kml2(const LWGEOM* geom, int precision, const char* prefix)
+char *
+lwgeom_to_kml2(const LWGEOM *geom, int precision, const char *prefix)
 {
-	stringbuffer_t* sb;
+	stringbuffer_t *sb;
 	int rv;
-	char* kml;
+	char *kml;
 
 	/* Can't do anything with empty */
 	if (lwgeom_is_empty(geom)) return NULL;
@@ -64,23 +64,23 @@ lwgeom_to_kml2(const LWGEOM* geom, int precision, const char* prefix)
 }
 
 static int
-lwgeom_to_kml2_sb(const LWGEOM* geom, int precision, const char* prefix, stringbuffer_t* sb)
+lwgeom_to_kml2_sb(const LWGEOM *geom, int precision, const char *prefix, stringbuffer_t *sb)
 {
 	switch (geom->type)
 	{
 	case POINTTYPE:
-		return lwpoint_to_kml2_sb((LWPOINT*)geom, precision, prefix, sb);
+		return lwpoint_to_kml2_sb((LWPOINT *)geom, precision, prefix, sb);
 
 	case LINETYPE:
-		return lwline_to_kml2_sb((LWLINE*)geom, precision, prefix, sb);
+		return lwline_to_kml2_sb((LWLINE *)geom, precision, prefix, sb);
 
 	case POLYGONTYPE:
-		return lwpoly_to_kml2_sb((LWPOLY*)geom, precision, prefix, sb);
+		return lwpoly_to_kml2_sb((LWPOLY *)geom, precision, prefix, sb);
 
 	case MULTIPOINTTYPE:
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
-		return lwcollection_to_kml2_sb((LWCOLLECTION*)geom, precision, prefix, sb);
+		return lwcollection_to_kml2_sb((LWCOLLECTION *)geom, precision, prefix, sb);
 
 	default:
 		lwerror("lwgeom_to_kml2: '%s' geometry type not supported", lwtype_name(geom->type));
@@ -89,17 +89,17 @@ lwgeom_to_kml2_sb(const LWGEOM* geom, int precision, const char* prefix, stringb
 }
 
 static int
-ptarray_to_kml2_sb(const POINTARRAY* pa, int precision, stringbuffer_t* sb)
+ptarray_to_kml2_sb(const POINTARRAY *pa, int precision, stringbuffer_t *sb)
 {
 	uint32_t i, j;
 	uint32_t dims = FLAGS_GET_Z(pa->flags) ? 3 : 2;
 	POINT4D pt;
-	double* d;
+	double *d;
 
 	for (i = 0; i < pa->npoints; i++)
 	{
 		getPoint4d_p(pa, i, &pt);
-		d = (double*)(&pt);
+		d = (double *)(&pt);
 		if (i) stringbuffer_append(sb, " ");
 		for (j = 0; j < dims; j++)
 		{
@@ -119,7 +119,7 @@ ptarray_to_kml2_sb(const POINTARRAY* pa, int precision, stringbuffer_t* sb)
 }
 
 static int
-lwpoint_to_kml2_sb(const LWPOINT* point, int precision, const char* prefix, stringbuffer_t* sb)
+lwpoint_to_kml2_sb(const LWPOINT *point, int precision, const char *prefix, stringbuffer_t *sb)
 {
 	/* Open point */
 	if (stringbuffer_aprintf(sb, "<%sPoint><%scoordinates>", prefix, prefix) < 0) return LW_FAILURE;
@@ -131,7 +131,7 @@ lwpoint_to_kml2_sb(const LWPOINT* point, int precision, const char* prefix, stri
 }
 
 static int
-lwline_to_kml2_sb(const LWLINE* line, int precision, const char* prefix, stringbuffer_t* sb)
+lwline_to_kml2_sb(const LWLINE *line, int precision, const char *prefix, stringbuffer_t *sb)
 {
 	/* Open linestring */
 	if (stringbuffer_aprintf(sb, "<%sLineString><%scoordinates>", prefix, prefix) < 0) return LW_FAILURE;
@@ -144,7 +144,7 @@ lwline_to_kml2_sb(const LWLINE* line, int precision, const char* prefix, stringb
 }
 
 static int
-lwpoly_to_kml2_sb(const LWPOLY* poly, int precision, const char* prefix, stringbuffer_t* sb)
+lwpoly_to_kml2_sb(const LWPOLY *poly, int precision, const char *prefix, stringbuffer_t *sb)
 {
 	uint32_t i;
 	int rv;
@@ -181,7 +181,7 @@ lwpoly_to_kml2_sb(const LWPOLY* poly, int precision, const char* prefix, stringb
 }
 
 static int
-lwcollection_to_kml2_sb(const LWCOLLECTION* col, int precision, const char* prefix, stringbuffer_t* sb)
+lwcollection_to_kml2_sb(const LWCOLLECTION *col, int precision, const char *prefix, stringbuffer_t *sb)
 {
 	uint32_t i;
 	int rv;

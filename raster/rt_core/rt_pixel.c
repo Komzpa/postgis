@@ -79,7 +79,7 @@ rt_pixtype_alignment(rt_pixtype pixtype)
 }
 
 rt_pixtype
-rt_pixtype_index_from_name(const char* pixname)
+rt_pixtype_index_from_name(const char *pixname)
 {
 	assert(pixname && strlen(pixname) > 0);
 
@@ -109,7 +109,7 @@ rt_pixtype_index_from_name(const char* pixname)
 	return PT_END;
 }
 
-const char*
+const char *
 rt_pixtype_name(rt_pixtype pixtype)
 {
 	switch (pixtype)
@@ -217,7 +217,7 @@ rt_pixtype_get_min_value(rt_pixtype pixtype)
  * @return ES_NONE on success, ES_ERROR on error
  */
 rt_errorstate
-rt_pixtype_compare_clamped_values(rt_pixtype pixtype, double val, double refval, int* isequal)
+rt_pixtype_compare_clamped_values(rt_pixtype pixtype, double val, double refval, int *isequal)
 {
 	assert(isequal != NULL);
 	*isequal = 0;
@@ -298,16 +298,16 @@ rt_pixel_set_to_array(rt_pixel npixel,
 		      int y,
 		      uint16_t distancex,
 		      uint16_t distancey,
-		      double*** value,
-		      int*** nodata,
-		      int* dimx,
-		      int* dimy)
+		      double ***value,
+		      int ***nodata,
+		      int *dimx,
+		      int *dimy)
 {
 	uint32_t i;
 	uint32_t j;
 	uint32_t dim[2] = {0};
-	double** values = NULL;
-	int** nodatas = NULL;
+	double **values = NULL;
+	int **nodatas = NULL;
 	int zero[2] = {0};
 	int _x;
 	int _y;
@@ -342,8 +342,8 @@ rt_pixel_set_to_array(rt_pixel npixel,
 	}
 
 	/* establish 2D arrays (Y axis) */
-	values = rtalloc(sizeof(double*) * dim[1]);
-	nodatas = rtalloc(sizeof(int*) * dim[1]);
+	values = rtalloc(sizeof(double *) * dim[1]);
+	nodatas = rtalloc(sizeof(int *) * dim[1]);
 
 	if (values == NULL || nodatas == NULL)
 	{

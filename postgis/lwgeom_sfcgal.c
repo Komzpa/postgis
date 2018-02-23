@@ -59,8 +59,8 @@ Datum sfcgal_minkowski_sum(PG_FUNCTION_ARGS);
 Datum sfcgal_make_solid(PG_FUNCTION_ARGS);
 Datum sfcgal_is_solid(PG_FUNCTION_ARGS);
 
-GSERIALIZED* geometry_serialize(LWGEOM* lwgeom);
-char* text_to_cstring(const text* textptr);
+GSERIALIZED *geometry_serialize(LWGEOM *lwgeom);
+char *text_to_cstring(const text *textptr);
 
 static int __sfcgal_init = 0;
 
@@ -77,11 +77,11 @@ sfcgal_postgis_init(void)
 }
 
 /* Conversion from GSERIALIZED* to SFCGAL::Geometry */
-sfcgal_geometry_t*
-POSTGIS2SFCGALGeometry(GSERIALIZED* pglwgeom)
+sfcgal_geometry_t *
+POSTGIS2SFCGALGeometry(GSERIALIZED *pglwgeom)
 {
-	sfcgal_geometry_t* g;
-	LWGEOM* lwgeom = lwgeom_from_gserialized(pglwgeom);
+	sfcgal_geometry_t *g;
+	LWGEOM *lwgeom = lwgeom_from_gserialized(pglwgeom);
 
 	if (!lwgeom) { lwpgerror("POSTGIS2SFCGALGeometry: Unable to deserialize input"); }
 	g = LWGEOM2SFCGAL(lwgeom);
@@ -91,11 +91,11 @@ POSTGIS2SFCGALGeometry(GSERIALIZED* pglwgeom)
 }
 
 /* Conversion from GSERIALIZED* to SFCGAL::PreparedGeometry */
-sfcgal_prepared_geometry_t*
-POSTGIS2SFCGALPreparedGeometry(GSERIALIZED* pglwgeom)
+sfcgal_prepared_geometry_t *
+POSTGIS2SFCGALPreparedGeometry(GSERIALIZED *pglwgeom)
 {
-	sfcgal_geometry_t* g;
-	LWGEOM* lwgeom = lwgeom_from_gserialized(pglwgeom);
+	sfcgal_geometry_t *g;
+	LWGEOM *lwgeom = lwgeom_from_gserialized(pglwgeom);
 
 	if (!lwgeom) { lwpgerror("POSTGIS2SFCGALPreparedGeometry: Unable to deserialize input"); }
 	g = LWGEOM2SFCGAL(lwgeom);
@@ -106,11 +106,11 @@ POSTGIS2SFCGALPreparedGeometry(GSERIALIZED* pglwgeom)
 }
 
 /* Conversion from SFCGAL::Geometry to GSERIALIZED */
-GSERIALIZED*
-SFCGALGeometry2POSTGIS(const sfcgal_geometry_t* geom, int force3D, int SRID)
+GSERIALIZED *
+SFCGALGeometry2POSTGIS(const sfcgal_geometry_t *geom, int force3D, int SRID)
 {
-	GSERIALIZED* result;
-	LWGEOM* lwgeom = SFCGAL2LWGEOM(geom, force3D, SRID);
+	GSERIALIZED *result;
+	LWGEOM *lwgeom = SFCGAL2LWGEOM(geom, force3D, SRID);
 
 	if (lwgeom_needs_bbox(lwgeom) == LW_TRUE) lwgeom_add_bbox(lwgeom);
 
@@ -121,8 +121,8 @@ SFCGALGeometry2POSTGIS(const sfcgal_geometry_t* geom, int force3D, int SRID)
 }
 
 /* Conversion from SFCGAL::PreparedGeometry to GSERIALIZED */
-GSERIALIZED*
-SFCGALPreparedGeometry2POSTGIS(const sfcgal_prepared_geometry_t* geom, int force3D)
+GSERIALIZED *
+SFCGALPreparedGeometry2POSTGIS(const sfcgal_prepared_geometry_t *geom, int force3D)
 {
 	return SFCGALGeometry2POSTGIS(
 	    sfcgal_prepared_geometry_geometry(geom), force3D, sfcgal_prepared_geometry_srid(geom));
@@ -132,10 +132,10 @@ SFCGALPreparedGeometry2POSTGIS(const sfcgal_prepared_geometry_t* geom, int force
 PG_FUNCTION_INFO_V1(sfcgal_from_ewkt);
 Datum sfcgal_from_ewkt(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* result;
-	sfcgal_prepared_geometry_t* g;
-	text* wkttext = PG_GETARG_TEXT_P(0);
-	char* cstring = text_to_cstring(wkttext);
+	GSERIALIZED *result;
+	sfcgal_prepared_geometry_t *g;
+	text *wkttext = PG_GETARG_TEXT_P(0);
+	char *cstring = text_to_cstring(wkttext);
 
 	sfcgal_postgis_init();
 
@@ -149,8 +149,8 @@ Datum sfcgal_from_ewkt(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_area);
 Datum sfcgal_area(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* input;
-	sfcgal_geometry_t* geom;
+	GSERIALIZED *input;
+	sfcgal_geometry_t *geom;
 	double result;
 
 	sfcgal_postgis_init();
@@ -169,8 +169,8 @@ Datum sfcgal_area(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_area3D);
 Datum sfcgal_area3D(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* input;
-	sfcgal_geometry_t* geom;
+	GSERIALIZED *input;
+	sfcgal_geometry_t *geom;
 	double result;
 
 	sfcgal_postgis_init();
@@ -189,8 +189,8 @@ Datum sfcgal_area3D(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_is_planar);
 Datum sfcgal_is_planar(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* input;
-	sfcgal_geometry_t* geom;
+	GSERIALIZED *input;
+	sfcgal_geometry_t *geom;
 	int result;
 
 	sfcgal_postgis_init();
@@ -209,8 +209,8 @@ Datum sfcgal_is_planar(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_orientation);
 Datum sfcgal_orientation(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* input;
-	sfcgal_geometry_t* geom;
+	GSERIALIZED *input;
+	sfcgal_geometry_t *geom;
 	int result;
 
 	sfcgal_postgis_init();
@@ -322,8 +322,8 @@ PG_FUNCTION_INFO_V1(sfcgal_tesselate);
 Datum sfcgal_tesselate(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -346,8 +346,8 @@ PG_FUNCTION_INFO_V1(sfcgal_triangulate);
 Datum sfcgal_triangulate(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -370,8 +370,8 @@ PG_FUNCTION_INFO_V1(sfcgal_force_lhr);
 Datum sfcgal_force_lhr(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -394,8 +394,8 @@ PG_FUNCTION_INFO_V1(sfcgal_straight_skeleton);
 Datum sfcgal_straight_skeleton(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -426,8 +426,8 @@ Datum sfcgal_approximate_medial_axis(PG_FUNCTION_ARGS)
 	PG_RETURN_NULL();
 #else  /* POSTGIS_SFCGAL_VERSION >= 12 */
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -452,7 +452,7 @@ Datum sfcgal_intersection(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -480,7 +480,7 @@ Datum sfcgal_intersection3D(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -508,14 +508,14 @@ Datum sfcgal_difference(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
 
-	input0 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	input0 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	srid = gserialized_get_srid(input0);
-	input1 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+	input1 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 	geom0 = POSTGIS2SFCGALGeometry(input0);
 	PG_FREE_IF_COPY(input0, 0);
 	geom1 = POSTGIS2SFCGALGeometry(input1);
@@ -536,14 +536,14 @@ Datum sfcgal_difference3D(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
 
-	input0 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	input0 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	srid = gserialized_get_srid(input0);
-	input1 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+	input1 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 	geom0 = POSTGIS2SFCGALGeometry(input0);
 	PG_FREE_IF_COPY(input0, 0);
 	geom1 = POSTGIS2SFCGALGeometry(input1);
@@ -564,14 +564,14 @@ Datum sfcgal_union(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
 
-	input0 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	input0 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	srid = gserialized_get_srid(input0);
-	input1 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+	input1 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 	geom0 = POSTGIS2SFCGALGeometry(input0);
 	PG_FREE_IF_COPY(input0, 0);
 	geom1 = POSTGIS2SFCGALGeometry(input1);
@@ -592,14 +592,14 @@ Datum sfcgal_union3D(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
 
-	input0 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	input0 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	srid = gserialized_get_srid(input0);
-	input1 = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
+	input1 = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(1));
 	geom0 = POSTGIS2SFCGALGeometry(input0);
 	PG_FREE_IF_COPY(input0, 0);
 	geom1 = POSTGIS2SFCGALGeometry(input1);
@@ -618,13 +618,13 @@ Datum sfcgal_union3D(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_volume);
 Datum sfcgal_volume(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* input;
-	sfcgal_geometry_t* geom;
+	GSERIALIZED *input;
+	sfcgal_geometry_t *geom;
 	double result;
 
 	sfcgal_postgis_init();
 
-	input = (GSERIALIZED*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	input = (GSERIALIZED *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	geom = POSTGIS2SFCGALGeometry(input);
 
 	result = sfcgal_geometry_volume(geom);
@@ -640,7 +640,7 @@ Datum sfcgal_minkowski_sum(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input0, *input1, *output;
 	sfcgal_geometry_t *geom0, *geom1;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *result;
 	srid_t srid;
 
 	sfcgal_postgis_init();
@@ -667,8 +667,8 @@ PG_FUNCTION_INFO_V1(sfcgal_extrude);
 Datum sfcgal_extrude(PG_FUNCTION_ARGS)
 {
 	GSERIALIZED *input, *output;
-	sfcgal_geometry_t* geom;
-	sfcgal_geometry_t* result;
+	sfcgal_geometry_t *geom;
+	sfcgal_geometry_t *result;
 	double dx, dy, dz;
 	srid_t srid;
 
@@ -696,8 +696,8 @@ Datum sfcgal_extrude(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(postgis_sfcgal_version);
 Datum postgis_sfcgal_version(PG_FUNCTION_ARGS)
 {
-	const char* ver = lwgeom_sfcgal_version();
-	text* result = cstring_to_text(ver);
+	const char *ver = lwgeom_sfcgal_version();
+	text *result = cstring_to_text(ver);
 	PG_RETURN_POINTER(result);
 }
 
@@ -705,8 +705,8 @@ PG_FUNCTION_INFO_V1(sfcgal_is_solid);
 Datum sfcgal_is_solid(PG_FUNCTION_ARGS)
 {
 	int result;
-	GSERIALIZED* input = PG_GETARG_GSERIALIZED_P(0);
-	LWGEOM* lwgeom = lwgeom_from_gserialized(input);
+	GSERIALIZED *input = PG_GETARG_GSERIALIZED_P(0);
+	LWGEOM *lwgeom = lwgeom_from_gserialized(input);
 	PG_FREE_IF_COPY(input, 0);
 	if (!lwgeom) { elog(ERROR, "sfcgal_is_solid: Unable to deserialize input"); }
 	result = FLAGS_GET_SOLID(lwgeom->flags);
@@ -719,9 +719,9 @@ Datum sfcgal_is_solid(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(sfcgal_make_solid);
 Datum sfcgal_make_solid(PG_FUNCTION_ARGS)
 {
-	GSERIALIZED* output;
-	GSERIALIZED* input = PG_GETARG_GSERIALIZED_P(0);
-	LWGEOM* lwgeom = lwgeom_from_gserialized(input);
+	GSERIALIZED *output;
+	GSERIALIZED *input = PG_GETARG_GSERIALIZED_P(0);
+	LWGEOM *lwgeom = lwgeom_from_gserialized(input);
 	PG_FREE_IF_COPY(input, 0);
 	if (!lwgeom) { elog(ERROR, "sfcgal_make_solid: Unable to deserialize input"); }
 

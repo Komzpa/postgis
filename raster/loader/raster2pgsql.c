@@ -31,9 +31,9 @@
 #include <assert.h>
 
 static void
-loader_rt_error_handler(const char* fmt, va_list ap)
+loader_rt_error_handler(const char *fmt, va_list ap)
 {
-	static const char* label = "ERROR: ";
+	static const char *label = "ERROR: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -42,9 +42,9 @@ loader_rt_error_handler(const char* fmt, va_list ap)
 }
 
 static void
-loader_rt_warning_handler(const char* fmt, va_list ap)
+loader_rt_warning_handler(const char *fmt, va_list ap)
 {
-	static const char* label = "WARNING: ";
+	static const char *label = "WARNING: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -53,9 +53,9 @@ loader_rt_warning_handler(const char* fmt, va_list ap)
 }
 
 static void
-loader_rt_info_handler(const char* fmt, va_list ap)
+loader_rt_info_handler(const char *fmt, va_list ap)
 {
-	static const char* label = "INFO: ";
+	static const char *label = "INFO: ";
 	char newfmt[1024] = {0};
 	snprintf(newfmt, 1024, "%s%s\n", label, fmt);
 	newfmt[1023] = '\0';
@@ -86,7 +86,7 @@ raster_destroy(rt_raster raster)
 
 		if (!rt_band_is_offline(band) && !rt_band_get_ownsdata_flag(band))
 		{
-			void* mem = rt_band_get_data(band);
+			void *mem = rt_band_get_data(band);
 			if (mem) rtdealloc(mem);
 		}
 		rt_band_destroy(band);
@@ -95,7 +95,7 @@ raster_destroy(rt_raster raster)
 }
 
 static int
-array_range(int min, int max, int step, int** range, uint32_t* len)
+array_range(int min, int max, int step, int **range, uint32_t *len)
 {
 	int i = 0;
 	int j = 0;
@@ -147,11 +147,11 @@ array_range(int min, int max, int step, int** range, uint32_t* len)
      - Case sensitive - Otherwise, replace functions "strstr" by "strcasestr"
      - Always allocates memory for the result.
 --------------------------------------------------------------------------- */
-static char*
-strreplace(const char* str, const char* oldstr, const char* newstr, int* count)
+static char *
+strreplace(const char *str, const char *oldstr, const char *newstr, int *count)
 {
-	const char* tmp = str;
-	char* result;
+	const char *tmp = str;
+	char *result;
 	int found = 0;
 	int length, reslen;
 	int oldlen = strlen(oldstr);
@@ -163,7 +163,7 @@ strreplace(const char* str, const char* oldstr, const char* newstr, int* count)
 		found++, tmp += oldlen;
 
 	length = strlen(str) + found * (newlen - oldlen);
-	if ((result = (char*)rtalloc(length + 1)) == NULL)
+	if ((result = (char *)rtalloc(length + 1)) == NULL)
 	{
 		rterror(_("strreplace: Not enough memory"));
 		found = -1;
@@ -192,8 +192,8 @@ strreplace(const char* str, const char* oldstr, const char* newstr, int* count)
 	return result;
 }
 
-static char*
-strtolower(char* str)
+static char *
+strtolower(char *str)
 {
 	int j;
 
@@ -204,12 +204,12 @@ strtolower(char* str)
 }
 
 /* split a string based on a delimiter */
-static char**
-strsplit(const char* str, const char* delimiter, uint32_t* n)
+static char **
+strsplit(const char *str, const char *delimiter, uint32_t *n)
 {
-	char* tmp = NULL;
-	char** rtn = NULL;
-	char* token = NULL;
+	char *tmp = NULL;
+	char **rtn = NULL;
+	char *token = NULL;
 
 	*n = 0;
 	if (!str) return NULL;
@@ -226,13 +226,13 @@ strsplit(const char* str, const char* delimiter, uint32_t* n)
 	if (!strlen(tmp) || !delimiter || !strlen(delimiter))
 	{
 		*n = 1;
-		rtn = (char**)rtalloc(*n * sizeof(char*));
+		rtn = (char **)rtalloc(*n * sizeof(char *));
 		if (NULL == rtn)
 		{
 			rterror(_("strsplit: Not enough memory"));
 			return NULL;
 		}
-		rtn[0] = (char*)rtalloc(sizeof(char) * (strlen(tmp) + 1));
+		rtn[0] = (char *)rtalloc(sizeof(char) * (strlen(tmp) + 1));
 		if (NULL == rtn[0])
 		{
 			rterror(_("strsplit: Not enough memory"));
@@ -246,10 +246,10 @@ strsplit(const char* str, const char* delimiter, uint32_t* n)
 	token = strtok(tmp, delimiter);
 	while (token != NULL)
 	{
-		if (*n < 1) { rtn = (char**)rtalloc(sizeof(char*)); }
+		if (*n < 1) { rtn = (char **)rtalloc(sizeof(char *)); }
 		else
 		{
-			rtn = (char**)rtrealloc(rtn, (*n + 1) * sizeof(char*));
+			rtn = (char **)rtrealloc(rtn, (*n + 1) * sizeof(char *));
 		}
 		if (NULL == rtn)
 		{
@@ -258,7 +258,7 @@ strsplit(const char* str, const char* delimiter, uint32_t* n)
 		}
 
 		rtn[*n] = NULL;
-		rtn[*n] = (char*)rtalloc(sizeof(char) * (strlen(token) + 1));
+		rtn[*n] = (char *)rtalloc(sizeof(char) * (strlen(token) + 1));
 		if (NULL == rtn[*n])
 		{
 			rterror(_("strsplit: Not enough memory"));
@@ -275,24 +275,24 @@ strsplit(const char* str, const char* delimiter, uint32_t* n)
 	return rtn;
 }
 
-static char*
-trim(const char* input)
+static char *
+trim(const char *input)
 {
-	char* rtn;
-	char* ptr;
+	char *rtn;
+	char *ptr;
 	uint32_t offset = 0;
 
 	if (!input)
 		return NULL;
 	else if (!*input)
-		return (char*)input;
+		return (char *)input;
 
 	/* trim left */
 	while (isspace(*input))
 		input++;
 
 	/* trim right */
-	ptr = ((char*)input) + strlen(input);
+	ptr = ((char *)input) + strlen(input);
 	while (isspace(*--ptr))
 		offset++;
 
@@ -308,24 +308,24 @@ trim(const char* input)
 	return rtn;
 }
 
-static char*
-chartrim(const char* input, char* remove)
+static char *
+chartrim(const char *input, char *remove)
 {
-	char* rtn = NULL;
-	char* ptr = NULL;
+	char *rtn = NULL;
+	char *ptr = NULL;
 	uint32_t offset = 0;
 
 	if (!input)
 		return NULL;
 	else if (!*input)
-		return (char*)input;
+		return (char *)input;
 
 	/* trim left */
 	while (strchr(remove, *input) != NULL)
 		input++;
 
 	/* trim right */
-	ptr = ((char*)input) + strlen(input);
+	ptr = ((char *)input) + strlen(input);
 	while (strchr(remove, *--ptr) != NULL)
 		offset++;
 
@@ -437,7 +437,7 @@ usage()
 }
 
 static void
-calc_tile_size(int dimX, int dimY, int* tileX, int* tileY)
+calc_tile_size(int dimX, int dimY, int *tileX, int *tileY)
 {
 	int i = 0;
 	int j = 0;
@@ -498,7 +498,7 @@ calc_tile_size(int dimX, int dimY, int* tileX, int* tileY)
 }
 
 static void
-init_rastinfo(RASTERINFO* info)
+init_rastinfo(RASTERINFO *info)
 {
 	info->srid = SRID_UNKNOWN;
 	info->srs = NULL;
@@ -514,7 +514,7 @@ init_rastinfo(RASTERINFO* info)
 }
 
 static void
-rtdealloc_rastinfo(RASTERINFO* info)
+rtdealloc_rastinfo(RASTERINFO *info)
 {
 	if (info->srs != NULL) rtdealloc(info->srs);
 	if (info->nband_count > 0 && info->nband != NULL) rtdealloc(info->nband);
@@ -525,7 +525,7 @@ rtdealloc_rastinfo(RASTERINFO* info)
 }
 
 static int
-copy_rastinfo(RASTERINFO* dst, RASTERINFO* src)
+copy_rastinfo(RASTERINFO *dst, RASTERINFO *src)
 {
 	if (src->srs != NULL)
 	{
@@ -596,7 +596,7 @@ copy_rastinfo(RASTERINFO* dst, RASTERINFO* src)
 }
 
 static void
-diff_rastinfo(RASTERINFO* x, RASTERINFO* ref)
+diff_rastinfo(RASTERINFO *x, RASTERINFO *ref)
 {
 	static uint8_t msg[6] = {0};
 	uint32_t i = 0;
@@ -709,7 +709,7 @@ diff_rastinfo(RASTERINFO* x, RASTERINFO* ref)
 }
 
 static void
-init_config(RTLOADERCFG* config)
+init_config(RTLOADERCFG *config)
 {
 	config->rt_file_count = 0;
 	config->rt_file = NULL;
@@ -747,7 +747,7 @@ init_config(RTLOADERCFG* config)
 }
 
 static void
-rtdealloc_config(RTLOADERCFG* config)
+rtdealloc_config(RTLOADERCFG *config)
 {
 	int i = 0;
 	if (config->rt_file_count)
@@ -782,14 +782,14 @@ rtdealloc_config(RTLOADERCFG* config)
 }
 
 static void
-init_stringbuffer(STRINGBUFFER* buffer)
+init_stringbuffer(STRINGBUFFER *buffer)
 {
 	buffer->line = NULL;
 	buffer->length = 0;
 }
 
 static void
-rtdealloc_stringbuffer(STRINGBUFFER* buffer, int freebuffer)
+rtdealloc_stringbuffer(STRINGBUFFER *buffer, int freebuffer)
 {
 	if (buffer->length)
 	{
@@ -807,7 +807,7 @@ rtdealloc_stringbuffer(STRINGBUFFER* buffer, int freebuffer)
 }
 
 static void
-dump_stringbuffer(STRINGBUFFER* buffer)
+dump_stringbuffer(STRINGBUFFER *buffer)
 {
 	uint32_t i = 0;
 
@@ -818,7 +818,7 @@ dump_stringbuffer(STRINGBUFFER* buffer)
 }
 
 static void
-flush_stringbuffer(STRINGBUFFER* buffer)
+flush_stringbuffer(STRINGBUFFER *buffer)
 {
 	dump_stringbuffer(buffer);
 	rtdealloc_stringbuffer(buffer, 0);
@@ -826,24 +826,24 @@ flush_stringbuffer(STRINGBUFFER* buffer)
 
 /* Takes ownership of the passed string */
 static int
-append_stringbuffer(STRINGBUFFER* buffer, const char* str)
+append_stringbuffer(STRINGBUFFER *buffer, const char *str)
 {
 	buffer->length++;
 
-	buffer->line = rtrealloc(buffer->line, sizeof(char*) * buffer->length);
+	buffer->line = rtrealloc(buffer->line, sizeof(char *) * buffer->length);
 	if (buffer->line == NULL)
 	{
 		rterror(_("append_stringbuffer: Could not allocate memory for appending string to buffer"));
 		return 0;
 	}
 
-	buffer->line[buffer->length - 1] = (char*)str;
+	buffer->line[buffer->length - 1] = (char *)str;
 
 	return 1;
 }
 
 static int
-append_sql_to_buffer(STRINGBUFFER* buffer, const char* str)
+append_sql_to_buffer(STRINGBUFFER *buffer, const char *str)
 {
 	if (buffer->length > 9) flush_stringbuffer(buffer);
 
@@ -851,14 +851,14 @@ append_sql_to_buffer(STRINGBUFFER* buffer, const char* str)
 }
 
 static int
-copy_from(const char* schema,
-	  const char* table,
-	  const char* column,
-	  const char* filename,
-	  const char* file_column_name,
-	  STRINGBUFFER* buffer)
+copy_from(const char *schema,
+	  const char *table,
+	  const char *column,
+	  const char *filename,
+	  const char *file_column_name,
+	  STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
 	assert(table != NULL);
@@ -891,7 +891,7 @@ copy_from(const char* schema,
 }
 
 static int
-copy_from_end(STRINGBUFFER* buffer)
+copy_from_end(STRINGBUFFER *buffer)
 {
 	/* end of data */
 	append_sql_to_buffer(buffer, strdup("\\."));
@@ -900,19 +900,19 @@ copy_from_end(STRINGBUFFER* buffer)
 }
 
 static int
-insert_records(const char* schema,
-	       const char* table,
-	       const char* column,
-	       const char* filename,
-	       const char* file_column_name,
+insert_records(const char *schema,
+	       const char *table,
+	       const char *column,
+	       const char *filename,
+	       const char *file_column_name,
 	       int copy_statements,
 	       int out_srid,
-	       STRINGBUFFER* tileset,
-	       STRINGBUFFER* buffer)
+	       STRINGBUFFER *tileset,
+	       STRINGBUFFER *buffer)
 {
-	char* fn = NULL;
+	char *fn = NULL;
 	uint32_t len = 0;
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t x = 0;
 
 	assert(table != NULL);
@@ -974,7 +974,7 @@ insert_records(const char* schema,
 
 		for (x = 0; x < tileset->length; x++)
 		{
-			char* ptr;
+			char *ptr;
 			int sqllen = len;
 
 			sqllen += strlen(tileset->line[x]);
@@ -1010,9 +1010,9 @@ insert_records(const char* schema,
 }
 
 static int
-drop_table(const char* schema, const char* table, STRINGBUFFER* buffer)
+drop_table(const char *schema, const char *table, STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
 	len = strlen("DROP TABLE IF EXISTS ;") + 1;
@@ -1033,16 +1033,16 @@ drop_table(const char* schema, const char* table, STRINGBUFFER* buffer)
 }
 
 static int
-create_table(const char* schema,
-	     const char* table,
-	     const char* column,
+create_table(const char *schema,
+	     const char *table,
+	     const char *column,
 	     const int file_column,
-	     const char* file_column_name,
-	     const char* tablespace,
-	     const char* idx_tablespace,
-	     STRINGBUFFER* buffer)
+	     const char *file_column_name,
+	     const char *tablespace,
+	     const char *idx_tablespace,
+	     STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
 	assert(table != NULL);
@@ -1081,12 +1081,12 @@ create_table(const char* schema,
 }
 
 static int
-create_index(const char* schema, const char* table, const char* column, const char* tablespace, STRINGBUFFER* buffer)
+create_index(const char *schema, const char *table, const char *column, const char *tablespace, STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
-	char* _table = NULL;
-	char* _column = NULL;
+	char *_table = NULL;
+	char *_column = NULL;
 
 	assert(table != NULL);
 	assert(column != NULL);
@@ -1127,9 +1127,9 @@ create_index(const char* schema, const char* table, const char* column, const ch
 }
 
 static int
-analyze_table(const char* schema, const char* table, STRINGBUFFER* buffer)
+analyze_table(const char *schema, const char *table, STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
 	assert(table != NULL);
@@ -1152,9 +1152,9 @@ analyze_table(const char* schema, const char* table, STRINGBUFFER* buffer)
 }
 
 static int
-vacuum_table(const char* schema, const char* table, STRINGBUFFER* buffer)
+vacuum_table(const char *schema, const char *table, STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
 	assert(table != NULL);
@@ -1177,20 +1177,20 @@ vacuum_table(const char* schema, const char* table, STRINGBUFFER* buffer)
 }
 
 static int
-add_raster_constraints(const char* schema,
-		       const char* table,
-		       const char* column,
+add_raster_constraints(const char *schema,
+		       const char *table,
+		       const char *column,
 		       int regular_blocking,
 		       int max_extent,
-		       STRINGBUFFER* buffer)
+		       STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
-	char* _tmp = NULL;
-	char* _schema = NULL;
-	char* _table = NULL;
-	char* _column = NULL;
+	char *_tmp = NULL;
+	char *_schema = NULL;
+	char *_table = NULL;
+	char *_column = NULL;
 
 	assert(table != NULL);
 	assert(column != NULL);
@@ -1248,27 +1248,27 @@ add_raster_constraints(const char* schema,
 }
 
 static int
-add_overview_constraints(const char* ovschema,
-			 const char* ovtable,
-			 const char* ovcolumn,
-			 const char* schema,
-			 const char* table,
-			 const char* column,
+add_overview_constraints(const char *ovschema,
+			 const char *ovtable,
+			 const char *ovcolumn,
+			 const char *schema,
+			 const char *table,
+			 const char *column,
 			 const int factor,
-			 STRINGBUFFER* buffer)
+			 STRINGBUFFER *buffer)
 {
-	char* sql = NULL;
+	char *sql = NULL;
 	uint32_t len = 0;
 
-	char* _tmp = NULL;
+	char *_tmp = NULL;
 
-	char* _ovschema = NULL;
-	char* _ovtable = NULL;
-	char* _ovcolumn = NULL;
+	char *_ovschema = NULL;
+	char *_ovtable = NULL;
+	char *_ovcolumn = NULL;
 
-	char* _schema = NULL;
-	char* _table = NULL;
-	char* _column = NULL;
+	char *_schema = NULL;
+	char *_table = NULL;
+	char *_column = NULL;
 
 	assert(ovtable != NULL);
 	assert(ovcolumn != NULL);
@@ -1357,11 +1357,11 @@ add_overview_constraints(const char* ovschema,
 
 static int
 build_overview(int idx,
-	       RTLOADERCFG* config,
-	       RASTERINFO* info,
+	       RTLOADERCFG *config,
+	       RASTERINFO *info,
 	       uint32_t ovx,
-	       STRINGBUFFER* tileset,
-	       STRINGBUFFER* buffer)
+	       STRINGBUFFER *tileset,
+	       STRINGBUFFER *buffer)
 {
 	GDALDatasetH hdsSrc;
 	VRTDatasetH hdsOv;
@@ -1371,7 +1371,7 @@ build_overview(int idx,
 
 	uint32_t j = 0;
 	int factor;
-	const char* ovtable = NULL;
+	const char *ovtable = NULL;
 
 	VRTDatasetH hdsDst;
 	VRTSourcedRasterBandH hbandDst;
@@ -1383,7 +1383,7 @@ build_overview(int idx,
 	double gt[6] = {0.};
 
 	rt_raster rast = NULL;
-	char* hex;
+	char *hex;
 	uint32_t hexlen = 0;
 
 	hdsSrc = GDALOpenShared(config->rt_file[idx], GA_ReadOnly);
@@ -1402,7 +1402,7 @@ build_overview(int idx,
 		return 0;
 	}
 	factor = config->overview[ovx];
-	ovtable = (const char*)config->overview_table[ovx];
+	ovtable = (const char *)config->overview_table[ovx];
 
 	/* factor must be within valid range */
 	if (factor < MINOVFACTOR || factor > MAXOVFACTOR)
@@ -1592,7 +1592,7 @@ build_overview(int idx,
 }
 
 static int
-convert_raster(int idx, RTLOADERCFG* config, RASTERINFO* info, STRINGBUFFER* tileset, STRINGBUFFER* buffer)
+convert_raster(int idx, RTLOADERCFG *config, RASTERINFO *info, STRINGBUFFER *tileset, STRINGBUFFER *buffer)
 {
 	GDALDatasetH hdsSrc;
 	GDALRasterBandH hbandSrc;
@@ -1603,13 +1603,13 @@ convert_raster(int idx, RTLOADERCFG* config, RASTERINFO* info, STRINGBUFFER* til
 	int xtile = 0;
 	int ytile = 0;
 	double gt[6] = {0.};
-	const char* pszProjectionRef = NULL;
+	const char *pszProjectionRef = NULL;
 	int tilesize = 0;
 
 	rt_raster rast = NULL;
 	uint32_t numbands = 0;
 	rt_band band = NULL;
-	char* hex;
+	char *hex;
 	uint32_t hexlen = 0;
 
 	info->srid = config->srid;
@@ -1660,8 +1660,8 @@ convert_raster(int idx, RTLOADERCFG* config, RASTERINFO* info, STRINGBUFFER* til
 			OGRSpatialReferenceH hSRS = OSRNewSpatialReference(NULL);
 			if (OSRSetFromUserInput(hSRS, pszProjectionRef) == OGRERR_NONE)
 			{
-				const char* pszAuthorityName = OSRGetAuthorityName(hSRS, NULL);
-				const char* pszAuthorityCode = OSRGetAuthorityCode(hSRS, NULL);
+				const char *pszAuthorityName = OSRGetAuthorityName(hSRS, NULL);
+				const char *pszAuthorityCode = OSRGetAuthorityCode(hSRS, NULL);
 				if (pszAuthorityName != NULL && strcmp(pszAuthorityName, "EPSG") == 0 &&
 				    pszAuthorityCode != NULL)
 				{ info->srid = atoi(pszAuthorityCode); }
@@ -2082,7 +2082,7 @@ convert_raster(int idx, RTLOADERCFG* config, RASTERINFO* info, STRINGBUFFER* til
 }
 
 static int
-process_rasters(RTLOADERCFG* config, STRINGBUFFER* buffer)
+process_rasters(RTLOADERCFG *config, STRINGBUFFER *buffer)
 {
 	uint32_t i = 0;
 
@@ -2416,16 +2416,16 @@ process_rasters(RTLOADERCFG* config, STRINGBUFFER* buffer)
 }
 
 int
-main(int argc, char** argv)
+main(int argc, char **argv)
 {
-	RTLOADERCFG* config = NULL;
-	STRINGBUFFER* buffer = NULL;
+	RTLOADERCFG *config = NULL;
+	STRINGBUFFER *buffer = NULL;
 	uint32_t i = 0;
 	uint32_t j = 0;
-	char** elements = NULL;
+	char **elements = NULL;
 	uint32_t n = 0;
 	GDALDriverH drv = NULL;
-	char* tmp = NULL;
+	char *tmp = NULL;
 	int argit = 0;
 
 	rt_init_allocators();
@@ -2490,9 +2490,9 @@ main(int argc, char** argv)
 			config->nband_count = 0;
 			for (j = 0; j < n; j++)
 			{
-				char* t = trim(elements[j]);
-				char** minmax = NULL;
-				int* range = NULL;
+				char *t = trim(elements[j]);
+				char **minmax = NULL;
+				int *range = NULL;
 				uint32_t p = 0;
 				uint32_t l = 0;
 				int m = 0;
@@ -2600,7 +2600,7 @@ main(int argc, char** argv)
 
 				for (j = 0; j < n; j++)
 				{
-					char* t = trim(elements[j]);
+					char *t = trim(elements[j]);
 					config->tile_size[j] = atoi(t);
 					rtdealloc(t);
 					rtdealloc(elements[j]);
@@ -2701,7 +2701,7 @@ main(int argc, char** argv)
 			}
 			for (j = 0; j < n; j++)
 			{
-				char* t = trim(elements[j]);
+				char *t = trim(elements[j]);
 				config->overview[j] = atoi(t);
 				rtdealloc(t);
 				rtdealloc(elements[j]);
@@ -2844,7 +2844,7 @@ main(int argc, char** argv)
 		else
 		{
 			config->rt_file_count++;
-			config->rt_file = (char**)rtrealloc(config->rt_file, sizeof(char*) * config->rt_file_count);
+			config->rt_file = (char **)rtrealloc(config->rt_file, sizeof(char *) * config->rt_file_count);
 			if (config->rt_file == NULL)
 			{
 				rterror(_("Could not allocate memory for storing raster files"));
@@ -2892,7 +2892,7 @@ main(int argc, char** argv)
 
 		if (drv == NULL)
 		{
-			char* ptr;
+			char *ptr;
 			ptr = strchr(config->rt_file[config->rt_file_count - 1], '.');
 
 			/* schema.table */
@@ -2945,7 +2945,7 @@ main(int argc, char** argv)
 			}
 
 			rtdealloc(config->rt_file[--(config->rt_file_count)]);
-			config->rt_file = (char**)rtrealloc(config->rt_file, sizeof(char*) * config->rt_file_count);
+			config->rt_file = (char **)rtrealloc(config->rt_file, sizeof(char *) * config->rt_file_count);
 			if (config->rt_file == NULL)
 			{
 				rterror(_("Could not reallocate the memory holding raster names"));
@@ -2973,7 +2973,7 @@ main(int argc, char** argv)
 	}
 
 	/* process each file for just the filename */
-	config->rt_filename = (char**)rtalloc(sizeof(char*) * config->rt_file_count);
+	config->rt_filename = (char **)rtalloc(sizeof(char *) * config->rt_file_count);
 	if (config->rt_filename == NULL)
 	{
 		rterror(_("Could not allocate memory for cleaned raster filenames"));
@@ -2982,8 +2982,8 @@ main(int argc, char** argv)
 	}
 	for (i = 0; i < config->rt_file_count; i++)
 	{
-		char* file;
-		char* ptr;
+		char *file;
+		char *ptr;
 
 		file = rtalloc(sizeof(char) * (strlen(config->rt_file[i]) + 1));
 		if (file == NULL)
@@ -3021,8 +3021,8 @@ main(int argc, char** argv)
 	/* first file as proxy table name */
 	if (config->table == NULL)
 	{
-		char* file;
-		char* ptr;
+		char *file;
+		char *ptr;
 
 		file = rtalloc(sizeof(char) * (strlen(config->rt_filename[0]) + 1));
 		if (file == NULL)
@@ -3101,7 +3101,7 @@ main(int argc, char** argv)
 	if (config->overview_count)
 	{
 		char factor[4];
-		config->overview_table = rtalloc(sizeof(char*) * config->overview_count);
+		config->overview_table = rtalloc(sizeof(char *) * config->overview_count);
 		if (config->overview_table == NULL)
 		{
 			rterror(_("Could not allocate memory for overview table names"));

@@ -42,34 +42,34 @@
 #define MAX_DBF_FIELD_SIZE 254
 
 /* Prototypes */
-static int reverse_points(int num_points, double* x, double* y, double* z, double* m);
-static int is_clockwise(int num_points, double* x, double* y, double* z);
+static int reverse_points(int num_points, double *x, double *y, double *z, double *m);
+static int is_clockwise(int num_points, double *x, double *y, double *z);
 static int is_bigendian(void);
-static SHPObject* create_point(SHPDUMPERSTATE* state, LWPOINT* lwpoint);
-static SHPObject* create_multipoint(SHPDUMPERSTATE* state, LWMPOINT* lwmultipoint);
-static SHPObject* create_polygon(SHPDUMPERSTATE* state, LWPOLY* lwpolygon);
-static SHPObject* create_multipolygon(SHPDUMPERSTATE* state, LWMPOLY* lwmultipolygon);
-static SHPObject* create_linestring(SHPDUMPERSTATE* state, LWLINE* lwlinestring);
-static SHPObject* create_multilinestring(SHPDUMPERSTATE* state, LWMLINE* lwmultilinestring);
-static char* nullDBFValue(char fieldType);
-static int getMaxFieldSize(PGconn* conn, char* schema, char* table, char* fname);
-static int getTableInfo(SHPDUMPERSTATE* state);
-static int projFileCreate(SHPDUMPERSTATE* state);
+static SHPObject *create_point(SHPDUMPERSTATE *state, LWPOINT *lwpoint);
+static SHPObject *create_multipoint(SHPDUMPERSTATE *state, LWMPOINT *lwmultipoint);
+static SHPObject *create_polygon(SHPDUMPERSTATE *state, LWPOLY *lwpolygon);
+static SHPObject *create_multipolygon(SHPDUMPERSTATE *state, LWMPOLY *lwmultipolygon);
+static SHPObject *create_linestring(SHPDUMPERSTATE *state, LWLINE *lwlinestring);
+static SHPObject *create_multilinestring(SHPDUMPERSTATE *state, LWMLINE *lwmultilinestring);
+static char *nullDBFValue(char fieldType);
+static int getMaxFieldSize(PGconn *conn, char *schema, char *table, char *fname);
+static int getTableInfo(SHPDUMPERSTATE *state);
+static int projFileCreate(SHPDUMPERSTATE *state);
 
 /**
  * @brief Make appropriate formatting of a DBF value based on type.
  * Might return untouched input or pointer to static private
  * buffer: use return value right away.
  */
-static char* goodDBFValue(char* in, char fieldType);
+static char *goodDBFValue(char *in, char fieldType);
 
 /** @brief Binary to hexewkb conversion function */
-char* convert_bytes_to_hex(uint8_t* ewkb, size_t size);
+char *convert_bytes_to_hex(uint8_t *ewkb, size_t size);
 
-static SHPObject*
-create_point(SHPDUMPERSTATE* state, LWPOINT* lwpoint)
+static SHPObject *
+create_point(SHPDUMPERSTATE *state, LWPOINT *lwpoint)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 
 	double *xpts, *ypts, *zpts, *mpts;
@@ -101,10 +101,10 @@ create_point(SHPDUMPERSTATE* state, LWPOINT* lwpoint)
 	return obj;
 }
 
-static SHPObject*
-create_multipoint(SHPDUMPERSTATE* state, LWMPOINT* lwmultipoint)
+static SHPObject *
+create_multipoint(SHPDUMPERSTATE *state, LWMPOINT *lwmultipoint)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 	uint32_t i;
 
@@ -140,10 +140,10 @@ create_multipoint(SHPDUMPERSTATE* state, LWMPOINT* lwmultipoint)
 	return obj;
 }
 
-static SHPObject*
-create_polygon(SHPDUMPERSTATE* state, LWPOLY* lwpolygon)
+static SHPObject *
+create_polygon(SHPDUMPERSTATE *state, LWPOLY *lwpolygon)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 	uint32_t i, j;
 
@@ -237,10 +237,10 @@ create_polygon(SHPDUMPERSTATE* state, LWPOLY* lwpolygon)
 	return obj;
 }
 
-static SHPObject*
-create_multipolygon(SHPDUMPERSTATE* state, LWMPOLY* lwmultipolygon)
+static SHPObject *
+create_multipolygon(SHPDUMPERSTATE *state, LWMPOLY *lwmultipolygon)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 	uint32_t i, j, k;
 
@@ -358,10 +358,10 @@ create_multipolygon(SHPDUMPERSTATE* state, LWMPOLY* lwmultipolygon)
 	return obj;
 }
 
-static SHPObject*
-create_linestring(SHPDUMPERSTATE* state, LWLINE* lwlinestring)
+static SHPObject *
+create_linestring(SHPDUMPERSTATE *state, LWLINE *lwlinestring)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 	uint32_t i;
 
@@ -398,10 +398,10 @@ create_linestring(SHPDUMPERSTATE* state, LWLINE* lwlinestring)
 	return obj;
 }
 
-static SHPObject*
-create_multilinestring(SHPDUMPERSTATE* state, LWMLINE* lwmultilinestring)
+static SHPObject *
+create_multilinestring(SHPDUMPERSTATE *state, LWMLINE *lwmultilinestring)
 {
-	SHPObject* obj;
+	SHPObject *obj;
 	POINT4D p4d;
 	uint32_t i, j;
 
@@ -465,7 +465,7 @@ create_multilinestring(SHPDUMPERSTATE* state, LWMLINE* lwmultilinestring)
 
 /*Reverse the clockwise-ness of the point list... */
 static int
-reverse_points(int num_points, double* x, double* y, double* z, double* m)
+reverse_points(int num_points, double *x, double *y, double *z, double *m)
 {
 
 	int i, j;
@@ -503,15 +503,15 @@ reverse_points(int num_points, double* x, double* y, double* z, double* m)
 
 /* Return 1 if the points are in clockwise order */
 static int
-is_clockwise(int num_points, double* x, double* y, double* z)
+is_clockwise(int num_points, double *x, double *y, double *z)
 {
 	int i;
 	double x_change, y_change, area;
 	double *x_new, *y_new; /* the points, translated to the origin
 				* for safer accuracy */
 
-	x_new = (double*)malloc(sizeof(double) * num_points);
-	y_new = (double*)malloc(sizeof(double) * num_points);
+	x_new = (double *)malloc(sizeof(double) * num_points);
+	y_new = (double *)malloc(sizeof(double) * num_points);
 	area = 0.0;
 	x_change = x[0];
 	y_change = y[0];
@@ -546,23 +546,23 @@ is_clockwise(int num_points, double* x, double* y, double* z)
  * Return -1 on error.
  */
 static int
-getMaxFieldSize(PGconn* conn, char* schema, char* table, char* fname)
+getMaxFieldSize(PGconn *conn, char *schema, char *table, char *fname)
 {
 	int size;
-	char* query;
-	PGresult* res;
+	char *query;
+	PGresult *res;
 
 	/*( this is ugly: don't forget counting the length  */
 	/* when changing the fixed query strings ) */
 
 	if (schema)
 	{
-		query = (char*)malloc(strlen(fname) + strlen(table) + strlen(schema) + 46);
+		query = (char *)malloc(strlen(fname) + strlen(table) + strlen(schema) + 46);
 		sprintf(query, "select max(octet_length(\"%s\"::text)) from \"%s\".\"%s\"", fname, schema, table);
 	}
 	else
 	{
-		query = (char*)malloc(strlen(fname) + strlen(table) + 46);
+		query = (char *)malloc(strlen(fname) + strlen(table) + 46);
 		sprintf(query, "select max(octet_length(\"%s\"::text)) from \"%s\"", fname, table);
 	}
 
@@ -591,14 +591,14 @@ is_bigendian(void)
 {
 	int test = 1;
 
-	if ((((char*)(&test))[0]) == 1) { return 0; /*NDR (little_endian) */ }
+	if ((((char *)(&test))[0]) == 1) { return 0; /*NDR (little_endian) */ }
 	else
 	{
 		return 1; /*XDR (big_endian) */
 	}
 }
 
-char*
+char *
 shapetypename(int num)
 {
 	switch (num)
@@ -637,7 +637,7 @@ shapetypename(int num)
 }
 
 /* This is taken and adapted from dbfopen.c of shapelib */
-static char*
+static char *
 nullDBFValue(char fieldType)
 {
 	switch (fieldType)
@@ -666,8 +666,8 @@ nullDBFValue(char fieldType)
  * 		Might return untouched input or pointer to static private
  * 		buffer: use return value right away.
  */
-static char*
-goodDBFValue(char* in, char fieldType)
+static char *
+goodDBFValue(char *in, char fieldType)
 {
 	/*
 	 * We only work on FTLogical and FTDate.
@@ -699,11 +699,11 @@ goodDBFValue(char* in, char fieldType)
 	}
 }
 
-char*
-convert_bytes_to_hex(uint8_t* ewkb, size_t size)
+char *
+convert_bytes_to_hex(uint8_t *ewkb, size_t size)
 {
 	size_t i;
-	char* hexewkb;
+	char *hexewkb;
 
 	/* Convert the byte stream to a hex string using liblwgeom's deparse_hex function */
 	hexewkb = malloc(size * 2 + 1);
@@ -722,25 +722,25 @@ convert_bytes_to_hex(uint8_t* ewkb, size_t size)
  *spatial_ref_sys.  The dbf and shp will still be output.
  */
 static int
-projFileCreate(SHPDUMPERSTATE* state)
+projFileCreate(SHPDUMPERSTATE *state)
 {
-	FILE* fp;
+	FILE *fp;
 	char *pszFullname, *pszBasename;
 	int i;
 
-	char* pszFilename = state->shp_file;
-	char* schema = state->schema;
-	char* table = state->table;
-	char* geo_col_name = state->geo_col_name;
+	char *pszFilename = state->shp_file;
+	char *schema = state->schema;
+	char *table = state->table;
+	char *geo_col_name = state->geo_col_name;
 
-	char* srtext;
-	char* query;
-	char* esc_schema;
-	char* esc_table;
-	char* esc_geo_col_name;
+	char *srtext;
+	char *query;
+	char *esc_schema;
+	char *esc_table;
+	char *esc_geo_col_name;
 
 	int error, result;
-	PGresult* res;
+	PGresult *res;
 	int size;
 
 	/***********
@@ -749,13 +749,13 @@ projFileCreate(SHPDUMPERSTATE* state)
 	size = 1000;
 	if (schema) { size += 3 * strlen(schema); }
 	size += 1000;
-	esc_table = (char*)malloc(3 * strlen(table) + 1);
-	esc_geo_col_name = (char*)malloc(3 * strlen(geo_col_name) + 1);
+	esc_table = (char *)malloc(3 * strlen(table) + 1);
+	esc_geo_col_name = (char *)malloc(3 * strlen(geo_col_name) + 1);
 	PQescapeStringConn(state->conn, esc_table, table, strlen(table), &error);
 	PQescapeStringConn(state->conn, esc_geo_col_name, geo_col_name, strlen(geo_col_name), &error);
 
 	/** make our address space large enough to hold query with table/schema **/
-	query = (char*)malloc(size);
+	query = (char *)malloc(size);
 	if (!query) return 0; /* out of virtual memory */
 
 	/**************************************************
@@ -768,7 +768,7 @@ projFileCreate(SHPDUMPERSTATE* state)
 	 **************************************************/
 	if (schema)
 	{
-		esc_schema = (char*)malloc(2 * strlen(schema) + 1);
+		esc_schema = (char *)malloc(2 * strlen(schema) + 1);
 		PQescapeStringConn(state->conn, esc_schema, schema, strlen(schema), &error);
 		sprintf(query,
 			"SELECT COALESCE((SELECT sr.srtext "
@@ -849,7 +849,7 @@ projFileCreate(SHPDUMPERSTATE* state)
 				/*	Compute the base (layer) name.  If there is any extension	*/
 				/*	on the passed in filename we will strip it off.			*/
 				/* -------------------------------------------------------------------- */
-				pszBasename = (char*)malloc(strlen(pszFilename) + 5);
+				pszBasename = (char *)malloc(strlen(pszFilename) + 5);
 				strcpy(pszBasename, pszFilename);
 				for (i = strlen(pszBasename) - 1;
 				     i > 0 && pszBasename[i] != '.' && pszBasename[i] != '/' && pszBasename[i] != '\\';
@@ -858,7 +858,7 @@ projFileCreate(SHPDUMPERSTATE* state)
 
 				if (pszBasename[i] == '.') pszBasename[i] = '\0';
 
-				pszFullname = (char*)malloc(strlen(pszBasename) + 5);
+				pszFullname = (char *)malloc(strlen(pszBasename) + 5);
 				sprintf(pszFullname, "%s.prj", pszBasename);
 				free(pszBasename);
 
@@ -896,7 +896,7 @@ projFileCreate(SHPDUMPERSTATE* state)
 }
 
 static int
-getTableInfo(SHPDUMPERSTATE* state)
+getTableInfo(SHPDUMPERSTATE *state)
 {
 
 	/* Get some more information from the table:
@@ -911,8 +911,8 @@ getTableInfo(SHPDUMPERSTATE* state)
 	   well get the row count too.
 	 */
 
-	PGresult* res;
-	char* query;
+	PGresult *res;
+	char *query;
 	int tmpint;
 
 	if (state->geo_col_name)
@@ -1174,7 +1174,7 @@ getTableInfo(SHPDUMPERSTATE* state)
 
 /* Default configuration settings */
 void
-set_dumper_config_defaults(SHPDUMPERCONFIG* config)
+set_dumper_config_defaults(SHPDUMPERCONFIG *config)
 {
 	config->conn = malloc(sizeof(SHPCONNECTIONCONFIG));
 	config->conn->host = NULL;
@@ -1198,10 +1198,10 @@ set_dumper_config_defaults(SHPDUMPERCONFIG* config)
 }
 
 /* Create a new shapefile state object */
-SHPDUMPERSTATE*
-ShpDumperCreate(SHPDUMPERCONFIG* config)
+SHPDUMPERSTATE *
+ShpDumperCreate(SHPDUMPERCONFIG *config)
 {
-	SHPDUMPERSTATE* state;
+	SHPDUMPERSTATE *state;
 
 	/* Create a new state object and assign the config to it */
 	state = malloc(sizeof(SHPDUMPERSTATE));
@@ -1229,10 +1229,10 @@ ShpDumperCreate(SHPDUMPERCONFIG* config)
 }
 
 /* Generate the database connection string used by a state */
-char*
-ShpDumperGetConnectionStringFromConn(SHPCONNECTIONCONFIG* conn)
+char *
+ShpDumperGetConnectionStringFromConn(SHPCONNECTIONCONFIG *conn)
 {
-	char* connstring;
+	char *connstring;
 	int connlen;
 
 	connlen = 64 + (conn->host ? strlen(conn->host) : 0) + (conn->port ? strlen(conn->port) : 0) +
@@ -1281,9 +1281,9 @@ ShpDumperGetConnectionStringFromConn(SHPCONNECTIONCONFIG* conn)
 /* Connect to the database and identify the version of PostGIS (and any other
 capabilities required) */
 int
-ShpDumperConnectDatabase(SHPDUMPERSTATE* state)
+ShpDumperConnectDatabase(SHPDUMPERSTATE *state)
 {
-	PGresult* res;
+	PGresult *res;
 
 	char *connstring, *tmpvalue;
 
@@ -1381,12 +1381,12 @@ ShpDumperConnectDatabase(SHPDUMPERSTATE* state)
 
 /* Open the specified table in preparation for extracting rows */
 int
-ShpDumperOpenTable(SHPDUMPERSTATE* state)
+ShpDumperOpenTable(SHPDUMPERSTATE *state)
 {
-	PGresult* res;
+	PGresult *res;
 
 	char buf[256];
-	char* query;
+	char *query;
 	int gidfound = 0, i, j, ret, status;
 
 	/* Open the column map if one was specified */
@@ -1489,7 +1489,7 @@ ShpDumperOpenTable(SHPDUMPERSTATE* state)
 	/* Otherwise, just use UTF-8 encoding, since that's usually our client encoding. */
 	if (getenv("PGCLIENTENCODING"))
 	{
-		char* codepage = encoding2codepage(getenv("PGCLIENTENCODING"));
+		char *codepage = encoding2codepage(getenv("PGCLIENTENCODING"));
 		state->dbf = DBFCreateEx(state->shp_file, codepage);
 	}
 	else
@@ -1507,9 +1507,9 @@ ShpDumperOpenTable(SHPDUMPERSTATE* state)
 	 * Scan the result setting fields to be returned in mainscan
 	 * query, filling the type_ary, and creating .dbf and .shp files.
 	 */
-	state->dbffieldnames = malloc(sizeof(char*) * PQntuples(res));
+	state->dbffieldnames = malloc(sizeof(char *) * PQntuples(res));
 	state->dbffieldtypes = malloc(sizeof(int) * PQntuples(res));
-	state->pgfieldnames = malloc(sizeof(char*) * PQntuples(res));
+	state->pgfieldnames = malloc(sizeof(char *) * PQntuples(res));
 	state->pgfieldlens = malloc(sizeof(int) * PQntuples(res));
 	state->pgfieldtypmods = malloc(sizeof(int) * PQntuples(res));
 	state->fieldcount = 0;
@@ -1517,13 +1517,13 @@ ShpDumperOpenTable(SHPDUMPERSTATE* state)
 
 	for (i = 0; i < PQntuples(res); i++)
 	{
-		char* ptr;
+		char *ptr;
 
 		int pgfieldtype, pgtypmod, pgfieldlen;
-		char* pgfieldname;
+		char *pgfieldname;
 
 		int dbffieldtype, dbffieldsize, dbffielddecs;
-		char* dbffieldname;
+		char *dbffieldname;
 
 		pgfieldname = PQgetvalue(res, i, 0);
 		pgfieldtype = atoi(PQgetvalue(res, i, 1));
@@ -1587,7 +1587,7 @@ ShpDumperOpenTable(SHPDUMPERSTATE* state)
 		 * use this to create the dbf field name from
 		 * the PostgreSQL column name */
 		{
-			const char* mapped = colmap_dbf_by_pg(&state->column_map, dbffieldname);
+			const char *mapped = colmap_dbf_by_pg(&state->column_map, dbffieldname);
 			if (mapped)
 			{
 				strncpy(dbffieldname, mapped, 10);
@@ -2030,14 +2030,14 @@ ShpDumperOpenTable(SHPDUMPERSTATE* state)
 
 /* Append the next row to the output shapefile */
 int
-ShpLoaderGenerateShapeRow(SHPDUMPERSTATE* state)
+ShpLoaderGenerateShapeRow(SHPDUMPERSTATE *state)
 {
-	char* hexewkb = NULL;
-	unsigned char* hexewkb_binary = NULL;
+	char *hexewkb = NULL;
+	unsigned char *hexewkb_binary = NULL;
 	size_t hexewkb_len;
-	char* val;
-	SHPObject* obj = NULL;
-	LWGEOM* lwgeom;
+	char *val;
+	SHPObject *obj = NULL;
+	LWGEOM *lwgeom;
 
 	int i, geocolnum = 0;
 
@@ -2133,7 +2133,7 @@ ShpLoaderGenerateShapeRow(SHPDUMPERSTATE* state)
 
 					/* Input is bytea encoded text field, so it must be unescaped and
 					then converted to hexewkb string */
-					hexewkb_binary = PQunescapeBytea((unsigned char*)val, &hexewkb_len);
+					hexewkb_binary = PQunescapeBytea((unsigned char *)val, &hexewkb_len);
 					hexewkb = convert_bytes_to_hex(hexewkb_binary, hexewkb_len);
 				}
 				else
@@ -2153,7 +2153,7 @@ ShpLoaderGenerateShapeRow(SHPDUMPERSTATE* state)
 
 				/* Input is binary field - must convert to hexewkb string */
 				hexewkb_len = PQgetlength(state->fetchres, state->curresrow, geocolnum);
-				hexewkb = convert_bytes_to_hex((unsigned char*)val, hexewkb_len);
+				hexewkb = convert_bytes_to_hex((unsigned char *)val, hexewkb_len);
 			}
 
 			LWDEBUGF(4, "HexEWKB - length: %d  value: %s", strlen(hexewkb), hexewkb);
@@ -2240,14 +2240,14 @@ ShpLoaderGenerateShapeRow(SHPDUMPERSTATE* state)
 
 /* Return a count of the number of rows in the table being dumped */
 int
-ShpDumperGetRecordCount(SHPDUMPERSTATE* state)
+ShpDumperGetRecordCount(SHPDUMPERSTATE *state)
 {
 	return state->rowcount;
 }
 
 /* Close the specified table and flush all files to disk */
 int
-ShpDumperCloseTable(SHPDUMPERSTATE* state)
+ShpDumperCloseTable(SHPDUMPERSTATE *state)
 {
 	int ret = SHPDUMPEROK;
 
@@ -2265,7 +2265,7 @@ ShpDumperCloseTable(SHPDUMPERSTATE* state)
 }
 
 void
-ShpDumperDestroy(SHPDUMPERSTATE* state)
+ShpDumperDestroy(SHPDUMPERSTATE *state)
 {
 	/* Destroy a state object created with ShpDumperConnect */
 	int i;
@@ -2309,11 +2309,11 @@ ShpDumperDestroy(SHPDUMPERSTATE* state)
  *		Properly double-quote a SQL identifier.
  *  Copied from PostgreSQL pg_upgrade/util.c
  */
-char*
-quote_identifier(const char* s)
+char *
+quote_identifier(const char *s)
 {
-	char* result = malloc(strlen(s) * 2 + 3);
-	char* r = result;
+	char *result = malloc(strlen(s) * 2 + 3);
+	char *r = result;
 
 	*r++ = '"';
 	while (*s)

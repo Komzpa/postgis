@@ -27,27 +27,27 @@
 #include <string.h> /* strlen */
 #include <assert.h>
 
-static char* asgeojson_point(const LWPOINT* point, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_line(const LWLINE* line, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_poly(const LWPOLY* poly, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_multipoint(const LWMPOINT* mpoint, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_multiline(const LWMLINE* mline, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_multipolygon(const LWMPOLY* mpoly, char* srs, GBOX* bbox, int precision);
-static char* asgeojson_collection(const LWCOLLECTION* col, char* srs, GBOX* bbox, int precision);
-static size_t asgeojson_geom_size(const LWGEOM* geom, GBOX* bbox, int precision);
-static size_t asgeojson_geom_buf(const LWGEOM* geom, char* output, GBOX* bbox, int precision);
+static char *asgeojson_point(const LWPOINT *point, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_line(const LWLINE *line, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_poly(const LWPOLY *poly, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_multipoint(const LWMPOINT *mpoint, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_multiline(const LWMLINE *mline, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_multipolygon(const LWMPOLY *mpoly, char *srs, GBOX *bbox, int precision);
+static char *asgeojson_collection(const LWCOLLECTION *col, char *srs, GBOX *bbox, int precision);
+static size_t asgeojson_geom_size(const LWGEOM *geom, GBOX *bbox, int precision);
+static size_t asgeojson_geom_buf(const LWGEOM *geom, char *output, GBOX *bbox, int precision);
 
-static size_t pointArray_to_geojson(POINTARRAY* pa, char* buf, int precision);
-static size_t pointArray_geojson_size(POINTARRAY* pa, int precision);
+static size_t pointArray_to_geojson(POINTARRAY *pa, char *buf, int precision);
+static size_t pointArray_geojson_size(POINTARRAY *pa, int precision);
 
 /**
  * Takes a GEOMETRY and returns a GeoJson representation
  */
-char*
-lwgeom_to_geojson(const LWGEOM* geom, char* srs, int precision, int has_bbox)
+char *
+lwgeom_to_geojson(const LWGEOM *geom, char *srs, int precision, int has_bbox)
 {
 	int type = geom->type;
-	GBOX* bbox = NULL;
+	GBOX *bbox = NULL;
 	GBOX tmp;
 
 	if (precision > OUT_MAX_DOUBLE_PRECISION) precision = OUT_MAX_DOUBLE_PRECISION;
@@ -63,19 +63,19 @@ lwgeom_to_geojson(const LWGEOM* geom, char* srs, int precision, int has_bbox)
 	switch (type)
 	{
 	case POINTTYPE:
-		return asgeojson_point((LWPOINT*)geom, srs, bbox, precision);
+		return asgeojson_point((LWPOINT *)geom, srs, bbox, precision);
 	case LINETYPE:
-		return asgeojson_line((LWLINE*)geom, srs, bbox, precision);
+		return asgeojson_line((LWLINE *)geom, srs, bbox, precision);
 	case POLYGONTYPE:
-		return asgeojson_poly((LWPOLY*)geom, srs, bbox, precision);
+		return asgeojson_poly((LWPOLY *)geom, srs, bbox, precision);
 	case MULTIPOINTTYPE:
-		return asgeojson_multipoint((LWMPOINT*)geom, srs, bbox, precision);
+		return asgeojson_multipoint((LWMPOINT *)geom, srs, bbox, precision);
 	case MULTILINETYPE:
-		return asgeojson_multiline((LWMLINE*)geom, srs, bbox, precision);
+		return asgeojson_multiline((LWMLINE *)geom, srs, bbox, precision);
 	case MULTIPOLYGONTYPE:
-		return asgeojson_multipolygon((LWMPOLY*)geom, srs, bbox, precision);
+		return asgeojson_multipolygon((LWMPOLY *)geom, srs, bbox, precision);
 	case COLLECTIONTYPE:
-		return asgeojson_collection((LWCOLLECTION*)geom, srs, bbox, precision);
+		return asgeojson_collection((LWCOLLECTION *)geom, srs, bbox, precision);
 	default:
 		lwerror("lwgeom_to_geojson: '%s' geometry type not supported", lwtype_name(type));
 	}
@@ -88,7 +88,7 @@ lwgeom_to_geojson(const LWGEOM* geom, char* srs, int precision, int has_bbox)
  * Handle SRS
  */
 static size_t
-asgeojson_srs_size(char* srs)
+asgeojson_srs_size(char *srs)
 {
 	int size;
 
@@ -100,9 +100,9 @@ asgeojson_srs_size(char* srs)
 }
 
 static size_t
-asgeojson_srs_buf(char* output, char* srs)
+asgeojson_srs_buf(char *output, char *srs)
 {
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "\"crs\":{\"type\":\"name\",");
 	ptr += sprintf(ptr, "\"properties\":{\"name\":\"%s\"}},", srs);
@@ -133,9 +133,9 @@ asgeojson_bbox_size(int hasz, int precision)
 }
 
 static size_t
-asgeojson_bbox_buf(char* output, GBOX* bbox, int hasz, int precision)
+asgeojson_bbox_buf(char *output, GBOX *bbox, int hasz, int precision)
 {
-	char* ptr = output;
+	char *ptr = output;
 
 	if (!hasz)
 		ptr += sprintf(ptr,
@@ -172,7 +172,7 @@ asgeojson_bbox_buf(char* output, GBOX* bbox, int hasz, int precision)
  */
 
 static size_t
-asgeojson_point_size(const LWPOINT* point, char* srs, GBOX* bbox, int precision)
+asgeojson_point_size(const LWPOINT *point, char *srs, GBOX *bbox, int precision)
 {
 	int size;
 
@@ -189,9 +189,9 @@ asgeojson_point_size(const LWPOINT* point, char* srs, GBOX* bbox, int precision)
 }
 
 static size_t
-asgeojson_point_buf(const LWPOINT* point, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_point_buf(const LWPOINT *point, char *srs, char *output, GBOX *bbox, int precision)
 {
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"Point\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -205,10 +205,10 @@ asgeojson_point_buf(const LWPOINT* point, char* srs, char* output, GBOX* bbox, i
 	return (ptr - output);
 }
 
-static char*
-asgeojson_point(const LWPOINT* point, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_point(const LWPOINT *point, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_point_size(point, srs, bbox, precision);
@@ -222,7 +222,7 @@ asgeojson_point(const LWPOINT* point, char* srs, GBOX* bbox, int precision)
  */
 
 static size_t
-asgeojson_line_size(const LWLINE* line, char* srs, GBOX* bbox, int precision)
+asgeojson_line_size(const LWLINE *line, char *srs, GBOX *bbox, int precision)
 {
 	int size;
 
@@ -236,9 +236,9 @@ asgeojson_line_size(const LWLINE* line, char* srs, GBOX* bbox, int precision)
 }
 
 static size_t
-asgeojson_line_buf(const LWLINE* line, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_line_buf(const LWLINE *line, char *srs, char *output, GBOX *bbox, int precision)
 {
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"LineString\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -250,10 +250,10 @@ asgeojson_line_buf(const LWLINE* line, char* srs, char* output, GBOX* bbox, int 
 	return (ptr - output);
 }
 
-static char*
-asgeojson_line(const LWLINE* line, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_line(const LWLINE *line, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_line_size(line, srs, bbox, precision);
@@ -268,7 +268,7 @@ asgeojson_line(const LWLINE* line, char* srs, GBOX* bbox, int precision)
  */
 
 static size_t
-asgeojson_poly_size(const LWPOLY* poly, char* srs, GBOX* bbox, int precision)
+asgeojson_poly_size(const LWPOLY *poly, char *srs, GBOX *bbox, int precision)
 {
 	size_t size;
 	uint32_t i;
@@ -289,10 +289,10 @@ asgeojson_poly_size(const LWPOLY* poly, char* srs, GBOX* bbox, int precision)
 }
 
 static size_t
-asgeojson_poly_buf(const LWPOLY* poly, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_poly_buf(const LWPOLY *poly, char *srs, char *output, GBOX *bbox, int precision)
 {
 	uint32_t i;
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"Polygon\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -310,10 +310,10 @@ asgeojson_poly_buf(const LWPOLY* poly, char* srs, char* output, GBOX* bbox, int 
 	return (ptr - output);
 }
 
-static char*
-asgeojson_poly(const LWPOLY* poly, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_poly(const LWPOLY *poly, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_poly_size(poly, srs, bbox, precision);
@@ -328,9 +328,9 @@ asgeojson_poly(const LWPOLY* poly, char* srs, GBOX* bbox, int precision)
  */
 
 static size_t
-asgeojson_multipoint_size(const LWMPOINT* mpoint, char* srs, GBOX* bbox, int precision)
+asgeojson_multipoint_size(const LWMPOINT *mpoint, char *srs, GBOX *bbox, int precision)
 {
-	LWPOINT* point;
+	LWPOINT *point;
 	int size;
 	uint32_t i;
 
@@ -350,11 +350,11 @@ asgeojson_multipoint_size(const LWMPOINT* mpoint, char* srs, GBOX* bbox, int pre
 }
 
 static size_t
-asgeojson_multipoint_buf(const LWMPOINT* mpoint, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_multipoint_buf(const LWMPOINT *mpoint, char *srs, char *output, GBOX *bbox, int precision)
 {
-	LWPOINT* point;
+	LWPOINT *point;
 	uint32_t i;
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"MultiPoint\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -372,10 +372,10 @@ asgeojson_multipoint_buf(const LWMPOINT* mpoint, char* srs, char* output, GBOX* 
 	return (ptr - output);
 }
 
-static char*
-asgeojson_multipoint(const LWMPOINT* mpoint, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_multipoint(const LWMPOINT *mpoint, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_multipoint_size(mpoint, srs, bbox, precision);
@@ -390,9 +390,9 @@ asgeojson_multipoint(const LWMPOINT* mpoint, char* srs, GBOX* bbox, int precisio
  */
 
 static size_t
-asgeojson_multiline_size(const LWMLINE* mline, char* srs, GBOX* bbox, int precision)
+asgeojson_multiline_size(const LWMLINE *mline, char *srs, GBOX *bbox, int precision)
 {
-	LWLINE* line;
+	LWLINE *line;
 	int size;
 	uint32_t i;
 
@@ -413,11 +413,11 @@ asgeojson_multiline_size(const LWMLINE* mline, char* srs, GBOX* bbox, int precis
 }
 
 static size_t
-asgeojson_multiline_buf(const LWMLINE* mline, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_multiline_buf(const LWMLINE *mline, char *srs, char *output, GBOX *bbox, int precision)
 {
-	LWLINE* line;
+	LWLINE *line;
 	uint32_t i;
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"MultiLineString\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -438,10 +438,10 @@ asgeojson_multiline_buf(const LWMLINE* mline, char* srs, char* output, GBOX* bbo
 	return (ptr - output);
 }
 
-static char*
-asgeojson_multiline(const LWMLINE* mline, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_multiline(const LWMLINE *mline, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_multiline_size(mline, srs, bbox, precision);
@@ -456,9 +456,9 @@ asgeojson_multiline(const LWMLINE* mline, char* srs, GBOX* bbox, int precision)
  */
 
 static size_t
-asgeojson_multipolygon_size(const LWMPOLY* mpoly, char* srs, GBOX* bbox, int precision)
+asgeojson_multipolygon_size(const LWMPOLY *mpoly, char *srs, GBOX *bbox, int precision)
 {
-	LWPOLY* poly;
+	LWPOLY *poly;
 	int size;
 	uint32_t i, j;
 
@@ -484,11 +484,11 @@ asgeojson_multipolygon_size(const LWMPOLY* mpoly, char* srs, GBOX* bbox, int pre
 }
 
 static size_t
-asgeojson_multipolygon_buf(const LWMPOLY* mpoly, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_multipolygon_buf(const LWMPOLY *mpoly, char *srs, char *output, GBOX *bbox, int precision)
 {
-	LWPOLY* poly;
+	LWPOLY *poly;
 	uint32_t i, j;
-	char* ptr = output;
+	char *ptr = output;
 
 	ptr += sprintf(ptr, "{\"type\":\"MultiPolygon\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -513,10 +513,10 @@ asgeojson_multipolygon_buf(const LWMPOLY* mpoly, char* srs, char* output, GBOX* 
 	return (ptr - output);
 }
 
-static char*
-asgeojson_multipolygon(const LWMPOLY* mpoly, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_multipolygon(const LWMPOLY *mpoly, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_multipolygon_size(mpoly, srs, bbox, precision);
@@ -531,11 +531,11 @@ asgeojson_multipolygon(const LWMPOLY* mpoly, char* srs, GBOX* bbox, int precisio
  */
 
 static size_t
-asgeojson_collection_size(const LWCOLLECTION* col, char* srs, GBOX* bbox, int precision)
+asgeojson_collection_size(const LWCOLLECTION *col, char *srs, GBOX *bbox, int precision)
 {
 	uint32_t i;
 	size_t size;
-	LWGEOM* subgeom;
+	LWGEOM *subgeom;
 
 	size = sizeof("{'type':'GeometryCollection',");
 	if (srs) size += asgeojson_srs_size(srs);
@@ -554,11 +554,11 @@ asgeojson_collection_size(const LWCOLLECTION* col, char* srs, GBOX* bbox, int pr
 }
 
 static size_t
-asgeojson_collection_buf(const LWCOLLECTION* col, char* srs, char* output, GBOX* bbox, int precision)
+asgeojson_collection_buf(const LWCOLLECTION *col, char *srs, char *output, GBOX *bbox, int precision)
 {
 	uint32_t i;
-	char* ptr = output;
-	LWGEOM* subgeom;
+	char *ptr = output;
+	LWGEOM *subgeom;
 
 	ptr += sprintf(ptr, "{\"type\":\"GeometryCollection\",");
 	if (srs) ptr += asgeojson_srs_buf(ptr, srs);
@@ -577,10 +577,10 @@ asgeojson_collection_buf(const LWCOLLECTION* col, char* srs, char* output, GBOX*
 	return (ptr - output);
 }
 
-static char*
-asgeojson_collection(const LWCOLLECTION* col, char* srs, GBOX* bbox, int precision)
+static char *
+asgeojson_collection(const LWCOLLECTION *col, char *srs, GBOX *bbox, int precision)
 {
-	char* output;
+	char *output;
 	int size;
 
 	size = asgeojson_collection_size(col, srs, bbox, precision);
@@ -591,7 +591,7 @@ asgeojson_collection(const LWCOLLECTION* col, char* srs, GBOX* bbox, int precisi
 }
 
 static size_t
-asgeojson_geom_size(const LWGEOM* geom, GBOX* bbox, int precision)
+asgeojson_geom_size(const LWGEOM *geom, GBOX *bbox, int precision)
 {
 	int type = geom->type;
 	size_t size = 0;
@@ -599,27 +599,27 @@ asgeojson_geom_size(const LWGEOM* geom, GBOX* bbox, int precision)
 	switch (type)
 	{
 	case POINTTYPE:
-		size = asgeojson_point_size((LWPOINT*)geom, NULL, bbox, precision);
+		size = asgeojson_point_size((LWPOINT *)geom, NULL, bbox, precision);
 		break;
 
 	case LINETYPE:
-		size = asgeojson_line_size((LWLINE*)geom, NULL, bbox, precision);
+		size = asgeojson_line_size((LWLINE *)geom, NULL, bbox, precision);
 		break;
 
 	case POLYGONTYPE:
-		size = asgeojson_poly_size((LWPOLY*)geom, NULL, bbox, precision);
+		size = asgeojson_poly_size((LWPOLY *)geom, NULL, bbox, precision);
 		break;
 
 	case MULTIPOINTTYPE:
-		size = asgeojson_multipoint_size((LWMPOINT*)geom, NULL, bbox, precision);
+		size = asgeojson_multipoint_size((LWMPOINT *)geom, NULL, bbox, precision);
 		break;
 
 	case MULTILINETYPE:
-		size = asgeojson_multiline_size((LWMLINE*)geom, NULL, bbox, precision);
+		size = asgeojson_multiline_size((LWMLINE *)geom, NULL, bbox, precision);
 		break;
 
 	case MULTIPOLYGONTYPE:
-		size = asgeojson_multipolygon_size((LWMPOLY*)geom, NULL, bbox, precision);
+		size = asgeojson_multipolygon_size((LWMPOLY *)geom, NULL, bbox, precision);
 		break;
 
 	default:
@@ -630,35 +630,35 @@ asgeojson_geom_size(const LWGEOM* geom, GBOX* bbox, int precision)
 }
 
 static size_t
-asgeojson_geom_buf(const LWGEOM* geom, char* output, GBOX* bbox, int precision)
+asgeojson_geom_buf(const LWGEOM *geom, char *output, GBOX *bbox, int precision)
 {
 	int type = geom->type;
-	char* ptr = output;
+	char *ptr = output;
 
 	switch (type)
 	{
 	case POINTTYPE:
-		ptr += asgeojson_point_buf((LWPOINT*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_point_buf((LWPOINT *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	case LINETYPE:
-		ptr += asgeojson_line_buf((LWLINE*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_line_buf((LWLINE *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	case POLYGONTYPE:
-		ptr += asgeojson_poly_buf((LWPOLY*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_poly_buf((LWPOLY *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	case MULTIPOINTTYPE:
-		ptr += asgeojson_multipoint_buf((LWMPOINT*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_multipoint_buf((LWMPOINT *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	case MULTILINETYPE:
-		ptr += asgeojson_multiline_buf((LWMLINE*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_multiline_buf((LWMLINE *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	case MULTIPOLYGONTYPE:
-		ptr += asgeojson_multipolygon_buf((LWMPOLY*)geom, NULL, ptr, bbox, precision);
+		ptr += asgeojson_multipolygon_buf((LWMPOLY *)geom, NULL, ptr, bbox, precision);
 		break;
 
 	default:
@@ -670,10 +670,10 @@ asgeojson_geom_buf(const LWGEOM* geom, char* output, GBOX* bbox, int precision)
 }
 
 static size_t
-pointArray_to_geojson(POINTARRAY* pa, char* output, int precision)
+pointArray_to_geojson(POINTARRAY *pa, char *output, int precision)
 {
 	uint32_t i;
-	char* ptr;
+	char *ptr;
 	char x[OUT_DOUBLE_BUFFER_SIZE];
 	char y[OUT_DOUBLE_BUFFER_SIZE];
 	char z[OUT_DOUBLE_BUFFER_SIZE];
@@ -686,7 +686,7 @@ pointArray_to_geojson(POINTARRAY* pa, char* output, int precision)
 	{
 		for (i = 0; i < pa->npoints; i++)
 		{
-			const POINT2D* pt;
+			const POINT2D *pt;
 			pt = getPoint2d_cp(pa, i);
 
 			lwprint_double(pt->x, precision, x, OUT_DOUBLE_BUFFER_SIZE);
@@ -700,7 +700,7 @@ pointArray_to_geojson(POINTARRAY* pa, char* output, int precision)
 	{
 		for (i = 0; i < pa->npoints; i++)
 		{
-			const POINT3DZ* pt;
+			const POINT3DZ *pt;
 			pt = getPoint3dz_cp(pa, i);
 
 			lwprint_double(pt->x, precision, x, OUT_DOUBLE_BUFFER_SIZE);
@@ -719,7 +719,7 @@ pointArray_to_geojson(POINTARRAY* pa, char* output, int precision)
  * Returns maximum size of rendered pointarray in bytes.
  */
 static size_t
-pointArray_geojson_size(POINTARRAY* pa, int precision)
+pointArray_geojson_size(POINTARRAY *pa, int precision)
 {
 	assert(precision <= OUT_MAX_DOUBLE_PRECISION);
 	if (FLAGS_NDIMS(pa->flags) == 2)

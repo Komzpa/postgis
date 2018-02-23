@@ -31,8 +31,8 @@
 /* Place to hold the ZM string used in other summaries */
 static char tflags[6];
 
-static char*
-lwgeom_flagchars(LWGEOM* lwg)
+static char *
+lwgeom_flagchars(LWGEOM *lwg)
 {
 	int flagno = 0;
 	if (FLAGS_GET_Z(lwg->flags)) tflags[flagno++] = 'Z';
@@ -50,47 +50,47 @@ lwgeom_flagchars(LWGEOM* lwg)
 /*
  * Returns an alloced string containing summary for the LWGEOM object
  */
-static char*
-lwpoint_summary(LWPOINT* point, int offset)
+static char *
+lwpoint_summary(LWPOINT *point, int offset)
 {
-	char* result;
-	char* pad = "";
-	char* zmflags = lwgeom_flagchars((LWGEOM*)point);
+	char *result;
+	char *pad = "";
+	char *zmflags = lwgeom_flagchars((LWGEOM *)point);
 
-	result = (char*)lwalloc(128 + offset);
+	result = (char *)lwalloc(128 + offset);
 
 	sprintf(result, "%*.s%s[%s]", offset, pad, lwtype_name(point->type), zmflags);
 	return result;
 }
 
-static char*
-lwline_summary(LWLINE* line, int offset)
+static char *
+lwline_summary(LWLINE *line, int offset)
 {
-	char* result;
-	char* pad = "";
-	char* zmflags = lwgeom_flagchars((LWGEOM*)line);
+	char *result;
+	char *pad = "";
+	char *zmflags = lwgeom_flagchars((LWGEOM *)line);
 
-	result = (char*)lwalloc(128 + offset);
+	result = (char *)lwalloc(128 + offset);
 
 	sprintf(
 	    result, "%*.s%s[%s] with %d points", offset, pad, lwtype_name(line->type), zmflags, line->points->npoints);
 	return result;
 }
 
-static char*
-lwcollection_summary(LWCOLLECTION* col, int offset)
+static char *
+lwcollection_summary(LWCOLLECTION *col, int offset)
 {
 	size_t size = 128;
-	char* result;
-	char* tmp;
+	char *result;
+	char *tmp;
 	uint32_t i;
-	static char* nl = "\n";
-	char* pad = "";
-	char* zmflags = lwgeom_flagchars((LWGEOM*)col);
+	static char *nl = "\n";
+	char *pad = "";
+	char *zmflags = lwgeom_flagchars((LWGEOM *)col);
 
 	LWDEBUG(2, "lwcollection_summary called");
 
-	result = (char*)lwalloc(size);
+	result = (char *)lwalloc(size);
 
 	sprintf(result, "%*.s%s[%s] with %d elements\n", offset, pad, lwtype_name(col->type), zmflags, col->ngeoms);
 
@@ -112,20 +112,20 @@ lwcollection_summary(LWCOLLECTION* col, int offset)
 	return result;
 }
 
-static char*
-lwpoly_summary(LWPOLY* poly, int offset)
+static char *
+lwpoly_summary(LWPOLY *poly, int offset)
 {
 	char tmp[256];
 	size_t size = 64 * (poly->nrings + 1) + 128;
-	char* result;
+	char *result;
 	uint32_t i;
-	char* pad = "";
-	static char* nl = "\n";
-	char* zmflags = lwgeom_flagchars((LWGEOM*)poly);
+	char *pad = "";
+	static char *nl = "\n";
+	char *zmflags = lwgeom_flagchars((LWGEOM *)poly);
 
 	LWDEBUG(2, "lwpoly_summary called");
 
-	result = (char*)lwalloc(size);
+	result = (char *)lwalloc(size);
 
 	sprintf(result, "%*.s%s[%s] with %i rings\n", offset, pad, lwtype_name(poly->type), zmflags, poly->nrings);
 
@@ -141,23 +141,23 @@ lwpoly_summary(LWPOLY* poly, int offset)
 	return result;
 }
 
-char*
-lwgeom_summary(const LWGEOM* lwgeom, int offset)
+char *
+lwgeom_summary(const LWGEOM *lwgeom, int offset)
 {
-	char* result;
+	char *result;
 
 	switch (lwgeom->type)
 	{
 	case POINTTYPE:
-		return lwpoint_summary((LWPOINT*)lwgeom, offset);
+		return lwpoint_summary((LWPOINT *)lwgeom, offset);
 
 	case CIRCSTRINGTYPE:
 	case TRIANGLETYPE:
 	case LINETYPE:
-		return lwline_summary((LWLINE*)lwgeom, offset);
+		return lwline_summary((LWLINE *)lwgeom, offset);
 
 	case POLYGONTYPE:
-		return lwpoly_summary((LWPOLY*)lwgeom, offset);
+		return lwpoly_summary((LWPOLY *)lwgeom, offset);
 
 	case TINTYPE:
 	case MULTISURFACETYPE:
@@ -168,9 +168,9 @@ lwgeom_summary(const LWGEOM* lwgeom, int offset)
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_summary((LWCOLLECTION*)lwgeom, offset);
+		return lwcollection_summary((LWCOLLECTION *)lwgeom, offset);
 	default:
-		result = (char*)lwalloc(256);
+		result = (char *)lwalloc(256);
 		sprintf(result, "Object is of unknown type: %d", lwgeom->type);
 		return result;
 	}

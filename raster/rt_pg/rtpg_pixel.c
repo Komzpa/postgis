@@ -69,7 +69,7 @@ Datum RASTER_neighborhood(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(RASTER_getPixelValue);
 Datum RASTER_getPixelValue(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	double pixvalue = 0;
@@ -98,7 +98,7 @@ Datum RASTER_getPixelValue(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -142,16 +142,16 @@ Datum RASTER_getPixelValue(PG_FUNCTION_ARGS)
 /*  ST_DumpValues function                                          */
 /* ---------------------------------------------------------------- */
 
-typedef struct rtpg_dumpvalues_arg_t* rtpg_dumpvalues_arg;
+typedef struct rtpg_dumpvalues_arg_t *rtpg_dumpvalues_arg;
 struct rtpg_dumpvalues_arg_t
 {
 	int numbands;
 	int rows;
 	int columns;
 
-	int* nbands; /* 0-based */
-	Datum** values;
-	bool** nodata;
+	int *nbands; /* 0-based */
+	Datum **values;
+	bool **nodata;
 };
 
 static rtpg_dumpvalues_arg
@@ -208,7 +208,7 @@ rtpg_dumpvalues_arg_destroy(rtpg_dumpvalues_arg arg)
 PG_FUNCTION_INFO_V1(RASTER_dumpValues);
 Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 	int call_cntr;
 	int max_calls;
@@ -228,17 +228,17 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 	if (SRF_IS_FIRSTCALL())
 	{
 		MemoryContext oldcontext;
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int numbands = 0;
 		int j = 0;
 		bool exclude_nodata_value = TRUE;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 
 		double val = 0;
 		int isnodata = 0;
@@ -257,7 +257,7 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
@@ -414,8 +414,8 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 		POSTGIS_RT_DEBUGF(4, "exclude_nodata_value = %d", exclude_nodata_value);
 
 		/* allocate memory for each band's values and nodata flags */
-		arg1->values = palloc(sizeof(Datum*) * arg1->numbands);
-		arg1->nodata = palloc(sizeof(bool*) * arg1->numbands);
+		arg1->values = palloc(sizeof(Datum *) * arg1->numbands);
+		arg1->nodata = palloc(sizeof(bool *) * arg1->numbands);
 		if (arg1->values == NULL || arg1->nodata == NULL)
 		{
 			rtpg_dumpvalues_arg_destroy(arg1);
@@ -425,8 +425,8 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 			elog(ERROR, "RASTER_dumpValues: Could not allocate memory for pixel values");
 			SRF_RETURN_DONE(funcctx);
 		}
-		memset(arg1->values, 0, sizeof(Datum*) * arg1->numbands);
-		memset(arg1->nodata, 0, sizeof(bool*) * arg1->numbands);
+		memset(arg1->values, 0, sizeof(Datum *) * arg1->numbands);
+		memset(arg1->nodata, 0, sizeof(bool *) * arg1->numbands);
 
 		/* get each band and dump data */
 		for (z = 0; z < arg1->numbands; z++)
@@ -552,7 +552,7 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 		bool nulls[values_length];
 		HeapTuple tuple;
 		Datum result;
-		ArrayType* mdValues = NULL;
+		ArrayType *mdValues = NULL;
 		int ndim = 2;
 		int dim[2] = {arg2->rows, arg2->columns};
 		int lbound[2] = {1, 1};
@@ -602,8 +602,8 @@ Datum RASTER_dumpValues(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_setPixelValue);
 Datum RASTER_setPixelValue(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	double pixvalue = 0;
@@ -648,7 +648,7 @@ Datum RASTER_setPixelValue(PG_FUNCTION_ARGS)
 	POSTGIS_RT_DEBUGF(3, "Pixel coordinates (%d, %d)", x, y);
 
 	/* Deserialize raster */
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
@@ -712,8 +712,8 @@ Datum RASTER_setPixelValue(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_setPixelValuesArray);
 Datum RASTER_setPixelValuesArray(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int numbands = 0;
@@ -722,15 +722,15 @@ Datum RASTER_setPixelValuesArray(PG_FUNCTION_ARGS)
 	int width = 0;
 	int height = 0;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* elements;
-	bool* nulls;
+	Datum *elements;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
 	int ndims = 1;
-	int* dims;
+	int *dims;
 	int num = 0;
 
 	int ul[2] = {0};
@@ -743,7 +743,7 @@ Datum RASTER_setPixelValuesArray(PG_FUNCTION_ARGS)
 		bool nodata;
 		double value;
 	};
-	struct pixelvalue* pixval = NULL;
+	struct pixelvalue *pixval = NULL;
 	int numpixval = 0;
 	int dimpixval[2] = {1, 1};
 	int dimnoset[2] = {1, 1};
@@ -765,7 +765,7 @@ Datum RASTER_setPixelValuesArray(PG_FUNCTION_ARGS)
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, FALSE);
@@ -1134,8 +1134,8 @@ Datum RASTER_setPixelValuesArray(PG_FUNCTION_ARGS)
 /*  ST_SetValues using geomval array                                */
 /* ---------------------------------------------------------------- */
 
-typedef struct rtpg_setvaluesgv_arg_t* rtpg_setvaluesgv_arg;
-typedef struct rtpg_setvaluesgv_geomval_t* rtpg_setvaluesgv_geomval;
+typedef struct rtpg_setvaluesgv_arg_t *rtpg_setvaluesgv_arg;
+typedef struct rtpg_setvaluesgv_geomval_t *rtpg_setvaluesgv_geomval;
 
 struct rtpg_setvaluesgv_arg_t
 {
@@ -1153,7 +1153,7 @@ struct rtpg_setvaluesgv_geomval_t
 		double value;
 	} pixval;
 
-	LWGEOM* geom;
+	LWGEOM *geom;
 	rt_raster mask;
 };
 
@@ -1194,7 +1194,7 @@ rtpg_setvaluesgv_arg_destroy(rtpg_setvaluesgv_arg arg)
 }
 
 static int
-rtpg_setvalues_geomval_callback(rt_iterator_arg arg, void* userarg, double* value, int* nodata)
+rtpg_setvalues_geomval_callback(rt_iterator_arg arg, void *userarg, double *value, int *nodata)
 {
 	rtpg_setvaluesgv_arg funcarg = (rtpg_setvaluesgv_arg)userarg;
 	int i = 0;
@@ -1247,8 +1247,8 @@ rtpg_setvalues_geomval_callback(rt_iterator_arg arg, void* userarg, double* valu
 PG_FUNCTION_INFO_V1(RASTER_setPixelValuesGeomval);
 Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
-	rt_pgraster* pgrtn = NULL;
+	rt_pgraster *pgraster = NULL;
+	rt_pgraster *pgrtn = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	rt_raster _raster = NULL;
@@ -1268,10 +1268,10 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 	rtpg_setvaluesgv_arg arg = NULL;
 	int allpoint = 0;
 
-	ArrayType* array;
+	ArrayType *array;
 	Oid etype;
-	Datum* e;
-	bool* nulls;
+	Datum *e;
+	bool *nulls;
 	int16 typlen;
 	bool typbyval;
 	char typalign;
@@ -1281,9 +1281,9 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 	bool isnull;
 	Datum tupv;
 
-	GSERIALIZED* gser = NULL;
+	GSERIALIZED *gser = NULL;
 	uint8_t gtype;
-	unsigned char* wkb = NULL;
+	unsigned char *wkb = NULL;
 	size_t wkb_len;
 
 	int i = 0;
@@ -1292,7 +1292,7 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 
 	/* pgraster is null, return null */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_COPY(PG_GETARG_DATUM(0));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, FALSE);
@@ -1404,7 +1404,7 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 			continue;
 		}
 
-		gser = (GSERIALIZED*)PG_DETOAST_DATUM(tupv);
+		gser = (GSERIALIZED *)PG_DETOAST_DATUM(tupv);
 		arg->gv[arg->ngv].geom = lwgeom_from_gserialized(gser);
 		if (arg->gv[arg->ngv].geom == NULL)
 		{
@@ -1440,7 +1440,7 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 		/* Get a 2D version of the geometry if necessary */
 		if (lwgeom_ndims(arg->gv[arg->ngv].geom) > 2)
 		{
-			LWGEOM* geom2d = lwgeom_force_2d(arg->gv[arg->ngv].geom);
+			LWGEOM *geom2d = lwgeom_force_2d(arg->gv[arg->ngv].geom);
 			lwgeom_free(arg->gv[arg->ngv].geom);
 			arg->gv[arg->ngv].geom = geom2d;
 		}
@@ -1541,8 +1541,8 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 		double value = 0;
 		int isnodata = 0;
 
-		LWCOLLECTION* coll = NULL;
-		LWPOINT* point = NULL;
+		LWCOLLECTION *coll = NULL;
+		LWPOINT *point = NULL;
 		POINT2D p;
 
 		POSTGIS_RT_DEBUG(3, "all geometries are points, using direct to pixel method");
@@ -1712,7 +1712,7 @@ Datum RASTER_setPixelValuesGeomval(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_pixelOfValue);
 Datum RASTER_pixelOfValue(PG_FUNCTION_ARGS)
 {
-	FuncCallContext* funcctx;
+	FuncCallContext *funcctx;
 	TupleDesc tupdesc;
 
 	rt_pixel pixels = NULL;
@@ -1727,20 +1727,20 @@ Datum RASTER_pixelOfValue(PG_FUNCTION_ARGS)
 	{
 		MemoryContext oldcontext;
 
-		rt_pgraster* pgraster = NULL;
+		rt_pgraster *pgraster = NULL;
 		rt_raster raster = NULL;
 		rt_band band = NULL;
 		int nband = 1;
 		int num_bands = 0;
-		double* search = NULL;
+		double *search = NULL;
 		int nsearch = 0;
 		double val;
 		bool exclude_nodata_value = TRUE;
 
-		ArrayType* array;
+		ArrayType *array;
 		Oid etype;
-		Datum* e;
-		bool* nulls;
+		Datum *e;
+		bool *nulls;
 		int16 typlen;
 		bool typbyval;
 		char typalign;
@@ -1756,7 +1756,7 @@ Datum RASTER_pixelOfValue(PG_FUNCTION_ARGS)
 			MemoryContextSwitchTo(oldcontext);
 			SRF_RETURN_DONE(funcctx);
 		}
-		pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+		pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 		raster = rt_raster_deserialize(pgraster, FALSE);
 		if (!raster)
 		{
@@ -1944,15 +1944,15 @@ Datum RASTER_pixelOfValue(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_nearestValue);
 Datum RASTER_nearestValue(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int bandindex = 1;
 	int num_bands = 0;
-	GSERIALIZED* geom;
+	GSERIALIZED *geom;
 	bool exclude_nodata_value = TRUE;
-	LWGEOM* lwgeom;
-	LWPOINT* point = NULL;
+	LWGEOM *lwgeom;
+	LWPOINT *point = NULL;
 	POINT2D p;
 
 	double x;
@@ -1964,7 +1964,7 @@ Datum RASTER_nearestValue(PG_FUNCTION_ARGS)
 	int isnodata = 0;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -2034,7 +2034,7 @@ Datum RASTER_nearestValue(PG_FUNCTION_ARGS)
 	/* Get a 2D version of the geometry if necessary */
 	if (lwgeom_ndims(lwgeom) > 2)
 	{
-		LWGEOM* lwgeom2d = lwgeom_force_2d(lwgeom);
+		LWGEOM *lwgeom2d = lwgeom_force_2d(lwgeom);
 		lwgeom_free(lwgeom);
 		lwgeom = lwgeom2d;
 	}
@@ -2100,7 +2100,7 @@ Datum RASTER_nearestValue(PG_FUNCTION_ARGS)
 	if (count > 1)
 	{
 		int i = 0;
-		LWPOLY* poly = NULL;
+		LWPOLY *poly = NULL;
 		double lastdist = -1;
 		double dist;
 
@@ -2154,7 +2154,7 @@ Datum RASTER_nearestValue(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(RASTER_neighborhood);
 Datum RASTER_neighborhood(PG_FUNCTION_ARGS)
 {
-	rt_pgraster* pgraster = NULL;
+	rt_pgraster *pgraster = NULL;
 	rt_raster raster = NULL;
 	rt_band band = NULL;
 	int bandindex = 1;
@@ -2170,17 +2170,17 @@ Datum RASTER_neighborhood(PG_FUNCTION_ARGS)
 
 	rt_pixel npixels = NULL;
 	int count;
-	double** value2D = NULL;
-	int** nodata2D = NULL;
+	double **value2D = NULL;
+	int **nodata2D = NULL;
 
 	int i = 0;
 	int j = 0;
 	int k = 0;
-	Datum* value1D = NULL;
-	bool* nodata1D = NULL;
+	Datum *value1D = NULL;
+	bool *nodata1D = NULL;
 	int dim[2] = {0};
 	int lbound[2] = {1, 1};
-	ArrayType* mdArray = NULL;
+	ArrayType *mdArray = NULL;
 
 	int16 typlen;
 	bool typbyval;
@@ -2188,7 +2188,7 @@ Datum RASTER_neighborhood(PG_FUNCTION_ARGS)
 
 	/* pgraster is null, return nothing */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster*)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
