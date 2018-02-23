@@ -33,9 +33,7 @@
 
 #include "../../postgis_config.h"
 
-
 #include "access/htup_details.h" /* for heap_form_tuple() */
-
 
 #include "rtpostgis.h"
 
@@ -86,10 +84,10 @@ Datum RASTER_getSRID(PG_FUNCTION_ARGS)
 	int32_t srid;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getSRID: Could not deserialize raster");
@@ -115,10 +113,10 @@ Datum RASTER_getWidth(PG_FUNCTION_ARGS)
 	uint16_t width;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getWidth: Could not deserialize raster");
@@ -144,10 +142,10 @@ Datum RASTER_getHeight(PG_FUNCTION_ARGS)
 	uint16_t height;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getHeight: Could not deserialize raster");
@@ -173,10 +171,10 @@ Datum RASTER_getNumBands(PG_FUNCTION_ARGS)
 	int32_t num_bands;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getNumBands: Could not deserialize raster");
@@ -202,10 +200,10 @@ Datum RASTER_getXScale(PG_FUNCTION_ARGS)
 	double xsize;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getXScale: Could not deserialize raster");
@@ -231,10 +229,10 @@ Datum RASTER_getYScale(PG_FUNCTION_ARGS)
 	double ysize;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getYScale: Could not deserialize raster");
@@ -260,10 +258,10 @@ Datum RASTER_getXSkew(PG_FUNCTION_ARGS)
 	double xskew;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getXSkew: Could not deserialize raster");
@@ -289,10 +287,10 @@ Datum RASTER_getYSkew(PG_FUNCTION_ARGS)
 	double yskew;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getYSkew: Could not deserialize raster");
@@ -318,10 +316,10 @@ Datum RASTER_getXUpperLeft(PG_FUNCTION_ARGS)
 	double xul;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getXUpperLeft: Could not deserialize raster");
@@ -347,10 +345,10 @@ Datum RASTER_getYUpperLeft(PG_FUNCTION_ARGS)
 	double yul;
 
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_getYUpperLeft: Could not deserialize raster");
@@ -394,7 +392,7 @@ Datum RASTER_getPixelWidth(PG_FUNCTION_ARGS)
 
 	xscale = rt_raster_get_x_scale(raster);
 	yskew = rt_raster_get_y_skew(raster);
-	pwidth = sqrt(xscale*xscale + yskew*yskew);
+	pwidth = sqrt(xscale * xscale + yskew * yskew);
 
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
@@ -431,7 +429,7 @@ Datum RASTER_getPixelHeight(PG_FUNCTION_ARGS)
 
 	yscale = rt_raster_get_y_scale(raster);
 	xskew = rt_raster_get_x_skew(raster);
-	pheight = sqrt(yscale*yscale + xskew*xskew);
+	pheight = sqrt(yscale * yscale + xskew * xskew);
 
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
@@ -462,14 +460,13 @@ Datum RASTER_getGeotransform(PG_FUNCTION_ARGS)
 	int values_length = 6;
 	Datum values[values_length];
 	bool nulls[values_length];
-	HeapTuple heap_tuple ;   /* instance of the tuple to return */
+	HeapTuple heap_tuple; /* instance of the tuple to return */
 	Datum result;
 
 	POSTGIS_RT_DEBUG(3, "RASTER_getGeotransform: Starting");
 
 	/* get argument */
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	/* raster */
@@ -482,12 +479,14 @@ Datum RASTER_getGeotransform(PG_FUNCTION_ARGS)
 	}
 
 	/* do the calculation */
-	rt_raster_calc_phys_params(
-	    rt_raster_get_x_scale(raster),
-	    rt_raster_get_x_skew(raster),
-	    rt_raster_get_y_skew(raster),
-	    rt_raster_get_y_scale(raster),
-	    &imag, &jmag, &theta_i, &theta_ij) ;
+	rt_raster_calc_phys_params(rt_raster_get_x_scale(raster),
+				   rt_raster_get_x_skew(raster),
+				   rt_raster_get_y_skew(raster),
+				   rt_raster_get_y_scale(raster),
+				   &imag,
+				   &jmag,
+				   &theta_i,
+				   &theta_ij);
 
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
@@ -495,11 +494,10 @@ Datum RASTER_getGeotransform(PG_FUNCTION_ARGS)
 	/* setup the return value infrastructure */
 	if (get_call_result_type(fcinfo, NULL, &result_tuple) != TYPEFUNC_COMPOSITE)
 	{
-		ereport(ERROR, (
-		            errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-		            errmsg("RASTER_getGeotransform(): function returning record called in context that cannot accept type record"
-		                  )
-		        ));
+		ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("RASTER_getGeotransform(): function returning record called in context that cannot "
+				"accept type record")));
 		PG_RETURN_NULL();
 	}
 
@@ -538,14 +536,13 @@ Datum RASTER_isEmpty(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		ereport(ERROR,
-		        (errcode(ERRCODE_OUT_OF_MEMORY),
-		         errmsg("RASTER_isEmpty: Could not deserialize raster")));
+			(errcode(ERRCODE_OUT_OF_MEMORY), errmsg("RASTER_isEmpty: Could not deserialize raster")));
 		PG_FREE_IF_COPY(pgraster, 0);
 		PG_RETURN_NULL();
 	}
@@ -571,14 +568,13 @@ Datum RASTER_hasNoBand(PG_FUNCTION_ARGS)
 
 	/* Deserialize raster */
 	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	raster = rt_raster_deserialize(pgraster, TRUE);
-	if ( ! raster )
+	if (!raster)
 	{
 		ereport(ERROR,
-		        (errcode(ERRCODE_OUT_OF_MEMORY),
-		         errmsg("RASTER_hasNoBand: Could not deserialize raster")));
+			(errcode(ERRCODE_OUT_OF_MEMORY), errmsg("RASTER_hasNoBand: Could not deserialize raster")));
 		PG_FREE_IF_COPY(pgraster, 0);
 		PG_RETURN_NULL();
 	}
@@ -623,9 +619,8 @@ Datum RASTER_metadata(PG_FUNCTION_ARGS)
 	POSTGIS_RT_DEBUG(3, "RASTER_metadata: Starting");
 
 	/* pgraster is null, return null */
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, TRUE);
@@ -664,13 +659,10 @@ Datum RASTER_metadata(PG_FUNCTION_ARGS)
 	/* Build a tuple descriptor for our result type */
 	if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 	{
-		ereport(ERROR, (
-		            errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-		            errmsg(
-		                "function returning record called in context "
-		                "that cannot accept type record"
-		            )
-		        ));
+		ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("function returning record called in context "
+				"that cannot accept type record")));
 	}
 
 	BlessTupleDesc(tupdesc);
@@ -717,9 +709,8 @@ Datum RASTER_rasterToWorldCoord(PG_FUNCTION_ARGS)
 	POSTGIS_RT_DEBUG(3, "RASTER_rasterToWorldCoord: Starting");
 
 	/* pgraster is null, return null */
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, TRUE);
@@ -742,7 +733,9 @@ Datum RASTER_rasterToWorldCoord(PG_FUNCTION_ARGS)
 			/* if skewed on same axis, parameter is required */
 			if (skewed[i - 1])
 			{
-				elog(NOTICE, "Pixel row and column required for computing longitude and latitude of a rotated raster");
+				elog(NOTICE,
+				     "Pixel row and column required for computing longitude and latitude of a rotated "
+				     "raster");
 				rt_raster_destroy(raster);
 				PG_FREE_IF_COPY(pgraster, 0);
 				PG_RETURN_NULL();
@@ -755,16 +748,13 @@ Datum RASTER_rasterToWorldCoord(PG_FUNCTION_ARGS)
 	}
 
 	/* user-provided value is 1-based but needs to be 0-based */
-	if (rt_raster_cell_to_geopoint(
-	            raster,
-	            (double) cr[0] - 1, (double) cr[1] - 1,
-	            &(cw[0]), &(cw[1]),
-	            NULL
-	        ) != ES_NONE)
+	if (rt_raster_cell_to_geopoint(raster, (double)cr[0] - 1, (double)cr[1] - 1, &(cw[0]), &(cw[1]), NULL) !=
+	    ES_NONE)
 	{
 		rt_raster_destroy(raster);
 		PG_FREE_IF_COPY(pgraster, 0);
-		elog(ERROR, "RASTER_rasterToWorldCoord: Could not compute longitude and latitude from pixel row and column");
+		elog(ERROR,
+		     "RASTER_rasterToWorldCoord: Could not compute longitude and latitude from pixel row and column");
 		PG_RETURN_NULL();
 	}
 	rt_raster_destroy(raster);
@@ -773,13 +763,10 @@ Datum RASTER_rasterToWorldCoord(PG_FUNCTION_ARGS)
 	/* Build a tuple descriptor for our result type */
 	if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 	{
-		ereport(ERROR, (
-		            errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-		            errmsg(
-		                "function returning record called in context "
-		                "that cannot accept type record"
-		            )
-		        ));
+		ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("function returning record called in context "
+				"that cannot accept type record")));
 	}
 
 	BlessTupleDesc(tupdesc);
@@ -819,9 +806,8 @@ Datum RASTER_worldToRasterCoord(PG_FUNCTION_ARGS)
 	POSTGIS_RT_DEBUG(3, "RASTER_worldToRasterCoord: Starting");
 
 	/* pgraster is null, return null */
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(0), 0, sizeof(struct rt_raster_serialized_t));
 
 	/* raster */
 	raster = rt_raster_deserialize(pgraster, TRUE);
@@ -834,8 +820,7 @@ Datum RASTER_worldToRasterCoord(PG_FUNCTION_ARGS)
 
 	/* raster skewed? */
 	skewed = FLT_NEQ(rt_raster_get_x_skew(raster), 0) ? true : false;
-	if (!skewed)
-		skewed = FLT_NEQ(rt_raster_get_y_skew(raster), 0) ? true : false;
+	if (!skewed) skewed = FLT_NEQ(rt_raster_get_y_skew(raster), 0) ? true : false;
 
 	/* longitude and latitude */
 	for (i = 1; i <= 2; i++)
@@ -845,7 +830,9 @@ Datum RASTER_worldToRasterCoord(PG_FUNCTION_ARGS)
 			/* if skewed, parameter is required */
 			if (skewed)
 			{
-				elog(NOTICE, "Latitude and longitude required for computing pixel row and column of a rotated raster");
+				elog(NOTICE,
+				     "Latitude and longitude required for computing pixel row and column of a rotated "
+				     "raster");
 				rt_raster_destroy(raster);
 				PG_FREE_IF_COPY(pgraster, 0);
 				PG_RETURN_NULL();
@@ -858,35 +845,28 @@ Datum RASTER_worldToRasterCoord(PG_FUNCTION_ARGS)
 	}
 
 	/* return pixel row and column values are 0-based */
-	if (rt_raster_geopoint_to_cell(
-	            raster,
-	            cw[0], cw[1],
-	            &(_cr[0]), &(_cr[1]),
-	            NULL
-	        ) != ES_NONE)
+	if (rt_raster_geopoint_to_cell(raster, cw[0], cw[1], &(_cr[0]), &(_cr[1]), NULL) != ES_NONE)
 	{
 		rt_raster_destroy(raster);
 		PG_FREE_IF_COPY(pgraster, 0);
-		elog(ERROR, "RASTER_worldToRasterCoord: Could not compute pixel row and column from longitude and latitude");
+		elog(ERROR,
+		     "RASTER_worldToRasterCoord: Could not compute pixel row and column from longitude and latitude");
 		PG_RETURN_NULL();
 	}
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
 
 	/* force to integer and add one to make 1-based */
-	cr[0] = ((int) _cr[0]) + 1;
-	cr[1] = ((int) _cr[1]) + 1;
+	cr[0] = ((int)_cr[0]) + 1;
+	cr[1] = ((int)_cr[1]) + 1;
 
 	/* Build a tuple descriptor for our result type */
 	if (get_call_result_type(fcinfo, NULL, &tupdesc) != TYPEFUNC_COMPOSITE)
 	{
-		ereport(ERROR, (
-		            errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-		            errmsg(
-		                "function returning record called in context "
-		                "that cannot accept type record"
-		            )
-		        ));
+		ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("function returning record called in context "
+				"that cannot accept type record")));
 	}
 
 	BlessTupleDesc(tupdesc);
@@ -950,9 +930,8 @@ Datum RASTER_setScale(PG_FUNCTION_ARGS)
 	rt_raster raster;
 	double size = PG_GETARG_FLOAT8(1);
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -966,8 +945,7 @@ Datum RASTER_setScale(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -985,9 +963,8 @@ Datum RASTER_setScaleXY(PG_FUNCTION_ARGS)
 	double xscale = PG_GETARG_FLOAT8(1);
 	double yscale = PG_GETARG_FLOAT8(2);
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -1000,8 +977,7 @@ Datum RASTER_setScaleXY(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -1018,9 +994,8 @@ Datum RASTER_setSkew(PG_FUNCTION_ARGS)
 	rt_raster raster;
 	double skew = PG_GETARG_FLOAT8(1);
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -1034,8 +1009,7 @@ Datum RASTER_setSkew(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -1053,9 +1027,8 @@ Datum RASTER_setSkewXY(PG_FUNCTION_ARGS)
 	double xskew = PG_GETARG_FLOAT8(1);
 	double yskew = PG_GETARG_FLOAT8(2);
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -1069,8 +1042,7 @@ Datum RASTER_setSkewXY(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -1088,9 +1060,8 @@ Datum RASTER_setUpperLeftXY(PG_FUNCTION_ARGS)
 	double xoffset = PG_GETARG_FLOAT8(1);
 	double yoffset = PG_GETARG_FLOAT8(2);
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	raster = rt_raster_deserialize(pgraster, FALSE);
 	if (!raster)
 	{
@@ -1104,8 +1075,7 @@ Datum RASTER_setUpperLeftXY(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -1122,17 +1092,12 @@ Datum RASTER_setGeotransform(PG_FUNCTION_ARGS)
 	rt_raster raster;
 	float8 imag, jmag, theta_i, theta_ij, xoffset, yoffset;
 
-	if (
-	    PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2) ||
-	    PG_ARGISNULL(3) || PG_ARGISNULL(4) ||
-	    PG_ARGISNULL(5) || PG_ARGISNULL(6)
-	)
-	{
-		PG_RETURN_NULL();
-	}
+	if (PG_ARGISNULL(0) || PG_ARGISNULL(1) || PG_ARGISNULL(2) || PG_ARGISNULL(3) || PG_ARGISNULL(4) ||
+	    PG_ARGISNULL(5) || PG_ARGISNULL(6))
+	{ PG_RETURN_NULL(); }
 
 	/* get the inputs */
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	imag = PG_GETARG_FLOAT8(1);
 	jmag = PG_GETARG_FLOAT8(2);
 	theta_i = PG_GETARG_FLOAT8(3);
@@ -1149,15 +1114,14 @@ Datum RASTER_setGeotransform(PG_FUNCTION_ARGS)
 	}
 
 	/* store the new geotransform */
-	rt_raster_set_phys_params(raster, imag,jmag,theta_i,theta_ij);
+	rt_raster_set_phys_params(raster, imag, jmag, theta_i, theta_ij);
 	rt_raster_set_offsets(raster, xoffset, yoffset);
 
 	/* prep the return value */
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);
@@ -1183,12 +1147,11 @@ Datum RASTER_setRotation(PG_FUNCTION_ARGS)
 	double rotation = PG_GETARG_FLOAT8(1);
 	double imag, jmag, theta_i, theta_ij;
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
-	pgraster = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+	pgraster = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 
 	raster = rt_raster_deserialize(pgraster, FALSE);
-	if (! raster )
+	if (!raster)
 	{
 		PG_FREE_IF_COPY(pgraster, 0);
 		elog(ERROR, "RASTER_setRotation: Could not deserialize raster");
@@ -1202,8 +1165,7 @@ Datum RASTER_setRotation(PG_FUNCTION_ARGS)
 	pgrtn = rt_raster_serialize(raster);
 	rt_raster_destroy(raster);
 	PG_FREE_IF_COPY(pgraster, 0);
-	if (!pgrtn)
-		PG_RETURN_NULL();
+	if (!pgrtn) PG_RETURN_NULL();
 
 	SET_VARSIZE(pgrtn, pgrtn->size);
 	PG_RETURN_POINTER(pgrtn);

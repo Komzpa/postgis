@@ -18,10 +18,9 @@
  *
  **********************************************************************
  *
-* Copyright 2014 Kashif Rasul <kashif.rasul@gmail.com> and
+ * Copyright 2014 Kashif Rasul <kashif.rasul@gmail.com> and
  *
  **********************************************************************/
-
 
 #include <assert.h>
 
@@ -51,11 +50,11 @@ Datum line_from_encoded_polyline(PG_FUNCTION_ARGS)
 	if (PG_NARGS() > 1 && !PG_ARGISNULL(1))
 	{
 		precision = PG_GETARG_INT32(1);
-		if ( precision < 0 ) precision = 5;
+		if (precision < 0) precision = 5;
 	}
 
 	lwgeom = lwgeom_from_encoded_polyline(encodedpolyline, precision);
-	if ( ! lwgeom )
+	if (!lwgeom)
 	{
 		/* Shouldn't get here */
 		elog(ERROR, "lwgeom_from_encoded_polyline returned NULL");

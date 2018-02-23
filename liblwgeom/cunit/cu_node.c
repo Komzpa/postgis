@@ -16,7 +16,8 @@
 #include "liblwgeom.h"
 #include "liblwgeom_internal.h"
 
-static void test_lwgeom_node(void)
+static void
+test_lwgeom_node(void)
 {
 	LWGEOM *in, *out;
 	const char *wkt;
@@ -58,7 +59,8 @@ static void test_lwgeom_node(void)
 	tmp = lwgeom_to_ewkt(out);
 	/* printf("%s\n", tmp); */
 	CU_ASSERT_STRING_EQUAL(
-	    "MULTILINESTRING((0 0,2.5 2.5),(0 5,2.5 2.5),(2.5 2.5,5 5,10 0),(10 0,11 0,12 0,20 0),(20 0,22 0),(2.5 2.5,5 0))",
+	    "MULTILINESTRING((0 0,2.5 2.5),(0 5,2.5 2.5),(2.5 2.5,5 5,10 0),(10 0,11 0,12 0,20 0),(20 0,22 0),(2.5 "
+	    "2.5,5 0))",
 	    tmp);
 	lwfree(tmp);
 	lwgeom_free(out);
@@ -69,7 +71,8 @@ static void test_lwgeom_node(void)
 ** Used by test harness to register the tests in this file.
 */
 void node_suite_setup(void);
-void node_suite_setup(void)
+void
+node_suite_setup(void)
 {
 	CU_pSuite suite = CU_add_suite("noding", NULL, NULL);
 	PG_ADD_TEST(suite, test_lwgeom_node);

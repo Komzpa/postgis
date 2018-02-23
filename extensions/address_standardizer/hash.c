@@ -138,8 +138,7 @@ test_hash_each()
 	void *vals[2];
 	int n = 0;
 
-	hash_each(hash,
-	{
+	hash_each(hash, {
 		keys[n] = key;
 		vals[n] = val;
 		n++;
@@ -161,10 +160,7 @@ test_hash_each_key()
 	const char *keys[2];
 	int n = 0;
 
-	hash_each_key(hash,
-	{
-		keys[n++] = key;
-	});
+	hash_each_key(hash, { keys[n++] = key; });
 
 	assert(0 == strcmp("age", keys[0]) || 0 == strcmp("name", keys[0]));
 	assert(0 == strcmp("age", keys[1]) || 0 == strcmp("name", keys[1]));
@@ -180,10 +176,7 @@ test_hash_each_val()
 	void *vals[2];
 	int n = 0;
 
-	hash_each_val(hash,
-	{
-		vals[n++] = val;
-	});
+	hash_each_val(hash, { vals[n++] = val; });
 
 	assert(0 == strcmp("25", vals[0]) || 0 == strcmp("tj", vals[0]));
 	assert(0 == strcmp("25", vals[1]) || 0 == strcmp("tj", vals[1]));

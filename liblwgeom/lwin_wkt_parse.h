@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 /* Bison interface for Yacc-like parsers in C
 
    Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
@@ -54,10 +53,10 @@
    version 2.2 of Bison.  */
 
 #ifndef YY_WKT_YY_LWIN_WKT_PARSE_H_INCLUDED
-# define YY_WKT_YY_LWIN_WKT_PARSE_H_INCLUDED
+#define YY_WKT_YY_LWIN_WKT_PARSE_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+#define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int wkt_yydebug;
@@ -65,7 +64,7 @@ extern int wkt_yydebug;
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
-# define YYTOKENTYPE
+#define YYTOKENTYPE
 enum yytokentype
 {
 	POINT_TOK = 258,
@@ -119,10 +118,9 @@ enum yytokentype
 #define SRID_TOK 280
 
 /* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+#if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
 
-union YYSTYPE
-{
+union YYSTYPE {
 #line 108 "lwin_wkt_parse.y" /* yacc.c:1909  */
 
 	int integervalue;
@@ -136,12 +134,12 @@ union YYSTYPE
 };
 
 typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
+#define YYSTYPE_IS_TRIVIAL 1
+#define YYSTYPE_IS_DECLARED 1
 #endif
 
 /* Location type.  */
-#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+#if !defined YYLTYPE && !defined YYLTYPE_IS_DECLARED
 typedef struct YYLTYPE YYLTYPE;
 struct YYLTYPE
 {
@@ -150,13 +148,12 @@ struct YYLTYPE
 	int last_line;
 	int last_column;
 };
-# define YYLTYPE_IS_DECLARED 1
-# define YYLTYPE_IS_TRIVIAL 1
+#define YYLTYPE_IS_DECLARED 1
+#define YYLTYPE_IS_TRIVIAL 1
 #endif
-
 
 extern YYSTYPE wkt_yylval;
 extern YYLTYPE wkt_yylloc;
-int wkt_yyparse (void);
+int wkt_yyparse(void);
 
 #endif /* !YY_WKT_YY_LWIN_WKT_PARSE_H_INCLUDED  */

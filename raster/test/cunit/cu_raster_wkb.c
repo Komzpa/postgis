@@ -25,7 +25,8 @@
 #include "CUnit/Basic.h"
 #include "cu_tester.h"
 
-static void test_raster_wkb()
+static void
+test_raster_wkb()
 {
 	/* will use default allocators and message handlers */
 	rt_raster raster = NULL;
@@ -66,7 +67,7 @@ static void test_raster_wkb()
 	CU_ASSERT_EQUAL(rt_raster_get_width(raster), 7);
 	CU_ASSERT_EQUAL(rt_raster_get_height(raster), 8);
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %d\n", strlen(hexwkb));
 		printf("out hexwkb len: %d\n", len);
@@ -77,7 +78,7 @@ static void test_raster_wkb()
 	/* would depend on machine endian...
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
 		void *serialized;
@@ -124,7 +125,7 @@ static void test_raster_wkb()
 	CU_ASSERT_EQUAL(rt_raster_get_width(raster), 7);
 	CU_ASSERT_EQUAL(rt_raster_get_height(raster), 8);
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -137,7 +138,7 @@ static void test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 1x1, little endian, band0(1bb)                         */
@@ -188,7 +189,7 @@ static void test_raster_wkb()
 		CU_ASSERT_DOUBLE_EQUAL(val, 1, DBL_EPSILON);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -199,7 +200,7 @@ static void test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, big endian, band0(8BSI)                           */
@@ -277,7 +278,7 @@ static void test_raster_wkb()
 		CU_ASSERT_DOUBLE_EQUAL(val, 2, DBL_EPSILON);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -287,7 +288,7 @@ static void test_raster_wkb()
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
 
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
 		void *serialized;
@@ -298,7 +299,6 @@ static void test_raster_wkb()
 
 		cu_free_raster(rast2);
 		free(serialized);
-
 	}
 
 	cu_free_raster(raster);
@@ -321,13 +321,13 @@ static void test_raster_wkb()
 	    "0300"             /* width (uint16 3) */
 	    "0200"             /* height (uint16 2) */
 	    "05"               /* First band type (16BSI, in memory) */
-	    "FFFF"               /* nodata value (-1) */
-	    "FFFF"               /* pix(0,0) == -1 */
-	    "0000"               /* pix(1,0) ==  0 */
-	    "F0FF"               /* pix(2,0) == -16 */
-	    "7F00"               /* pix(0,1) == 127 */
-	    "0A00"               /* pix(1,1) == 10 */
-	    "0200"               /* pix(2,1) == 2 */
+	    "FFFF"             /* nodata value (-1) */
+	    "FFFF"             /* pix(0,0) == -1 */
+	    "0000"             /* pix(1,0) ==  0 */
+	    "F0FF"             /* pix(2,0) == -16 */
+	    "7F00"             /* pix(0,1) == 127 */
+	    "0A00"             /* pix(1,1) == 10 */
+	    "0200"             /* pix(2,1) == 2 */
 	    ;
 
 	raster = rt_raster_from_hexwkb(hexwkb, strlen(hexwkb));
@@ -376,7 +376,7 @@ static void test_raster_wkb()
 		CU_ASSERT_DOUBLE_EQUAL(val, 2, DBL_EPSILON);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -387,7 +387,7 @@ static void test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, big endian, band0(16BSI)                          */
@@ -462,7 +462,7 @@ static void test_raster_wkb()
 		CU_ASSERT_DOUBLE_EQUAL(val, 2, DBL_EPSILON);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -473,7 +473,7 @@ static void test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 3x2, bit endian, band0(16BSI ext: 3;/tmp/t.tif)        */
@@ -496,8 +496,7 @@ static void test_raster_wkb()
 	    "FFFF"             /* nodata value (-1) */
 	    "03"               /* ext band num == 3 */
 	    /* ext band path == /tmp/t.tif */
-	    "2F746D702F742E74696600"
-	    ;
+	    "2F746D702F742E74696600";
 
 	raster = rt_raster_from_hexwkb(hexwkb, strlen(hexwkb));
 	CU_ASSERT(raster != NULL);
@@ -526,7 +525,7 @@ static void test_raster_wkb()
 		CU_ASSERT_EQUAL(bandnum, 3);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 		printf("out hexwkb len: %u\n", len);
@@ -537,7 +536,7 @@ static void test_raster_wkb()
 	*/
 
 	cu_free_raster(raster);
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	/* ------------------------------------------------------ */
 	/* 1x3, little endian, band0 16BSI, nodata 1, srid -1     */
@@ -599,7 +598,7 @@ static void test_raster_wkb()
 		CU_ASSERT_DOUBLE_EQUAL(val, 431, DBL_EPSILON);
 	}
 
-	out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+	out = rt_raster_to_hexwkb(raster, FALSE, &len);
 	/*
 		printf(" in hexwkb len: %d\n", strlen(hexwkb));
 		printf("out hexwkb len: %d\n", len);
@@ -610,7 +609,7 @@ static void test_raster_wkb()
 	/* would depend on machine endian
 		CU_ASSERT_STRING_EQUAL(hexwkb, out);
 	*/
-	free((/*no const*/ void*)out);
+	free((/*no const*/ void *)out);
 
 	{
 		void *serialized;
@@ -635,26 +634,26 @@ static void test_raster_wkb()
 	{
 
 		hexwkb =
-		    "01"	              /* little endian (uint8 ndr) */
-		    "0000"              /* version (uint16 0) */
-		    "0300"              /* nBands (uint16 3) */
-		    "9A9999999999A93F"  /* scaleX (float64 0.050000) */
-		    "9A9999999999A9BF"  /* scaleY (float64 -0.050000) */
-		    "000000E02B274A41"  /* ipX (float64 3427927.750000) */
-		    "0000000077195641"  /* ipY (float64 5793244.000000) */
-		    "0000000000000000"  /* skewX (float64 0.000000) */
-		    "0000000000000000"  /* skewY (float64 0.000000) */
-		    "FFFFFFFF"          /* srid (int32 -1) */
-		    "0500"              /* width (uint16 5) */
-		    "0500"              /* height (uint16 5) */
-		    "44"                /* 1st band pixel type (8BUI, in memory, hasnodata) */
-		    "00"                /* 1st band nodata 0 */
+		    "01"               /* little endian (uint8 ndr) */
+		    "0000"             /* version (uint16 0) */
+		    "0300"             /* nBands (uint16 3) */
+		    "9A9999999999A93F" /* scaleX (float64 0.050000) */
+		    "9A9999999999A9BF" /* scaleY (float64 -0.050000) */
+		    "000000E02B274A41" /* ipX (float64 3427927.750000) */
+		    "0000000077195641" /* ipY (float64 5793244.000000) */
+		    "0000000000000000" /* skewX (float64 0.000000) */
+		    "0000000000000000" /* skewY (float64 0.000000) */
+		    "FFFFFFFF"         /* srid (int32 -1) */
+		    "0500"             /* width (uint16 5) */
+		    "0500"             /* height (uint16 5) */
+		    "44"               /* 1st band pixel type (8BUI, in memory, hasnodata) */
+		    "00"               /* 1st band nodata 0 */
 		    "FDFEFDFEFEFDFEFEFDF9FAFEFEFCF9FBFDFEFEFDFCFAFEFEFE" /* 1st band pixels */
-		    "44"                /* 2nd band pixel type (8BUI, in memory, hasnodata) */
-		    "00"                /* 2nd band nodata 0 */
+		    "44" /* 2nd band pixel type (8BUI, in memory, hasnodata) */
+		    "00" /* 2nd band nodata 0 */
 		    "4E627AADD16076B4F9FE6370A9F5FE59637AB0E54F58617087" /* 2nd band pixels */
-		    "44"                /* 3rd band pixel type (8BUI, in memory, hasnodata) */
-		    "00"                /* 3rd band nodata 0 */
+		    "44" /* 3rd band pixel type (8BUI, in memory, hasnodata) */
+		    "00" /* 3rd band nodata 0 */
 		    "46566487A1506CA2E3FA5A6CAFFBFE4D566DA4CB3E454C5665" /* 3rd band pixels */
 		    ;
 
@@ -769,7 +768,7 @@ static void test_raster_wkb()
 			CU_ASSERT_DOUBLE_EQUAL(val, 161, DBL_EPSILON);
 		}
 
-		out  = rt_raster_to_hexwkb(raster, FALSE, &len);
+		out = rt_raster_to_hexwkb(raster, FALSE, &len);
 		/*
 			printf(" in hexwkb len: %u\n", (uint32_t) strlen(hexwkb));
 			printf("out hexwkb len: %u\n", len);
@@ -779,7 +778,7 @@ static void test_raster_wkb()
 			CU_ASSERT_STRING_EQUAL(hexwkb, out);
 		*/
 
-		free((/*no const*/ void*)out);
+		free((/*no const*/ void *)out);
 		{
 			void *serialized;
 			rt_raster rast2;
@@ -811,9 +810,9 @@ static void test_raster_wkb()
 
 /* register tests */
 void raster_wkb_suite_setup(void);
-void raster_wkb_suite_setup(void)
+void
+raster_wkb_suite_setup(void)
 {
 	CU_pSuite suite = CU_add_suite("raster_wkb", NULL, NULL);
 	PG_ADD_TEST(suite, test_raster_wkb);
 }
-

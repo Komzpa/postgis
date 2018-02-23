@@ -30,14 +30,14 @@
 #include "lwgeom_log.h"
 
 static double
-calc_weighted_distances_3d(const POINT3D* curr, const POINT4D* points, uint32_t npoints, double* distances)
+calc_weighted_distances_3d(const POINT3D *curr, const POINT4D *points, uint32_t npoints, double *distances)
 {
 	uint32_t i;
 	double weight = 0.0;
 	for (i = 0; i < npoints; i++)
 	{
-		double dist = distance3d_pt_pt(curr, (POINT3D*)&points[i]);
-		distances[i] =  dist / points[i].m;
+		double dist = distance3d_pt_pt(curr, (POINT3D *)&points[i]);
+		distances[i] = dist / points[i].m;
 		weight += dist * points[i].m;
 	}
 
@@ -45,7 +45,7 @@ calc_weighted_distances_3d(const POINT3D* curr, const POINT4D* points, uint32_t 
 }
 
 static uint32_t
-iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const uint32_t max_iter, const double tol)
+iterate_4d(POINT3D *curr, const POINT4D *points, const uint32_t npoints, const uint32_t max_iter, const double tol)
 {
 	uint32_t i, iter;
 	double delta;
@@ -57,7 +57,7 @@ iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const u
 
 	for (iter = 0; iter < max_iter; iter++)
 	{
-		POINT3D next = { 0, 0, 0 };
+		POINT3D next = {0, 0, 0};
 		double denom = 0;
 
 		/** Calculate denom to get the next point */
@@ -89,19 +89,19 @@ iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const u
 		next.z /= denom;
 
 		/* If any of the intermediate points in the calculation is found in the
-		* set of input points, the standard Weiszfeld method gets stuck with a
-		* divide-by-zero.
-		*
-		* To get ourselves out of the hole, we follow an alternate procedure to
-		* get the next iteration, as described in:
-		*
-		* Vardi, Y. and Zhang, C. (2011) "A modified Weiszfeld algorithm for the
-		* Fermat-Weber location problem."  Math. Program., Ser. A 90: 559-566.
-		* DOI 10.1007/s101070100222
-		*
-		* Available online at the time of this writing at
-		* http://www.stat.rutgers.edu/home/cunhui/papers/43.pdf
-		*/
+		 * set of input points, the standard Weiszfeld method gets stuck with a
+		 * divide-by-zero.
+		 *
+		 * To get ourselves out of the hole, we follow an alternate procedure to
+		 * get the next iteration, as described in:
+		 *
+		 * Vardi, Y. and Zhang, C. (2011) "A modified Weiszfeld algorithm for the
+		 * Fermat-Weber location problem."  Math. Program., Ser. A 90: 559-566.
+		 * DOI 10.1007/s101070100222
+		 *
+		 * Available online at the time of this writing at
+		 * http://www.stat.rutgers.edu/home/cunhui/papers/43.pdf
+		 */
 		if (hit)
 		{
 			double dx = 0, dy = 0, dz = 0;
@@ -118,23 +118,20 @@ iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const u
 				}
 			}
 
-			d_sqr = sqrt(dx*dx + dy*dy + dz*dz);
+			d_sqr = sqrt(dx * dx + dy * dy + dz * dz);
 			if (d_sqr > DBL_EPSILON)
 			{
 				double r_inv = FP_MAX(0, 1.0 / d_sqr);
-				next.x = (1.0 - r_inv)*next.x + r_inv*curr->x;
-				next.y = (1.0 - r_inv)*next.y + r_inv*curr->y;
-				next.z = (1.0 - r_inv)*next.z + r_inv*curr->z;
+				next.x = (1.0 - r_inv) * next.x + r_inv * curr->x;
+				next.y = (1.0 - r_inv) * next.y + r_inv * curr->y;
+				next.z = (1.0 - r_inv) * next.z + r_inv * curr->z;
 			}
 		}
 
 		/* Check movement with next point */
 		sum_next = calc_weighted_distances_3d(&next, points, npoints, distances);
 		delta = sum_curr - sum_next;
-		if (delta < tol)
-		{
-			break;
-		}
+		if (delta < tol) { break; }
 		else
 		{
 			curr->x = next.x;
@@ -149,10 +146,10 @@ iterate_4d(POINT3D* curr, const POINT4D* points, const uint32_t npoints, const u
 }
 
 static POINT3D
-init_guess(const POINT4D* points, uint32_t npoints)
+init_guess(const POINT4D *points, uint32_t npoints)
 {
 	assert(npoints > 0);
-	POINT3D guess = { 0, 0, 0 };
+	POINT3D guess = {0, 0, 0};
 	double mass = 0;
 	uint32_t i;
 	for (i = 0; i < npoints; i++)
@@ -168,23 +165,31 @@ init_guess(const POINT4D* points, uint32_t npoints)
 	return guess;
 }
 
-POINT4D*
-lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empty)
+POINT4D *
+lwmpoint_extract_points_4d(const LWMPOINT *g, uint32_t *npoints, int *input_empty)
 {
 	uint32_t i;
 	uint32_t n = 0;
-	POINT4D* points = lwalloc(g->ngeoms * sizeof(POINT4D));
-	int has_m = lwgeom_has_m((LWGEOM*) g);
+	POINT4D *points = lwalloc(g->ngeoms * sizeof(POINT4D));
+	int has_m = lwgeom_has_m((LWGEOM *)g);
 
 	for (i = 0; i < g->ngeoms; i++)
 	{
-		LWGEOM* subg = lwcollection_getsubgeom((LWCOLLECTION*) g, i);
+		LWGEOM *subg = lwcollection_getsubgeom((LWCOLLECTION *)g, i);
 		if (!lwgeom_is_empty(subg))
 		{
 			*input_empty = LW_FALSE;
-			if (!getPoint4d_p(((LWPOINT*) subg)->point, 0, &points[n]))
+			if (!getPoint4d_p(((LWPOINT *)subg)->point, 0, &points[n]))
 			{
-				lwerror("Geometric median: getPoint4d_p reported failure on point (POINT(%g %g %g %g), number %d of %d in input).", points[n].x, points[n].y, points[n].z, points[n].m, i, g->ngeoms);
+				lwerror(
+				    "Geometric median: getPoint4d_p reported failure on point (POINT(%g %g %g %g), "
+				    "number %d of %d in input).",
+				    points[n].x,
+				    points[n].y,
+				    points[n].z,
+				    points[n].m,
+				    i,
+				    g->ngeoms);
 				lwfree(points);
 				return NULL;
 			}
@@ -201,7 +206,16 @@ lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empt
 				 */
 				if (points[n].m < 0)
 				{
-					lwerror("Geometric median input contains points with negative weights (POINT(%g %g %g %g), number %d of %d in input). Implementation can't guarantee global minimum convergence.", points[n].x, points[n].y, points[n].z, points[n].m, i, g->ngeoms);
+					lwerror(
+					    "Geometric median input contains points with negative weights (POINT(%g %g "
+					    "%g %g), number %d of %d in input). Implementation can't guarantee global "
+					    "minimum convergence.",
+					    points[n].x,
+					    points[n].y,
+					    points[n].z,
+					    points[n].m,
+					    i,
+					    g->ngeoms);
 					lwfree(points);
 					return NULL;
 				}
@@ -219,23 +233,24 @@ lwmpoint_extract_points_4d(const LWMPOINT* g, uint32_t* npoints, int* input_empt
 
 #if PARANOIA_LEVEL > 0
 	/* check Z=0 for 2D inputs*/
-	if (!lwgeom_has_z((LWGEOM*) g)) for (i = 0; i < n; i++) assert(points[i].z == 0);
+	if (!lwgeom_has_z((LWGEOM *)g))
+		for (i = 0; i < n; i++)
+			assert(points[i].z == 0);
 #endif
 
 	*npoints = n;
 	return points;
 }
 
-
-LWPOINT*
-lwmpoint_median(const LWMPOINT* g, double tol, uint32_t max_iter, char fail_if_not_converged)
+LWPOINT *
+lwmpoint_median(const LWMPOINT *g, double tol, uint32_t max_iter, char fail_if_not_converged)
 {
 	/* m ordinate is considered weight, if defined */
 	uint32_t npoints = 0; /* we need to count this ourselves so we can exclude empties and weightless points */
 	uint32_t i;
 	int input_empty = LW_TRUE;
 	POINT3D median;
-	POINT4D* points = lwmpoint_extract_points_4d(g, &npoints, &input_empty);
+	POINT4D *points = lwmpoint_extract_points_4d(g, &npoints, &input_empty);
 
 	/* input validation failed, error reported already */
 	if (points == NULL) return NULL;
@@ -243,10 +258,7 @@ lwmpoint_median(const LWMPOINT* g, double tol, uint32_t max_iter, char fail_if_n
 	if (npoints == 0)
 	{
 		lwfree(points);
-		if (input_empty)
-		{
-			return lwpoint_construct_empty(g->srid, 0, 0);
-		}
+		if (input_empty) { return lwpoint_construct_empty(g->srid, 0, 0); }
 		else
 		{
 			lwerror("Median failed to find non-empty input points with positive weight.");
@@ -266,20 +278,17 @@ lwmpoint_median(const LWMPOINT* g, double tol, uint32_t max_iter, char fail_if_n
 		return NULL;
 	}
 
-	if (lwgeom_has_z((LWGEOM*) g))
-	{
-		return lwpoint_make3dz(g->srid, median.x, median.y, median.z);
-	}
+	if (lwgeom_has_z((LWGEOM *)g)) { return lwpoint_make3dz(g->srid, median.x, median.y, median.z); }
 	else
 	{
 		return lwpoint_make2d(g->srid, median.x, median.y);
 	}
 }
 
-LWPOINT*
-lwgeom_median(const LWGEOM* g, double tol, uint32_t max_iter, char fail_if_not_converged)
+LWPOINT *
+lwgeom_median(const LWGEOM *g, double tol, uint32_t max_iter, char fail_if_not_converged)
 {
-	switch( lwgeom_get_type(g) )
+	switch (lwgeom_get_type(g))
 	{
 	case POINTTYPE:
 		return lwpoint_clone(lwgeom_as_lwpoint(g));
@@ -290,4 +299,3 @@ lwgeom_median(const LWGEOM* g, double tol, uint32_t max_iter, char fail_if_not_c
 		return NULL;
 	}
 }
-

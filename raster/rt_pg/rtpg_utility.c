@@ -59,7 +59,7 @@ Datum RASTER_lib_build_date(PG_FUNCTION_ARGS)
 {
 	char *ver = POSTGIS_BUILD_DATE;
 	text *result;
-	result = palloc(VARHDRSZ  + strlen(ver));
+	result = palloc(VARHDRSZ + strlen(ver));
 	SET_VARSIZE(result, VARHDRSZ + strlen(ver));
 	memcpy(VARDATA(result), ver, strlen(ver));
 	PG_RETURN_POINTER(result);
@@ -99,8 +99,7 @@ Datum RASTER_minPossibleValue(PG_FUNCTION_ARGS)
 	rt_pixtype pixtype = PT_END;
 	double pixsize = 0;
 
-	if (PG_ARGISNULL(0))
-		PG_RETURN_NULL();
+	if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 
 	pixeltypetext = PG_GETARG_TEXT_P(0);
 	pixeltypechar = text_to_cstring(pixeltypetext);
@@ -143,8 +142,6 @@ Datum RASTER_memsize(PG_FUNCTION_ARGS)
 {
 	void *detoasted = PG_DETOAST_DATUM(PG_GETARG_DATUM(0));
 	size_t size = VARSIZE(detoasted);
-	PG_FREE_IF_COPY(detoasted,0);
+	PG_FREE_IF_COPY(detoasted, 0);
 	PG_RETURN_INT32(size);
 }
-
-

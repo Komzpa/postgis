@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 /* basic LWCIRCSTRING functions */
 
 #include <stdio.h>
@@ -40,8 +39,6 @@ LWCIRCSTRING *lwcircstring_addpoint(LWCIRCSTRING *curve, LWPOINT *point, uint32_
 LWCIRCSTRING *lwcircstring_removepoint(LWCIRCSTRING *curve, uint32_t index);
 void lwcircstring_setPoint4d(LWCIRCSTRING *curve, uint32_t index, POINT4D *newpoint);
 
-
-
 /*
  * Construct a new LWCIRCSTRING.  points will *NOT* be copied
  * use SRID=SRID_UNKNOWN for unknown SRID (will have 8bit type's S = 0)
@@ -52,21 +49,19 @@ lwcircstring_construct(int srid, GBOX *bbox, POINTARRAY *points)
 	LWCIRCSTRING *result;
 
 	/*
-	* The first arc requires three points.  Each additional
-	* arc requires two more points.  Thus the minimum point count
-	* is three, and the count must be odd.
-	*/
+	 * The first arc requires three points.  Each additional
+	 * arc requires two more points.  Thus the minimum point count
+	 * is three, and the count must be odd.
+	 */
 	if (points->npoints % 2 != 1 || points->npoints < 3)
-	{
-		lwnotice("lwcircstring_construct: invalid point count %d", points->npoints);
-	}
+	{ lwnotice("lwcircstring_construct: invalid point count %d", points->npoints); }
 
-	result = (LWCIRCSTRING*) lwalloc(sizeof(LWCIRCSTRING));
+	result = (LWCIRCSTRING *)lwalloc(sizeof(LWCIRCSTRING));
 
 	result->type = CIRCSTRINGTYPE;
 
 	result->flags = points->flags;
-	FLAGS_SET_BBOX(result->flags, bbox?1:0);
+	FLAGS_SET_BBOX(result->flags, bbox ? 1 : 0);
 
 	result->srid = srid;
 	result->points = points;
@@ -80,7 +75,7 @@ lwcircstring_construct_empty(int srid, char hasz, char hasm)
 {
 	LWCIRCSTRING *result = lwalloc(sizeof(LWCIRCSTRING));
 	result->type = CIRCSTRINGTYPE;
-	result->flags = gflags(hasz,hasm,0);
+	result->flags = gflags(hasz, hasm, 0);
 	result->srid = srid;
 	result->points = ptarray_construct_empty(hasz, hasm, 1);
 	result->bbox = NULL;
@@ -93,21 +88,18 @@ lwcircstring_release(LWCIRCSTRING *lwcirc)
 	lwgeom_release(lwcircstring_as_lwgeom(lwcirc));
 }
 
-
-void lwcircstring_free(LWCIRCSTRING *curve)
+void
+lwcircstring_free(LWCIRCSTRING *curve)
 {
-	if ( ! curve ) return;
+	if (!curve) return;
 
-	if ( curve->bbox )
-		lwfree(curve->bbox);
-	if ( curve->points )
-		ptarray_free(curve->points);
+	if (curve->bbox) lwfree(curve->bbox);
+	if (curve->points) ptarray_free(curve->points);
 	lwfree(curve);
 }
 
-
-
-void printLWCIRCSTRING(LWCIRCSTRING *curve)
+void
+printLWCIRCSTRING(LWCIRCSTRING *curve)
 {
 	lwnotice("LWCIRCSTRING {");
 	lwnotice("    ndims = %i", (int)FLAGS_NDIMS(curve->flags));
@@ -140,7 +132,7 @@ lwcircstring_same(const LWCIRCSTRING *me, const LWCIRCSTRING *you)
 LWCIRCSTRING *
 lwcircstring_from_lwpointarray(int srid, uint32_t npoints, LWPOINT **points)
 {
-	int zmflag=0;
+	int zmflag = 0;
 	uint32_t i;
 	POINTARRAY *pa;
 	uint8_t *newpoints, *ptr;
@@ -153,8 +145,7 @@ lwcircstring_from_lwpointarray(int srid, uint32_t npoints, LWPOINT **points)
 	{
 		if (points[i]->type != POINTTYPE)
 		{
-			lwerror("lwcurve_from_lwpointarray: invalid input type: %s",
-			        lwtype_name(points[i]->type));
+			lwerror("lwcurve_from_lwpointarray: invalid input type: %s", lwtype_name(points[i]->type));
 			return NULL;
 		}
 		if (FLAGS_GET_Z(points[i]->flags)) zmflag |= 2;
@@ -162,9 +153,12 @@ lwcircstring_from_lwpointarray(int srid, uint32_t npoints, LWPOINT **points)
 		if (zmflag == 3) break;
 	}
 
-	if (zmflag == 0) ptsize = 2 * sizeof(double);
-	else if (zmflag == 3) ptsize = 4 * sizeof(double);
-	else ptsize = 3 * sizeof(double);
+	if (zmflag == 0)
+		ptsize = 2 * sizeof(double);
+	else if (zmflag == 3)
+		ptsize = 4 * sizeof(double);
+	else
+		ptsize = 3 * sizeof(double);
 
 	/*
 	 * Allocate output points array
@@ -180,7 +174,7 @@ lwcircstring_from_lwpointarray(int srid, uint32_t npoints, LWPOINT **points)
 		memcpy(ptr, getPoint_internal(points[i]->point, 0), size);
 		ptr += ptsize;
 	}
-	pa = ptarray_construct_reference_data(zmflag&2, zmflag&1, npoints, newpoints);
+	pa = ptarray_construct_reference_data(zmflag & 2, zmflag & 1, npoints, newpoints);
 
 	return lwcircstring_construct(srid, NULL, pa);
 }
@@ -197,9 +191,12 @@ lwcircstring_from_lwmpoint(int srid, LWMPOINT *mpoint)
 	size_t ptsize, size;
 	uint8_t *newpoints, *ptr;
 
-	if (zmflag == 0) ptsize = 2 * sizeof(double);
-	else if (zmflag == 3) ptsize = 4 * sizeof(double);
-	else ptsize = 3 * sizeof(double);
+	if (zmflag == 0)
+		ptsize = 2 * sizeof(double);
+	else if (zmflag == 3)
+		ptsize = 4 * sizeof(double);
+	else
+		ptsize = 3 * sizeof(double);
 
 	/* Allocate space for output points */
 	size = ptsize * mpoint->ngeoms;
@@ -209,13 +206,11 @@ lwcircstring_from_lwmpoint(int srid, LWMPOINT *mpoint)
 	ptr = newpoints;
 	for (i = 0; i < mpoint->ngeoms; i++)
 	{
-		memcpy(ptr,
-		       getPoint_internal(mpoint->geoms[i]->point, 0),
-		       ptsize);
+		memcpy(ptr, getPoint_internal(mpoint->geoms[i]->point, 0), ptsize);
 		ptr += ptsize;
 	}
 
-	pa = ptarray_construct_reference_data(zmflag&2, zmflag&1, mpoint->ngeoms, newpoints);
+	pa = ptarray_construct_reference_data(zmflag & 2, zmflag & 1, mpoint->ngeoms, newpoints);
 
 	LWDEBUGF(3, "lwcurve_from_lwmpoint: constructed pointarray for %d points, %d zmflag", mpoint->ngeoms, zmflag);
 
@@ -228,9 +223,7 @@ lwcircstring_addpoint(LWCIRCSTRING *curve, LWPOINT *point, uint32_t where)
 	POINTARRAY *newpa;
 	LWCIRCSTRING *ret;
 
-	newpa = ptarray_addPoint(curve->points,
-	                         getPoint_internal(point->point, 0),
-	                         FLAGS_NDIMS(point->flags), where);
+	newpa = ptarray_addPoint(curve->points, getPoint_internal(point->point, 0), FLAGS_NDIMS(point->flags), where);
 	ret = lwcircstring_construct(curve->srid, NULL, newpa);
 
 	return ret;
@@ -260,28 +253,28 @@ lwcircstring_setPoint4d(LWCIRCSTRING *curve, uint32_t index, POINT4D *newpoint)
 int
 lwcircstring_is_closed(const LWCIRCSTRING *curve)
 {
-	if (FLAGS_GET_Z(curve->flags))
-		return ptarray_is_closed_3d(curve->points);
+	if (FLAGS_GET_Z(curve->flags)) return ptarray_is_closed_3d(curve->points);
 
 	return ptarray_is_closed_2d(curve->points);
 }
 
-int lwcircstring_is_empty(const LWCIRCSTRING *circ)
+int
+lwcircstring_is_empty(const LWCIRCSTRING *circ)
 {
-	if ( !circ->points || circ->points->npoints < 1 )
-		return LW_TRUE;
+	if (!circ->points || circ->points->npoints < 1) return LW_TRUE;
 	return LW_FALSE;
 }
 
-double lwcircstring_length(const LWCIRCSTRING *circ)
+double
+lwcircstring_length(const LWCIRCSTRING *circ)
 {
 	return lwcircstring_length_2d(circ);
 }
 
-double lwcircstring_length_2d(const LWCIRCSTRING *circ)
+double
+lwcircstring_length_2d(const LWCIRCSTRING *circ)
 {
-	if ( lwcircstring_is_empty(circ) )
-		return 0.0;
+	if (lwcircstring_is_empty(circ)) return 0.0;
 
 	return ptarray_arc_length_2d(circ->points);
 }
@@ -290,14 +283,14 @@ double lwcircstring_length_2d(const LWCIRCSTRING *circ)
  * Returns freshly allocated #LWPOINT that corresponds to the index where.
  * Returns NULL if the geometry is empty or the index invalid.
  */
-LWPOINT* lwcircstring_get_lwpoint(const LWCIRCSTRING *circ, uint32_t where)
+LWPOINT *
+lwcircstring_get_lwpoint(const LWCIRCSTRING *circ, uint32_t where)
 {
 	POINT4D pt;
 	LWPOINT *lwpoint;
 	POINTARRAY *pa;
 
-	if ( lwcircstring_is_empty(circ) || where >= circ->points->npoints )
-		return NULL;
+	if (lwcircstring_is_empty(circ) || where >= circ->points->npoints) return NULL;
 
 	pa = ptarray_construct_empty(FLAGS_GET_Z(circ->flags), FLAGS_GET_M(circ->flags), 1);
 	pt = getPoint4d(circ->points, where);
@@ -305,5 +298,3 @@ LWPOINT* lwcircstring_get_lwpoint(const LWCIRCSTRING *circ, uint32_t where)
 	lwpoint = lwpoint_construct(circ->srid, NULL, pa);
 	return lwpoint;
 }
-
-

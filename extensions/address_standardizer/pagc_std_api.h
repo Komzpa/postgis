@@ -18,8 +18,8 @@ typedef struct RULES_s
 	RULE_PARAM *r_p;
 	ERR_PARAM *err_p;
 	NODE **Trie;
-	SYMB *rule_end ;
-	SYMB *r ;
+	SYMB *rule_end;
+	SYMB *r;
 } RULES;
 
 typedef struct STANDARDIZER_s
@@ -29,7 +29,7 @@ typedef struct STANDARDIZER_s
 	ERR_PARAM *err_p;
 } STANDARDIZER;
 
-typedef struct STDADDR_s    // define as required
+typedef struct STDADDR_s // define as required
 {
 	char *building;
 	char *house_num;
@@ -49,9 +49,8 @@ typedef struct STDADDR_s    // define as required
 	char *unit;
 } STDADDR;
 
-LEXICON * lex_init();
-int lex_add_entry(LEXICON *lex, int seq, char *word, char
-                  *stdword, SYMB token);
+LEXICON *lex_init();
+int lex_add_entry(LEXICON *lex, int seq, char *word, char *stdword, SYMB token);
 void lex_free(LEXICON *lex);
 
 RULES *rules_init();
@@ -71,7 +70,8 @@ STDADDR *std_standardize_one(STANDARDIZER *std, char *address_one_line, int opti
 
 STDADDR *std_standardize_mm(STANDARDIZER *std, char *micro, char *macro, int options);
 
-STDADDR *std_standardize(STANDARDIZER *std, char *address, char *city, char *state, char *postcode, char *country, int options);
+STDADDR *
+std_standardize(STANDARDIZER *std, char *address, char *city, char *state, char *postcode, char *country, int options);
 
 void stdaddr_free(STDADDR *stdaddr);
 void print_stdaddr(STDADDR *stdaddr);

@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -41,7 +40,6 @@
 #include "liblwgeom.h"
 #include "lwgeom_pg.h"
 
-
 Datum LWGEOM_dump(PG_FUNCTION_ARGS);
 Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS);
 Datum ST_Subdivide(PG_FUNCTION_ARGS);
@@ -50,8 +48,7 @@ typedef struct GEOMDUMPNODE_T
 {
 	uint32_t idx;
 	LWGEOM *geom;
-}
-GEOMDUMPNODE;
+} GEOMDUMPNODE;
 
 #define MAXDEPTH 32
 typedef struct GEOMDUMPSTATE
@@ -59,13 +56,11 @@ typedef struct GEOMDUMPSTATE
 	int stacklen;
 	GEOMDUMPNODE *stack[MAXDEPTH];
 	LWGEOM *root;
-}
-GEOMDUMPSTATE;
+} GEOMDUMPSTATE;
 
-#define PUSH(x,y) ((x)->stack[(x)->stacklen++]=(y))
-#define LAST(x) ((x)->stack[(x)->stacklen-1])
+#define PUSH(x, y) ((x)->stack[(x)->stacklen++] = (y))
+#define LAST(x) ((x)->stack[(x)->stacklen - 1])
 #define POP(x) (--((x)->stacklen))
-
 
 PG_FUNCTION_INFO_V1(LWGEOM_dump);
 Datum LWGEOM_dump(PG_FUNCTION_ARGS)
@@ -99,15 +94,15 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 		/* Create function state */
 		state = lwalloc(sizeof(GEOMDUMPSTATE));
 		state->root = lwgeom;
-		state->stacklen=0;
+		state->stacklen = 0;
 
-		if ( lwgeom_is_collection(lwgeom) )
+		if (lwgeom_is_collection(lwgeom))
 		{
 			/*
 			 * Push a GEOMDUMPNODE on the state stack
 			 */
 			node = lwalloc(sizeof(GEOMDUMPNODE));
-			node->idx=0;
+			node->idx = 0;
 			node->geom = lwgeom;
 			PUSH(state, node);
 		}
@@ -138,10 +133,10 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 	state = funcctx->user_fctx;
 
 	/* Handled simple geometries */
-	if ( ! state->root ) SRF_RETURN_DONE(funcctx);
+	if (!state->root) SRF_RETURN_DONE(funcctx);
 	/* Return nothing for empties */
-	if ( lwgeom_is_empty(state->root) ) SRF_RETURN_DONE(funcctx);
-	if ( ! lwgeom_is_collection(state->root) )
+	if (lwgeom_is_empty(state->root)) SRF_RETURN_DONE(funcctx);
+	if (!lwgeom_is_collection(state->root))
 	{
 		values[0] = "{}";
 		values[1] = lwgeom_to_hexwkb(state->root, WKB_EXTENDED, 0);
@@ -155,23 +150,23 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 	while (1)
 	{
 		node = LAST(state);
-		lwcoll = (LWCOLLECTION*)node->geom;
+		lwcoll = (LWCOLLECTION *)node->geom;
 
-		if ( node->idx < lwcoll->ngeoms )
+		if (node->idx < lwcoll->ngeoms)
 		{
 			lwgeom = lwcoll->geoms[node->idx];
-			if ( ! lwgeom_is_collection(lwgeom) )
+			if (!lwgeom_is_collection(lwgeom))
 			{
 				/* write address of current geom */
-				ptr=address;
-				*ptr++='{';
-				for (i=0; i<state->stacklen; i++)
+				ptr = address;
+				*ptr++ = '{';
+				for (i = 0; i < state->stacklen; i++)
 				{
-					if ( i ) ptr += sprintf(ptr, ",");
-					ptr += sprintf(ptr, "%d", state->stack[i]->idx+1);
+					if (i) ptr += sprintf(ptr, ",");
+					ptr += sprintf(ptr, "%d", state->stack[i]->idx + 1);
 				}
-				*ptr++='}';
-				*ptr='\0';
+				*ptr++ = '}';
+				*ptr = '\0';
 
 				break;
 			}
@@ -185,7 +180,7 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 			oldcontext = MemoryContextSwitchTo(newcontext);
 
 			node = lwalloc(sizeof(GEOMDUMPNODE));
-			node->idx=0;
+			node->idx = 0;
 			node->geom = lwgeom;
 			PUSH(state, node);
 
@@ -194,7 +189,7 @@ Datum LWGEOM_dump(PG_FUNCTION_ARGS)
 			continue;
 		}
 
-		if ( ! POP(state) ) SRF_RETURN_DONE(funcctx);
+		if (!POP(state)) SRF_RETURN_DONE(funcctx);
 		LAST(state)->idx++;
 	}
 
@@ -237,18 +232,15 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 		oldcontext = MemoryContextSwitchTo(newcontext);
 
 		pglwgeom = PG_GETARG_GSERIALIZED_P_COPY(0);
-		if ( gserialized_get_type(pglwgeom) != POLYGONTYPE )
-		{
-			elog(ERROR, "Input is not a polygon");
-		}
+		if (gserialized_get_type(pglwgeom) != POLYGONTYPE) { elog(ERROR, "Input is not a polygon"); }
 
 		lwgeom = lwgeom_from_gserialized(pglwgeom);
 
 		/* Create function state */
 		state = lwalloc(sizeof(struct POLYDUMPSTATE));
 		state->poly = lwgeom_as_lwpoly(lwgeom);
-		assert (state->poly);
-		state->ringnum=0;
+		assert(state->poly);
+		state->ringnum = 0;
 
 		funcctx->user_fctx = state;
 
@@ -276,11 +268,11 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 	state = funcctx->user_fctx;
 
 	/* Loop trough polygon rings */
-	while (state->ringnum < state->poly->nrings )
+	while (state->ringnum < state->poly->nrings)
 	{
-		LWPOLY* poly = state->poly;
+		LWPOLY *poly = state->poly;
 		POINTARRAY *ring;
-		LWGEOM* ringgeom;
+		LWGEOM *ringgeom;
 
 		/* Switch to an appropriate memory context for POINTARRAY
 		 * cloning and hexwkb allocation */
@@ -290,11 +282,10 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 		ring = ptarray_clone_deep(poly->rings[state->ringnum]);
 
 		/* Construct another polygon with shell only */
-		ringgeom = (LWGEOM*)lwpoly_construct(
-		               poly->srid,
-		               NULL, /* TODO: could use input bounding box here */
-		               1, /* one ring */
-		               &ring);
+		ringgeom = (LWGEOM *)lwpoly_construct(poly->srid,
+						      NULL, /* TODO: could use input bounding box here */
+						      1,    /* one ring */
+						      &ring);
 
 		/* Write path as ``{ <ringnum> }'' */
 		sprintf(address, "{%d}", state->ringnum);
@@ -311,9 +302,7 @@ Datum LWGEOM_dump_rings(PG_FUNCTION_ARGS)
 	}
 
 	SRF_RETURN_DONE(funcctx);
-
 }
-
 
 struct FLATCOLLECTIONDUMPSTATE
 {
@@ -322,17 +311,19 @@ struct FLATCOLLECTIONDUMPSTATE
 };
 
 /*
-* Break an object up into smaller objects of no more than N vertices
-*/
+ * Break an object up into smaller objects of no more than N vertices
+ */
 PG_FUNCTION_INFO_V1(ST_Subdivide);
 Datum ST_Subdivide(PG_FUNCTION_ARGS)
 {
 #if POSTGIS_GEOS_VERSION < 35
 
-	elog(ERROR, "The GEOS version this PostGIS binary "
+	elog(ERROR,
+	     "The GEOS version this PostGIS binary "
 	     "was compiled against (%d) doesn't support "
 	     "'%s' function (3.5.0+ required)",
-	     POSTGIS_GEOS_VERSION, __func__);
+	     POSTGIS_GEOS_VERSION,
+	     __func__);
 	PG_RETURN_NULL();
 
 #else /* POSTGIS_GEOS_VERSION >= 35 */
@@ -360,32 +351,30 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS)
 		funcctx = SRF_FIRSTCALL_INIT();
 
 		/*
-		* switch to memory context appropriate for multiple function calls
-		*/
+		 * switch to memory context appropriate for multiple function calls
+		 */
 		oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 
 		/*
-		* Get the geometry value
-		*/
+		 * Get the geometry value
+		 */
 		gser = PG_GETARG_GSERIALIZED_P(0);
 		geom = lwgeom_from_gserialized(gser);
 
 		/*
-		* Get the max vertices value
-		*/
-		if ( PG_NARGS() > 1 && ! PG_ARGISNULL(1) )
-			maxvertices = PG_GETARG_INT32(1);
+		 * Get the max vertices value
+		 */
+		if (PG_NARGS() > 1 && !PG_ARGISNULL(1)) maxvertices = PG_GETARG_INT32(1);
 
 		/*
-		* Compute the subdivision of the geometry
-		*/
+		 * Compute the subdivision of the geometry
+		 */
 		col = lwgeom_subdivide(geom, maxvertices);
 
-		if ( ! col )
-			SRF_RETURN_DONE(funcctx);
+		if (!col) SRF_RETURN_DONE(funcctx);
 
 		/* allocate memory for user context */
-		fctx = (collection_fctx *) palloc(sizeof(collection_fctx));
+		fctx = (collection_fctx *)palloc(sizeof(collection_fctx));
 
 		/* initialize state */
 		fctx->nextgeom = 0;
@@ -415,4 +404,3 @@ Datum ST_Subdivide(PG_FUNCTION_ARGS)
 
 #endif /* POSTGIS_GEOS_VERSION >= 35 */
 }
-

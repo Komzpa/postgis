@@ -66,6 +66,6 @@ void geobuf_agg_init_context(struct geobuf_agg_context *ctx);
 void geobuf_agg_transfn(struct geobuf_agg_context *ctx);
 uint8_t *geobuf_agg_finalfn(struct geobuf_agg_context *ctx);
 
-#endif  /* HAVE_LIBPROTOBUF */
+#endif /* HAVE_LIBPROTOBUF */
 
 #endif

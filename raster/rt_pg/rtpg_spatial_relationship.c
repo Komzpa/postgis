@@ -99,7 +99,7 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -109,11 +109,12 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_intersects: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(ERROR,
+			     "RASTER_intersects: Could not deserialize the %s raster",
+			     i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 
@@ -137,7 +138,9 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -156,12 +159,10 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -182,11 +183,11 @@ Datum RASTER_intersects(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_intersects(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_intersects(rast[0],
+				   (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+				   rast[1],
+				   (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+				   &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -234,7 +235,7 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -244,8 +245,7 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
 			elog(ERROR, "RASTER_overlaps: Could not deserialize the %s raster", i < 1 ? "first" : "second");
@@ -272,7 +272,9 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -291,12 +293,10 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -317,11 +317,11 @@ Datum RASTER_overlaps(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_overlaps(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_overlaps(rast[0],
+				 (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+				 rast[1],
+				 (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+				 &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -369,7 +369,7 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -379,8 +379,7 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
 			elog(ERROR, "RASTER_touches: Could not deserialize the %s raster", i < 1 ? "first" : "second");
@@ -407,7 +406,9 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -426,12 +427,10 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -452,11 +451,11 @@ Datum RASTER_touches(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_touches(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_touches(rast[0],
+				(hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+				rast[1],
+				(hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+				&result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -504,7 +503,7 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -514,8 +513,7 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
 			elog(ERROR, "RASTER_contains: Could not deserialize the %s raster", i < 1 ? "first" : "second");
@@ -542,7 +540,9 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -561,12 +561,10 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -587,11 +585,11 @@ Datum RASTER_contains(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_contains(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_contains(rast[0],
+				 (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+				 rast[1],
+				 (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+				 &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -639,7 +637,7 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -649,11 +647,12 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_containsProperly: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(ERROR,
+			     "RASTER_containsProperly: Could not deserialize the %s raster",
+			     i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 
@@ -677,7 +676,9 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -696,12 +697,10 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -722,11 +721,11 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_contains_properly(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_contains_properly(rast[0],
+					  (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+					  rast[1],
+					  (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+					  &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -735,7 +734,9 @@ Datum RASTER_containsProperly(PG_FUNCTION_ARGS)
 
 	if (rtn != ES_NONE)
 	{
-		elog(ERROR, "RASTER_containsProperly: Could not test that the first raster contains properly the second raster");
+		elog(ERROR,
+		     "RASTER_containsProperly: Could not test that the first raster contains properly the second "
+		     "raster");
 		PG_RETURN_NULL();
 	}
 
@@ -774,7 +775,7 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -784,8 +785,7 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
 			elog(ERROR, "RASTER_covers: Could not deserialize the %s raster", i < 1 ? "first" : "second");
@@ -812,7 +812,9 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -831,12 +833,10 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -857,11 +857,11 @@ Datum RASTER_covers(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_covers(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_covers(rast[0],
+			       (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+			       rast[1],
+			       (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+			       &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -909,7 +909,7 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -919,11 +919,11 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_coveredby: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(
+			    ERROR, "RASTER_coveredby: Could not deserialize the %s raster", i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 
@@ -947,7 +947,9 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -966,12 +968,10 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -992,11 +992,11 @@ Datum RASTER_coveredby(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_coveredby(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          &result
-	      );
+	rtn = rt_raster_coveredby(rast[0],
+				  (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+				  rast[1],
+				  (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+				  &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -1045,7 +1045,7 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1055,8 +1055,7 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
 			elog(ERROR, "RASTER_dwithin: Could not deserialize the %s raster", i < 1 ? "first" : "second");
@@ -1083,7 +1082,9 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -1126,12 +1127,10 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -1152,12 +1151,12 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_within_distance(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          distance,
-	          &result
-	      );
+	rtn = rt_raster_within_distance(rast[0],
+					(hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+					rast[1],
+					(hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+					distance,
+					&result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -1166,7 +1165,9 @@ Datum RASTER_dwithin(PG_FUNCTION_ARGS)
 
 	if (rtn != ES_NONE)
 	{
-		elog(ERROR, "RASTER_dwithin: Could not test that the two rasters are within the specified distance of each other");
+		elog(ERROR,
+		     "RASTER_dwithin: Could not test that the two rasters are within the specified distance of each "
+		     "other");
 		PG_RETURN_NULL();
 	}
 
@@ -1206,7 +1207,7 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
+		pgrast[i] = (rt_pgraster *)PG_DETOAST_DATUM(PG_GETARG_DATUM(j));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1216,11 +1217,12 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_dfullywithin: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(ERROR,
+			     "RASTER_dfullywithin: Could not deserialize the %s raster",
+			     i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 
@@ -1244,7 +1246,9 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 			bandindex[i] = PG_GETARG_INT32(j);
 			if (bandindex[i] < 1 || bandindex[i] > numBands)
 			{
-				elog(NOTICE, "Invalid band index (must use 1-based) for the %s raster. Returning NULL", i < 1 ? "first" : "second");
+				elog(NOTICE,
+				     "Invalid band index (must use 1-based) for the %s raster. Returning NULL",
+				     i < 1 ? "first" : "second");
 				if (i > 0) i++;
 				for (k = 0; k < i; k++)
 				{
@@ -1287,12 +1291,10 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 	}
 
 	/* hasbandindex must be balanced */
-	if (
-	    (hasbandindex[0] && !hasbandindex[1]) ||
-	    (!hasbandindex[0] && hasbandindex[1])
-	)
+	if ((hasbandindex[0] && !hasbandindex[1]) || (!hasbandindex[0] && hasbandindex[1]))
 	{
-		elog(NOTICE, "Missing band index.  Band indices must be provided for both rasters if any one is provided");
+		elog(NOTICE,
+		     "Missing band index.  Band indices must be provided for both rasters if any one is provided");
 		for (k = 0; k < set_count; k++)
 		{
 			rt_raster_destroy(rast[k]);
@@ -1313,12 +1315,12 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	rtn = rt_raster_fully_within_distance(
-	          rast[0], (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
-	          rast[1], (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
-	          distance,
-	          &result
-	      );
+	rtn = rt_raster_fully_within_distance(rast[0],
+					      (hasbandindex[0] ? (int)bandindex[0] - 1 : -1),
+					      rast[1],
+					      (hasbandindex[1] ? (int)bandindex[1] - 1 : -1),
+					      distance,
+					      &result);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -1327,7 +1329,9 @@ Datum RASTER_dfullywithin(PG_FUNCTION_ARGS)
 
 	if (rtn != ES_NONE)
 	{
-		elog(ERROR, "RASTER_dfullywithin: Could not test that the two rasters are fully within the specified distance of each other");
+		elog(ERROR,
+		     "RASTER_dfullywithin: Could not test that the two rasters are fully within the specified distance "
+		     "of each other");
 		PG_RETURN_NULL();
 	}
 
@@ -1364,7 +1368,8 @@ Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
+		pgrast[i] =
+		    (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1374,21 +1379,17 @@ Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_sameAlignment: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(ERROR,
+			     "RASTER_sameAlignment: Could not deserialize the %s raster",
+			     i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 	}
 
-	rtn = rt_raster_same_alignment(
-	          rast[0],
-	          rast[1],
-	          &aligned,
-	          &reason
-	      );
+	rtn = rt_raster_same_alignment(rast[0], rast[1], &aligned, &reason);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);
@@ -1402,8 +1403,7 @@ Datum RASTER_sameAlignment(PG_FUNCTION_ARGS)
 	}
 
 	/* only output reason if not aligned */
-	if (reason != NULL && !aligned)
-		elog(NOTICE, "%s", reason);
+	if (reason != NULL && !aligned) elog(NOTICE, "%s", reason);
 
 	PG_RETURN_BOOL(aligned);
 }
@@ -1439,7 +1439,8 @@ Datum RASTER_notSameAlignmentReason(PG_FUNCTION_ARGS)
 			}
 			PG_RETURN_NULL();
 		}
-		pgrast[i] = (rt_pgraster *) PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
+		pgrast[i] =
+		    (rt_pgraster *)PG_DETOAST_DATUM_SLICE(PG_GETARG_DATUM(j), 0, sizeof(struct rt_raster_serialized_t));
 		pgrastpos[i] = j;
 		j++;
 
@@ -1449,21 +1450,17 @@ Datum RASTER_notSameAlignmentReason(PG_FUNCTION_ARGS)
 		{
 			for (k = 0; k <= i; k++)
 			{
-				if (k < i)
-					rt_raster_destroy(rast[k]);
+				if (k < i) rt_raster_destroy(rast[k]);
 				PG_FREE_IF_COPY(pgrast[k], pgrastpos[k]);
 			}
-			elog(ERROR, "RASTER_notSameAlignmentReason: Could not deserialize the %s raster", i < 1 ? "first" : "second");
+			elog(ERROR,
+			     "RASTER_notSameAlignmentReason: Could not deserialize the %s raster",
+			     i < 1 ? "first" : "second");
 			PG_RETURN_NULL();
 		}
 	}
 
-	rtn = rt_raster_same_alignment(
-	          rast[0],
-	          rast[1],
-	          &aligned,
-	          &reason
-	      );
+	rtn = rt_raster_same_alignment(rast[0], rast[1], &aligned, &reason);
 	for (k = 0; k < set_count; k++)
 	{
 		rt_raster_destroy(rast[k]);

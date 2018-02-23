@@ -18,24 +18,23 @@
  *
  **********************************************************************
  *
-* Copyright 2014 Kashif Rasul <kashif.rasul@gmail.com> and
+ * Copyright 2014 Kashif Rasul <kashif.rasul@gmail.com> and
  *
  **********************************************************************/
-
 
 #include <assert.h>
 #include <string.h>
 #include "liblwgeom.h"
 #include "../postgis_config.h"
 
-LWGEOM*
+LWGEOM *
 lwgeom_from_encoded_polyline(const char *encodedpolyline, int precision)
 {
 	LWGEOM *geom = NULL;
 	POINTARRAY *pa = NULL;
 	int length = strlen(encodedpolyline);
 	int idx = 0;
-	double scale = pow(10,precision);
+	double scale = pow(10, precision);
 
 	float latitude = 0.0f;
 	float longitude = 0.0f;
@@ -54,8 +53,7 @@ lwgeom_from_encoded_polyline(const char *encodedpolyline, int precision)
 			byte = encodedpolyline[idx++] - 63;
 			res |= (byte & 0x1F) << shift;
 			shift += 5;
-		}
-		while (byte >= 0x20);
+		} while (byte >= 0x20);
 		float deltaLat = ((res & 1) ? ~(res >> 1) : (res >> 1));
 		latitude += deltaLat;
 
@@ -66,13 +64,12 @@ lwgeom_from_encoded_polyline(const char *encodedpolyline, int precision)
 			byte = encodedpolyline[idx++] - 63;
 			res |= (byte & 0x1F) << shift;
 			shift += 5;
-		}
-		while (byte >= 0x20);
+		} while (byte >= 0x20);
 		float deltaLon = ((res & 1) ? ~(res >> 1) : (res >> 1));
 		longitude += deltaLon;
 
-		pt.x = longitude/scale;
-		pt.y = latitude/scale;
+		pt.x = longitude / scale;
+		pt.y = latitude / scale;
 		pt.m = pt.z = 0.0;
 		ptarray_append_point(pa, &pt, LW_FALSE);
 	}

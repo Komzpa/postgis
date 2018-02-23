@@ -39,17 +39,17 @@
  * Return Nth vertex in GEOSGeometry as a POINT.
  * May return NULL if the geometry has NO vertexex.
  */
-GEOSGeometry* LWGEOM_GEOS_getPointN(const GEOSGeometry*, uint32_t);
-GEOSGeometry*
-LWGEOM_GEOS_getPointN(const GEOSGeometry* g_in, uint32_t n)
+GEOSGeometry *LWGEOM_GEOS_getPointN(const GEOSGeometry *, uint32_t);
+GEOSGeometry *
+LWGEOM_GEOS_getPointN(const GEOSGeometry *g_in, uint32_t n)
 {
 	uint32_t dims;
-	const GEOSCoordSequence* seq_in;
+	const GEOSCoordSequence *seq_in;
 	GEOSCoordSeq seq_out;
 	double val;
 	uint32_t sz;
 	int gn;
-	GEOSGeometry* ret;
+	GEOSGeometry *ret;
 
 	switch (GEOSGeomTypeId(g_in))
 	{
@@ -60,7 +60,7 @@ LWGEOM_GEOS_getPointN(const GEOSGeometry* g_in, uint32_t n)
 	{
 		for (gn = 0; gn < GEOSGetNumGeometries(g_in); ++gn)
 		{
-			const GEOSGeometry* g = GEOSGetGeometryN(g_in, gn);
+			const GEOSGeometry *g = GEOSGetGeometryN(g_in, gn);
 			ret = LWGEOM_GEOS_getPointN(g, n);
 			if (ret) return ret;
 		}
@@ -73,7 +73,7 @@ LWGEOM_GEOS_getPointN(const GEOSGeometry* g_in, uint32_t n)
 		if (ret) return ret;
 		for (gn = 0; gn < GEOSGetNumInteriorRings(g_in); ++gn)
 		{
-			const GEOSGeometry* g = GEOSGetInteriorRingN(g_in, gn);
+			const GEOSGeometry *g = GEOSGetInteriorRingN(g_in, gn);
 			ret = LWGEOM_GEOS_getPointN(g, n);
 			if (ret) return ret;
 		}
@@ -109,10 +109,10 @@ LWGEOM_GEOS_getPointN(const GEOSGeometry* g_in, uint32_t n)
 	return GEOSGeom_createPoint(seq_out);
 }
 
-LWGEOM* lwcollection_make_geos_friendly(LWCOLLECTION* g);
-LWGEOM* lwline_make_geos_friendly(LWLINE* line);
-LWGEOM* lwpoly_make_geos_friendly(LWPOLY* poly);
-POINTARRAY* ring_make_geos_friendly(POINTARRAY* ring);
+LWGEOM *lwcollection_make_geos_friendly(LWCOLLECTION *g);
+LWGEOM *lwline_make_geos_friendly(LWLINE *line);
+LWGEOM *lwpoly_make_geos_friendly(LWPOLY *poly);
+POINTARRAY *ring_make_geos_friendly(POINTARRAY *ring);
 
 /*
  * Ensure the geometry is "structurally" valid
@@ -120,8 +120,8 @@ POINTARRAY* ring_make_geos_friendly(POINTARRAY* ring);
  * May return the input untouched (if already valid).
  * May return geometries of lower dimension (on collapses)
  */
-static LWGEOM*
-lwgeom_make_geos_friendly(LWGEOM* geom)
+static LWGEOM *
+lwgeom_make_geos_friendly(LWGEOM *geom)
 {
 	LWDEBUGF(2, "lwgeom_make_geos_friendly enter (type %d)", geom->type);
 	switch (geom->type)
@@ -134,18 +134,18 @@ lwgeom_make_geos_friendly(LWGEOM* geom)
 
 	case LINETYPE:
 		/* lines need at least 2 points */
-		return lwline_make_geos_friendly((LWLINE*)geom);
+		return lwline_make_geos_friendly((LWLINE *)geom);
 		break;
 
 	case POLYGONTYPE:
 		/* polygons need all rings closed and with npoints > 3 */
-		return lwpoly_make_geos_friendly((LWPOLY*)geom);
+		return lwpoly_make_geos_friendly((LWPOLY *)geom);
 		break;
 
 	case MULTILINETYPE:
 	case MULTIPOLYGONTYPE:
 	case COLLECTIONTYPE:
-		return lwcollection_make_geos_friendly((LWCOLLECTION*)geom);
+		return lwcollection_make_geos_friendly((LWCOLLECTION *)geom);
 		break;
 
 	case CIRCSTRINGTYPE:
@@ -155,8 +155,8 @@ lwgeom_make_geos_friendly(LWGEOM* geom)
 	case MULTICURVETYPE:
 	default:
 		lwerror("lwgeom_make_geos_friendly: unsupported input geometry type: %s (%d)",
-		        lwtype_name(geom->type),
-		        geom->type);
+			lwtype_name(geom->type),
+			geom->type);
 		break;
 	}
 	return 0;
@@ -168,11 +168,11 @@ lwgeom_make_geos_friendly(LWGEOM* geom)
  * constructed POINTARRAY.
  * TODO: move in ptarray.c
  */
-POINTARRAY* ptarray_close2d(POINTARRAY* ring);
-POINTARRAY*
-ptarray_close2d(POINTARRAY* ring)
+POINTARRAY *ptarray_close2d(POINTARRAY *ring);
+POINTARRAY *
+ptarray_close2d(POINTARRAY *ring)
 {
-	POINTARRAY* newring;
+	POINTARRAY *newring;
 
 	/* close the ring if not already closed (2d only) */
 	if (!ptarray_is_closed_2d(ring))
@@ -185,11 +185,11 @@ ptarray_close2d(POINTARRAY* ring)
 }
 
 /* May return the same input or a new one (never zero) */
-POINTARRAY*
-ring_make_geos_friendly(POINTARRAY* ring)
+POINTARRAY *
+ring_make_geos_friendly(POINTARRAY *ring)
 {
-	POINTARRAY* closedring;
-	POINTARRAY* ring_in = ring;
+	POINTARRAY *closedring;
+	POINTARRAY *ring_in = ring;
 
 	/* close the ring if not already closed (2d only) */
 	closedring = ptarray_close2d(ring);
@@ -199,7 +199,7 @@ ring_make_geos_friendly(POINTARRAY* ring)
 
 	while (ring->npoints < 4)
 	{
-		POINTARRAY* oring = ring;
+		POINTARRAY *oring = ring;
 		LWDEBUGF(4, "ring has %d points, adding another", ring->npoints);
 		/* let's add another... */
 		ring = ptarray_addPoint(ring, getPoint_internal(ring, 0), FLAGS_NDIMS(ring->flags), ring->npoints);
@@ -212,24 +212,24 @@ ring_make_geos_friendly(POINTARRAY* ring)
 /* Make sure all rings are closed and have > 3 points.
  * May return the input untouched.
  */
-LWGEOM*
-lwpoly_make_geos_friendly(LWPOLY* poly)
+LWGEOM *
+lwpoly_make_geos_friendly(LWPOLY *poly)
 {
-	LWGEOM* ret;
-	POINTARRAY** new_rings;
+	LWGEOM *ret;
+	POINTARRAY **new_rings;
 	uint32_t i;
 
 	/* If the polygon has no rings there's nothing to do */
-	if (!poly->nrings) return (LWGEOM*)poly;
+	if (!poly->nrings) return (LWGEOM *)poly;
 
 	/* Allocate enough pointers for all rings */
-	new_rings = lwalloc(sizeof(POINTARRAY*) * poly->nrings);
+	new_rings = lwalloc(sizeof(POINTARRAY *) * poly->nrings);
 
 	/* All rings must be closed and have > 3 points */
 	for (i = 0; i < poly->nrings; i++)
 	{
-		POINTARRAY* ring_in = poly->rings[i];
-		POINTARRAY* ring_out = ring_make_geos_friendly(ring_in);
+		POINTARRAY *ring_in = poly->rings[i];
+		POINTARRAY *ring_out = ring_make_geos_friendly(ring_in);
 
 		if (ring_in != ring_out)
 		{
@@ -246,48 +246,48 @@ lwpoly_make_geos_friendly(LWPOLY* poly)
 
 	lwfree(poly->rings);
 	poly->rings = new_rings;
-	ret = (LWGEOM*)poly;
+	ret = (LWGEOM *)poly;
 
 	return ret;
 }
 
 /* Need NO or >1 points. Duplicate first if only one. */
-LWGEOM*
-lwline_make_geos_friendly(LWLINE* line)
+LWGEOM *
+lwline_make_geos_friendly(LWLINE *line)
 {
-	LWGEOM* ret;
+	LWGEOM *ret;
 
 	if (line->points->npoints == 1) /* 0 is fine, 2 is fine */
 	{
 #if 1
 		/* Duplicate point */
 		line->points = ptarray_addPoint(line->points,
-		                                getPoint_internal(line->points, 0),
-		                                FLAGS_NDIMS(line->points->flags),
-		                                line->points->npoints);
-		ret = (LWGEOM*)line;
+						getPoint_internal(line->points, 0),
+						FLAGS_NDIMS(line->points->flags),
+						line->points->npoints);
+		ret = (LWGEOM *)line;
 #else
 		/* Turn into a point */
-		ret = (LWGEOM*)lwpoint_construct(line->srid, 0, line->points);
+		ret = (LWGEOM *)lwpoint_construct(line->srid, 0, line->points);
 #endif
 		return ret;
 	}
 	else
 	{
-		return (LWGEOM*)line;
+		return (LWGEOM *)line;
 		/* return lwline_clone(line); */
 	}
 }
 
-LWGEOM*
-lwcollection_make_geos_friendly(LWCOLLECTION* g)
+LWGEOM *
+lwcollection_make_geos_friendly(LWCOLLECTION *g)
 {
-	LWGEOM** new_geoms;
+	LWGEOM **new_geoms;
 	uint32_t i, new_ngeoms = 0;
-	LWCOLLECTION* ret;
+	LWCOLLECTION *ret;
 
 	/* enough space for all components */
-	new_geoms = lwalloc(sizeof(LWGEOM*) * g->ngeoms);
+	new_geoms = lwalloc(sizeof(LWGEOM *) * g->ngeoms);
 
 	ret = lwalloc(sizeof(LWCOLLECTION));
 	memcpy(ret, g, sizeof(LWCOLLECTION));
@@ -295,7 +295,7 @@ lwcollection_make_geos_friendly(LWCOLLECTION* g)
 
 	for (i = 0; i < g->ngeoms; i++)
 	{
-		LWGEOM* newg = lwgeom_make_geos_friendly(g->geoms[i]);
+		LWGEOM *newg = lwgeom_make_geos_friendly(g->geoms[i]);
 		if (newg) new_geoms[new_ngeoms++] = newg;
 	}
 
@@ -311,17 +311,17 @@ lwcollection_make_geos_friendly(LWCOLLECTION* g)
 		ret->maxgeoms = 0;
 	}
 
-	return (LWGEOM*)ret;
+	return (LWGEOM *)ret;
 }
 
 /*
  * Fully node given linework
  */
-static GEOSGeometry*
-LWGEOM_GEOS_nodeLines(const GEOSGeometry* lines)
+static GEOSGeometry *
+LWGEOM_GEOS_nodeLines(const GEOSGeometry *lines)
 {
-	GEOSGeometry* noded;
-	GEOSGeometry* point;
+	GEOSGeometry *noded;
+	GEOSGeometry *point;
 
 	/*
 	 * Union with first geometry point, obtaining full noding
@@ -345,9 +345,9 @@ LWGEOM_GEOS_nodeLines(const GEOSGeometry* lines)
 	GEOSGeom_destroy(point);
 
 	LWDEBUGF(3,
-	         "LWGEOM_GEOS_nodeLines: in[%s] out[%s]",
-	         lwgeom_to_ewkt(GEOS2LWGEOM(lines, 0)),
-	         lwgeom_to_ewkt(GEOS2LWGEOM(noded, 0)));
+		 "LWGEOM_GEOS_nodeLines: in[%s] out[%s]",
+		 lwgeom_to_ewkt(GEOS2LWGEOM(lines, 0)),
+		 lwgeom_to_ewkt(GEOS2LWGEOM(noded, 0)));
 
 	return noded;
 }
@@ -357,13 +357,13 @@ LWGEOM_GEOS_nodeLines(const GEOSGeometry* lines)
  * Will return NULL on error (expect error handler being called by then)
  *
  */
-static GEOSGeometry*
-LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
+static GEOSGeometry *
+LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry *gin)
 {
 	GEOSGeom gout;
 	GEOSGeom geos_bound;
 	GEOSGeom geos_cut_edges, geos_area, collapse_points;
-	GEOSGeometry* vgeoms[3]; /* One for area, one for cut-edges */
+	GEOSGeometry *vgeoms[3]; /* One for area, one for cut-edges */
 	unsigned int nvgeoms = 0;
 
 	assert(GEOSGeomTypeId(gin) == GEOS_POLYGON || GEOSGeomTypeId(gin) == GEOS_MULTIPOLYGON);
@@ -390,8 +390,8 @@ LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
 	/* NOTE: the noding process may drop lines collapsing to points.
 	 *       We want to retrive any of those */
 	{
-		GEOSGeometry* pi;
-		GEOSGeometry* po;
+		GEOSGeometry *pi;
+		GEOSGeometry *po;
 
 #ifdef LWGEOM_PROFILE_MAKEVALID
 		lwnotice("ST_MakeValid: extracting unique points from bounds");
@@ -466,10 +466,10 @@ LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
 	 */
 	while (GEOSGetNumGeometries(geos_cut_edges))
 	{
-		GEOSGeometry* new_area = 0;
-		GEOSGeometry* new_area_bound = 0;
-		GEOSGeometry* symdif = 0;
-		GEOSGeometry* new_cut_edges = 0;
+		GEOSGeometry *new_area = 0;
+		GEOSGeometry *new_area_bound = 0;
+		GEOSGeometry *symdif = 0;
+		GEOSGeometry *new_cut_edges = 0;
 
 #ifdef LWGEOM_PROFILE_MAKEVALID
 		lwnotice("ST_MakeValid: building area from %d edges", GEOSGetNumGeometries(geos_cut_edges));
@@ -501,7 +501,7 @@ LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
 
 #ifdef LWGEOM_PROFILE_MAKEVALID
 		lwnotice("ST_MakeValid: ring built with %d cut edges, saving boundaries",
-		         GEOSGetNumGeometries(geos_cut_edges));
+			 GEOSGetNumGeometries(geos_cut_edges));
 #endif
 
 		/*
@@ -514,8 +514,8 @@ LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
 			/* We did check for empty area already so
 			 * this must be some other error */
 			lwnotice("GEOSBoundary('%s') threw an error: %s",
-			         lwgeom_to_ewkt(GEOS2LWGEOM(new_area, 0)),
-			         lwgeom_geos_errmsg);
+				 lwgeom_to_ewkt(GEOS2LWGEOM(new_area, 0)),
+				 lwgeom_geos_errmsg);
 			GEOSGeom_destroy(new_area);
 			GEOSGeom_destroy(geos_area);
 			return NULL;
@@ -615,22 +615,22 @@ LWGEOM_GEOS_makeValidPolygon(const GEOSGeometry* gin)
 	return gout;
 }
 
-static GEOSGeometry*
-LWGEOM_GEOS_makeValidLine(const GEOSGeometry* gin)
+static GEOSGeometry *
+LWGEOM_GEOS_makeValidLine(const GEOSGeometry *gin)
 {
-	GEOSGeometry* noded;
+	GEOSGeometry *noded;
 	noded = LWGEOM_GEOS_nodeLines(gin);
 	return noded;
 }
 
-static GEOSGeometry*
-LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry* gin)
+static GEOSGeometry *
+LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry *gin)
 {
-	GEOSGeometry** lines;
-	GEOSGeometry** points;
-	GEOSGeometry* mline_out = 0;
-	GEOSGeometry* mpoint_out = 0;
-	GEOSGeometry* gout = 0;
+	GEOSGeometry **lines;
+	GEOSGeometry **points;
+	GEOSGeometry *mline_out = 0;
+	GEOSGeometry *mpoint_out = 0;
+	GEOSGeometry *gout = 0;
 	uint32_t nlines = 0, nlines_alloc;
 	uint32_t npoints = 0;
 	uint32_t ngeoms = 0, nsubgeoms;
@@ -639,13 +639,13 @@ LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry* gin)
 	ngeoms = GEOSGetNumGeometries(gin);
 
 	nlines_alloc = ngeoms;
-	lines = lwalloc(sizeof(GEOSGeometry*) * nlines_alloc);
-	points = lwalloc(sizeof(GEOSGeometry*) * ngeoms);
+	lines = lwalloc(sizeof(GEOSGeometry *) * nlines_alloc);
+	points = lwalloc(sizeof(GEOSGeometry *) * ngeoms);
 
 	for (i = 0; i < ngeoms; ++i)
 	{
-		const GEOSGeometry* g = GEOSGetGeometryN(gin, i);
-		GEOSGeometry* vg;
+		const GEOSGeometry *g = GEOSGetGeometryN(gin, i);
+		GEOSGeometry *vg;
 		vg = LWGEOM_GEOS_makeValidLine(g);
 		if (GEOSisEmpty(vg))
 		{
@@ -660,10 +660,10 @@ LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry* gin)
 		{
 			nsubgeoms = GEOSGetNumGeometries(vg);
 			nlines_alloc += nsubgeoms;
-			lines = lwrealloc(lines, sizeof(GEOSGeometry*) * nlines_alloc);
+			lines = lwrealloc(lines, sizeof(GEOSGeometry *) * nlines_alloc);
 			for (j = 0; j < nsubgeoms; ++j)
 			{
-				const GEOSGeometry* gc = GEOSGetGeometryN(vg, j);
+				const GEOSGeometry *gc = GEOSGetGeometryN(vg, j);
 				/* NOTE: ownership of the cloned geoms will be
 				 *       taken by final collection */
 				lines[nlines++] = GEOSGeom_clone(gc);
@@ -712,17 +712,17 @@ LWGEOM_GEOS_makeValidMultiLine(const GEOSGeometry* gin)
 	return gout;
 }
 
-static GEOSGeometry* LWGEOM_GEOS_makeValid(const GEOSGeometry*);
+static GEOSGeometry *LWGEOM_GEOS_makeValid(const GEOSGeometry *);
 
 /*
  * We expect initGEOS being called already.
  * Will return NULL on error (expect error handler being called by then)
  */
-static GEOSGeometry*
-LWGEOM_GEOS_makeValidCollection(const GEOSGeometry* gin)
+static GEOSGeometry *
+LWGEOM_GEOS_makeValidCollection(const GEOSGeometry *gin)
 {
 	int nvgeoms;
-	GEOSGeometry** vgeoms;
+	GEOSGeometry **vgeoms;
 	GEOSGeom gout;
 	int i;
 
@@ -733,7 +733,7 @@ LWGEOM_GEOS_makeValidCollection(const GEOSGeometry* gin)
 		return 0;
 	}
 
-	vgeoms = lwalloc(sizeof(GEOSGeometry*) * nvgeoms);
+	vgeoms = lwalloc(sizeof(GEOSGeometry *) * nvgeoms);
 	if (!vgeoms)
 	{
 		lwerror("LWGEOM_GEOS_makeValidCollection: out of memory");
@@ -770,10 +770,10 @@ LWGEOM_GEOS_makeValidCollection(const GEOSGeometry* gin)
 	return gout;
 }
 
-static GEOSGeometry*
-LWGEOM_GEOS_makeValid(const GEOSGeometry* gin)
+static GEOSGeometry *
+LWGEOM_GEOS_makeValid(const GEOSGeometry *gin)
 {
-	GEOSGeometry* gout;
+	GEOSGeometry *gout;
 	char ret_char;
 
 	/*
@@ -796,9 +796,9 @@ LWGEOM_GEOS_makeValid(const GEOSGeometry* gin)
 	}
 
 	LWDEBUGF(3,
-	         "Geometry [%s] is still not valid: %s. Will try to clean up further.",
-	         lwgeom_to_ewkt(GEOS2LWGEOM(gin, 0)),
-	         lwgeom_geos_errmsg);
+		 "Geometry [%s] is still not valid: %s. Will try to clean up further.",
+		 lwgeom_to_ewkt(GEOS2LWGEOM(gin, 0)),
+		 lwgeom_geos_errmsg);
 
 	/*
 	 * Step 3 : make what we got valid
@@ -860,7 +860,7 @@ LWGEOM_GEOS_makeValid(const GEOSGeometry* gin)
 
 	default:
 	{
-		char* typname = GEOSGeomType(gin);
+		char *typname = GEOSGeomType(gin);
 		lwnotice("ST_MakeValid: doesn't support geometry type: %s", typname);
 		GEOSFree(typname);
 		return NULL;
@@ -901,13 +901,13 @@ LWGEOM_GEOS_makeValid(const GEOSGeometry* gin)
 }
 
 /* Exported. Uses GEOS internally */
-LWGEOM*
-lwgeom_make_valid(LWGEOM* lwgeom_in)
+LWGEOM *
+lwgeom_make_valid(LWGEOM *lwgeom_in)
 {
 	int is3d;
 	GEOSGeom geosgeom;
-	GEOSGeometry* geosout;
-	LWGEOM* lwgeom_out;
+	GEOSGeometry *geosout;
+	LWGEOM *lwgeom_out;
 
 	is3d = FLAGS_GET_Z(lwgeom_in->flags);
 
@@ -923,9 +923,9 @@ lwgeom_make_valid(LWGEOM* lwgeom_in)
 	if (!geosgeom)
 	{
 		LWDEBUGF(4,
-		         "Original geom can't be converted to GEOS (%s)"
-		         " - will try cleaning that up first",
-		         lwgeom_geos_errmsg);
+			 "Original geom can't be converted to GEOS (%s)"
+			 " - will try cleaning that up first",
+			 lwgeom_geos_errmsg);
 
 		lwgeom_out = lwgeom_make_geos_friendly(lwgeom_out);
 		if (!lwgeom_out) lwerror("Could not make a valid geometry out of input");
@@ -954,15 +954,15 @@ lwgeom_make_valid(LWGEOM* lwgeom_in)
 
 	if (lwgeom_is_collection(lwgeom_in) && !lwgeom_is_collection(lwgeom_out))
 	{
-		LWGEOM** ogeoms = lwalloc(sizeof(LWGEOM*));
-		LWGEOM* ogeom;
+		LWGEOM **ogeoms = lwalloc(sizeof(LWGEOM *));
+		LWGEOM *ogeom;
 		LWDEBUG(3, "lwgeom_make_valid: forcing multi");
 		/* NOTE: this is safe because lwgeom_out is surely not lwgeom_in or
 		 * otherwise we couldn't have a collection and a non-collection */
 		assert(lwgeom_in != lwgeom_out);
 		ogeoms[0] = lwgeom_out;
-		ogeom = (LWGEOM*)lwcollection_construct(
-		            MULTITYPE[lwgeom_out->type], lwgeom_out->srid, lwgeom_out->bbox, 1, ogeoms);
+		ogeom = (LWGEOM *)lwcollection_construct(
+		    MULTITYPE[lwgeom_out->type], lwgeom_out->srid, lwgeom_out->bbox, 1, ogeoms);
 		lwgeom_out->bbox = NULL;
 		lwgeom_out = ogeom;
 	}

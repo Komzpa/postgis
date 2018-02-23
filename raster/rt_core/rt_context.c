@@ -33,8 +33,8 @@
 #include "librtcore_internal.h"
 
 /******************************************************************************
-* rt_context
-******************************************************************************/
+ * rt_context
+ ******************************************************************************/
 
 /*
  * Default allocators
@@ -119,16 +119,12 @@ struct rt_context_t
 };
 
 /* Static variable, to be used for all rt_core functions */
-static struct rt_context_t ctx_t =
-{
-	.alloc = default_rt_allocator,
-	.realloc = default_rt_reallocator,
-	.dealloc = default_rt_deallocator,
-	.err = default_rt_error_handler,
-	.warn = default_rt_warning_handler,
-	.info = default_rt_info_handler
-};
-
+static struct rt_context_t ctx_t = {.alloc = default_rt_allocator,
+				    .realloc = default_rt_reallocator,
+				    .dealloc = default_rt_deallocator,
+				    .err = default_rt_error_handler,
+				    .warn = default_rt_warning_handler,
+				    .info = default_rt_info_handler};
 
 /**
  * Useful in raster core testing and in the (future)
@@ -147,15 +143,17 @@ rt_install_default_allocators(void)
 	ctx_t.warn = default_rt_warning_handler;
 }
 
-
 /**
  * This function is called when the PostgreSQL backend is
  * taking care of the memory and we want to use palloc family
  */
 void
-rt_set_handlers(rt_allocator allocator, rt_reallocator reallocator,
-                rt_deallocator deallocator, rt_message_handler error_handler,
-                rt_message_handler info_handler, rt_message_handler warning_handler)
+rt_set_handlers(rt_allocator allocator,
+		rt_reallocator reallocator,
+		rt_deallocator deallocator,
+		rt_message_handler error_handler,
+		rt_message_handler info_handler,
+		rt_message_handler warning_handler)
 {
 
 	ctx_t.alloc = allocator;
@@ -167,7 +165,6 @@ rt_set_handlers(rt_allocator allocator, rt_reallocator reallocator,
 	ctx_t.warn = warning_handler;
 }
 
-
 /**
  * Raster core memory management functions.
  *
@@ -176,22 +173,21 @@ rt_set_handlers(rt_allocator allocator, rt_reallocator reallocator,
 void *
 rtalloc(size_t size)
 {
-	void * mem = ctx_t.alloc(size);
+	void *mem = ctx_t.alloc(size);
 	RASTER_DEBUGF(5, "rtalloc called: %d@%p", size, mem);
 	return mem;
 }
 
-
 void *
-rtrealloc(void * mem, size_t size)
+rtrealloc(void *mem, size_t size)
 {
-	void * result = ctx_t.realloc(mem, size);
+	void *result = ctx_t.realloc(mem, size);
 	RASTER_DEBUGF(5, "rtrealloc called: %d@%p", size, result);
 	return result;
 }
 
 void
-rtdealloc(void * mem)
+rtdealloc(void *mem)
 {
 	ctx_t.dealloc(mem);
 	RASTER_DEBUG(5, "rtdealloc called");
@@ -229,7 +225,6 @@ rtinfo(const char *fmt, ...)
 
 	va_end(ap);
 }
-
 
 void
 rtwarn(const char *fmt, ...)

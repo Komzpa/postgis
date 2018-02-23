@@ -22,7 +22,6 @@
  *
  **********************************************************************/
 
-
 #include "postgres.h"
 #include "fmgr.h"
 #include "utils/elog.h"
@@ -38,7 +37,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-
 
 /*
  * Return the measure at which interpolated points on the two
@@ -58,7 +56,7 @@ Datum ST_ClosestPointOfApproach(PG_FUNCTION_ARGS)
 	lwgeom_free(g1);
 	PG_FREE_IF_COPY(gs0, 0);
 	PG_FREE_IF_COPY(gs1, 1);
-	if ( m < 0 ) PG_RETURN_NULL();
+	if (m < 0) PG_RETURN_NULL();
 	PG_RETURN_FLOAT8(m);
 }
 
@@ -97,7 +95,7 @@ Datum ST_DistanceCPA(PG_FUNCTION_ARGS)
 	lwgeom_free(g1);
 	PG_FREE_IF_COPY(gs0, 0);
 	PG_FREE_IF_COPY(gs1, 1);
-	if ( m < 0 ) PG_RETURN_NULL();
+	if (m < 0) PG_RETURN_NULL();
 	PG_RETURN_FLOAT8(mindist);
 }
 
@@ -120,6 +118,5 @@ Datum ST_CPAWithin(PG_FUNCTION_ARGS)
 	lwgeom_free(g1);
 	PG_FREE_IF_COPY(gs0, 0);
 	PG_FREE_IF_COPY(gs1, 1);
-	PG_RETURN_BOOL( ret == LW_TRUE );
+	PG_RETURN_BOOL(ret == LW_TRUE);
 }
-
