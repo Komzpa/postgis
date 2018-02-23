@@ -21,11 +21,11 @@
 
 typedef struct
 {
-    int ldid;
-    int cpg;
-    char *desc;
-    char *iconv;
-    char *pg;
+  int ldid;
+  int cpg;
+  char *desc;
+  char *iconv;
+  char *pg;
 } code_page_entry;
 
 static int num_code_pages = 60;
@@ -102,170 +102,170 @@ static code_page_entry code_pages[] = {{0x01, 437, "U.S. MS-DOS", "CP437", ""},
 char *
 escape_connection_string(char *str)
 {
-    /*
-     * Escape apostrophes and backslashes:
-     *   ' -> \'
-     *   \ -> \\
-     *
-     * 1. find # of characters
-     * 2. make new string
-     */
+  /*
+   * Escape apostrophes and backslashes:
+   *   ' -> \'
+   *   \ -> \\
+   *
+   * 1. find # of characters
+   * 2. make new string
+   */
 
-    char *result;
-    char *ptr, *optr;
-    int toescape = 0;
-    size_t size;
+  char *result;
+  char *ptr, *optr;
+  int toescape = 0;
+  size_t size;
 
-    ptr = str;
+  ptr = str;
 
-    /* Count how many characters we need to escape so we know the size of the string we need to return */
-    while (*ptr)
-    {
-        if (*ptr == '\'' || *ptr == '\\') toescape++;
+  /* Count how many characters we need to escape so we know the size of the string we need to return */
+  while (*ptr)
+  {
+    if (*ptr == '\'' || *ptr == '\\') toescape++;
 
-        ptr++;
-    }
+    ptr++;
+  }
 
-    /* If we don't have to escape anything, simply return the input pointer */
-    if (toescape == 0) return str;
+  /* If we don't have to escape anything, simply return the input pointer */
+  if (toescape == 0) return str;
 
-    size = ptr - str + toescape + 1;
-    result = calloc(1, size);
-    optr = result;
-    ptr = str;
+  size = ptr - str + toescape + 1;
+  result = calloc(1, size);
+  optr = result;
+  ptr = str;
 
-    while (*ptr)
-    {
-        if (*ptr == '\'' || *ptr == '\\') *optr++ = '\\';
+  while (*ptr)
+  {
+    if (*ptr == '\'' || *ptr == '\\') *optr++ = '\\';
 
-        *optr++ = *ptr++;
-    }
+    *optr++ = *ptr++;
+  }
 
-    *optr = '\0';
+  *optr = '\0';
 
-    return result;
+  return result;
 }
 
 void
 colmap_init(colmap *map)
 {
-    map->size = 0;
-    map->pgfieldnames = NULL;
-    map->dbffieldnames = NULL;
+  map->size = 0;
+  map->pgfieldnames = NULL;
+  map->dbffieldnames = NULL;
 }
 
 void
 colmap_clean(colmap *map)
 {
-    int i;
-    if (map != NULL)
+  int i;
+  if (map != NULL)
+  {
+    if (map->size)
     {
-        if (map->size)
-        {
-            for (i = 0; i < map->size; i++)
-            {
-                if (map->pgfieldnames[i]) free(map->pgfieldnames[i]);
-                if (map->dbffieldnames[i]) free(map->dbffieldnames[i]);
-            }
-            free(map->pgfieldnames);
-            free(map->dbffieldnames);
-        }
+      for (i = 0; i < map->size; i++)
+      {
+        if (map->pgfieldnames[i]) free(map->pgfieldnames[i]);
+        if (map->dbffieldnames[i]) free(map->dbffieldnames[i]);
+      }
+      free(map->pgfieldnames);
+      free(map->dbffieldnames);
     }
+  }
 }
 
 const char *
 colmap_dbf_by_pg(colmap *map, const char *pgname)
 {
-    int i;
-    for (i = 0; i < map->size; i++)
-    {
-        if (!strcasecmp(map->pgfieldnames[i], pgname)) { return map->dbffieldnames[i]; }
-    }
-    return NULL;
+  int i;
+  for (i = 0; i < map->size; i++)
+  {
+    if (!strcasecmp(map->pgfieldnames[i], pgname)) { return map->dbffieldnames[i]; }
+  }
+  return NULL;
 }
 
 const char *
 colmap_pg_by_dbf(colmap *map, const char *dbfname)
 {
-    int i;
-    for (i = 0; i < map->size; i++)
-    {
-        if (!strcasecmp(map->dbffieldnames[i], dbfname)) { return map->pgfieldnames[i]; }
-    }
-    return NULL;
+  int i;
+  for (i = 0; i < map->size; i++)
+  {
+    if (!strcasecmp(map->dbffieldnames[i], dbfname)) { return map->pgfieldnames[i]; }
+  }
+  return NULL;
 }
 
 int
 colmap_read(const char *filename, colmap *map, char *errbuf, size_t errbuflen)
 {
-    FILE *fptr;
-    char linebuffer[1024];
-    char *tmpstr;
-    int curmapsize, fieldnamesize;
+  FILE *fptr;
+  char linebuffer[1024];
+  char *tmpstr;
+  int curmapsize, fieldnamesize;
 
-    /* Read column map file and load the colmap_dbffieldnames
-     * and colmap_pgfieldnames arrays */
-    fptr = fopen(filename, "r");
-    if (!fptr)
+  /* Read column map file and load the colmap_dbffieldnames
+   * and colmap_pgfieldnames arrays */
+  fptr = fopen(filename, "r");
+  if (!fptr)
+  {
+    /* Return an error */
+    snprintf(errbuf, errbuflen, _("ERROR: Unable to open column map file %s"), filename);
+    return 0;
+  }
+
+  /* First count how many columns we have... */
+  while (fgets(linebuffer, 1024, fptr) != NULL)
+    ++map->size;
+
+  /* Now we know the final size, allocate the arrays and load the data */
+  fseek(fptr, 0, SEEK_SET);
+  map->pgfieldnames = (char **)malloc(sizeof(char *) * map->size);
+  map->dbffieldnames = (char **)malloc(sizeof(char *) * map->size);
+
+  /* Read in a line at a time... */
+  curmapsize = 0;
+  while (fgets(linebuffer, 1024, fptr) != NULL)
+  {
+    /* Split into two separate strings: pgfieldname and dbffieldname */
+    /* First locate end of first column (pgfieldname) */
+    fieldnamesize = strcspn(linebuffer, "\t\n ");
+    tmpstr = linebuffer;
+
+    /* Allocate memory and copy the string ensuring it is terminated */
+    map->pgfieldnames[curmapsize] = malloc(fieldnamesize + 1);
+    strncpy(map->pgfieldnames[curmapsize], tmpstr, fieldnamesize);
+    map->pgfieldnames[curmapsize][fieldnamesize] = '\0';
+
+    /* Now swallow up any whitespace */
+    tmpstr = linebuffer + fieldnamesize;
+    tmpstr += strspn(tmpstr, "\t\n ");
+
+    /* Finally locate end of second column (dbffieldname) */
+    fieldnamesize = strcspn(tmpstr, "\t\n ");
+
+    /* Allocate memory and copy the string ensuring it is terminated */
+    map->dbffieldnames[curmapsize] = malloc(fieldnamesize + 1);
+    strncpy(map->dbffieldnames[curmapsize], tmpstr, fieldnamesize);
+    map->dbffieldnames[curmapsize][fieldnamesize] = '\0';
+
+    /* Error out if the dbffieldname is > 10 chars */
+    if (strlen(map->dbffieldnames[curmapsize]) > 10)
     {
-        /* Return an error */
-        snprintf(errbuf, errbuflen, _("ERROR: Unable to open column map file %s"), filename);
-        return 0;
+      snprintf(errbuf,
+               errbuflen,
+               _("ERROR: column map file specifies a DBF field name \"%s\" which is longer than 10 "
+                 "characters"),
+               map->dbffieldnames[curmapsize]);
+      return 0;
     }
 
-    /* First count how many columns we have... */
-    while (fgets(linebuffer, 1024, fptr) != NULL)
-        ++map->size;
+    ++curmapsize;
+  }
 
-    /* Now we know the final size, allocate the arrays and load the data */
-    fseek(fptr, 0, SEEK_SET);
-    map->pgfieldnames = (char **)malloc(sizeof(char *) * map->size);
-    map->dbffieldnames = (char **)malloc(sizeof(char *) * map->size);
+  fclose(fptr);
 
-    /* Read in a line at a time... */
-    curmapsize = 0;
-    while (fgets(linebuffer, 1024, fptr) != NULL)
-    {
-        /* Split into two separate strings: pgfieldname and dbffieldname */
-        /* First locate end of first column (pgfieldname) */
-        fieldnamesize = strcspn(linebuffer, "\t\n ");
-        tmpstr = linebuffer;
-
-        /* Allocate memory and copy the string ensuring it is terminated */
-        map->pgfieldnames[curmapsize] = malloc(fieldnamesize + 1);
-        strncpy(map->pgfieldnames[curmapsize], tmpstr, fieldnamesize);
-        map->pgfieldnames[curmapsize][fieldnamesize] = '\0';
-
-        /* Now swallow up any whitespace */
-        tmpstr = linebuffer + fieldnamesize;
-        tmpstr += strspn(tmpstr, "\t\n ");
-
-        /* Finally locate end of second column (dbffieldname) */
-        fieldnamesize = strcspn(tmpstr, "\t\n ");
-
-        /* Allocate memory and copy the string ensuring it is terminated */
-        map->dbffieldnames[curmapsize] = malloc(fieldnamesize + 1);
-        strncpy(map->dbffieldnames[curmapsize], tmpstr, fieldnamesize);
-        map->dbffieldnames[curmapsize][fieldnamesize] = '\0';
-
-        /* Error out if the dbffieldname is > 10 chars */
-        if (strlen(map->dbffieldnames[curmapsize]) > 10)
-        {
-            snprintf(errbuf,
-                     errbuflen,
-                     _("ERROR: column map file specifies a DBF field name \"%s\" which is longer than 10 "
-                       "characters"),
-                     map->dbffieldnames[curmapsize]);
-            return 0;
-        }
-
-        ++curmapsize;
-    }
-
-    fclose(fptr);
-
-    /* Done; return success */
-    return 1;
+  /* Done; return success */
+  return 1;
 }
 
 /*
@@ -277,47 +277,47 @@ colmap_read(const char *filename, colmap *map, char *errbuf, size_t errbuflen)
 char *
 codepage2encoding(const char *cpg)
 {
-    int cpglen;
-    int is_ldid = 0;
-    int num, i;
+  int cpglen;
+  int is_ldid = 0;
+  int num, i;
 
-    /* Do nothing on nothing. */
-    if (!cpg) return NULL;
+  /* Do nothing on nothing. */
+  if (!cpg) return NULL;
 
-    /* Is this an LDID string? */
-    /* If so, note it and move past the "LDID/" tag */
-    cpglen = strlen(cpg);
-    if (strstr(cpg, "LDID/"))
+  /* Is this an LDID string? */
+  /* If so, note it and move past the "LDID/" tag */
+  cpglen = strlen(cpg);
+  if (strstr(cpg, "LDID/"))
+  {
+    if (cpglen > 5)
     {
-        if (cpglen > 5)
-        {
-            cpg += 5;
-            is_ldid = 1;
-        }
-        else
-        {
-            return NULL;
-        }
+      cpg += 5;
+      is_ldid = 1;
     }
-
-    /* Read the number */
-    num = atoi(cpg);
-
-    /* Can we find this number in our lookup table? */
-    for (i = is_ldid; i < num_code_pages; i++)
+    else
     {
-        if (is_ldid)
-        {
-            if (code_pages[i].ldid == num) return strdup(code_pages[i].iconv);
-        }
-        else
-        {
-            if (code_pages[i].cpg == num) return strdup(code_pages[i].iconv);
-        }
+      return NULL;
     }
+  }
 
-    /* Didn't find a matching entry */
-    return NULL;
+  /* Read the number */
+  num = atoi(cpg);
+
+  /* Can we find this number in our lookup table? */
+  for (i = is_ldid; i < num_code_pages; i++)
+  {
+    if (is_ldid)
+    {
+      if (code_pages[i].ldid == num) return strdup(code_pages[i].iconv);
+    }
+    else
+    {
+      if (code_pages[i].cpg == num) return strdup(code_pages[i].iconv);
+    }
+  }
+
+  /* Didn't find a matching entry */
+  return NULL;
 }
 
 /*
@@ -329,22 +329,22 @@ codepage2encoding(const char *cpg)
 char *
 encoding2codepage(const char *encoding)
 {
-    int i;
-    for (i = 0; i < num_code_pages; i++)
+  int i;
+  for (i = 0; i < num_code_pages; i++)
+  {
+    if (strcasecmp(encoding, code_pages[i].pg) == 0)
     {
-        if (strcasecmp(encoding, code_pages[i].pg) == 0)
-        {
-            if (code_pages[i].ldid == 0xFF) { return strdup("UTF-8"); }
-            else
-            {
-                char *codepage = NULL;
-                int ret = asprintf(&codepage, "LDID/%d", code_pages[i].ldid);
-                if (ret == -1) return NULL; /* return null on error */
-                return codepage;
-            }
-        }
+      if (code_pages[i].ldid == 0xFF) { return strdup("UTF-8"); }
+      else
+      {
+        char *codepage = NULL;
+        int ret = asprintf(&codepage, "LDID/%d", code_pages[i].ldid);
+        if (ret == -1) return NULL; /* return null on error */
+        return codepage;
+      }
     }
+  }
 
-    /* OK, we give up, pretend it's UTF8 */
-    return strdup("UTF-8");
+  /* OK, we give up, pretend it's UTF8 */
+  return strdup("UTF-8");
 }

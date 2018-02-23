@@ -42,22 +42,22 @@
 static text *
 cstring2text(const char *cstring)
 {
-    size_t len = strlen(cstring);
-    text *result = (text *)palloc(len + VARHDRSZ);
-    SET_VARSIZE(result, len + VARHDRSZ);
-    memcpy(VARDATA(result), cstring, len);
+  size_t len = strlen(cstring);
+  text *result = (text *)palloc(len + VARHDRSZ);
+  SET_VARSIZE(result, len + VARHDRSZ);
+  memcpy(VARDATA(result), cstring, len);
 
-    return result;
+  return result;
 }
 
 static char *
 text2cstring(const text *textptr)
 {
-    size_t size = VARSIZE(textptr) - VARHDRSZ;
-    char *str = lwalloc(size + 1);
-    memcpy(str, VARDATA(textptr), size);
-    str[size] = '\0';
-    return str;
+  size_t size = VARSIZE(textptr) - VARHDRSZ;
+  char *str = lwalloc(size + 1);
+  memcpy(str, VARDATA(textptr), size);
+  str[size] = '\0';
+  return str;
 }
 #endif
 
@@ -68,15 +68,15 @@ PG_FUNCTION_INFO_V1(postgis_libjson_version);
 Datum postgis_libjson_version(PG_FUNCTION_ARGS)
 {
 #ifndef HAVE_LIBJSON
-    PG_RETURN_NULL();
+  PG_RETURN_NULL();
 #else /* HAVE_LIBJSON  */
 #ifdef JSON_C_VERSION
-    const char *ver = json_c_version();
+  const char *ver = json_c_version();
 #else
-    const char *ver = "UNKNOWN";
+  const char *ver = "UNKNOWN";
 #endif
-    text *result = cstring2text(ver);
-    PG_RETURN_POINTER(result);
+  text *result = cstring2text(ver);
+  PG_RETURN_POINTER(result);
 #endif
 }
 
@@ -84,39 +84,39 @@ PG_FUNCTION_INFO_V1(geom_from_geojson);
 Datum geom_from_geojson(PG_FUNCTION_ARGS)
 {
 #ifndef HAVE_LIBJSON
-    elog(ERROR, "You need JSON-C for ST_GeomFromGeoJSON");
-    PG_RETURN_NULL();
+  elog(ERROR, "You need JSON-C for ST_GeomFromGeoJSON");
+  PG_RETURN_NULL();
 #else /* HAVE_LIBJSON  */
 
-    GSERIALIZED *geom;
-    LWGEOM *lwgeom;
-    text *geojson_input;
-    char *geojson;
-    char *srs = NULL;
+  GSERIALIZED *geom;
+  LWGEOM *lwgeom;
+  text *geojson_input;
+  char *geojson;
+  char *srs = NULL;
 
-    /* Get the geojson stream */
-    if (PG_ARGISNULL(0)) PG_RETURN_NULL();
+  /* Get the geojson stream */
+  if (PG_ARGISNULL(0)) PG_RETURN_NULL();
 
-    geojson_input = PG_GETARG_TEXT_P(0);
-    geojson = text2cstring(geojson_input);
+  geojson_input = PG_GETARG_TEXT_P(0);
+  geojson = text2cstring(geojson_input);
 
-    lwgeom = lwgeom_from_geojson(geojson, &srs);
-    if (!lwgeom)
-    {
-        /* Shouldn't get here */
-        elog(ERROR, "lwgeom_from_geojson returned NULL");
-        PG_RETURN_NULL();
-    }
+  lwgeom = lwgeom_from_geojson(geojson, &srs);
+  if (!lwgeom)
+  {
+    /* Shouldn't get here */
+    elog(ERROR, "lwgeom_from_geojson returned NULL");
+    PG_RETURN_NULL();
+  }
 
-    if (srs)
-    {
-        lwgeom_set_srid(lwgeom, getSRIDbySRS(srs));
-        lwfree(srs);
-    }
+  if (srs)
+  {
+    lwgeom_set_srid(lwgeom, getSRIDbySRS(srs));
+    lwfree(srs);
+  }
 
-    geom = geometry_serialize(lwgeom);
-    lwgeom_free(lwgeom);
+  geom = geometry_serialize(lwgeom);
+  lwgeom_free(lwgeom);
 
-    PG_RETURN_POINTER(geom);
+  PG_RETURN_POINTER(geom);
 #endif
 }

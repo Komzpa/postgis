@@ -29,10 +29,10 @@
 /* Structure for the type array */
 struct geomtype_struct
 {
-    char *typename;
-    int type;
-    int z;
-    int m;
+  char *typename;
+  int type;
+  int z;
+  int m;
 };
 
 /* Type array. Note that the order of this array is important in
@@ -137,18 +137,18 @@ const char dumb_upper_map[128] =
 static char
 dump_toupper(int in)
 {
-    if (in < 0 || in > 127) return '.';
-    return dumb_upper_map[in];
+  if (in < 0 || in > 127) return '.';
+  return dumb_upper_map[in];
 }
 
 uint8_t
 gflags(int hasz, int hasm, int geodetic)
 {
-    uint8_t flags = 0;
-    if (hasz) FLAGS_SET_Z(flags, 1);
-    if (hasm) FLAGS_SET_M(flags, 1);
-    if (geodetic) FLAGS_SET_GEODETIC(flags, 1);
-    return flags;
+  uint8_t flags = 0;
+  if (hasz) FLAGS_SET_Z(flags, 1);
+  if (hasm) FLAGS_SET_M(flags, 1);
+  if (geodetic) FLAGS_SET_GEODETIC(flags, 1);
+  return flags;
 }
 
 /**
@@ -160,65 +160,65 @@ gflags(int hasz, int hasm, int geodetic)
 int
 geometry_type_from_string(const char *str, uint8_t *type, int *z, int *m)
 {
-    char *tmpstr;
-    size_t tmpstartpos, tmpendpos;
-    size_t i;
+  char *tmpstr;
+  size_t tmpstartpos, tmpendpos;
+  size_t i;
 
-    assert(str);
-    assert(type);
-    assert(z);
-    assert(m);
+  assert(str);
+  assert(type);
+  assert(z);
+  assert(m);
 
-    /* Initialize. */
-    *type = 0;
-    *z = 0;
-    *m = 0;
+  /* Initialize. */
+  *type = 0;
+  *z = 0;
+  *m = 0;
 
-    /* Locate any leading/trailing spaces */
-    tmpstartpos = 0;
-    for (i = 0; i < strlen(str); i++)
+  /* Locate any leading/trailing spaces */
+  tmpstartpos = 0;
+  for (i = 0; i < strlen(str); i++)
+  {
+    if (str[i] != ' ')
     {
-        if (str[i] != ' ')
-        {
-            tmpstartpos = i;
-            break;
-        }
+      tmpstartpos = i;
+      break;
     }
+  }
 
-    tmpendpos = strlen(str) - 1;
-    for (i = strlen(str) - 1; i != 0; i--)
+  tmpendpos = strlen(str) - 1;
+  for (i = strlen(str) - 1; i != 0; i--)
+  {
+    if (str[i] != ' ')
     {
-        if (str[i] != ' ')
-        {
-            tmpendpos = i;
-            break;
-        }
+      tmpendpos = i;
+      break;
     }
+  }
 
-    /* Copy and convert to upper case for comparison */
-    tmpstr = lwalloc(tmpendpos - tmpstartpos + 2);
-    for (i = tmpstartpos; i <= tmpendpos; i++)
-        tmpstr[i - tmpstartpos] = dump_toupper(str[i]);
+  /* Copy and convert to upper case for comparison */
+  tmpstr = lwalloc(tmpendpos - tmpstartpos + 2);
+  for (i = tmpstartpos; i <= tmpendpos; i++)
+    tmpstr[i - tmpstartpos] = dump_toupper(str[i]);
 
-    /* Add NULL to terminate */
-    tmpstr[i - tmpstartpos] = '\0';
+  /* Add NULL to terminate */
+  tmpstr[i - tmpstartpos] = '\0';
 
-    /* Now check for the type */
-    for (i = 0; i < GEOMTYPE_STRUCT_ARRAY_LEN; i++)
+  /* Now check for the type */
+  for (i = 0; i < GEOMTYPE_STRUCT_ARRAY_LEN; i++)
+  {
+    if (!strcmp(tmpstr, geomtype_struct_array[i].typename))
     {
-        if (!strcmp(tmpstr, geomtype_struct_array[i].typename))
-        {
-            *type = geomtype_struct_array[i].type;
-            *z = geomtype_struct_array[i].z;
-            *m = geomtype_struct_array[i].m;
+      *type = geomtype_struct_array[i].type;
+      *z = geomtype_struct_array[i].z;
+      *m = geomtype_struct_array[i].m;
 
-            lwfree(tmpstr);
+      lwfree(tmpstr);
 
-            return LW_SUCCESS;
-        }
+      return LW_SUCCESS;
     }
+  }
 
-    lwfree(tmpstr);
+  lwfree(tmpstr);
 
-    return LW_FAILURE;
+  return LW_FAILURE;
 }

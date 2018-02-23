@@ -48,17 +48,17 @@ typedef hash_t HHash;
 
 typedef struct address_struct
 {
-    char *num;
-    char *street;
-    char *street2;
-    char *address1;
-    char *city;
-    char *st;
-    char *zip;
-    char *zipplus;
-    char *cc;
-    double lat;
-    double lon;
+  char *num;
+  char *street;
+  char *street2;
+  char *address1;
+  char *city;
+  char *st;
+  char *zip;
+  char *zipplus;
+  char *cc;
+  double lat;
+  double lon;
 } ADDRESS;
 
 int clean_trailing_punct(char *s);

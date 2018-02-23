@@ -36,14 +36,14 @@
  */
 typedef struct
 {
-    int type;
-    GSERIALIZED *geom1;
-    GSERIALIZED *geom2;
-    size_t geom1_size;
-    size_t geom2_size;
-    LWGEOM *lwgeom1;
-    LWGEOM *lwgeom2;
-    int32 argnum;
+  int type;
+  GSERIALIZED *geom1;
+  GSERIALIZED *geom2;
+  size_t geom1_size;
+  size_t geom2_size;
+  LWGEOM *lwgeom1;
+  LWGEOM *lwgeom2;
+  int32 argnum;
 } GeomCache;
 
 /*
@@ -64,9 +64,9 @@ typedef struct
 /* An entry in the PROJ4 SRS cache */
 typedef struct struct_PROJ4SRSCacheItem
 {
-    int srid;
-    projPJ projection;
-    MemoryContext projection_mcxt;
+  int srid;
+  projPJ projection;
+  MemoryContext projection_mcxt;
 } PROJ4SRSCacheItem;
 
 /* PROJ 4 lookup transaction cache methods */
@@ -79,10 +79,10 @@ typedef struct struct_PROJ4SRSCacheItem
  */
 typedef struct struct_PROJ4PortalCache
 {
-    int type;
-    PROJ4SRSCacheItem PROJ4SRSCache[PROJ4_CACHE_ITEMS];
-    int PROJ4SRSCacheCount;
-    MemoryContext PROJ4SRSCacheContext;
+  int type;
+  PROJ4SRSCacheItem PROJ4SRSCache[PROJ4_CACHE_ITEMS];
+  int PROJ4SRSCacheCount;
+  MemoryContext PROJ4SRSCacheContext;
 } PROJ4PortalCache;
 
 /**
@@ -91,10 +91,10 @@ typedef struct struct_PROJ4PortalCache
  */
 typedef struct
 {
-    int entry_number;                                                /* What kind of structure is this? */
-    int (*GeomIndexBuilder)(const LWGEOM *lwgeom, GeomCache *cache); /* Build an index/tree and add it to your cache */
-    int (*GeomIndexFreer)(GeomCache *cache);                         /* Free the index/tree in your cache */
-    GeomCache *(*GeomCacheAllocator)(void); /* Allocate the kind of cache object you use (GeomCache+some extra space) */
+  int entry_number;                                                /* What kind of structure is this? */
+  int (*GeomIndexBuilder)(const LWGEOM *lwgeom, GeomCache *cache); /* Build an index/tree and add it to your cache */
+  int (*GeomIndexFreer)(GeomCache *cache);                         /* Free the index/tree in your cache */
+  GeomCache *(*GeomCacheAllocator)(void); /* Allocate the kind of cache object you use (GeomCache+some extra space) */
 } GeomCacheMethods;
 
 /*

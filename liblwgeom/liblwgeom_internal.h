@@ -204,13 +204,13 @@ void ptarray_simplify_in_place(POINTARRAY *pa, double epsilon, uint32_t minpts);
  */
 enum CG_SEGMENT_INTERSECTION_TYPE
 {
-    SEG_ERROR = -1,
-    SEG_NO_INTERSECTION = 0,
-    SEG_COLINEAR = 1,
-    SEG_CROSS_LEFT = 2,
-    SEG_CROSS_RIGHT = 3,
-    SEG_TOUCH_LEFT = 4,
-    SEG_TOUCH_RIGHT = 5
+  SEG_ERROR = -1,
+  SEG_NO_INTERSECTION = 0,
+  SEG_COLINEAR = 1,
+  SEG_CROSS_LEFT = 2,
+  SEG_CROSS_RIGHT = 3,
+  SEG_TOUCH_LEFT = 4,
+  SEG_TOUCH_RIGHT = 5
 };
 
 /*
@@ -422,14 +422,14 @@ int lwtin_is_closed(const LWTIN *tin);
  */
 typedef struct gridspec_t
 {
-    double ipx;
-    double ipy;
-    double ipz;
-    double ipm;
-    double xsize;
-    double ysize;
-    double zsize;
-    double msize;
+  double ipx;
+  double ipy;
+  double ipz;
+  double ipm;
+  double xsize;
+  double ysize;
+  double zsize;
+  double msize;
 } gridspec;
 
 LWGEOM *lwgeom_grid(const LWGEOM *lwgeom, const gridspec *grid);
@@ -487,15 +487,15 @@ extern uint8_t MULTITYPE[NUMTYPES];
 extern lwinterrupt_callback *_lwgeom_interrupt_callback;
 extern int _lwgeom_interrupt_requested;
 #define LW_ON_INTERRUPT(x) \
+  { \
+    if (_lwgeom_interrupt_callback) { (*_lwgeom_interrupt_callback)(); } \
+    if (_lwgeom_interrupt_requested) \
     { \
-        if (_lwgeom_interrupt_callback) { (*_lwgeom_interrupt_callback)(); } \
-        if (_lwgeom_interrupt_requested) \
-        { \
-            _lwgeom_interrupt_requested = 0; \
-            lwnotice("liblwgeom code interrupted"); \
-            x; \
-        } \
-    }
+      _lwgeom_interrupt_requested = 0; \
+      lwnotice("liblwgeom code interrupted"); \
+      x; \
+    } \
+  }
 
 int ptarray_npoints_in_rect(const POINTARRAY *pa, const GBOX *gbox);
 int gbox_contains_point2d(const GBOX *g, const POINT2D *p);

@@ -33,8 +33,8 @@
  */
 typedef struct
 {
-    double min;
-    double max;
+  double min;
+  double max;
 } RTREE_INTERVAL;
 
 /**
@@ -44,10 +44,10 @@ typedef struct
  */
 typedef struct rtree_node
 {
-    RTREE_INTERVAL *interval;
-    struct rtree_node *leftNode;
-    struct rtree_node *rightNode;
-    LWLINE *segment;
+  RTREE_INTERVAL *interval;
+  struct rtree_node *leftNode;
+  struct rtree_node *rightNode;
+  LWLINE *segment;
 } RTREE_NODE;
 
 /**
@@ -55,15 +55,15 @@ typedef struct rtree_node
  */
 typedef struct
 {
-    RTREE_NODE **ringIndices;
-    int *ringCounts;
-    int polyCount;
+  RTREE_NODE **ringIndices;
+  int *ringCounts;
+  int polyCount;
 } RTREE_POLY_CACHE;
 
 typedef struct
 {
-    GeomCache gcache;
-    RTREE_POLY_CACHE *index;
+  GeomCache gcache;
+  RTREE_POLY_CACHE *index;
 } RTreeGeomCache;
 
 /**

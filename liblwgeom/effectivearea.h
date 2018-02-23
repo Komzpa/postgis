@@ -35,10 +35,10 @@ It has links into the minheap rtee and kepps track of eliminated points
 */
 typedef struct
 {
-    double area;
-    int treeindex;
-    int prev;
-    int next;
+  double area;
+  int treeindex;
+  int prev;
+  int next;
 } areanode;
 
 /**
@@ -48,9 +48,9 @@ When elliminating points the neighbor points has its effective area affected and
 */
 typedef struct
 {
-    int maxSize;
-    int usedSize;
-    areanode **key_array;
+  int maxSize;
+  int usedSize;
+  areanode **key_array;
 } MINHEAP;
 
 /**
@@ -59,9 +59,9 @@ Structure to hold pointarray and it's arealist
 */
 typedef struct
 {
-    const POINTARRAY *inpts;
-    areanode *initial_arealist;
-    double *res_arealist;
+  const POINTARRAY *inpts;
+  areanode *initial_arealist;
+  double *res_arealist;
 } EFFECTIVE_AREAS;
 
 EFFECTIVE_AREAS *initiate_effectivearea(const POINTARRAY *inpts);

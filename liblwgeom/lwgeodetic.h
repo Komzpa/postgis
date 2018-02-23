@@ -45,8 +45,8 @@ extern int gbox_geocentric_slow;
  */
 typedef struct
 {
-    double lon;
-    double lat;
+  double lon;
+  double lat;
 } GEOGRAPHIC_POINT;
 
 /**
@@ -54,8 +54,8 @@ typedef struct
  */
 typedef struct
 {
-    GEOGRAPHIC_POINT start;
-    GEOGRAPHIC_POINT end;
+  GEOGRAPHIC_POINT start;
+  GEOGRAPHIC_POINT end;
 } GEOGRAPHIC_EDGE;
 
 /**
@@ -63,8 +63,8 @@ typedef struct
  */
 typedef struct
 {
-    double measure;
-    uint32_t index;
+  double measure;
+  uint32_t index;
 } DISTANCE_ORDER;
 
 /**

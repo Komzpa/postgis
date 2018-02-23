@@ -26,20 +26,20 @@
 
 typedef struct shp_connection_state
 {
-    /* PgSQL username to log in with */
-    char *username;
+  /* PgSQL username to log in with */
+  char *username;
 
-    /* PgSQL password to log in with */
-    char *password;
+  /* PgSQL password to log in with */
+  char *password;
 
-    /* PgSQL database to connect to */
-    char *database;
+  /* PgSQL database to connect to */
+  char *database;
 
-    /* PgSQL port to connect to */
-    char *port;
+  /* PgSQL port to connect to */
+  char *port;
 
-    /* PgSQL server to connect to */
-    char *host;
+  /* PgSQL server to connect to */
+  char *host;
 
 } SHPCONNECTIONCONFIG;
 
@@ -50,14 +50,14 @@ char *escape_connection_string(char *str);
 typedef struct colmap_t
 {
 
-    /* Column map pgfieldnames */
-    char **pgfieldnames;
+  /* Column map pgfieldnames */
+  char **pgfieldnames;
 
-    /* Column map dbffieldnames */
-    char **dbffieldnames;
+  /* Column map dbffieldnames */
+  char **dbffieldnames;
 
-    /* Number of entries within column map */
-    int size;
+  /* Number of entries within column map */
+  int size;
 
 } colmap;
 

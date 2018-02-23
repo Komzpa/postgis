@@ -46,63 +46,63 @@
 void *
 default_rt_allocator(size_t size)
 {
-    void *mem = malloc(size);
-    return mem;
+  void *mem = malloc(size);
+  return mem;
 }
 
 void *
 default_rt_reallocator(void *mem, size_t size)
 {
-    void *ret = realloc(mem, size);
-    return ret;
+  void *ret = realloc(mem, size);
+  return ret;
 }
 
 void
 default_rt_deallocator(void *mem)
 {
-    free(mem);
+  free(mem);
 }
 
 void
 default_rt_error_handler(const char *fmt, va_list ap)
 {
 
-    static const char *label = "ERROR: ";
-    char newfmt[1024] = {0};
-    snprintf(newfmt, 1024, "%s%s\n", label, fmt);
-    newfmt[1023] = '\0';
+  static const char *label = "ERROR: ";
+  char newfmt[1024] = {0};
+  snprintf(newfmt, 1024, "%s%s\n", label, fmt);
+  newfmt[1023] = '\0';
 
-    vprintf(newfmt, ap);
+  vprintf(newfmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }
 
 void
 default_rt_warning_handler(const char *fmt, va_list ap)
 {
 
-    static const char *label = "WARNING: ";
-    char newfmt[1024] = {0};
-    snprintf(newfmt, 1024, "%s%s\n", label, fmt);
-    newfmt[1023] = '\0';
+  static const char *label = "WARNING: ";
+  char newfmt[1024] = {0};
+  snprintf(newfmt, 1024, "%s%s\n", label, fmt);
+  newfmt[1023] = '\0';
 
-    vprintf(newfmt, ap);
+  vprintf(newfmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }
 
 void
 default_rt_info_handler(const char *fmt, va_list ap)
 {
 
-    static const char *label = "INFO: ";
-    char newfmt[1024] = {0};
-    snprintf(newfmt, 1024, "%s%s\n", label, fmt);
-    newfmt[1023] = '\0';
+  static const char *label = "INFO: ";
+  char newfmt[1024] = {0};
+  snprintf(newfmt, 1024, "%s%s\n", label, fmt);
+  newfmt[1023] = '\0';
 
-    vprintf(newfmt, ap);
+  vprintf(newfmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }
 
 /**
@@ -110,12 +110,12 @@ default_rt_info_handler(const char *fmt, va_list ap)
  */
 struct rt_context_t
 {
-    rt_allocator alloc;
-    rt_reallocator realloc;
-    rt_deallocator dealloc;
-    rt_message_handler err;
-    rt_message_handler warn;
-    rt_message_handler info;
+  rt_allocator alloc;
+  rt_reallocator realloc;
+  rt_deallocator dealloc;
+  rt_message_handler err;
+  rt_message_handler warn;
+  rt_message_handler info;
 };
 
 /* Static variable, to be used for all rt_core functions */
@@ -135,12 +135,12 @@ static struct rt_context_t ctx_t = {.alloc = default_rt_allocator,
 void
 rt_install_default_allocators(void)
 {
-    ctx_t.alloc = default_rt_allocator;
-    ctx_t.realloc = default_rt_reallocator;
-    ctx_t.dealloc = default_rt_deallocator;
-    ctx_t.err = default_rt_error_handler;
-    ctx_t.info = default_rt_info_handler;
-    ctx_t.warn = default_rt_warning_handler;
+  ctx_t.alloc = default_rt_allocator;
+  ctx_t.realloc = default_rt_reallocator;
+  ctx_t.dealloc = default_rt_deallocator;
+  ctx_t.err = default_rt_error_handler;
+  ctx_t.info = default_rt_info_handler;
+  ctx_t.warn = default_rt_warning_handler;
 }
 
 /**
@@ -156,13 +156,13 @@ rt_set_handlers(rt_allocator allocator,
                 rt_message_handler warning_handler)
 {
 
-    ctx_t.alloc = allocator;
-    ctx_t.realloc = reallocator;
-    ctx_t.dealloc = deallocator;
+  ctx_t.alloc = allocator;
+  ctx_t.realloc = reallocator;
+  ctx_t.dealloc = deallocator;
 
-    ctx_t.err = error_handler;
-    ctx_t.info = info_handler;
-    ctx_t.warn = warning_handler;
+  ctx_t.err = error_handler;
+  ctx_t.info = info_handler;
+  ctx_t.warn = warning_handler;
 }
 
 /**
@@ -173,24 +173,24 @@ rt_set_handlers(rt_allocator allocator,
 void *
 rtalloc(size_t size)
 {
-    void *mem = ctx_t.alloc(size);
-    RASTER_DEBUGF(5, "rtalloc called: %d@%p", size, mem);
-    return mem;
+  void *mem = ctx_t.alloc(size);
+  RASTER_DEBUGF(5, "rtalloc called: %d@%p", size, mem);
+  return mem;
 }
 
 void *
 rtrealloc(void *mem, size_t size)
 {
-    void *result = ctx_t.realloc(mem, size);
-    RASTER_DEBUGF(5, "rtrealloc called: %d@%p", size, result);
-    return result;
+  void *result = ctx_t.realloc(mem, size);
+  RASTER_DEBUGF(5, "rtrealloc called: %d@%p", size, result);
+  return result;
 }
 
 void
 rtdealloc(void *mem)
 {
-    ctx_t.dealloc(mem);
-    RASTER_DEBUG(5, "rtdealloc called");
+  ctx_t.dealloc(mem);
+  RASTER_DEBUG(5, "rtdealloc called");
 }
 
 /**
@@ -203,38 +203,38 @@ rtdealloc(void *mem)
 void
 rterror(const char *fmt, ...)
 {
-    va_list ap;
+  va_list ap;
 
-    va_start(ap, fmt);
+  va_start(ap, fmt);
 
-    /* Call the supplied function */
-    (*ctx_t.err)(fmt, ap);
+  /* Call the supplied function */
+  (*ctx_t.err)(fmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }
 
 void
 rtinfo(const char *fmt, ...)
 {
-    va_list ap;
+  va_list ap;
 
-    va_start(ap, fmt);
+  va_start(ap, fmt);
 
-    /* Call the supplied function */
-    (*ctx_t.info)(fmt, ap);
+  /* Call the supplied function */
+  (*ctx_t.info)(fmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }
 
 void
 rtwarn(const char *fmt, ...)
 {
-    va_list ap;
+  va_list ap;
 
-    va_start(ap, fmt);
+  va_start(ap, fmt);
 
-    /* Call the supplied function */
-    (*ctx_t.warn)(fmt, ap);
+  /* Call the supplied function */
+  (*ctx_t.warn)(fmt, ap);
 
-    va_end(ap);
+  va_end(ap);
 }

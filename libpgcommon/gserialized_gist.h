@@ -11,8 +11,8 @@
 */
 typedef struct
 {
-    int32 varsize;
-    float c[1];
+  int32 varsize;
+  float c[1];
 } GIDX;
 
 /*
@@ -32,10 +32,10 @@ typedef struct
  * for more details.
  */
 #define POSTGIS_FREE_IF_COPY_P(ptrsrc, ptrori) \
-    do \
-    { \
-        if ((Pointer)(ptrsrc) != (Pointer)(ptrori)) pfree(ptrsrc); \
-    } while (0)
+  do \
+  { \
+    if ((Pointer)(ptrsrc) != (Pointer)(ptrori)) pfree(ptrsrc); \
+  } while (0)
 
 /**********************************************************************
 **  BOX2DF structure.
@@ -47,7 +47,7 @@ typedef struct
 
 typedef struct
 {
-    float xmin, xmax, ymin, ymax;
+  float xmin, xmax, ymin, ymax;
 } BOX2DF;
 
 /*********************************************************************************

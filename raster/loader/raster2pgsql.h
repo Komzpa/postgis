@@ -71,131 +71,131 @@
 
 typedef struct raster_loader_config
 {
-    /* raster filename */
-    uint32_t rt_file_count;
-    char **rt_file;
-    char **rt_filename;
+  /* raster filename */
+  uint32_t rt_file_count;
+  char **rt_file;
+  char **rt_filename;
 
-    /* schema to load into */
-    char *schema;
+  /* schema to load into */
+  char *schema;
 
-    /* table to load into */
-    char *table;
+  /* table to load into */
+  char *table;
 
-    /* raster column name specified by user */
-    char *raster_column;
+  /* raster column name specified by user */
+  char *raster_column;
 
-    /* add column with raster filename, 1 = yes, 0 = no (default) */
-    int file_column;
-    char *file_column_name;
+  /* add column with raster filename, 1 = yes, 0 = no (default) */
+  int file_column;
+  char *file_column_name;
 
-    /* overview factor */
-    uint32_t overview_count;
-    int *overview;
-    char **overview_table;
+  /* overview factor */
+  uint32_t overview_count;
+  int *overview;
+  char **overview_table;
 
-    /* case-sensitive of identifiers, 1 = yes, 0 = no (default) */
-    int quoteident;
+  /* case-sensitive of identifiers, 1 = yes, 0 = no (default) */
+  int quoteident;
 
-    /* SRID of input raster */
-    int srid;
+  /* SRID of input raster */
+  int srid;
 
-    /* SRID of output raster (reprojection) */
-    int out_srid;
+  /* SRID of output raster (reprojection) */
+  int out_srid;
 
-    /* bands to extract */
-    int *nband; /* 1-based */
-    uint32_t nband_count;
+  /* bands to extract */
+  int *nband; /* 1-based */
+  uint32_t nband_count;
 
-    /* tile size */
-    int tile_size[2];
+  /* tile size */
+  int tile_size[2];
 
-    /* pad tiles */
-    int pad_tile;
+  /* pad tiles */
+  int pad_tile;
 
-    /* register raster as of out-of-db, 1 = yes, 0 = no (default) */
-    int outdb;
+  /* register raster as of out-of-db, 1 = yes, 0 = no (default) */
+  int outdb;
 
-    /* type of operation, (d|a|c|p) */
-    char opt;
+  /* type of operation, (d|a|c|p) */
+  char opt;
 
-    /* create index, 1 = yes, 0 = no (default) */
-    int idx;
+  /* create index, 1 = yes, 0 = no (default) */
+  int idx;
 
-    /* maintenance statements, 1 = yes, 0 = no (default) */
-    int maintenance;
+  /* maintenance statements, 1 = yes, 0 = no (default) */
+  int maintenance;
 
-    /* set constraints */
-    int constraints;
+  /* set constraints */
+  int constraints;
 
-    /* enable max extent constraint, 1 = yes (default), 0 = no */
-    int max_extent;
+  /* enable max extent constraint, 1 = yes (default), 0 = no */
+  int max_extent;
 
-    /* enable regular_blocking constraint, 1 = yes, 0 = no (default) */
-    int regular_blocking;
+  /* enable regular_blocking constraint, 1 = yes, 0 = no (default) */
+  int regular_blocking;
 
-    /* new table's tablespace */
-    char *tablespace;
+  /* new table's tablespace */
+  char *tablespace;
 
-    /* new index's tablespace */
-    char *idx_tablespace;
+  /* new index's tablespace */
+  char *idx_tablespace;
 
-    /* flag indicating that user specified a nodata value */
-    int hasnodata;
-    /* nodata value for bands with no nodata value */
-    double nodataval;
+  /* flag indicating that user specified a nodata value */
+  int hasnodata;
+  /* nodata value for bands with no nodata value */
+  double nodataval;
 
-    /* skip NODATA value check for bands */
-    int skip_nodataval_check;
+  /* skip NODATA value check for bands */
+  int skip_nodataval_check;
 
-    /* endianness of binary output, 0 = XDR, 1 = NDR (default) */
-    int endian;
+  /* endianness of binary output, 0 = XDR, 1 = NDR (default) */
+  int endian;
 
-    /* version of output format */
-    int version;
+  /* version of output format */
+  int version;
 
-    /* use a transaction, 0 = no, 1 = yes (default) */
-    int transaction;
+  /* use a transaction, 0 = no, 1 = yes (default) */
+  int transaction;
 
-    /* use COPY instead of INSERT */
-    int copy_statements;
+  /* use COPY instead of INSERT */
+  int copy_statements;
 
 } RTLOADERCFG;
 
 typedef struct rasterinfo_t
 {
-    /* SRID of raster */
-    int srid;
+  /* SRID of raster */
+  int srid;
 
-    /* srs of raster */
-    char *srs;
+  /* srs of raster */
+  char *srs;
 
-    /* width, height */
-    uint32_t dim[2];
+  /* width, height */
+  uint32_t dim[2];
 
-    /* number of bands */
-    int *nband; /* 1-based */
-    uint32_t nband_count;
+  /* number of bands */
+  int *nband; /* 1-based */
+  uint32_t nband_count;
 
-    /* array of pixeltypes */
-    GDALDataType *gdalbandtype;
-    rt_pixtype *bandtype;
+  /* array of pixeltypes */
+  GDALDataType *gdalbandtype;
+  rt_pixtype *bandtype;
 
-    /* array of hasnodata flags */
-    int *hasnodata;
-    /* array of nodatavals */
-    double *nodataval;
+  /* array of hasnodata flags */
+  int *hasnodata;
+  /* array of nodatavals */
+  double *nodataval;
 
-    /* geotransform matrix */
-    double gt[6];
+  /* geotransform matrix */
+  double gt[6];
 
-    /* tile size */
-    int tile_size[2];
+  /* tile size */
+  int tile_size[2];
 
 } RASTERINFO;
 
 typedef struct stringbuffer_t
 {
-    uint32_t length;
-    char **line;
+  uint32_t length;
+  char **line;
 } STRINGBUFFER;

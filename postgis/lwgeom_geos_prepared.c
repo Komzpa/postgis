@@ -80,9 +80,9 @@ static HTAB *PrepGeomHash = NULL;
 
 typedef struct
 {
-    MemoryContext context;
-    const GEOSPreparedGeometry *prepared_geom;
-    const GEOSGeometry *geom;
+  MemoryContext context;
+  const GEOSPreparedGeometry *prepared_geom;
+  const GEOSGeometry *geom;
 } PrepGeomHashEntry;
 
 /* Memory context hash table function prototypes */
@@ -99,80 +99,80 @@ PreparedCacheDelete(MemoryContext context)
 #else
 PreparedCacheDelete(void *ptr)
 {
-    MemoryContext context = (MemoryContext)ptr;
+  MemoryContext context = (MemoryContext)ptr;
 #endif
 
-    PrepGeomHashEntry *pghe;
+  PrepGeomHashEntry *pghe;
 
-    /* Lookup the hash entry pointer in the global hash table so we can free it */
-    pghe = GetPrepGeomHashEntry(context);
+  /* Lookup the hash entry pointer in the global hash table so we can free it */
+  pghe = GetPrepGeomHashEntry(context);
 
-    if (!pghe)
-        elog(ERROR,
-             "PreparedCacheDelete: Trying to delete non-existant hash entry object with MemoryContext key (%p)",
-             (void *)context);
+  if (!pghe)
+    elog(ERROR,
+         "PreparedCacheDelete: Trying to delete non-existant hash entry object with MemoryContext key (%p)",
+         (void *)context);
 
-    POSTGIS_DEBUGF(3,
-                   "deleting geom object (%p) and prepared geom object (%p) with MemoryContext key (%p)",
-                   pghe->geom,
-                   pghe->prepared_geom,
-                   context);
+  POSTGIS_DEBUGF(3,
+                 "deleting geom object (%p) and prepared geom object (%p) with MemoryContext key (%p)",
+                 pghe->geom,
+                 pghe->prepared_geom,
+                 context);
 
-    /* Free them */
-    if (pghe->prepared_geom) GEOSPreparedGeom_destroy(pghe->prepared_geom);
-    if (pghe->geom) GEOSGeom_destroy((GEOSGeometry *)pghe->geom);
+  /* Free them */
+  if (pghe->prepared_geom) GEOSPreparedGeom_destroy(pghe->prepared_geom);
+  if (pghe->geom) GEOSGeom_destroy((GEOSGeometry *)pghe->geom);
 
-    /* Remove the hash entry as it is no longer needed */
-    DeletePrepGeomHashEntry(context);
+  /* Remove the hash entry as it is no longer needed */
+  DeletePrepGeomHashEntry(context);
 }
 
 #if POSTGIS_PGSQL_VERSION < 96
 static void
 PreparedCacheInit(MemoryContext context)
 {
-    /*
-     * Do nothing as the cache is initialised when the transform()
-     * function is first called
-     */
+  /*
+   * Do nothing as the cache is initialised when the transform()
+   * function is first called
+   */
 }
 
 static void
 PreparedCacheReset(MemoryContext context)
 {
-    /*
-     * Do nothing, but we must supply a function since this call is mandatory according to tgl
-     * (see postgis-devel archives July 2007)
-     */
+  /*
+   * Do nothing, but we must supply a function since this call is mandatory according to tgl
+   * (see postgis-devel archives July 2007)
+   */
 }
 
 static bool
 PreparedCacheIsEmpty(MemoryContext context)
 {
-    /*
-     * Always return false since this call is mandatory according to tgl
-     * (see postgis-devel archives July 2007)
-     */
-    return LW_FALSE;
+  /*
+   * Always return false since this call is mandatory according to tgl
+   * (see postgis-devel archives July 2007)
+   */
+  return LW_FALSE;
 }
 
 static void
 PreparedCacheStats(MemoryContext context, int level)
 {
-    /*
-     * Simple stats display function - we must supply a function since this call is mandatory according to tgl
-     * (see postgis-devel archives July 2007)
-       fprintf(stderr, "%s: Prepared context\n", context->name);
-     */
+  /*
+   * Simple stats display function - we must supply a function since this call is mandatory according to tgl
+   * (see postgis-devel archives July 2007)
+     fprintf(stderr, "%s: Prepared context\n", context->name);
+   */
 }
 
 #ifdef MEMORY_CONTEXT_CHECKING
 static void
 PreparedCacheCheck(MemoryContext context)
 {
-    /*
-     * Do nothing - stub required for when PostgreSQL is compiled
-     * with MEMORY_CONTEXT_CHECKING defined
-     */
+  /*
+   * Do nothing - stub required for when PostgreSQL is compiled
+   * with MEMORY_CONTEXT_CHECKING defined
+   */
 }
 #endif
 
@@ -201,89 +201,89 @@ static MemoryContextMethods PreparedCacheContextMethods = {NULL,
 uint32
 mcxt_ptr_hasha(const void *key, Size keysize)
 {
-    uint32 hashval;
+  uint32 hashval;
 
-    hashval = DatumGetUInt32(hash_any(key, keysize));
+  hashval = DatumGetUInt32(hash_any(key, keysize));
 
-    return hashval;
+  return hashval;
 }
 
 static void
 CreatePrepGeomHash(void)
 {
-    HASHCTL ctl;
+  HASHCTL ctl;
 
-    ctl.keysize = sizeof(MemoryContext);
-    ctl.entrysize = sizeof(PrepGeomHashEntry);
-    ctl.hash = mcxt_ptr_hasha;
+  ctl.keysize = sizeof(MemoryContext);
+  ctl.entrysize = sizeof(PrepGeomHashEntry);
+  ctl.hash = mcxt_ptr_hasha;
 
-    PrepGeomHash = hash_create("PostGIS Prepared Geometry Backend MemoryContext Hash",
-                               PREPARED_BACKEND_HASH_SIZE,
-                               &ctl,
-                               (HASH_ELEM | HASH_FUNCTION));
+  PrepGeomHash = hash_create("PostGIS Prepared Geometry Backend MemoryContext Hash",
+                             PREPARED_BACKEND_HASH_SIZE,
+                             &ctl,
+                             (HASH_ELEM | HASH_FUNCTION));
 }
 
 static void
 AddPrepGeomHashEntry(PrepGeomHashEntry pghe)
 {
-    bool found;
-    void **key;
-    PrepGeomHashEntry *he;
+  bool found;
+  void **key;
+  PrepGeomHashEntry *he;
 
-    /* The hash key is the MemoryContext pointer */
-    key = (void *)&(pghe.context);
+  /* The hash key is the MemoryContext pointer */
+  key = (void *)&(pghe.context);
 
-    he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_ENTER, &found);
-    if (!found)
-    {
-        /* Insert the entry into the new hash element */
-        he->context = pghe.context;
-        he->geom = pghe.geom;
-        he->prepared_geom = pghe.prepared_geom;
-    }
-    else
-    {
-        elog(ERROR, "AddPrepGeomHashEntry: This memory context is already in use! (%p)", (void *)pghe.context);
-    }
+  he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_ENTER, &found);
+  if (!found)
+  {
+    /* Insert the entry into the new hash element */
+    he->context = pghe.context;
+    he->geom = pghe.geom;
+    he->prepared_geom = pghe.prepared_geom;
+  }
+  else
+  {
+    elog(ERROR, "AddPrepGeomHashEntry: This memory context is already in use! (%p)", (void *)pghe.context);
+  }
 }
 
 static PrepGeomHashEntry *
 GetPrepGeomHashEntry(MemoryContext mcxt)
 {
-    void **key;
-    PrepGeomHashEntry *he;
+  void **key;
+  PrepGeomHashEntry *he;
 
-    /* The hash key is the MemoryContext pointer */
-    key = (void *)&mcxt;
+  /* The hash key is the MemoryContext pointer */
+  key = (void *)&mcxt;
 
-    /* Return the projection object from the hash */
-    he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_FIND, NULL);
+  /* Return the projection object from the hash */
+  he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_FIND, NULL);
 
-    return he;
+  return he;
 }
 
 static void
 DeletePrepGeomHashEntry(MemoryContext mcxt)
 {
-    void **key;
-    PrepGeomHashEntry *he;
+  void **key;
+  PrepGeomHashEntry *he;
 
-    /* The hash key is the MemoryContext pointer */
-    key = (void *)&mcxt;
+  /* The hash key is the MemoryContext pointer */
+  key = (void *)&mcxt;
 
-    /* Delete the projection object from the hash */
-    he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_REMOVE, NULL);
+  /* Delete the projection object from the hash */
+  he = (PrepGeomHashEntry *)hash_search(PrepGeomHash, key, HASH_REMOVE, NULL);
 
-    if (!he)
-    {
-        elog(ERROR,
-             "DeletePrepGeomHashEntry: There was an error removing the geometry object from this MemoryContext "
-             "(%p)",
-             (void *)mcxt);
-    }
+  if (!he)
+  {
+    elog(ERROR,
+         "DeletePrepGeomHashEntry: There was an error removing the geometry object from this MemoryContext "
+         "(%p)",
+         (void *)mcxt);
+  }
 
-    he->prepared_geom = NULL;
-    he->geom = NULL;
+  he->prepared_geom = NULL;
+  he->geom = NULL;
 }
 
 /**
@@ -301,87 +301,86 @@ DeletePrepGeomHashEntry(MemoryContext mcxt)
 static int
 PrepGeomCacheBuilder(const LWGEOM *lwgeom, GeomCache *cache)
 {
-    PrepGeomCache *prepcache = (PrepGeomCache *)cache;
-    PrepGeomHashEntry *pghe;
+  PrepGeomCache *prepcache = (PrepGeomCache *)cache;
+  PrepGeomHashEntry *pghe;
 
-    /*
-     * First time through? allocate the global hash.
-     */
-    if (!PrepGeomHash) CreatePrepGeomHash();
+  /*
+   * First time through? allocate the global hash.
+   */
+  if (!PrepGeomHash) CreatePrepGeomHash();
 
-    /*
-     * No callback entry for this statement context yet? Set it up
-     */
-    if (!prepcache->context_callback)
-    {
-        PrepGeomHashEntry pghe;
+  /*
+   * No callback entry for this statement context yet? Set it up
+   */
+  if (!prepcache->context_callback)
+  {
+    PrepGeomHashEntry pghe;
 #if POSTGIS_PGSQL_VERSION < 96
-        prepcache->context_callback = MemoryContextCreate(T_AllocSetContext,
-                                                          8192,
-                                                          &PreparedCacheContextMethods,
-                                                          prepcache->context_statement,
-                                                          "PostGIS Prepared Geometry Context");
+    prepcache->context_callback = MemoryContextCreate(T_AllocSetContext,
+                                                      8192,
+                                                      &PreparedCacheContextMethods,
+                                                      prepcache->context_statement,
+                                                      "PostGIS Prepared Geometry Context");
 
 #else
-        prepcache->context_callback = AllocSetContextCreate(
-            prepcache->context_statement, "PostGIS Prepared Geometry Context", ALLOCSET_SMALL_SIZES);
+    prepcache->context_callback =
+        AllocSetContextCreate(prepcache->context_statement, "PostGIS Prepared Geometry Context", ALLOCSET_SMALL_SIZES);
 
-        /* PgSQL comments suggest allocating callback in the context */
-        /* being managed, so that the callback object gets cleaned along with */
-        /* the context */
-        MemoryContextCallback *callback =
-            MemoryContextAlloc(prepcache->context_callback, sizeof(MemoryContextCallback));
-        callback->arg = (void *)(prepcache->context_callback);
-        callback->func = PreparedCacheDelete;
-        MemoryContextRegisterResetCallback(prepcache->context_callback, callback);
+    /* PgSQL comments suggest allocating callback in the context */
+    /* being managed, so that the callback object gets cleaned along with */
+    /* the context */
+    MemoryContextCallback *callback = MemoryContextAlloc(prepcache->context_callback, sizeof(MemoryContextCallback));
+    callback->arg = (void *)(prepcache->context_callback);
+    callback->func = PreparedCacheDelete;
+    MemoryContextRegisterResetCallback(prepcache->context_callback, callback);
 #endif
 
-        pghe.context = prepcache->context_callback;
-        pghe.geom = 0;
-        pghe.prepared_geom = 0;
-        AddPrepGeomHashEntry(pghe);
-    }
+    pghe.context = prepcache->context_callback;
+    pghe.geom = 0;
+    pghe.prepared_geom = 0;
+    AddPrepGeomHashEntry(pghe);
+  }
 
-    /*
-     * Hum, we shouldn't be asked to build a new cache on top of
-     * an existing one. Error.
-     */
-    if (prepcache->gcache.argnum || prepcache->geom || prepcache->prepared_geom)
-    {
-        lwpgerror("PrepGeomCacheBuilder asked to build new prepcache where one already exists.");
-        return LW_FAILURE;
-    }
+  /*
+   * Hum, we shouldn't be asked to build a new cache on top of
+   * an existing one. Error.
+   */
+  if (prepcache->gcache.argnum || prepcache->geom || prepcache->prepared_geom)
+  {
+    lwpgerror("PrepGeomCacheBuilder asked to build new prepcache where one already exists.");
+    return LW_FAILURE;
+  }
 
-    /*
-     * Avoid creating a PreparedPoint around a Point or a MultiPoint.
-     * Consider changing this behavior in the future if supported GEOS
-     * versions correctly handle prepared points and multipoints and
-     * provide a performance benefit.
-     * See https://trac.osgeo.org/postgis/ticket/3437
-     */
-    if (lwgeom_get_type(lwgeom) == POINTTYPE || lwgeom_get_type(lwgeom) == MULTIPOINTTYPE) return LW_FAILURE;
+  /*
+   * Avoid creating a PreparedPoint around a Point or a MultiPoint.
+   * Consider changing this behavior in the future if supported GEOS
+   * versions correctly handle prepared points and multipoints and
+   * provide a performance benefit.
+   * See https://trac.osgeo.org/postgis/ticket/3437
+   */
+  if (lwgeom_get_type(lwgeom) == POINTTYPE || lwgeom_get_type(lwgeom) == MULTIPOINTTYPE) return LW_FAILURE;
 
-    prepcache->geom = LWGEOM2GEOS(lwgeom, 0);
-    if (!prepcache->geom) return LW_FAILURE;
-    prepcache->prepared_geom = GEOSPrepare(prepcache->geom);
-    if (!prepcache->prepared_geom) return LW_FAILURE;
-    prepcache->gcache.argnum = cache->argnum;
+  prepcache->geom = LWGEOM2GEOS(lwgeom, 0);
+  if (!prepcache->geom) return LW_FAILURE;
+  prepcache->prepared_geom = GEOSPrepare(prepcache->geom);
+  if (!prepcache->prepared_geom) return LW_FAILURE;
+  prepcache->gcache.argnum = cache->argnum;
 
-    /*
-     * In order to find the objects we need to destroy, we keep
-     * extra references in a global hash object.
-     */
-    pghe = GetPrepGeomHashEntry(prepcache->context_callback);
-    if (!pghe)
-    {
-        lwpgerror("PrepGeomCacheBuilder failed to find hash entry for context %p", prepcache->context_callback);
-        return LW_FAILURE;
-    }
+  /*
+   * In order to find the objects we need to destroy, we keep
+   * extra references in a global hash object.
+   */
+  pghe = GetPrepGeomHashEntry(prepcache->context_callback);
+  if (!pghe)
+  {
+    lwpgerror("PrepGeomCacheBuilder failed to find hash entry for context %p", prepcache->context_callback);
+    return LW_FAILURE;
+  }
 
-    pghe->geom = prepcache->geom;
-    pghe->prepared_geom = prepcache->prepared_geom;
+  pghe->geom = prepcache->geom;
+  pghe->prepared_geom = prepcache->prepared_geom;
 
-    return LW_SUCCESS;
+  return LW_SUCCESS;
 }
 
 /**
@@ -397,45 +396,45 @@ PrepGeomCacheBuilder(const LWGEOM *lwgeom, GeomCache *cache)
 static int
 PrepGeomCacheCleaner(GeomCache *cache)
 {
-    PrepGeomHashEntry *pghe = 0;
-    PrepGeomCache *prepcache = (PrepGeomCache *)cache;
+  PrepGeomHashEntry *pghe = 0;
+  PrepGeomCache *prepcache = (PrepGeomCache *)cache;
 
-    if (!prepcache) return LW_FAILURE;
+  if (!prepcache) return LW_FAILURE;
 
-    /*
-     * Clear out the references to the soon-to-be-freed GEOS objects
-     * from the callback hash entry
-     */
-    pghe = GetPrepGeomHashEntry(prepcache->context_callback);
-    if (!pghe)
-    {
-        lwpgerror("PrepGeomCacheCleaner failed to find hash entry for context %p", prepcache->context_callback);
-        return LW_FAILURE;
-    }
-    pghe->geom = 0;
-    pghe->prepared_geom = 0;
+  /*
+   * Clear out the references to the soon-to-be-freed GEOS objects
+   * from the callback hash entry
+   */
+  pghe = GetPrepGeomHashEntry(prepcache->context_callback);
+  if (!pghe)
+  {
+    lwpgerror("PrepGeomCacheCleaner failed to find hash entry for context %p", prepcache->context_callback);
+    return LW_FAILURE;
+  }
+  pghe->geom = 0;
+  pghe->prepared_geom = 0;
 
-    /*
-     * Free the GEOS objects and free the index tree
-     */
-    POSTGIS_DEBUGF(3, "PrepGeomCacheFreeer: freeing %p argnum %d", prepcache, prepcache->gcache.argnum);
-    GEOSPreparedGeom_destroy(prepcache->prepared_geom);
-    GEOSGeom_destroy((GEOSGeometry *)prepcache->geom);
-    prepcache->gcache.argnum = 0;
-    prepcache->prepared_geom = 0;
-    prepcache->geom = 0;
+  /*
+   * Free the GEOS objects and free the index tree
+   */
+  POSTGIS_DEBUGF(3, "PrepGeomCacheFreeer: freeing %p argnum %d", prepcache, prepcache->gcache.argnum);
+  GEOSPreparedGeom_destroy(prepcache->prepared_geom);
+  GEOSGeom_destroy((GEOSGeometry *)prepcache->geom);
+  prepcache->gcache.argnum = 0;
+  prepcache->prepared_geom = 0;
+  prepcache->geom = 0;
 
-    return LW_SUCCESS;
+  return LW_SUCCESS;
 }
 
 static GeomCache *
 PrepGeomCacheAllocator()
 {
-    PrepGeomCache *prepcache = palloc(sizeof(PrepGeomCache));
-    memset(prepcache, 0, sizeof(PrepGeomCache));
-    prepcache->context_statement = CurrentMemoryContext;
-    prepcache->gcache.type = PREP_CACHE_ENTRY;
-    return (GeomCache *)prepcache;
+  PrepGeomCache *prepcache = palloc(sizeof(PrepGeomCache));
+  memset(prepcache, 0, sizeof(PrepGeomCache));
+  prepcache->context_statement = CurrentMemoryContext;
+  prepcache->gcache.type = PREP_CACHE_ENTRY;
+  return (GeomCache *)prepcache;
 }
 
 static GeomCacheMethods PrepGeomCacheMethods = {PREP_CACHE_ENTRY,
@@ -457,5 +456,5 @@ static GeomCacheMethods PrepGeomCacheMethods = {PREP_CACHE_ENTRY,
 PrepGeomCache *
 GetPrepGeomCache(FunctionCallInfoData *fcinfo, GSERIALIZED *g1, GSERIALIZED *g2)
 {
-    return (PrepGeomCache *)GetGeomCache(fcinfo, &PrepGeomCacheMethods, g1, g2);
+  return (PrepGeomCache *)GetGeomCache(fcinfo, &PrepGeomCacheMethods, g1, g2);
 }

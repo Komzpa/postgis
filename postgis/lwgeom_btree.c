@@ -49,105 +49,105 @@ Datum lwgeom_cmp(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(lwgeom_lt);
 Datum lwgeom_lt(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int cmp = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    if (cmp < 0)
-        PG_RETURN_BOOL(true);
-    else
-        PG_RETURN_BOOL(false);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int cmp = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  if (cmp < 0)
+    PG_RETURN_BOOL(true);
+  else
+    PG_RETURN_BOOL(false);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_le);
 Datum lwgeom_le(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int cmp = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    if (cmp == 0)
-        PG_RETURN_BOOL(true);
-    else
-        PG_RETURN_BOOL(false);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int cmp = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  if (cmp == 0)
+    PG_RETURN_BOOL(true);
+  else
+    PG_RETURN_BOOL(false);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_eq);
 Datum lwgeom_eq(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int cmp = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    if (cmp == 0)
-        PG_RETURN_BOOL(true);
-    else
-        PG_RETURN_BOOL(false);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int cmp = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  if (cmp == 0)
+    PG_RETURN_BOOL(true);
+  else
+    PG_RETURN_BOOL(false);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_ge);
 Datum lwgeom_ge(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int cmp = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    if (cmp >= 0)
-        PG_RETURN_BOOL(true);
-    else
-        PG_RETURN_BOOL(false);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int cmp = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  if (cmp >= 0)
+    PG_RETURN_BOOL(true);
+  else
+    PG_RETURN_BOOL(false);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_gt);
 Datum lwgeom_gt(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int cmp = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    if (cmp > 0)
-        PG_RETURN_BOOL(true);
-    else
-        PG_RETURN_BOOL(false);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int cmp = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  if (cmp > 0)
+    PG_RETURN_BOOL(true);
+  else
+    PG_RETURN_BOOL(false);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_cmp);
 Datum lwgeom_cmp(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
-    int ret = gserialized_cmp(g1, g2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_FREE_IF_COPY(g2, 1);
-    PG_RETURN_INT32(ret);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  GSERIALIZED *g2 = PG_GETARG_GSERIALIZED_P(1);
+  int ret = gserialized_cmp(g1, g2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_FREE_IF_COPY(g2, 1);
+  PG_RETURN_INT32(ret);
 }
 
 PG_FUNCTION_INFO_V1(lwgeom_hash);
 Datum lwgeom_hash(PG_FUNCTION_ARGS)
 {
-    GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
-    /* Point to just the type/coordinate part of buffer */
-    size_t hsz1 = gserialized_header_size(g1);
-    uint8_t *b1 = (uint8_t *)g1 + hsz1;
-    /* Calculate size of type/coordinate buffer */
-    size_t sz1 = VARSIZE(g1);
-    size_t bsz1 = sz1 - hsz1;
-    /* Calculate size of srid/type/coordinate buffer */
-    int srid = gserialized_get_srid(g1);
-    size_t bsz2 = bsz1 + sizeof(int);
-    uint8_t *b2 = palloc(bsz2);
-    /* Copy srid into front of combined buffer */
-    memcpy(b2, &srid, sizeof(int));
-    /* Copy type/coordinates into rest of combined buffer */
-    memcpy(b2 + sizeof(int), b1, bsz1);
-    /* Hash combined buffer */
-    Datum hval = hash_any(b2, bsz2);
-    pfree(b2);
-    PG_FREE_IF_COPY(g1, 0);
-    PG_RETURN_DATUM(hval);
+  GSERIALIZED *g1 = PG_GETARG_GSERIALIZED_P(0);
+  /* Point to just the type/coordinate part of buffer */
+  size_t hsz1 = gserialized_header_size(g1);
+  uint8_t *b1 = (uint8_t *)g1 + hsz1;
+  /* Calculate size of type/coordinate buffer */
+  size_t sz1 = VARSIZE(g1);
+  size_t bsz1 = sz1 - hsz1;
+  /* Calculate size of srid/type/coordinate buffer */
+  int srid = gserialized_get_srid(g1);
+  size_t bsz2 = bsz1 + sizeof(int);
+  uint8_t *b2 = palloc(bsz2);
+  /* Copy srid into front of combined buffer */
+  memcpy(b2, &srid, sizeof(int));
+  /* Copy type/coordinates into rest of combined buffer */
+  memcpy(b2 + sizeof(int), b1, bsz1);
+  /* Hash combined buffer */
+  Datum hval = hash_any(b2, bsz2);
+  pfree(b2);
+  PG_FREE_IF_COPY(g1, 0);
+  PG_RETURN_DATUM(hval);
 }

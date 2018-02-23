@@ -35,9 +35,9 @@
 
 typedef struct
 {
-    size_t capacity;
-    char *str_end;
-    char *str_start;
+  size_t capacity;
+  char *str_end;
+  char *str_start;
 } stringbuffer_t;
 
 extern stringbuffer_t *stringbuffer_create_with_size(size_t size);

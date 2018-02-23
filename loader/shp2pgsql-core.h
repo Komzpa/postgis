@@ -81,71 +81,71 @@
  */
 typedef struct shp_loader_config
 {
-    /* load mode: c = create, d = delete, a = append, p = prepare */
-    char opt;
+  /* load mode: c = create, d = delete, a = append, p = prepare */
+  char opt;
 
-    /* table to load into */
-    char *table;
+  /* table to load into */
+  char *table;
 
-    /* schema to load into */
-    char *schema;
+  /* schema to load into */
+  char *schema;
 
-    /* geometry/geography column name specified by the user, may be null. */
-    char *geo_col;
+  /* geometry/geography column name specified by the user, may be null. */
+  char *geo_col;
 
-    /* the shape file (without the .shp extension) */
-    char *shp_file;
+  /* the shape file (without the .shp extension) */
+  char *shp_file;
 
-    /* 0 = SQL inserts, 1 = dump */
-    int dump_format;
+  /* 0 = SQL inserts, 1 = dump */
+  int dump_format;
 
-    /* 0 = MULTIPOLYGON/MULTILINESTRING, 1 = force to POLYGON/LINESTRING */
-    int simple_geometries;
+  /* 0 = MULTIPOLYGON/MULTILINESTRING, 1 = force to POLYGON/LINESTRING */
+  int simple_geometries;
 
-    /* 0 = geometry, 1 = geography */
-    int geography;
+  /* 0 = geometry, 1 = geography */
+  int geography;
 
-    /* 0 = columnname, 1 = "columnName" */
-    int quoteidentifiers;
+  /* 0 = columnname, 1 = "columnName" */
+  int quoteidentifiers;
 
-    /* 0 = allow int8 fields, 1 = no int8 fields */
-    int forceint4;
+  /* 0 = allow int8 fields, 1 = no int8 fields */
+  int forceint4;
 
-    /* 0 = no index, 1 = create index after load */
-    int createindex;
+  /* 0 = no index, 1 = create index after load */
+  int createindex;
 
-    /* 0 = load DBF file only, 1 = load everything */
-    int readshape;
+  /* 0 = load DBF file only, 1 = load everything */
+  int readshape;
 
-    /* Override the output geometry type (a FORCE_OUTPUT_* constant) */
-    int force_output;
+  /* Override the output geometry type (a FORCE_OUTPUT_* constant) */
+  int force_output;
 
-    /* iconv encoding name */
-    char *encoding;
+  /* iconv encoding name */
+  char *encoding;
 
-    /* tablespace name for the table */
-    char *tablespace;
+  /* tablespace name for the table */
+  char *tablespace;
 
-    /* tablespace name for the indexes */
-    char *idxtablespace;
+  /* tablespace name for the indexes */
+  char *idxtablespace;
 
-    /* how to handle nulls */
-    int null_policy;
+  /* how to handle nulls */
+  int null_policy;
 
-    /* SRID specified */
-    int sr_id;
+  /* SRID specified */
+  int sr_id;
 
-    /* SRID of the shape file */
-    int shp_sr_id;
+  /* SRID of the shape file */
+  int shp_sr_id;
 
-    /* 0 = WKB (more precise), 1 = WKT (may have coordinate drift). */
-    int use_wkt;
+  /* 0 = WKB (more precise), 1 = WKT (may have coordinate drift). */
+  int use_wkt;
 
-    /* whether to do a single transaction or run each statement on its own */
-    int usetransaction;
+  /* whether to do a single transaction or run each statement on its own */
+  int usetransaction;
 
-    /* Name of the column map file if specified */
-    char *column_map_filename;
+  /* Name of the column map file if specified */
+  char *column_map_filename;
 
 } SHPLOADERCONFIG;
 
@@ -154,70 +154,70 @@ typedef struct shp_loader_config
  */
 typedef struct shp_loader_state
 {
-    /* Configuration for this state */
-    SHPLOADERCONFIG *config;
+  /* Configuration for this state */
+  SHPLOADERCONFIG *config;
 
-    /* Shapefile handle */
-    SHPHandle hSHPHandle;
+  /* Shapefile handle */
+  SHPHandle hSHPHandle;
 
-    /* Shapefile type */
-    int shpfiletype;
+  /* Shapefile type */
+  int shpfiletype;
 
-    /* Data file handle */
-    DBFHandle hDBFHandle;
+  /* Data file handle */
+  DBFHandle hDBFHandle;
 
-    /* Number of rows in the shapefile */
-    int num_entities;
+  /* Number of rows in the shapefile */
+  int num_entities;
 
-    /* Number of fields in the shapefile */
-    int num_fields;
+  /* Number of fields in the shapefile */
+  int num_fields;
 
-    /* Number of rows in the DBF file */
-    int num_records;
+  /* Number of rows in the DBF file */
+  int num_records;
 
-    /* Pointer to an array of field names */
-    char **field_names;
+  /* Pointer to an array of field names */
+  char **field_names;
 
-    /* Field type */
-    DBFFieldType *types;
+  /* Field type */
+  DBFFieldType *types;
 
-    /* Arrays of field widths and precisions */
-    int *widths;
-    int *precisions;
+  /* Arrays of field widths and precisions */
+  int *widths;
+  int *precisions;
 
-    /* Pointer to an array of PostgreSQL field types */
-    char **pgfieldtypes;
+  /* Pointer to an array of PostgreSQL field types */
+  char **pgfieldtypes;
 
-    /* String containing colume name list in the form "(col1, col2, col3 ... , colN)" */
-    char *col_names;
+  /* String containing colume name list in the form "(col1, col2, col3 ... , colN)" */
+  char *col_names;
 
-    /* String containing the PostGIS geometry type, e.g. POINT, POLYGON etc. */
-    char *pgtype;
+  /* String containing the PostGIS geometry type, e.g. POINT, POLYGON etc. */
+  char *pgtype;
 
-    /* Flag for whether the output geometry has Z coordinates or not. */
-    int has_z;
+  /* Flag for whether the output geometry has Z coordinates or not. */
+  int has_z;
 
-    /* Flag for whether the output geometry has M coordinates or not. */
-    int has_m;
+  /* Flag for whether the output geometry has M coordinates or not. */
+  int has_m;
 
-    /* Number of dimensions to output */
-    int pgdims;
+  /* Number of dimensions to output */
+  int pgdims;
 
-    /* Last (error) message */
-    char message[SHPLOADERMSGLEN];
+  /* Last (error) message */
+  char message[SHPLOADERMSGLEN];
 
-    /* SRID of the shape file.  If not reprojecting, will be the same as to_srid. */
-    int from_srid;
+  /* SRID of the shape file.  If not reprojecting, will be the same as to_srid. */
+  int from_srid;
 
-    /* SRID of the table.  If not reprojecting, will be the same as from_srid. */
-    int to_srid;
+  /* SRID of the table.  If not reprojecting, will be the same as from_srid. */
+  int to_srid;
 
-    /* geometry/geography column name to use.  Will be set to the default if the config did
-       not specify a column name. */
-    char *geo_col;
+  /* geometry/geography column name to use.  Will be set to the default if the config did
+     not specify a column name. */
+  char *geo_col;
 
-    /* Column map */
-    colmap column_map;
+  /* Column map */
+  colmap column_map;
 
 } SHPLOADERSTATE;
 

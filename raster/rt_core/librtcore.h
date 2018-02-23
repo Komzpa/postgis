@@ -162,13 +162,13 @@ typedef struct rt_colormap_t *rt_colormap;
 /* envelope information */
 typedef struct
 {
-    double MinX;
-    double MaxX;
-    double MinY;
-    double MaxY;
+  double MinX;
+  double MaxX;
+  double MinY;
+  double MaxY;
 
-    double UpperLeftX;
-    double UpperLeftY;
+  double UpperLeftX;
+  double UpperLeftY;
 } rt_envelope;
 
 /**
@@ -178,35 +178,35 @@ typedef struct
 /* function return error states */
 typedef enum
 {
-    ES_NONE = 0, /* no error */
-    ES_ERROR = 1 /* generic error */
+  ES_NONE = 0, /* no error */
+  ES_ERROR = 1 /* generic error */
 } rt_errorstate;
 
 /* Pixel types */
 typedef enum
 {
-    PT_1BB = 0,   /* 1-bit boolean            */
-    PT_2BUI = 1,  /* 2-bit unsigned integer   */
-    PT_4BUI = 2,  /* 4-bit unsigned integer   */
-    PT_8BSI = 3,  /* 8-bit signed integer     */
-    PT_8BUI = 4,  /* 8-bit unsigned integer   */
-    PT_16BSI = 5, /* 16-bit signed integer    */
-    PT_16BUI = 6, /* 16-bit unsigned integer  */
-    PT_32BSI = 7, /* 32-bit signed integer    */
-    PT_32BUI = 8, /* 32-bit unsigned integer  */
-    PT_32BF = 10, /* 32-bit float             */
-    PT_64BF = 11, /* 64-bit float             */
-    PT_END = 13
+  PT_1BB = 0,   /* 1-bit boolean            */
+  PT_2BUI = 1,  /* 2-bit unsigned integer   */
+  PT_4BUI = 2,  /* 4-bit unsigned integer   */
+  PT_8BSI = 3,  /* 8-bit signed integer     */
+  PT_8BUI = 4,  /* 8-bit unsigned integer   */
+  PT_16BSI = 5, /* 16-bit signed integer    */
+  PT_16BUI = 6, /* 16-bit unsigned integer  */
+  PT_32BSI = 7, /* 32-bit signed integer    */
+  PT_32BUI = 8, /* 32-bit unsigned integer  */
+  PT_32BF = 10, /* 32-bit float             */
+  PT_64BF = 11, /* 64-bit float             */
+  PT_END = 13
 } rt_pixtype;
 
 typedef enum
 {
-    ET_INTERSECTION = 0,
-    ET_UNION,
-    ET_FIRST,
-    ET_SECOND,
-    ET_LAST,
-    ET_CUSTOM
+  ET_INTERSECTION = 0,
+  ET_UNION,
+  ET_FIRST,
+  ET_SECOND,
+  ET_LAST,
+  ET_CUSTOM
 } rt_extenttype;
 
 /**
@@ -219,12 +219,12 @@ typedef enum
  */
 typedef enum
 {
-    GSR_OVERLAPS = 0,
-    GSR_TOUCHES,
-    GSR_CONTAINS,
-    GSR_CONTAINSPROPERLY,
-    GSR_COVERS,
-    GSR_COVEREDBY
+  GSR_OVERLAPS = 0,
+  GSR_TOUCHES,
+  GSR_CONTAINS,
+  GSR_CONTAINSPROPERLY,
+  GSR_COVERS,
+  GSR_COVEREDBY
 } rt_geos_spatial_test;
 
 /**
@@ -276,17 +276,17 @@ void default_rt_info_handler(const char *fmt, va_list ap);
 
 /* Display a simple message at NOTICE level */
 #define RASTER_DEBUG(level, msg) \
-    do \
-    { \
-        if (POSTGIS_DEBUG_LEVEL >= level) rtinfo("[%s:%s:%d] " msg, __FILE__, __func__, __LINE__); \
-    } while (0);
+  do \
+  { \
+    if (POSTGIS_DEBUG_LEVEL >= level) rtinfo("[%s:%s:%d] " msg, __FILE__, __func__, __LINE__); \
+  } while (0);
 
 /* Display a formatted message at NOTICE level (like printf, with variadic arguments) */
 #define RASTER_DEBUGF(level, msg, ...) \
-    do \
-    { \
-        if (POSTGIS_DEBUG_LEVEL >= level) rtinfo("[%s:%s:%d] " msg, __FILE__, __func__, __LINE__, __VA_ARGS__); \
-    } while (0);
+  do \
+  { \
+    if (POSTGIS_DEBUG_LEVEL >= level) rtinfo("[%s:%s:%d] " msg, __FILE__, __func__, __LINE__, __VA_ARGS__); \
+  } while (0);
 
 #else
 
@@ -2093,33 +2093,33 @@ rt_errorstate rt_util_hsv_to_rgb(double hsv[3], double rgb[3]);
  */
 struct rt_raster_serialized_t
 {
-    /*---[ 8 byte boundary ]---{ */
-    uint32_t size;     /* required by postgresql: 4 bytes */
-    uint16_t version;  /* format version (this is version 0): 2 bytes */
-    uint16_t numBands; /* Number of bands: 2 bytes */
+  /*---[ 8 byte boundary ]---{ */
+  uint32_t size;     /* required by postgresql: 4 bytes */
+  uint16_t version;  /* format version (this is version 0): 2 bytes */
+  uint16_t numBands; /* Number of bands: 2 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double scaleX; /* pixel width: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double scaleX; /* pixel width: 8 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double scaleY; /* pixel height: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double scaleY; /* pixel height: 8 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double ipX; /* insertion point X: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double ipX; /* insertion point X: 8 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double ipY; /* insertion point Y: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double ipY; /* insertion point Y: 8 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double skewX; /* skew about the X axis: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double skewX; /* skew about the X axis: 8 bytes */
 
-    /* }---[ 8 byte boundary ]---{ */
-    double skewY; /* skew about the Y axis: 8 bytes */
+  /* }---[ 8 byte boundary ]---{ */
+  double skewY; /* skew about the Y axis: 8 bytes */
 
-    /* }---[ 8 byte boundary ]--- */
-    int32_t srid;    /* Spatial reference id: 4 bytes */
-    uint16_t width;  /* pixel columns: 2 bytes */
-    uint16_t height; /* pixel rows: 2 bytes */
+  /* }---[ 8 byte boundary ]--- */
+  int32_t srid;    /* Spatial reference id: 4 bytes */
+  uint16_t width;  /* pixel columns: 2 bytes */
+  uint16_t height; /* pixel rows: 2 bytes */
 };
 
 /* NOTE: the initial part of this structure matches the layout
@@ -2128,236 +2128,236 @@ struct rt_raster_serialized_t
  */
 struct rt_raster_t
 {
-    uint32_t size;
-    uint16_t version;
+  uint32_t size;
+  uint16_t version;
 
-    /* Number of bands, all share the same dimension
-     * and georeference */
-    uint16_t numBands;
+  /* Number of bands, all share the same dimension
+   * and georeference */
+  uint16_t numBands;
 
-    /* Georeference (in projection units) */
-    double scaleX; /* pixel width */
-    double scaleY; /* pixel height */
-    double ipX;    /* geo x ordinate of the corner of upper-left pixel */
-    double ipY;    /* geo y ordinate of the corner of bottom-right pixel */
-    double skewX;  /* skew about the X axis*/
-    double skewY;  /* skew about the Y axis */
+  /* Georeference (in projection units) */
+  double scaleX; /* pixel width */
+  double scaleY; /* pixel height */
+  double ipX;    /* geo x ordinate of the corner of upper-left pixel */
+  double ipY;    /* geo y ordinate of the corner of bottom-right pixel */
+  double skewX;  /* skew about the X axis*/
+  double skewY;  /* skew about the Y axis */
 
-    int32_t srid;    /* spatial reference id */
-    uint16_t width;  /* pixel columns - max 65535 */
-    uint16_t height; /* pixel rows - max 65535 */
-    rt_band *bands;  /* actual bands */
+  int32_t srid;    /* spatial reference id */
+  uint16_t width;  /* pixel columns - max 65535 */
+  uint16_t height; /* pixel rows - max 65535 */
+  rt_band *bands;  /* actual bands */
 };
 
 struct rt_extband_t
 {
-    uint8_t bandNum; /* 0-based */
-    char *path;      /* internally owned */
-    void *mem;       /* loaded external band data, internally owned */
+  uint8_t bandNum; /* 0-based */
+  char *path;      /* internally owned */
+  void *mem;       /* loaded external band data, internally owned */
 };
 
 struct rt_band_t
 {
-    rt_pixtype pixtype;
-    int32_t offline;
-    uint16_t width;
-    uint16_t height;
-    int32_t hasnodata; /* a flag indicating if this band contains nodata values */
-    int32_t isnodata;  /* a flag indicating if this band is filled only with
-                          nodata values. flag CANNOT be TRUE if hasnodata is FALSE */
-    double nodataval;  /* int will be converted ... */
-    int8_t ownsdata;   /* 0, externally owned. 1, internally owned. only applies to data.mem */
+  rt_pixtype pixtype;
+  int32_t offline;
+  uint16_t width;
+  uint16_t height;
+  int32_t hasnodata; /* a flag indicating if this band contains nodata values */
+  int32_t isnodata;  /* a flag indicating if this band is filled only with
+                        nodata values. flag CANNOT be TRUE if hasnodata is FALSE */
+  double nodataval;  /* int will be converted ... */
+  int8_t ownsdata;   /* 0, externally owned. 1, internally owned. only applies to data.mem */
 
-    rt_raster raster; /* reference to parent raster */
+  rt_raster raster; /* reference to parent raster */
 
-    union {
-        void *mem; /* actual data, externally owned */
-        struct rt_extband_t offline;
-    } data;
+  union {
+    void *mem; /* actual data, externally owned */
+    struct rt_extband_t offline;
+  } data;
 };
 
 struct rt_pixel_t
 {
-    int x; /* column */
-    int y; /* line */
+  int x; /* column */
+  int y; /* line */
 
-    uint8_t nodata;
-    double value;
+  uint8_t nodata;
+  double value;
 
-    LWGEOM *geom;
+  LWGEOM *geom;
 };
 
 struct rt_mask_t
 {
-    uint16_t dimx;
-    uint16_t dimy;
-    double **values;
-    int **nodata;
-    int weighted; /* 0 if not weighted values 1 if weighted values */
+  uint16_t dimx;
+  uint16_t dimy;
+  double **values;
+  int **nodata;
+  int weighted; /* 0 if not weighted values 1 if weighted values */
 };
 
 /* polygon as LWPOLY with associated value */
 struct rt_geomval_t
 {
-    LWPOLY *geom;
-    double val;
+  LWPOLY *geom;
+  double val;
 };
 
 /* summary stats of specified band */
 struct rt_bandstats_t
 {
-    double sample;
-    uint32_t count;
+  double sample;
+  uint32_t count;
 
-    double min;
-    double max;
-    double sum;
-    double mean;
-    double stddev;
+  double min;
+  double max;
+  double sum;
+  double mean;
+  double stddev;
 
-    double *values;
-    int sorted; /* flag indicating that values is sorted ascending by value */
+  double *values;
+  int sorted; /* flag indicating that values is sorted ascending by value */
 };
 
 /* histogram bin(s) of specified band */
 struct rt_histogram_t
 {
-    uint32_t count;
-    double percent;
+  uint32_t count;
+  double percent;
 
-    double min;
-    double max;
+  double min;
+  double max;
 
-    int inc_min;
-    int inc_max;
+  int inc_min;
+  int inc_max;
 };
 
 /* quantile(s) of the specified band */
 struct rt_quantile_t
 {
-    double quantile;
-    double value;
-    uint32_t has_value;
+  double quantile;
+  double value;
+  uint32_t has_value;
 };
 
 /* listed-list structures for rt_band_get_quantiles_stream */
 struct quantile_llist
 {
-    uint8_t algeq; /* AL-GEQ (1) or AL-GT (0) */
-    double quantile;
-    uint64_t tau; /* position in sequence */
+  uint8_t algeq; /* AL-GEQ (1) or AL-GT (0) */
+  double quantile;
+  uint64_t tau; /* position in sequence */
 
-    struct quantile_llist_element *head; /* H index 0 */
-    struct quantile_llist_element *tail; /* H index last */
-    uint32_t count;                      /* # of elements in H */
+  struct quantile_llist_element *head; /* H index 0 */
+  struct quantile_llist_element *tail; /* H index last */
+  uint32_t count;                      /* # of elements in H */
 
-    /* faster access to elements at specific intervals */
-    struct quantile_llist_index *index;
-    uint32_t index_max; /* max # of elements in index */
+  /* faster access to elements at specific intervals */
+  struct quantile_llist_index *index;
+  uint32_t index_max; /* max # of elements in index */
 
-    uint64_t sum1; /* N1H */
-    uint64_t sum2; /* N2H */
+  uint64_t sum1; /* N1H */
+  uint64_t sum2; /* N2H */
 };
 
 struct quantile_llist_element
 {
-    double value;
-    uint32_t count;
+  double value;
+  uint32_t count;
 
-    struct quantile_llist_element *prev;
-    struct quantile_llist_element *next;
+  struct quantile_llist_element *prev;
+  struct quantile_llist_element *next;
 };
 
 struct quantile_llist_index
 {
-    struct quantile_llist_element *element;
-    uint32_t index;
+  struct quantile_llist_element *element;
+  uint32_t index;
 };
 
 /* number of times a value occurs */
 struct rt_valuecount_t
 {
-    double value;
-    uint32_t count;
-    double percent;
+  double value;
+  uint32_t count;
+  double percent;
 };
 
 /* reclassification expression */
 struct rt_reclassexpr_t
 {
-    struct rt_reclassrange
-    {
-        double min;
-        double max;
-        int inc_min; /* include min */
-        int inc_max; /* include max */
-        int exc_min; /* exceed min */
-        int exc_max; /* exceed max */
-    } src, dst;
+  struct rt_reclassrange
+  {
+    double min;
+    double max;
+    int inc_min; /* include min */
+    int inc_max; /* include max */
+    int exc_min; /* exceed min */
+    int exc_max; /* exceed max */
+  } src, dst;
 };
 
 /* raster iterator */
 struct rt_iterator_t
 {
-    rt_raster raster;
-    uint16_t nband;   /* 0-based */
-    uint8_t nbnodata; /* no band = treat as NODATA  */
+  rt_raster raster;
+  uint16_t nband;   /* 0-based */
+  uint8_t nbnodata; /* no band = treat as NODATA  */
 };
 
 /* callback argument from raster iterator */
 struct rt_iterator_arg_t
 {
-    /* # of rasters, Z-axis */
-    uint16_t rasters;
-    /* # of rows, Y-axis */
-    uint32_t rows;
-    /* # of columns, X-axis */
-    uint32_t columns;
+  /* # of rasters, Z-axis */
+  uint16_t rasters;
+  /* # of rows, Y-axis */
+  uint32_t rows;
+  /* # of columns, X-axis */
+  uint32_t columns;
 
-    /* axis order: Z,X,Y */
-    /* individual pixel values */
-    double ***values;
-    /* 0,1 value of nodata flag */
-    int ***nodata;
+  /* axis order: Z,X,Y */
+  /* individual pixel values */
+  double ***values;
+  /* 0,1 value of nodata flag */
+  int ***nodata;
 
-    /* X,Y of pixel from each input raster */
-    int **src_pixel;
+  /* X,Y of pixel from each input raster */
+  int **src_pixel;
 
-    /* X,Y of pixel from output raster */
-    int dst_pixel[2];
+  /* X,Y of pixel from output raster */
+  int dst_pixel[2];
 };
 
 /* gdal driver information */
 struct rt_gdaldriver_t
 {
-    int idx;
-    char *short_name;
-    char *long_name;
-    char *create_options;
-    uint8_t can_read;
-    uint8_t can_write;
+  int idx;
+  char *short_name;
+  char *long_name;
+  char *create_options;
+  uint8_t can_read;
+  uint8_t can_write;
 };
 
 /* raster colormap entry */
 struct rt_colormap_entry_t
 {
-    int isnodata;
-    double value;
-    uint8_t color[4]; /* RGBA */
+  int isnodata;
+  double value;
+  uint8_t color[4]; /* RGBA */
 };
 
 struct rt_colormap_t
 {
-    enum
-    {
-        CM_INTERPOLATE,
-        CM_EXACT,
-        CM_NEAREST
-    } method;
+  enum
+  {
+    CM_INTERPOLATE,
+    CM_EXACT,
+    CM_NEAREST
+  } method;
 
-    int ncolor;
-    uint16_t nentry;
-    rt_colormap_entry entry;
+  int ncolor;
+  uint16_t nentry;
+  rt_colormap_entry entry;
 };
 
 #endif /* LIBRTCORE_H_INCLUDED */

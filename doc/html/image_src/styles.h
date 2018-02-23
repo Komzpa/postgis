@@ -18,19 +18,19 @@ typedef struct layerStyle LAYERSTYLE;
 
 struct layerStyle
 {
-    char *styleName; // A unique name
+  char *styleName; // A unique name
 
-    int pointSize;
-    char *pointColor;
+  int pointSize;
+  char *pointColor;
 
-    int lineWidth;
-    char *lineColor;
+  int lineWidth;
+  char *lineColor;
 
-    char *polygonFillColor;
-    char *polygonStrokeColor;
-    int polygonStrokeWidth;
+  char *polygonFillColor;
+  char *polygonStrokeColor;
+  int polygonStrokeWidth;
 
-    LAYERSTYLE *next;
+  LAYERSTYLE *next;
 };
 
 void getStyles(LAYERSTYLE **headRef);

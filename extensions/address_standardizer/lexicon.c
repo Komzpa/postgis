@@ -73,35 +73,35 @@ typedef struct LEXICON_s {
 LEXICON *
 lex_init(ERR_PARAM *err_p)
 {
-    LEXICON *lex;
+  LEXICON *lex;
 
-    PAGC_CALLOC_STRUC(lex, LEXICON, 1, err_p, NULL);
+  PAGC_CALLOC_STRUC(lex, LEXICON, 1, err_p, NULL);
 
-    lex->hash_table = create_hash_table(err_p);
-    if (lex->hash_table == NULL)
-    {
-        lex_free(lex);
-        return NULL;
-    }
+  lex->hash_table = create_hash_table(err_p);
+  if (lex->hash_table == NULL)
+  {
+    lex_free(lex);
+    return NULL;
+  }
 
-    lex->err_p = err_p;
+  lex->err_p = err_p;
 
-    return lex;
+  return lex;
 }
 
 int
 lex_add_entry(LEXICON *lex, int seq, char *word, char *stdword, SYMB token)
 {
-    return add_dict_entry(lex->err_p, lex->hash_table, word, seq - 1, token, stdword);
+  return add_dict_entry(lex->err_p, lex->hash_table, word, seq - 1, token, stdword);
 }
 
 void
 lex_free(LEXICON *lex)
 {
-    if (lex == NULL) return;
-    destroy_lexicon(lex->hash_table);
-    free(lex);
-    lex = NULL;
+  if (lex == NULL) return;
+  destroy_lexicon(lex->hash_table);
+  free(lex);
+  lex = NULL;
 }
 
 #else
@@ -118,32 +118,32 @@ stdio.h (fclose)
 ENTRY **
 create_lexicon(PAGC_GLOBAL *glo_p, const char *lex_name, const char *gaz_name)
 {
-    /* -- called by init_stand_process to read in the Lexicon and set up the
-       definitions in memory for hash table access -- */
-    FILE *gaz_file, *dict_file;
-    ENTRY **hash_table;
+  /* -- called by init_stand_process to read in the Lexicon and set up the
+     definitions in memory for hash table access -- */
+  FILE *gaz_file, *dict_file;
+  ENTRY **hash_table;
 
-    if ((hash_table = create_hash_table(glo_p->process_errors)) == NULL) { return NULL; }
-    /* 2009-08-13 : support multiple lexicons */
-    if (gaz_name != NULL)
+  if ((hash_table = create_hash_table(glo_p->process_errors)) == NULL) { return NULL; }
+  /* 2009-08-13 : support multiple lexicons */
+  if (gaz_name != NULL)
+  {
+    if ((gaz_file = open_aux_file(glo_p, gaz_name)) == NULL) return NULL;
+    if (!read_lexicon(glo_p->process_errors, hash_table, gaz_file))
     {
-        if ((gaz_file = open_aux_file(glo_p, gaz_name)) == NULL) return NULL;
-        if (!read_lexicon(glo_p->process_errors, hash_table, gaz_file))
-        {
-            fclose(gaz_file);
-            return NULL;
-        }
-        fclose(gaz_file);
+      fclose(gaz_file);
+      return NULL;
     }
+    fclose(gaz_file);
+  }
 
-    if ((dict_file = open_aux_file(glo_p, lex_name)) == NULL) return NULL;
-    if (!read_lexicon(glo_p->process_errors, hash_table, dict_file))
-    {
-        fclose(dict_file);
-        return NULL;
-    }
+  if ((dict_file = open_aux_file(glo_p, lex_name)) == NULL) return NULL;
+  if (!read_lexicon(glo_p->process_errors, hash_table, dict_file))
+  {
     fclose(dict_file);
-    return hash_table;
+    return NULL;
+  }
+  fclose(dict_file);
+  return hash_table;
 }
 
 /* ----------------------------------------------------
@@ -157,37 +157,37 @@ uses macro BLANK_STRING
 static int
 read_lexicon(ERR_PARAM *err_p, ENTRY **hash_table, FILE *CFile)
 {
-    char record_buffer[MAXSTRLEN];
-    char lookup_str[MAXTEXT];
-    char num_str[MAXTEXT];
-    int cur_token;
-    int num_def;
-    char standard_str[MAXTEXT];
-    char *next_str;
+  char record_buffer[MAXSTRLEN];
+  char lookup_str[MAXTEXT];
+  char num_str[MAXTEXT];
+  int cur_token;
+  int num_def;
+  char standard_str[MAXTEXT];
+  char *next_str;
 
-    while (!feof(CFile))
-    {
-        /* -- read in each line of the csv file and add to hash table -- */
-        BLANK_STRING(record_buffer);
-        fgets(record_buffer, MAXSTRLEN, CFile);
+  while (!feof(CFile))
+  {
+    /* -- read in each line of the csv file and add to hash table -- */
+    BLANK_STRING(record_buffer);
+    fgets(record_buffer, MAXSTRLEN, CFile);
 
 #ifdef SEW_NOT_SURE_IF_WE_NEED_THIS
-        /* -- check for and skip over blank lines -- */
-        if (strspn(record_buffer, " \t\r\n") == strlen(record_buffer)) continue;
+    /* -- check for and skip over blank lines -- */
+    if (strspn(record_buffer, " \t\r\n") == strlen(record_buffer)) continue;
 #endif
 
-        /* -- comma-separated values are handled only as well as necessary
-           in the present context -- */
-        if ((next_str = convert_field(num_str, record_buffer)) == NULL) { break; }
-        sscanf(num_str, "%d", &num_def);
-        next_str = convert_field(lookup_str, next_str);
-        next_str = convert_field(num_str, next_str);
-        sscanf(num_str, "%d", &cur_token);
-        next_str = convert_field(standard_str, next_str);
-        if (add_dict_entry(err_p, hash_table, lookup_str, (num_def - 1), cur_token, standard_str) == ERR_FAIL)
-        { return FALSE; }
-    }
-    return TRUE;
+    /* -- comma-separated values are handled only as well as necessary
+       in the present context -- */
+    if ((next_str = convert_field(num_str, record_buffer)) == NULL) { break; }
+    sscanf(num_str, "%d", &num_def);
+    next_str = convert_field(lookup_str, next_str);
+    next_str = convert_field(num_str, next_str);
+    sscanf(num_str, "%d", &cur_token);
+    next_str = convert_field(standard_str, next_str);
+    if (add_dict_entry(err_p, hash_table, lookup_str, (num_def - 1), cur_token, standard_str) == ERR_FAIL)
+    { return FALSE; }
+  }
+  return TRUE;
 }
 
 /* ----------------------------------------------------
@@ -199,25 +199,25 @@ uses macro BLANK_STRING
 static char *
 convert_field(char *buf, char *inp)
 {
-    char c;
-    char *d = buf;
-    char *s = inp;
+  char c;
+  char *d = buf;
+  char *s = inp;
 
-    BLANK_STRING(d);
-    /* -- space at the beginning of a line will stop the read -- */
-    if (isspace(*s)) return NULL;
-    while ((c = *s++) != SENTINEL)
+  BLANK_STRING(d);
+  /* -- space at the beginning of a line will stop the read -- */
+  if (isspace(*s)) return NULL;
+  while ((c = *s++) != SENTINEL)
+  {
+    if (c == '\"' || c == '\r') continue; /* -- ignore quotes and carriage returns -- */
+    /* -- zero terminate field and record delimiters -- */
+    if (c == '\n' || c == ',')
     {
-        if (c == '\"' || c == '\r') continue; /* -- ignore quotes and carriage returns -- */
-        /* -- zero terminate field and record delimiters -- */
-        if (c == '\n' || c == ',')
-        {
-            BLANK_STRING(d);
-            return s;
-        }
-        *d++ = c; /* -- copy it -- */
+      BLANK_STRING(d);
+      return s;
     }
-    return NULL;
+    *d++ = c; /* -- copy it -- */
+  }
+  return NULL;
 }
 
 #endif
@@ -231,24 +231,24 @@ uses macro FREE_AND_NULL
 void
 destroy_lexicon(ENTRY **hash_table)
 {
-    /* -- called by Clean-Up - */
-    unsigned __i__;
-    ENTRY *__E__, *__F__;
-    if (hash_table == NULL) { return; }
-    for (__i__ = 0; __i__ < LEXICON_HTABSIZE; __i__++)
+  /* -- called by Clean-Up - */
+  unsigned __i__;
+  ENTRY *__E__, *__F__;
+  if (hash_table == NULL) { return; }
+  for (__i__ = 0; __i__ < LEXICON_HTABSIZE; __i__++)
+  {
+    for (__E__ = hash_table[__i__]; __E__ != NULL; __E__ = __F__)
     {
-        for (__E__ = hash_table[__i__]; __E__ != NULL; __E__ = __F__)
-        {
-            destroy_def_list(__E__->DefList);
-            __F__ = __E__->Next;
-            FREE_AND_NULL(__E__->Lookup);
-            FREE_AND_NULL(__E__);
-        }
+      destroy_def_list(__E__->DefList);
+      __F__ = __E__->Next;
+      FREE_AND_NULL(__E__->Lookup);
+      FREE_AND_NULL(__E__);
     }
-    DBG("destroy_lexicon: i=%d", __i__);
-    /* <revision date='2012-05-23'>free hash table</revision> */
-    FREE_AND_NULL(hash_table);
-    DBG("leaving destroy_lexicon");
+  }
+  DBG("destroy_lexicon: i=%d", __i__);
+  /* <revision date='2012-05-23'>free hash table</revision> */
+  FREE_AND_NULL(hash_table);
+  DBG("leaving destroy_lexicon");
 }
 
 /* ----------------------------------------------------------
@@ -259,16 +259,16 @@ uses macro FREE_AND_NULL
 void
 destroy_def_list(DEF *start_def)
 {
-    DEF *cur_def;
-    DEF *next_def = NULL;
+  DEF *cur_def;
+  DEF *next_def = NULL;
 
-    for (cur_def = start_def; cur_def != NULL; cur_def = next_def)
-    {
-        next_def = cur_def->Next;
-        /* -- Default definitions have no associated text -- */
-        if (cur_def->Protect == 0) { FREE_AND_NULL(cur_def->Standard); }
-        FREE_AND_NULL(cur_def);
-    }
+  for (cur_def = start_def; cur_def != NULL; cur_def = next_def)
+  {
+    next_def = cur_def->Next;
+    /* -- Default definitions have no associated text -- */
+    if (cur_def->Protect == 0) { FREE_AND_NULL(cur_def->Standard); }
+    FREE_AND_NULL(cur_def);
+  }
 }
 
 /* ----------------------------------------------------
@@ -280,16 +280,16 @@ string.h (strcmp)
 ENTRY *
 find_entry(ENTRY **hash_table, char *lookup_str)
 {
-    /* -- called to create a lexeme -- */
-    ENTRY *__E__;
-    unsigned __hash_index__; /* -- 2006-11-20 : to return hash table pointer -- */
+  /* -- called to create a lexeme -- */
+  ENTRY *__E__;
+  unsigned __hash_index__; /* -- 2006-11-20 : to return hash table pointer -- */
 
-    __hash_index__ = calc_hash(lookup_str);
-    for (__E__ = hash_table[__hash_index__]; __E__ != NULL; __E__ = __E__->Next)
-    {
-        if (strcmp(lookup_str, __E__->Lookup) == 0) { return __E__; }
-    }
-    return __E__;
+  __hash_index__ = calc_hash(lookup_str);
+  for (__E__ = hash_table[__hash_index__]; __E__ != NULL; __E__ = __E__->Next)
+  {
+    if (strcmp(lookup_str, __E__->Lookup) == 0) { return __E__; }
+  }
+  return __E__;
 }
 
 #define US sizeof(unsigned)
@@ -300,17 +300,17 @@ called by lexicon.c (calc_hash)
 static unsigned
 elf_hash(char *key_str)
 {
-    unsigned h, g, c;
+  unsigned h, g, c;
 
-    h = 0;
-    while ((c = (unsigned)*key_str) != '\0')
-    {
-        h = (h << US) + c;
-        if ((g = h & (~((unsigned)(~0) >> US)))) h ^= g >> (US * 6);
-        h &= ~g;
-        key_str++;
-    }
-    return h;
+  h = 0;
+  while ((c = (unsigned)*key_str) != '\0')
+  {
+    h = (h << US) + c;
+    if ((g = h & (~((unsigned)(~0) >> US)))) h ^= g >> (US * 6);
+    h &= ~g;
+    key_str++;
+  }
+  return h;
 }
 
 /* ----------------------------------------------------
@@ -322,10 +322,10 @@ calls lexicon.c (elf_hash)
 static unsigned
 calc_hash(char *key_str)
 {
-    unsigned h;
+  unsigned h;
 
-    h = elf_hash(key_str);
-    return (h % LEXICON_HTABSIZE);
+  h = elf_hash(key_str);
+  return (h % LEXICON_HTABSIZE);
 }
 
 /* ----------------------------------------------------
@@ -338,14 +338,14 @@ uses macro PAGC_CALLOC_STRUC
 static ENTRY **
 create_hash_table(ERR_PARAM *err_p)
 {
-    unsigned __i__;
-    ENTRY **__hash_table__;
-    PAGC_CALLOC_STRUC(__hash_table__, ENTRY *, LEXICON_HTABSIZE, err_p, NULL);
-    for (__i__ = 0; __i__ < LEXICON_HTABSIZE; __i__++)
-    {
-        __hash_table__[__i__] = NULL;
-    }
-    return __hash_table__;
+  unsigned __i__;
+  ENTRY **__hash_table__;
+  PAGC_CALLOC_STRUC(__hash_table__, ENTRY *, LEXICON_HTABSIZE, err_p, NULL);
+  for (__i__ = 0; __i__ < LEXICON_HTABSIZE; __i__++)
+  {
+    __hash_table__[__i__] = NULL;
+  }
+  return __hash_table__;
 }
 
 /* ----------------------------------------------------
@@ -358,30 +358,30 @@ return ERR_FAIL if error
 static int
 add_dict_entry(ERR_PARAM *err_p, ENTRY **hash_table, char *lookup_str, int def_num, SYMB t, char *standard_str)
 {
-    ENTRY *E;
+  ENTRY *E;
 
-    E = find_entry(hash_table, lookup_str);
-    if (E == NULL)
-    {
-        unsigned hash_index;
+  E = find_entry(hash_table, lookup_str);
+  if (E == NULL)
+  {
+    unsigned hash_index;
 
-        PAGC_ALLOC_STRUC(E, ENTRY, err_p, ERR_FAIL);
-        /* -- add the Lookup string to the record -- */
-        PAGC_STORE_STR(E->Lookup, lookup_str, err_p, ERR_FAIL);
-        /* -- add new entry to beginning of table -- */
-        hash_index = calc_hash(lookup_str);
+    PAGC_ALLOC_STRUC(E, ENTRY, err_p, ERR_FAIL);
+    /* -- add the Lookup string to the record -- */
+    PAGC_STORE_STR(E->Lookup, lookup_str, err_p, ERR_FAIL);
+    /* -- add new entry to beginning of table -- */
+    hash_index = calc_hash(lookup_str);
 
-        E->Next = hash_table[hash_index]; /* -- collision chain -- */
-        hash_table[hash_index] = E;
-        if ((E->DefList = create_def(t, standard_str, def_num, FALSE, err_p)) == NULL) { return ERR_FAIL; }
-    }
-    else
-    {
-        int err_stat;
-        if (E->DefList == NULL) { RET_ERR("add_dict_entry: Lexical entry lacks definition", err_p, ERR_FAIL); }
-        if ((err_stat = append_new_def(err_p, E, t, standard_str, def_num)) != TRUE) { return err_stat; }
-    }
-    return TRUE;
+    E->Next = hash_table[hash_index]; /* -- collision chain -- */
+    hash_table[hash_index] = E;
+    if ((E->DefList = create_def(t, standard_str, def_num, FALSE, err_p)) == NULL) { return ERR_FAIL; }
+  }
+  else
+  {
+    int err_stat;
+    if (E->DefList == NULL) { RET_ERR("add_dict_entry: Lexical entry lacks definition", err_p, ERR_FAIL); }
+    if ((err_stat = append_new_def(err_p, E, t, standard_str, def_num)) != TRUE) { return err_stat; }
+  }
+  return TRUE;
 }
 
 /* ----------------------------------------------------
@@ -395,21 +395,21 @@ static int
 append_new_def(ERR_PARAM *err_p, ENTRY *E, SYMB t, char *text, int def_num)
 {
 
-    DEF *D, *pd, *cd;
-    for (cd = E->DefList, pd = NULL; cd != NULL; cd = cd->Next)
-    {
-        pd = cd;
-        /* -- avoid duplication except for local entries -- */
-        if (cd->Type == t) { return FALSE; }
-    }
-    if ((D = create_def(t, text, def_num, FALSE, err_p)) == NULL) { return ERR_FAIL; }
-    if (pd == NULL) { E->DefList = D; }
-    else
-    {
-        D->Next = pd->Next;
-        pd->Next = D;
-    }
-    return TRUE;
+  DEF *D, *pd, *cd;
+  for (cd = E->DefList, pd = NULL; cd != NULL; cd = cd->Next)
+  {
+    pd = cd;
+    /* -- avoid duplication except for local entries -- */
+    if (cd->Type == t) { return FALSE; }
+  }
+  if ((D = create_def(t, text, def_num, FALSE, err_p)) == NULL) { return ERR_FAIL; }
+  if (pd == NULL) { E->DefList = D; }
+  else
+  {
+    D->Next = pd->Next;
+    pd->Next = D;
+  }
+  return TRUE;
 }
 
 /*--------------------------------------------------------------------
@@ -423,25 +423,25 @@ uses macro PAGC_ALLOC_STRUC, PAGC_STORE_STR
 DEF *
 create_def(SYMB s, char *standard_str, int def_num, int PFlag, ERR_PARAM *err_p)
 {
-    /* -- allocate the memory and set up the definition structure with the
-       standard form -- */
-    DEF *cur_def;
+  /* -- allocate the memory and set up the definition structure with the
+     standard form -- */
+  DEF *cur_def;
 
+  /* -- initialization-time allocation -- */
+  PAGC_ALLOC_STRUC(cur_def, DEF, err_p, NULL);
+  cur_def->Type = s;
+  cur_def->Protect = PFlag; /* -- False for definitions from lexicon
+                               true for default definitions -- */
+  if (!PFlag)
+  {
     /* -- initialization-time allocation -- */
-    PAGC_ALLOC_STRUC(cur_def, DEF, err_p, NULL);
-    cur_def->Type = s;
-    cur_def->Protect = PFlag; /* -- False for definitions from lexicon
-                                 true for default definitions -- */
-    if (!PFlag)
-    {
-        /* -- initialization-time allocation -- */
-        PAGC_STORE_STR(cur_def->Standard, standard_str, err_p, NULL);
-    }
-    else
-        cur_def->Standard = NULL;
-    cur_def->Order = def_num;
-    cur_def->Next = NULL;
-    return cur_def;
+    PAGC_STORE_STR(cur_def->Standard, standard_str, err_p, NULL);
+  }
+  else
+    cur_def->Standard = NULL;
+  cur_def->Order = def_num;
+  cur_def->Next = NULL;
+  return cur_def;
 }
 
 /*--------------------------------------------------------------------
@@ -451,24 +451,24 @@ not called by useful for debugging. It will print out the lexicon.
 void
 print_lexicon(ENTRY **hash_table)
 {
-    unsigned i;
-    ENTRY *E;
+  unsigned i;
+  ENTRY *E;
 
-    if (!hash_table) return;
+  if (!hash_table) return;
 
-    for (i = 0; i < LEXICON_HTABSIZE; i++)
+  for (i = 0; i < LEXICON_HTABSIZE; i++)
+  {
+    E = hash_table[i];
+    while (E)
     {
-        E = hash_table[i];
-        while (E)
-        {
-            DEF *D = E->DefList;
-            printf("'%s'\n", E->Lookup);
-            while (D)
-            {
-                printf("    %d, %d, %d, '%s'\n", D->Order, D->Type, D->Protect, D->Standard);
-                D = D->Next;
-            }
-            E = E->Next;
-        }
+      DEF *D = E->DefList;
+      printf("'%s'\n", E->Lookup);
+      while (D)
+      {
+        printf("    %d, %d, %d, '%s'\n", D->Order, D->Type, D->Protect, D->Standard);
+        D = D->Next;
+      }
+      E = E->Next;
     }
+  }
 }

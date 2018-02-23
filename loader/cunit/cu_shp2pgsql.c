@@ -26,21 +26,21 @@ SHPLOADERSTATE *loader_state;
 CU_pSuite
 register_shp2pgsql_suite(void)
 {
-    CU_pSuite pSuite;
-    pSuite = CU_add_suite("Shapefile Loader File shp2pgsql Test", init_shp2pgsql_suite, clean_shp2pgsql_suite);
-    if (NULL == pSuite)
-    {
-        CU_cleanup_registry();
-        return NULL;
-    }
+  CU_pSuite pSuite;
+  pSuite = CU_add_suite("Shapefile Loader File shp2pgsql Test", init_shp2pgsql_suite, clean_shp2pgsql_suite);
+  if (NULL == pSuite)
+  {
+    CU_cleanup_registry();
+    return NULL;
+  }
 
-    if ((NULL == CU_add_test(pSuite, "test_ShpLoaderCreate()", test_ShpLoaderCreate)) ||
-        (NULL == CU_add_test(pSuite, "test_ShpLoaderDestroy()", test_ShpLoaderDestroy)))
-    {
-        CU_cleanup_registry();
-        return NULL;
-    }
-    return pSuite;
+  if ((NULL == CU_add_test(pSuite, "test_ShpLoaderCreate()", test_ShpLoaderCreate)) ||
+      (NULL == CU_add_test(pSuite, "test_ShpLoaderDestroy()", test_ShpLoaderDestroy)))
+  {
+    CU_cleanup_registry();
+    return NULL;
+  }
+  return pSuite;
 }
 
 /*
@@ -50,7 +50,7 @@ register_shp2pgsql_suite(void)
 int
 init_shp2pgsql_suite(void)
 {
-    return 0;
+  return 0;
 }
 
 /*
@@ -60,21 +60,21 @@ init_shp2pgsql_suite(void)
 int
 clean_shp2pgsql_suite(void)
 {
-    return 0;
+  return 0;
 }
 
 void
 test_ShpLoaderCreate(void)
 {
-    loader_config = (SHPLOADERCONFIG *)calloc(1, sizeof(SHPLOADERCONFIG));
-    set_loader_config_defaults(loader_config);
-    loader_state = ShpLoaderCreate(loader_config);
-    CU_ASSERT_PTR_NOT_NULL(loader_state);
-    CU_ASSERT_STRING_EQUAL(loader_state->config->encoding, ENCODING_DEFAULT);
+  loader_config = (SHPLOADERCONFIG *)calloc(1, sizeof(SHPLOADERCONFIG));
+  set_loader_config_defaults(loader_config);
+  loader_state = ShpLoaderCreate(loader_config);
+  CU_ASSERT_PTR_NOT_NULL(loader_state);
+  CU_ASSERT_STRING_EQUAL(loader_state->config->encoding, ENCODING_DEFAULT);
 }
 
 void
 test_ShpLoaderDestroy(void)
 {
-    ShpLoaderDestroy(loader_state);
+  ShpLoaderDestroy(loader_state);
 }

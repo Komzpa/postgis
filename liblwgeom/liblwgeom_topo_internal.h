@@ -38,8 +38,8 @@
 
 struct LWT_BE_IFACE_T
 {
-    const LWT_BE_DATA *data;
-    const LWT_BE_CALLBACKS *cb;
+  const LWT_BE_DATA *data;
+  const LWT_BE_CALLBACKS *cb;
 };
 
 const char *lwt_be_lastErrorMessage(const LWT_BE_IFACE *be);
@@ -85,11 +85,11 @@ lwt_be_updateTopoGeomEdgeSplit(LWT_TOPOLOGY *topo, LWT_ELEMID split_edge, LWT_EL
 
 struct LWT_TOPOLOGY_T
 {
-    const LWT_BE_IFACE *be_iface;
-    LWT_BE_TOPOLOGY *be_topo;
-    int srid;
-    double precision;
-    int hasZ;
+  const LWT_BE_IFACE *be_iface;
+  LWT_BE_TOPOLOGY *be_topo;
+  int srid;
+  double precision;
+  int hasZ;
 };
 
 #endif /* LIBLWGEOM_TOPO_INTERNAL_H */

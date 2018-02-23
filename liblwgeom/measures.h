@@ -44,20 +44,20 @@
  */
 typedef struct
 {
-    double distance; /*the distance between p1 and p2*/
-    POINT2D p1;
-    POINT2D p2;
-    int mode;    /*the direction of looking, if thedir = -1 then we look for maxdistance and if it is 1 then we look
-                    for mindistance*/
-    int twisted; /*To preserve the order of incoming points to match the first and secon point in shortest and
-                    longest line*/
-    double tolerance; /*the tolerance for dwithin and dfullywithin*/
+  double distance; /*the distance between p1 and p2*/
+  POINT2D p1;
+  POINT2D p2;
+  int mode;         /*the direction of looking, if thedir = -1 then we look for maxdistance and if it is 1 then we look
+                       for mindistance*/
+  int twisted;      /*To preserve the order of incoming points to match the first and secon point in shortest and
+                       longest line*/
+  double tolerance; /*the tolerance for dwithin and dfullywithin*/
 } DISTPTS;
 
 typedef struct
 {
-    double themeasure; /*a value calculated to compare distances*/
-    int pnr;           /*pointnumber. the ordernumber of the point*/
+  double themeasure; /*a value calculated to compare distances*/
+  int pnr;           /*pointnumber. the ordernumber of the point*/
 } LISTSTRUCT;
 
 /*

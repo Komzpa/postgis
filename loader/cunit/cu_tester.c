@@ -23,27 +23,27 @@ int
 main()
 {
 
-    /* initialize the CUnit test registry */
-    if (CUE_SUCCESS != CU_initialize_registry()) return CU_get_error();
+  /* initialize the CUnit test registry */
+  if (CUE_SUCCESS != CU_initialize_registry()) return CU_get_error();
 
-    /* Add the shp2pgsql test suite */
-    if (NULL == register_shp2pgsql_suite())
-    {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /* Add the pgsql2shp test suite */
-    if (NULL == register_pgsql2shp_suite())
-    {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /* Run all tests using the CUnit Basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
+  /* Add the shp2pgsql test suite */
+  if (NULL == register_shp2pgsql_suite())
+  {
     CU_cleanup_registry();
-
     return CU_get_error();
+  }
+
+  /* Add the pgsql2shp test suite */
+  if (NULL == register_pgsql2shp_suite())
+  {
+    CU_cleanup_registry();
+    return CU_get_error();
+  }
+
+  /* Run all tests using the CUnit Basic interface */
+  CU_basic_set_mode(CU_BRM_VERBOSE);
+  CU_basic_run_tests();
+  CU_cleanup_registry();
+
+  return CU_get_error();
 }
