@@ -38,8 +38,8 @@
 
 struct LWT_BE_IFACE_T
 {
-	const LWT_BE_DATA *data;
-	const LWT_BE_CALLBACKS *cb;
+    const LWT_BE_DATA *data;
+    const LWT_BE_CALLBACKS *cb;
 };
 
 const char *lwt_be_lastErrorMessage(const LWT_BE_IFACE *be);
@@ -64,12 +64,12 @@ LWT_ISO_EDGE *
 lwt_be_getEdgeWithinDistance2D(LWT_TOPOLOGY *topo, LWPOINT *pt, double dist, int *numelems, int fields, int limit);
 int lwt_be_insertEdges(LWT_TOPOLOGY *topo, LWT_ISO_EDGE *edge, int numelems);
 int lwt_be_updateEdges(LWT_TOPOLOGY *topo,
-		       const LWT_ISO_EDGE *sel_edge,
-		       int sel_fields,
-		       const LWT_ISO_EDGE *upd_edge,
-		       int upd_fields,
-		       const LWT_ISO_EDGE *exc_edge,
-		       int exc_fields);
+                       const LWT_ISO_EDGE *sel_edge,
+                       int sel_fields,
+                       const LWT_ISO_EDGE *upd_edge,
+                       int upd_fields,
+                       const LWT_ISO_EDGE *exc_edge,
+                       int exc_fields);
 int lwt_be_deleteEdges(LWT_TOPOLOGY *topo, const LWT_ISO_EDGE *sel_edge, int sel_fields);
 
 LWT_ELEMID lwt_be_getFaceContainingPoint(LWT_TOPOLOGY *topo, LWPOINT *pt);
@@ -85,11 +85,11 @@ lwt_be_updateTopoGeomEdgeSplit(LWT_TOPOLOGY *topo, LWT_ELEMID split_edge, LWT_EL
 
 struct LWT_TOPOLOGY_T
 {
-	const LWT_BE_IFACE *be_iface;
-	LWT_BE_TOPOLOGY *be_topo;
-	int srid;
-	double precision;
-	int hasZ;
+    const LWT_BE_IFACE *be_iface;
+    LWT_BE_TOPOLOGY *be_topo;
+    int srid;
+    double precision;
+    int hasZ;
 };
 
 #endif /* LIBLWGEOM_TOPO_INTERNAL_H */

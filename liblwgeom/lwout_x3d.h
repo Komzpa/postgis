@@ -40,11 +40,11 @@ static int
 asx3d3_line_sb(const LWLINE *line, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb);
 
 static int asx3d3_triangle_sb(const LWTRIANGLE *triangle,
-			      char *srs,
-			      int precision,
-			      int opts,
-			      const char *defid,
-			      stringbuffer_t *sb);
+                              char *srs,
+                              int precision,
+                              int opts,
+                              const char *defid,
+                              stringbuffer_t *sb);
 
 static int
 asx3d3_multi_sb(const LWCOLLECTION *col, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb);
@@ -53,9 +53,9 @@ asx3d3_psurface_sb(const LWPSURFACE *psur, char *srs, int precision, int opts, c
 static int asx3d3_tin_sb(const LWTIN *tin, char *srs, int precision, int opts, const char *defid, stringbuffer_t *sb);
 
 static int asx3d3_collection_sb(const LWCOLLECTION *col,
-				char *srs,
-				int precision,
-				int opts,
-				const char *defid,
-				stringbuffer_t *sb);
+                                char *srs,
+                                int precision,
+                                int opts,
+                                const char *defid,
+                                stringbuffer_t *sb);
 static int ptarray_to_x3d3_sb(POINTARRAY *pa, int precision, int opts, int is_closed, stringbuffer_t *sb);

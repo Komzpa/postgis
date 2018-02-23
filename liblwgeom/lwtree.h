@@ -26,64 +26,64 @@
 
 typedef enum
 {
-	RECT_NODE_INTERNAL_TYPE,
-	RECT_NODE_LEAF_TYPE
+    RECT_NODE_INTERNAL_TYPE,
+    RECT_NODE_LEAF_TYPE
 } RECT_NODE_TYPE;
 
 typedef enum
 {
-	RECT_NODE_RING_NONE = 0,
-	RECT_NODE_RING_EXTERIOR,
-	RECT_NODE_RING_INTERIOR
+    RECT_NODE_RING_NONE = 0,
+    RECT_NODE_RING_EXTERIOR,
+    RECT_NODE_RING_INTERIOR
 } RECT_NODE_RING_TYPE;
 
 typedef enum
 {
-	RECT_NODE_SEG_UNKNOWN = 0,
-	RECT_NODE_SEG_POINT,
-	RECT_NODE_SEG_LINEAR,
-	RECT_NODE_SEG_CIRCULAR
+    RECT_NODE_SEG_UNKNOWN = 0,
+    RECT_NODE_SEG_POINT,
+    RECT_NODE_SEG_LINEAR,
+    RECT_NODE_SEG_CIRCULAR
 } RECT_NODE_SEG_TYPE;
 
 typedef struct
 {
-	const POINTARRAY *pa;
-	RECT_NODE_SEG_TYPE seg_type;
-	int seg_num;
+    const POINTARRAY *pa;
+    RECT_NODE_SEG_TYPE seg_type;
+    int seg_num;
 } RECT_NODE_LEAF;
 
 struct rect_node;
 
 typedef struct
 {
-	int num_nodes;
-	RECT_NODE_RING_TYPE ring_type;
-	struct rect_node *nodes[RECT_NODE_SIZE];
-	int sorted;
+    int num_nodes;
+    RECT_NODE_RING_TYPE ring_type;
+    struct rect_node *nodes[RECT_NODE_SIZE];
+    int sorted;
 } RECT_NODE_INTERNAL;
 
 typedef struct rect_node
 {
-	RECT_NODE_TYPE type;
-	unsigned char geom_type;
-	double xmin;
-	double xmax;
-	double ymin;
-	double ymax;
-	double d;
-	union {
-		RECT_NODE_INTERNAL i;
-		RECT_NODE_LEAF l;
-	};
+    RECT_NODE_TYPE type;
+    unsigned char geom_type;
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
+    double d;
+    union {
+        RECT_NODE_INTERNAL i;
+        RECT_NODE_LEAF l;
+    };
 } RECT_NODE;
 
 typedef struct rect_tree_distance_state
 {
-	double threshold;
-	double min_dist;
-	double max_dist;
-	POINT2D p1;
-	POINT2D p2;
+    double threshold;
+    double min_dist;
+    double max_dist;
+    POINT2D p1;
+    POINT2D p2;
 } RECT_TREE_DISTANCE_STATE;
 
 /**

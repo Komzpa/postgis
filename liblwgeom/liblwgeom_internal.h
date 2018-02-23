@@ -204,13 +204,13 @@ void ptarray_simplify_in_place(POINTARRAY *pa, double epsilon, uint32_t minpts);
  */
 enum CG_SEGMENT_INTERSECTION_TYPE
 {
-	SEG_ERROR = -1,
-	SEG_NO_INTERSECTION = 0,
-	SEG_COLINEAR = 1,
-	SEG_CROSS_LEFT = 2,
-	SEG_CROSS_RIGHT = 3,
-	SEG_TOUCH_LEFT = 4,
-	SEG_TOUCH_RIGHT = 5
+    SEG_ERROR = -1,
+    SEG_NO_INTERSECTION = 0,
+    SEG_COLINEAR = 1,
+    SEG_CROSS_LEFT = 2,
+    SEG_CROSS_RIGHT = 3,
+    SEG_TOUCH_LEFT = 4,
+    SEG_TOUCH_RIGHT = 5
 };
 
 /*
@@ -228,12 +228,12 @@ void lwpoint_set_ordinate(POINT4D *p, char ordinate, double value);
  * Generate an interpolated coordinate p given an interpolation value and ordinate to apply it to
  */
 int point_interpolate(const POINT4D *p1,
-		      const POINT4D *p2,
-		      POINT4D *p,
-		      int hasz,
-		      int hasm,
-		      char ordinate,
-		      double interpolation_value);
+                      const POINT4D *p2,
+                      POINT4D *p,
+                      int hasz,
+                      int hasm,
+                      char ordinate,
+                      double interpolation_value);
 
 /**
  * Clip a line based on the from/to range of one of its ordinates. Use for m- and z- clipping
@@ -422,14 +422,14 @@ int lwtin_is_closed(const LWTIN *tin);
  */
 typedef struct gridspec_t
 {
-	double ipx;
-	double ipy;
-	double ipz;
-	double ipm;
-	double xsize;
-	double ysize;
-	double zsize;
-	double msize;
+    double ipx;
+    double ipy;
+    double ipz;
+    double ipm;
+    double xsize;
+    double ysize;
+    double zsize;
+    double msize;
 } gridspec;
 
 LWGEOM *lwgeom_grid(const LWGEOM *lwgeom, const gridspec *grid);
@@ -487,15 +487,15 @@ extern uint8_t MULTITYPE[NUMTYPES];
 extern lwinterrupt_callback *_lwgeom_interrupt_callback;
 extern int _lwgeom_interrupt_requested;
 #define LW_ON_INTERRUPT(x) \
-	{ \
-		if (_lwgeom_interrupt_callback) { (*_lwgeom_interrupt_callback)(); } \
-		if (_lwgeom_interrupt_requested) \
-		{ \
-			_lwgeom_interrupt_requested = 0; \
-			lwnotice("liblwgeom code interrupted"); \
-			x; \
-		} \
-	}
+    { \
+        if (_lwgeom_interrupt_callback) { (*_lwgeom_interrupt_callback)(); } \
+        if (_lwgeom_interrupt_requested) \
+        { \
+            _lwgeom_interrupt_requested = 0; \
+            lwnotice("liblwgeom code interrupted"); \
+            x; \
+        } \
+    }
 
 int ptarray_npoints_in_rect(const POINTARRAY *pa, const GBOX *gbox);
 int gbox_contains_point2d(const GBOX *g, const POINT2D *p);

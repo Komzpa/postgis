@@ -37,8 +37,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 /* -- 2006-04-25 : structure added to index arc endpoints -- */
 typedef struct pagc_point
 {
-	double X;
-	double Y;
+    double X;
+    double Y;
 } PAGC_POINT;
 
 typedef int SYMB;

@@ -54,11 +54,11 @@
  */
 typedef struct
 {
-	GeomCache gcache;
-	MemoryContext context_statement;
-	MemoryContext context_callback;
-	const GEOSPreparedGeometry *prepared_geom;
-	const GEOSGeometry *geom;
+    GeomCache gcache;
+    MemoryContext context_statement;
+    MemoryContext context_callback;
+    const GEOSPreparedGeometry *prepared_geom;
+    const GEOSGeometry *geom;
 } PrepGeomCache;
 
 /*

@@ -31,11 +31,11 @@
  */
 typedef struct
 {
-	uint8_t flags;
-	double x;
-	double y;
-	double z;
-	double m;
+    uint8_t flags;
+    double x;
+    double y;
+    double z;
+    double m;
 } POINT;
 
 /*

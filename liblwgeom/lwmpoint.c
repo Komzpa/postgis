@@ -31,75 +31,75 @@
 void
 lwmpoint_release(LWMPOINT *lwmpoint)
 {
-	lwgeom_release(lwmpoint_as_lwgeom(lwmpoint));
+    lwgeom_release(lwmpoint_as_lwgeom(lwmpoint));
 }
 
 LWMPOINT *
 lwmpoint_construct_empty(int srid, char hasz, char hasm)
 {
-	LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
-	return ret;
+    LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
+    return ret;
 }
 
 LWMPOINT *
 lwmpoint_add_lwpoint(LWMPOINT *mobj, const LWPOINT *obj)
 {
-	LWDEBUG(4, "Called");
-	return (LWMPOINT *)lwcollection_add_lwgeom((LWCOLLECTION *)mobj, (LWGEOM *)obj);
+    LWDEBUG(4, "Called");
+    return (LWMPOINT *)lwcollection_add_lwgeom((LWCOLLECTION *)mobj, (LWGEOM *)obj);
 }
 
 LWMPOINT *
 lwmpoint_construct(int srid, const POINTARRAY *pa)
 {
-	uint32_t i;
-	int hasz = ptarray_has_z(pa);
-	int hasm = ptarray_has_m(pa);
-	LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
+    uint32_t i;
+    int hasz = ptarray_has_z(pa);
+    int hasm = ptarray_has_m(pa);
+    LWMPOINT *ret = (LWMPOINT *)lwcollection_construct_empty(MULTIPOINTTYPE, srid, hasz, hasm);
 
-	for (i = 0; i < pa->npoints; i++)
-	{
-		LWPOINT *lwp;
-		POINT4D p;
-		getPoint4d_p(pa, i, &p);
-		lwp = lwpoint_make(srid, hasz, hasm, &p);
-		lwmpoint_add_lwpoint(ret, lwp);
-	}
+    for (i = 0; i < pa->npoints; i++)
+    {
+        LWPOINT *lwp;
+        POINT4D p;
+        getPoint4d_p(pa, i, &p);
+        lwp = lwpoint_make(srid, hasz, hasm, &p);
+        lwmpoint_add_lwpoint(ret, lwp);
+    }
 
-	return ret;
+    return ret;
 }
 
 void
 lwmpoint_free(LWMPOINT *mpt)
 {
-	uint32_t i;
+    uint32_t i;
 
-	if (!mpt) return;
+    if (!mpt) return;
 
-	if (mpt->bbox) lwfree(mpt->bbox);
+    if (mpt->bbox) lwfree(mpt->bbox);
 
-	for (i = 0; i < mpt->ngeoms; i++)
-		if (mpt->geoms && mpt->geoms[i]) lwpoint_free(mpt->geoms[i]);
+    for (i = 0; i < mpt->ngeoms; i++)
+        if (mpt->geoms && mpt->geoms[i]) lwpoint_free(mpt->geoms[i]);
 
-	if (mpt->geoms) lwfree(mpt->geoms);
+    if (mpt->geoms) lwfree(mpt->geoms);
 
-	lwfree(mpt);
+    lwfree(mpt);
 }
 
 LWMPOINT *
 lwmpoint_from_lwgeom(const LWGEOM *g)
 {
-	LWPOINTITERATOR *it = lwpointiterator_create(g);
-	int has_z = lwgeom_has_z(g);
-	int has_m = lwgeom_has_m(g);
-	LWMPOINT *result = lwmpoint_construct_empty(g->srid, has_z, has_m);
-	POINT4D p;
+    LWPOINTITERATOR *it = lwpointiterator_create(g);
+    int has_z = lwgeom_has_z(g);
+    int has_m = lwgeom_has_m(g);
+    LWMPOINT *result = lwmpoint_construct_empty(g->srid, has_z, has_m);
+    POINT4D p;
 
-	while (lwpointiterator_next(it, &p))
-	{
-		LWPOINT *lwp = lwpoint_make(g->srid, has_z, has_m, &p);
-		lwmpoint_add_lwpoint(result, lwp);
-	}
+    while (lwpointiterator_next(it, &p))
+    {
+        LWPOINT *lwp = lwpoint_make(g->srid, has_z, has_m, &p);
+        lwmpoint_add_lwpoint(result, lwp);
+    }
 
-	lwpointiterator_destroy(it);
-	return result;
+    lwpointiterator_destroy(it);
+    return result;
 }

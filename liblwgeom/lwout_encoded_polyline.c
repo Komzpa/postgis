@@ -34,103 +34,103 @@ static char *pointarray_to_encoded_polyline(const POINTARRAY *, int precision);
 extern char *
 lwgeom_to_encoded_polyline(const LWGEOM *geom, int precision)
 {
-	int type = geom->type;
-	switch (type)
-	{
-	case LINETYPE:
-		return lwline_to_encoded_polyline((LWLINE *)geom, precision);
-	case MULTIPOINTTYPE:
-		return lwmmpoint_to_encoded_polyline((LWMPOINT *)geom, precision);
-	default:
-		lwerror("lwgeom_to_encoded_polyline: '%s' geometry type not supported", lwtype_name(type));
-		return NULL;
-	}
+    int type = geom->type;
+    switch (type)
+    {
+    case LINETYPE:
+        return lwline_to_encoded_polyline((LWLINE *)geom, precision);
+    case MULTIPOINTTYPE:
+        return lwmmpoint_to_encoded_polyline((LWMPOINT *)geom, precision);
+    default:
+        lwerror("lwgeom_to_encoded_polyline: '%s' geometry type not supported", lwtype_name(type));
+        return NULL;
+    }
 }
 
 static char *
 lwline_to_encoded_polyline(const LWLINE *line, int precision)
 {
-	return pointarray_to_encoded_polyline(line->points, precision);
+    return pointarray_to_encoded_polyline(line->points, precision);
 }
 
 static char *
 lwmmpoint_to_encoded_polyline(const LWMPOINT *mpoint, int precision)
 {
-	LWLINE *line = lwline_from_lwmpoint(mpoint->srid, mpoint);
-	char *encoded_polyline = lwline_to_encoded_polyline(line, precision);
+    LWLINE *line = lwline_from_lwmpoint(mpoint->srid, mpoint);
+    char *encoded_polyline = lwline_to_encoded_polyline(line, precision);
 
-	lwline_free(line);
-	return encoded_polyline;
+    lwline_free(line);
+    return encoded_polyline;
 }
 
 static char *
 pointarray_to_encoded_polyline(const POINTARRAY *pa, int precision)
 {
-	uint32_t i;
-	const POINT2D *prevPoint;
-	int *delta;
-	char *encoded_polyline = NULL;
-	stringbuffer_t *sb;
-	double scale = pow(10, precision);
+    uint32_t i;
+    const POINT2D *prevPoint;
+    int *delta;
+    char *encoded_polyline = NULL;
+    stringbuffer_t *sb;
+    double scale = pow(10, precision);
 
-	/* Empty input is empty string */
-	if (pa->npoints == 0)
-	{
-		encoded_polyline = lwalloc(1 * sizeof(char));
-		encoded_polyline[0] = 0;
-		return encoded_polyline;
-	}
+    /* Empty input is empty string */
+    if (pa->npoints == 0)
+    {
+        encoded_polyline = lwalloc(1 * sizeof(char));
+        encoded_polyline[0] = 0;
+        return encoded_polyline;
+    }
 
-	delta = lwalloc(2 * sizeof(int) * pa->npoints);
+    delta = lwalloc(2 * sizeof(int) * pa->npoints);
 
-	/* Take the double value and multiply it by 1x10^precision, rounding the
-	 * result */
-	prevPoint = getPoint2d_cp(pa, 0);
-	delta[0] = round(prevPoint->y * scale);
-	delta[1] = round(prevPoint->x * scale);
+    /* Take the double value and multiply it by 1x10^precision, rounding the
+     * result */
+    prevPoint = getPoint2d_cp(pa, 0);
+    delta[0] = round(prevPoint->y * scale);
+    delta[1] = round(prevPoint->x * scale);
 
-	/* Points only include the offset from the previous point */
-	for (i = 1; i < pa->npoints; i++)
-	{
-		const POINT2D *point = getPoint2d_cp(pa, i);
-		delta[2 * i] = round(point->y * scale) - round(prevPoint->y * scale);
-		delta[(2 * i) + 1] = round(point->x * scale) - round(prevPoint->x * scale);
-		prevPoint = point;
-	}
+    /* Points only include the offset from the previous point */
+    for (i = 1; i < pa->npoints; i++)
+    {
+        const POINT2D *point = getPoint2d_cp(pa, i);
+        delta[2 * i] = round(point->y * scale) - round(prevPoint->y * scale);
+        delta[(2 * i) + 1] = round(point->x * scale) - round(prevPoint->x * scale);
+        prevPoint = point;
+    }
 
-	/* value to binary: a negative value must be calculated using its two's
-	 * complement */
-	for (i = 0; i < pa->npoints * 2; i++)
-	{
-		/* Multiply by 2 for a signed left shift */
-		delta[i] *= 2;
-		/* if value is negative, invert this encoding */
-		if (delta[i] < 0) { delta[i] = ~(delta[i]); }
-	}
+    /* value to binary: a negative value must be calculated using its two's
+     * complement */
+    for (i = 0; i < pa->npoints * 2; i++)
+    {
+        /* Multiply by 2 for a signed left shift */
+        delta[i] *= 2;
+        /* if value is negative, invert this encoding */
+        if (delta[i] < 0) { delta[i] = ~(delta[i]); }
+    }
 
-	sb = stringbuffer_create();
-	for (i = 0; i < pa->npoints * 2; i++)
-	{
-		int numberToEncode = delta[i];
+    sb = stringbuffer_create();
+    for (i = 0; i < pa->npoints * 2; i++)
+    {
+        int numberToEncode = delta[i];
 
-		while (numberToEncode >= 0x20)
-		{
-			/* Place the 5-bit chunks into reverse order or
-			 each value with 0x20 if another bit chunk follows and add 63*/
-			int nextValue = (0x20 | (numberToEncode & 0x1f)) + 63;
-			stringbuffer_aprintf(sb, "%c", (char)nextValue);
+        while (numberToEncode >= 0x20)
+        {
+            /* Place the 5-bit chunks into reverse order or
+             each value with 0x20 if another bit chunk follows and add 63*/
+            int nextValue = (0x20 | (numberToEncode & 0x1f)) + 63;
+            stringbuffer_aprintf(sb, "%c", (char)nextValue);
 
-			/* Break the binary value out into 5-bit chunks */
-			numberToEncode >>= 5;
-		}
+            /* Break the binary value out into 5-bit chunks */
+            numberToEncode >>= 5;
+        }
 
-		numberToEncode += 63;
-		stringbuffer_aprintf(sb, "%c", (char)numberToEncode);
-	}
+        numberToEncode += 63;
+        stringbuffer_aprintf(sb, "%c", (char)numberToEncode);
+    }
 
-	lwfree(delta);
-	encoded_polyline = stringbuffer_getstringcopy(sb);
-	stringbuffer_destroy(sb);
+    lwfree(delta);
+    encoded_polyline = stringbuffer_getstringcopy(sb);
+    stringbuffer_destroy(sb);
 
-	return encoded_polyline;
+    return encoded_polyline;
 }

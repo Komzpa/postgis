@@ -48,25 +48,25 @@
 
 typedef struct mvt_agg_context
 {
-	char *name;
-	uint32_t extent;
-	char *geom_name;
-	uint32_t geom_index;
-	HeapTupleHeader row;
-	VectorTile__Tile__Feature *feature;
-	VectorTile__Tile__Layer *layer;
-	VectorTile__Tile *tile;
-	size_t features_capacity;
-	struct mvt_kv_key *keys_hash;
-	struct mvt_kv_string_value *string_values_hash;
-	struct mvt_kv_float_value *float_values_hash;
-	struct mvt_kv_double_value *double_values_hash;
-	struct mvt_kv_uint_value *uint_values_hash;
-	struct mvt_kv_sint_value *sint_values_hash;
-	struct mvt_kv_bool_value *bool_values_hash;
-	uint32_t values_hash_i;
-	uint32_t keys_hash_i;
-	uint32_t c;
+    char *name;
+    uint32_t extent;
+    char *geom_name;
+    uint32_t geom_index;
+    HeapTupleHeader row;
+    VectorTile__Tile__Feature *feature;
+    VectorTile__Tile__Layer *layer;
+    VectorTile__Tile *tile;
+    size_t features_capacity;
+    struct mvt_kv_key *keys_hash;
+    struct mvt_kv_string_value *string_values_hash;
+    struct mvt_kv_float_value *float_values_hash;
+    struct mvt_kv_double_value *double_values_hash;
+    struct mvt_kv_uint_value *uint_values_hash;
+    struct mvt_kv_sint_value *sint_values_hash;
+    struct mvt_kv_bool_value *bool_values_hash;
+    uint32_t values_hash_i;
+    uint32_t keys_hash_i;
+    uint32_t c;
 } mvt_agg_context;
 
 /* Prototypes */

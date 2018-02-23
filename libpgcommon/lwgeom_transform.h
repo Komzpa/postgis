@@ -15,9 +15,9 @@
 
 typedef struct srs_precision
 {
-	int precision_xy;
-	int precision_z;
-	int precision_m;
+    int precision_xy;
+    int precision_z;
+    int precision_m;
 } srs_precision;
 
 char *GetProj4StringSPI(int srid);

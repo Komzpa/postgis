@@ -122,14 +122,14 @@ int wkt_yydebug = 0;
 void
 wkt_yyerror(__attribute__((__unused__)) const char *str)
 {
-	/* If we haven't already set a message and location, let's set one now. */
-	if (!global_parser_result.message)
-	{
-		global_parser_result.message = parser_error_messages[PARSER_ERROR_OTHER];
-		global_parser_result.errcode = PARSER_ERROR_OTHER;
-		global_parser_result.errlocation = wkt_yylloc.last_column;
-	}
-	LWDEBUGF(4, "%s", str);
+    /* If we haven't already set a message and location, let's set one now. */
+    if (!global_parser_result.message)
+    {
+        global_parser_result.message = parser_error_messages[PARSER_ERROR_OTHER];
+        global_parser_result.errcode = PARSER_ERROR_OTHER;
+        global_parser_result.errlocation = wkt_yylloc.last_column;
+    }
+    LWDEBUGF(4, "%s", str);
 }
 
 /**
@@ -141,59 +141,59 @@ wkt_yyerror(__attribute__((__unused__)) const char *str)
 int
 lwgeom_parse_wkt(LWGEOM_PARSER_RESULT *parser_result, char *wktstr, int parser_check_flags)
 {
-	int parse_rv = 0;
+    int parse_rv = 0;
 
-	/* Clean up our global parser result. */
-	lwgeom_parser_result_init(&global_parser_result);
-	/* Work-around possible bug in GNU Bison 3.0.2 resulting in wkt_yylloc
-	 * members not being initialized on yyparse() as documented here:
-	 * https://www.gnu.org/software/bison/manual/html_node/Location-Type.html
-	 * See discussion here:
-	 * http://lists.osgeo.org/pipermail/postgis-devel/2014-September/024506.html
-	 */
-	wkt_yylloc.last_column = wkt_yylloc.last_line = wkt_yylloc.first_column = wkt_yylloc.first_line = 1;
+    /* Clean up our global parser result. */
+    lwgeom_parser_result_init(&global_parser_result);
+    /* Work-around possible bug in GNU Bison 3.0.2 resulting in wkt_yylloc
+     * members not being initialized on yyparse() as documented here:
+     * https://www.gnu.org/software/bison/manual/html_node/Location-Type.html
+     * See discussion here:
+     * http://lists.osgeo.org/pipermail/postgis-devel/2014-September/024506.html
+     */
+    wkt_yylloc.last_column = wkt_yylloc.last_line = wkt_yylloc.first_column = wkt_yylloc.first_line = 1;
 
-	/* Set the input text string, and parse checks. */
-	global_parser_result.wkinput = wktstr;
-	global_parser_result.parser_check_flags = parser_check_flags;
+    /* Set the input text string, and parse checks. */
+    global_parser_result.wkinput = wktstr;
+    global_parser_result.parser_check_flags = parser_check_flags;
 
-	wkt_lexer_init(wktstr);   /* Lexer ready */
-	parse_rv = wkt_yyparse(); /* Run the parse */
-	LWDEBUGF(4, "wkt_yyparse returned %d", parse_rv);
-	wkt_lexer_close(); /* Clean up lexer */
+    wkt_lexer_init(wktstr);   /* Lexer ready */
+    parse_rv = wkt_yyparse(); /* Run the parse */
+    LWDEBUGF(4, "wkt_yyparse returned %d", parse_rv);
+    wkt_lexer_close(); /* Clean up lexer */
 
-	/* A non-zero parser return is an error. */
-	if (parse_rv != 0)
-	{
-		if (!global_parser_result.errcode)
-		{
-			global_parser_result.errcode = PARSER_ERROR_OTHER;
-			global_parser_result.message = parser_error_messages[PARSER_ERROR_OTHER];
-			global_parser_result.errlocation = wkt_yylloc.last_column;
-		}
+    /* A non-zero parser return is an error. */
+    if (parse_rv != 0)
+    {
+        if (!global_parser_result.errcode)
+        {
+            global_parser_result.errcode = PARSER_ERROR_OTHER;
+            global_parser_result.message = parser_error_messages[PARSER_ERROR_OTHER];
+            global_parser_result.errlocation = wkt_yylloc.last_column;
+        }
 
-		LWDEBUGF(5,
-			 "error returned by wkt_yyparse() @ %d: [%d] '%s'",
-			 global_parser_result.errlocation,
-			 global_parser_result.errcode,
-			 global_parser_result.message);
+        LWDEBUGF(5,
+                 "error returned by wkt_yyparse() @ %d: [%d] '%s'",
+                 global_parser_result.errlocation,
+                 global_parser_result.errcode,
+                 global_parser_result.message);
 
-		/* Copy the global values into the return pointer */
-		*parser_result = global_parser_result;
-		wkt_yylex_destroy();
-		return LW_FAILURE;
-	}
+        /* Copy the global values into the return pointer */
+        *parser_result = global_parser_result;
+        wkt_yylex_destroy();
+        return LW_FAILURE;
+    }
 
-	/* Copy the global value into the return pointer */
-	*parser_result = global_parser_result;
-	wkt_yylex_destroy();
-	return LW_SUCCESS;
+    /* Copy the global value into the return pointer */
+    *parser_result = global_parser_result;
+    wkt_yylex_destroy();
+    return LW_SUCCESS;
 }
 
 #define WKT_ERROR() \
-	{ \
-		if (global_parser_result.errcode != 0) { YYERROR; } \
-	}
+    { \
+        if (global_parser_result.errcode != 0) { YYERROR; } \
+    }
 
 #line 178 "lwin_wkt_parse.c" /* yacc.c:339  */
 
@@ -230,29 +230,29 @@ extern int wkt_yydebug;
 #define YYTOKENTYPE
 enum yytokentype
 {
-	POINT_TOK = 258,
-	LINESTRING_TOK = 259,
-	POLYGON_TOK = 260,
-	MPOINT_TOK = 261,
-	MLINESTRING_TOK = 262,
-	MPOLYGON_TOK = 263,
-	MSURFACE_TOK = 264,
-	MCURVE_TOK = 265,
-	CURVEPOLYGON_TOK = 266,
-	COMPOUNDCURVE_TOK = 267,
-	CIRCULARSTRING_TOK = 268,
-	COLLECTION_TOK = 269,
-	RBRACKET_TOK = 270,
-	LBRACKET_TOK = 271,
-	COMMA_TOK = 272,
-	EMPTY_TOK = 273,
-	SEMICOLON_TOK = 274,
-	TRIANGLE_TOK = 275,
-	TIN_TOK = 276,
-	POLYHEDRALSURFACE_TOK = 277,
-	DOUBLE_TOK = 278,
-	DIMENSIONALITY_TOK = 279,
-	SRID_TOK = 280
+    POINT_TOK = 258,
+    LINESTRING_TOK = 259,
+    POLYGON_TOK = 260,
+    MPOINT_TOK = 261,
+    MLINESTRING_TOK = 262,
+    MPOLYGON_TOK = 263,
+    MSURFACE_TOK = 264,
+    MCURVE_TOK = 265,
+    CURVEPOLYGON_TOK = 266,
+    COMPOUNDCURVE_TOK = 267,
+    CIRCULARSTRING_TOK = 268,
+    COLLECTION_TOK = 269,
+    RBRACKET_TOK = 270,
+    LBRACKET_TOK = 271,
+    COMMA_TOK = 272,
+    EMPTY_TOK = 273,
+    SEMICOLON_TOK = 274,
+    TRIANGLE_TOK = 275,
+    TIN_TOK = 276,
+    POLYHEDRALSURFACE_TOK = 277,
+    DOUBLE_TOK = 278,
+    DIMENSIONALITY_TOK = 279,
+    SRID_TOK = 280
 };
 #endif
 /* Tokens.  */
@@ -286,12 +286,12 @@ enum yytokentype
 union YYSTYPE {
 #line 108 "lwin_wkt_parse.y" /* yacc.c:355  */
 
-	int integervalue;
-	double doublevalue;
-	char *stringvalue;
-	LWGEOM *geometryvalue;
-	POINT coordinatevalue;
-	POINTARRAY *ptarrayvalue;
+    int integervalue;
+    double doublevalue;
+    char *stringvalue;
+    LWGEOM *geometryvalue;
+    POINT coordinatevalue;
+    POINTARRAY *ptarrayvalue;
 
 #line 277 "lwin_wkt_parse.c" /* yacc.c:355  */
 };
@@ -306,10 +306,10 @@ typedef union YYSTYPE YYSTYPE;
 typedef struct YYLTYPE YYLTYPE;
 struct YYLTYPE
 {
-	int first_line;
-	int first_column;
-	int last_line;
-	int last_column;
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
 };
 #define YYLTYPE_IS_DECLARED 1
 #define YYLTYPE_IS_TRIVIAL 1
@@ -415,8 +415,8 @@ typedef short int yytype_int16;
 #if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
 #define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
-	_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wuninitialized\"") \
-	    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wuninitialized\"") \
+        _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
 #define YY_IGNORE_MAYBE_UNINITIALIZED_END _Pragma("GCC diagnostic pop")
 #else
 #define YY_INITIAL_VALUE(Value) Value
@@ -460,10 +460,10 @@ typedef short int yytype_int16;
 #ifdef YYSTACK_ALLOC
 /* Pacify GCC's 'empty if-body' warning.  */
 #define YYSTACK_FREE(Ptr) \
-	do \
-	{ /* empty */ \
-		; \
-	} while (0)
+    do \
+    { /* empty */ \
+        ; \
+    } while (0)
 #ifndef YYSTACK_ALLOC_MAXIMUM
 /* The OS might guarantee only one guard page at the bottom of the stack,
    and a page size can be as small as 4096 bytes.  So we cannot safely
@@ -500,13 +500,13 @@ void free(void *);      /* INFRINGES ON USER NAME SPACE */
 #endif /* ! defined yyoverflow || YYERROR_VERBOSE */
 
 #if (!defined yyoverflow && (!defined __cplusplus || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL && \
-						      defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+                                                      defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc {
-	yytype_int16 yyss_alloc;
-	YYSTYPE yyvs_alloc;
-	YYLTYPE yyls_alloc;
+    yytype_int16 yyss_alloc;
+    YYSTYPE yyvs_alloc;
+    YYLTYPE yyls_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
@@ -524,14 +524,14 @@ union yyalloc {
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
 #define YYSTACK_RELOCATE(Stack_alloc, Stack) \
-	do \
-	{ \
-		YYSIZE_T yynewbytes; \
-		YYCOPY(&yyptr->Stack_alloc, Stack, yysize); \
-		Stack = &yyptr->Stack_alloc; \
-		yynewbytes = yystacksize * sizeof(*Stack) + YYSTACK_GAP_MAXIMUM; \
-		yyptr += yynewbytes / sizeof(*yyptr); \
-	} while (0)
+    do \
+    { \
+        YYSIZE_T yynewbytes; \
+        YYCOPY(&yyptr->Stack_alloc, Stack, yysize); \
+        Stack = &yyptr->Stack_alloc; \
+        yynewbytes = yystacksize * sizeof(*Stack) + YYSTACK_GAP_MAXIMUM; \
+        yyptr += yynewbytes / sizeof(*yyptr); \
+    } while (0)
 
 #endif
 
@@ -543,12 +543,12 @@ union yyalloc {
 #define YYCOPY(Dst, Src, Count) __builtin_memcpy(Dst, Src, (Count) * sizeof(*(Src)))
 #else
 #define YYCOPY(Dst, Src, Count) \
-	do \
-	{ \
-		YYSIZE_T yyi; \
-		for (yyi = 0; yyi < (Count); yyi++) \
-			(Dst)[yyi] = (Src)[yyi]; \
-	} while (0)
+    do \
+    { \
+        YYSIZE_T yyi; \
+        for (yyi = 0; yyi < (Count); yyi++) \
+            (Dst)[yyi] = (Src)[yyi]; \
+    } while (0)
 #endif
 #endif
 #endif /* !YYCOPY_NEEDED */
@@ -602,79 +602,79 @@ static const yytype_uint16 yyrline[] = {
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] = {"$end",
-				      "error",
-				      "$undefined",
-				      "POINT_TOK",
-				      "LINESTRING_TOK",
-				      "POLYGON_TOK",
-				      "MPOINT_TOK",
-				      "MLINESTRING_TOK",
-				      "MPOLYGON_TOK",
-				      "MSURFACE_TOK",
-				      "MCURVE_TOK",
-				      "CURVEPOLYGON_TOK",
-				      "COMPOUNDCURVE_TOK",
-				      "CIRCULARSTRING_TOK",
-				      "COLLECTION_TOK",
-				      "RBRACKET_TOK",
-				      "LBRACKET_TOK",
-				      "COMMA_TOK",
-				      "EMPTY_TOK",
-				      "SEMICOLON_TOK",
-				      "TRIANGLE_TOK",
-				      "TIN_TOK",
-				      "POLYHEDRALSURFACE_TOK",
-				      "DOUBLE_TOK",
-				      "DIMENSIONALITY_TOK",
-				      "SRID_TOK",
-				      "$accept",
-				      "geometry",
-				      "geometry_no_srid",
-				      "geometrycollection",
-				      "geometry_list",
-				      "multisurface",
-				      "surface_list",
-				      "tin",
-				      "polyhedralsurface",
-				      "multipolygon",
-				      "polygon_list",
-				      "patch_list",
-				      "polygon",
-				      "polygon_untagged",
-				      "patch",
-				      "curvepolygon",
-				      "curvering_list",
-				      "curvering",
-				      "patchring_list",
-				      "ring_list",
-				      "patchring",
-				      "ring",
-				      "compoundcurve",
-				      "compound_list",
-				      "multicurve",
-				      "curve_list",
-				      "multilinestring",
-				      "linestring_list",
-				      "circularstring",
-				      "linestring",
-				      "linestring_untagged",
-				      "triangle_list",
-				      "triangle",
-				      "triangle_untagged",
-				      "multipoint",
-				      "point_list",
-				      "point_untagged",
-				      "point",
-				      "ptarray",
-				      "coordinate",
-				      YY_NULLPTR};
+                                      "error",
+                                      "$undefined",
+                                      "POINT_TOK",
+                                      "LINESTRING_TOK",
+                                      "POLYGON_TOK",
+                                      "MPOINT_TOK",
+                                      "MLINESTRING_TOK",
+                                      "MPOLYGON_TOK",
+                                      "MSURFACE_TOK",
+                                      "MCURVE_TOK",
+                                      "CURVEPOLYGON_TOK",
+                                      "COMPOUNDCURVE_TOK",
+                                      "CIRCULARSTRING_TOK",
+                                      "COLLECTION_TOK",
+                                      "RBRACKET_TOK",
+                                      "LBRACKET_TOK",
+                                      "COMMA_TOK",
+                                      "EMPTY_TOK",
+                                      "SEMICOLON_TOK",
+                                      "TRIANGLE_TOK",
+                                      "TIN_TOK",
+                                      "POLYHEDRALSURFACE_TOK",
+                                      "DOUBLE_TOK",
+                                      "DIMENSIONALITY_TOK",
+                                      "SRID_TOK",
+                                      "$accept",
+                                      "geometry",
+                                      "geometry_no_srid",
+                                      "geometrycollection",
+                                      "geometry_list",
+                                      "multisurface",
+                                      "surface_list",
+                                      "tin",
+                                      "polyhedralsurface",
+                                      "multipolygon",
+                                      "polygon_list",
+                                      "patch_list",
+                                      "polygon",
+                                      "polygon_untagged",
+                                      "patch",
+                                      "curvepolygon",
+                                      "curvering_list",
+                                      "curvering",
+                                      "patchring_list",
+                                      "ring_list",
+                                      "patchring",
+                                      "ring",
+                                      "compoundcurve",
+                                      "compound_list",
+                                      "multicurve",
+                                      "curve_list",
+                                      "multilinestring",
+                                      "linestring_list",
+                                      "circularstring",
+                                      "linestring",
+                                      "linestring_untagged",
+                                      "triangle_list",
+                                      "triangle",
+                                      "triangle_untagged",
+                                      "multipoint",
+                                      "point_list",
+                                      "point_untagged",
+                                      "point",
+                                      "ptarray",
+                                      "coordinate",
+                                      YY_NULLPTR};
 #endif
 
 #ifdef YYPRINT
 /* YYTOKNUM[NUM] -- (External) token number corresponding to the
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_uint16 yytoknum[] = {0,   256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267,
-					 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280};
+                                         268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280};
 #endif
 
 #define YYPACT_NINF -90
@@ -719,13 +719,13 @@ static const yytype_uint8 yydefact[] = {
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] = {-90, -90, 0,   -90, 5,   -90, 37,  -90, -90, -90, 48,  6,   -39, -33,
-				       -42, -32, 55,  -21, -90, -89, -57, 118, -50, 150, -90, 165, -90, 185,
-				       -51, -49, -44, 138, -90, 89,  -90, 193, 121, -90, -36, -6};
+                                       -42, -32, 55,  -21, -90, -89, -57, 118, -50, 150, -90, 165, -90, 185,
+                                       -51, -49, -44, 138, -90, 89,  -90, 193, 121, -90, -36, -6};
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] = {-1,  17, 143, 19,  144, 20,  113, 21, 22, 23,  109, 156, 24, 110,
-					 157, 25, 126, 127, 207, 90,  208, 91, 26, 134, 27,  120, 28, 103,
-					 29,  30, 131, 151, 31,  152, 32,  96, 97, 33,  82,  83};
+                                         157, 25, 126, 127, 207, 90,  208, 91, 26, 134, 27,  120, 28, 103,
+                                         29,  30, 131, 151, 31,  152, 32,  96, 97, 33,  82,  83};
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule whose
@@ -784,10 +784,10 @@ static const yytype_uint8 yyr1[] = {
 
 /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] = {0, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 5, 3, 2, 3, 1, 4, 5, 3,
-				    2, 3, 3, 3, 1, 1, 1, 4, 5, 3, 2, 4, 5, 3, 2, 4, 5, 3, 2, 3, 1, 3, 1, 4, 5, 3, 2, 3,
-				    1, 3, 4, 5, 3, 2, 3, 1, 1, 1, 1, 1, 3, 1, 3, 1, 3, 3, 4, 5, 3, 2, 3, 3, 3, 1, 1, 1,
-				    4, 5, 3, 2, 3, 3, 3, 3, 1, 1, 1, 1, 4, 5, 3, 2, 3, 1, 4, 5, 3, 2, 4, 5, 3, 2, 3, 1,
-				    3, 1, 6, 7, 3, 2, 5, 4, 5, 3, 2, 3, 1, 1, 3, 1, 4, 5, 3, 2, 3, 1, 2, 3, 4};
+                                    2, 3, 3, 3, 1, 1, 1, 4, 5, 3, 2, 4, 5, 3, 2, 4, 5, 3, 2, 3, 1, 3, 1, 4, 5, 3, 2, 3,
+                                    1, 3, 4, 5, 3, 2, 3, 1, 1, 1, 1, 1, 3, 1, 3, 1, 3, 3, 4, 5, 3, 2, 3, 3, 3, 1, 1, 1,
+                                    4, 5, 3, 2, 3, 3, 3, 3, 1, 1, 1, 1, 4, 5, 3, 2, 3, 1, 4, 5, 3, 2, 4, 5, 3, 2, 3, 1,
+                                    3, 1, 6, 7, 3, 2, 5, 4, 5, 3, 2, 3, 1, 1, 3, 1, 4, 5, 3, 2, 3, 1, 2, 3, 4};
 
 #define yyerrok (yyerrstatus = 0)
 #define yyclearin (yychar = YYEMPTY)
@@ -801,21 +801,21 @@ static const yytype_uint8 yyr2[] = {0, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 #define YYRECOVERING() (!!yyerrstatus)
 
 #define YYBACKUP(Token, Value) \
-	do \
-		if (yychar == YYEMPTY) \
-		{ \
-			yychar = (Token); \
-			yylval = (Value); \
-			YYPOPSTACK(yylen); \
-			yystate = *yyssp; \
-			goto yybackup; \
-		} \
-		else \
-		{ \
-			yyerror(YY_("syntax error: cannot back up")); \
-			YYERROR; \
-		} \
-	while (0)
+    do \
+        if (yychar == YYEMPTY) \
+        { \
+            yychar = (Token); \
+            yylval = (Value); \
+            YYPOPSTACK(yylen); \
+            yystate = *yyssp; \
+            goto yybackup; \
+        } \
+        else \
+        { \
+            yyerror(YY_("syntax error: cannot back up")); \
+            YYERROR; \
+        } \
+    while (0)
 
 /* Error token number */
 #define YYTERROR 1
@@ -827,20 +827,20 @@ static const yytype_uint8 yyr2[] = {0, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 #ifndef YYLLOC_DEFAULT
 #define YYLLOC_DEFAULT(Current, Rhs, N) \
-	do \
-		if (N) \
-		{ \
-			(Current).first_line = YYRHSLOC(Rhs, 1).first_line; \
-			(Current).first_column = YYRHSLOC(Rhs, 1).first_column; \
-			(Current).last_line = YYRHSLOC(Rhs, N).last_line; \
-			(Current).last_column = YYRHSLOC(Rhs, N).last_column; \
-		} \
-		else \
-		{ \
-			(Current).first_line = (Current).last_line = YYRHSLOC(Rhs, 0).last_line; \
-			(Current).first_column = (Current).last_column = YYRHSLOC(Rhs, 0).last_column; \
-		} \
-	while (0)
+    do \
+        if (N) \
+        { \
+            (Current).first_line = YYRHSLOC(Rhs, 1).first_line; \
+            (Current).first_column = YYRHSLOC(Rhs, 1).first_column; \
+            (Current).last_line = YYRHSLOC(Rhs, N).last_line; \
+            (Current).last_column = YYRHSLOC(Rhs, N).last_column; \
+        } \
+        else \
+        { \
+            (Current).first_line = (Current).last_line = YYRHSLOC(Rhs, 0).last_line; \
+            (Current).first_column = (Current).last_column = YYRHSLOC(Rhs, 0).last_column; \
+        } \
+    while (0)
 #endif
 
 #define YYRHSLOC(Rhs, K) ((Rhs)[K])
@@ -854,10 +854,10 @@ static const yytype_uint8 yyr2[] = {0, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 #endif
 
 #define YYDPRINTF(Args) \
-	do \
-	{ \
-		if (yydebug) YYFPRINTF Args; \
-	} while (0)
+    do \
+    { \
+        if (yydebug) YYFPRINTF Args; \
+    } while (0)
 
 /* YY_LOCATION_PRINT -- Print the location on the stream.
    This macro was not mandated originally: define only if we know
@@ -872,24 +872,24 @@ YY_ATTRIBUTE_UNUSED
 static unsigned
 yy_location_print_(FILE *yyo, YYLTYPE const *const yylocp)
 {
-	unsigned res = 0;
-	int end_col = 0 != yylocp->last_column ? yylocp->last_column - 1 : 0;
-	if (0 <= yylocp->first_line)
-	{
-		res += YYFPRINTF(yyo, "%d", yylocp->first_line);
-		if (0 <= yylocp->first_column) res += YYFPRINTF(yyo, ".%d", yylocp->first_column);
-	}
-	if (0 <= yylocp->last_line)
-	{
-		if (yylocp->first_line < yylocp->last_line)
-		{
-			res += YYFPRINTF(yyo, "-%d", yylocp->last_line);
-			if (0 <= end_col) res += YYFPRINTF(yyo, ".%d", end_col);
-		}
-		else if (0 <= end_col && yylocp->first_column < end_col)
-			res += YYFPRINTF(yyo, "-%d", end_col);
-	}
-	return res;
+    unsigned res = 0;
+    int end_col = 0 != yylocp->last_column ? yylocp->last_column - 1 : 0;
+    if (0 <= yylocp->first_line)
+    {
+        res += YYFPRINTF(yyo, "%d", yylocp->first_line);
+        if (0 <= yylocp->first_column) res += YYFPRINTF(yyo, ".%d", yylocp->first_column);
+    }
+    if (0 <= yylocp->last_line)
+    {
+        if (yylocp->first_line < yylocp->last_line)
+        {
+            res += YYFPRINTF(yyo, "-%d", yylocp->last_line);
+            if (0 <= end_col) res += YYFPRINTF(yyo, ".%d", end_col);
+        }
+        else if (0 <= end_col && yylocp->first_column < end_col)
+            res += YYFPRINTF(yyo, "-%d", end_col);
+    }
+    return res;
 }
 
 #define YY_LOCATION_PRINT(File, Loc) yy_location_print_(File, &(Loc))
@@ -900,15 +900,15 @@ yy_location_print_(FILE *yyo, YYLTYPE const *const yylocp)
 #endif
 
 #define YY_SYMBOL_PRINT(Title, Type, Value, Location) \
-	do \
-	{ \
-		if (yydebug) \
-		{ \
-			YYFPRINTF(stderr, "%s ", Title); \
-			yy_symbol_print(stderr, Type, Value, Location); \
-			YYFPRINTF(stderr, "\n"); \
-		} \
-	} while (0)
+    do \
+    { \
+        if (yydebug) \
+        { \
+            YYFPRINTF(stderr, "%s ", Title); \
+            yy_symbol_print(stderr, Type, Value, Location); \
+            YYFPRINTF(stderr, "\n"); \
+        } \
+    } while (0)
 
 /*----------------------------------------.
 | Print this symbol's value on YYOUTPUT.  |
@@ -917,14 +917,14 @@ yy_location_print_(FILE *yyo, YYLTYPE const *const yylocp)
 static void
 yy_symbol_value_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp)
 {
-	FILE *yyo = yyoutput;
-	YYUSE(yyo);
-	YYUSE(yylocationp);
-	if (!yyvaluep) return;
+    FILE *yyo = yyoutput;
+    YYUSE(yyo);
+    YYUSE(yylocationp);
+    if (!yyvaluep) return;
 #ifdef YYPRINT
-	if (yytype < YYNTOKENS) YYPRINT(yyoutput, yytoknum[yytype], *yyvaluep);
+    if (yytype < YYNTOKENS) YYPRINT(yyoutput, yytoknum[yytype], *yyvaluep);
 #endif
-	YYUSE(yytype);
+    YYUSE(yytype);
 }
 
 /*--------------------------------.
@@ -934,12 +934,12 @@ yy_symbol_value_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep,
 static void
 yy_symbol_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTYPE const *const yylocationp)
 {
-	YYFPRINTF(yyoutput, "%s %s (", yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
+    YYFPRINTF(yyoutput, "%s %s (", yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
 
-	YY_LOCATION_PRINT(yyoutput, *yylocationp);
-	YYFPRINTF(yyoutput, ": ");
-	yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
-	YYFPRINTF(yyoutput, ")");
+    YY_LOCATION_PRINT(yyoutput, *yylocationp);
+    YYFPRINTF(yyoutput, ": ");
+    yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
+    YYFPRINTF(yyoutput, ")");
 }
 
 /*------------------------------------------------------------------.
@@ -950,20 +950,20 @@ yy_symbol_print(FILE *yyoutput, int yytype, YYSTYPE const *const yyvaluep, YYLTY
 static void
 yy_stack_print(yytype_int16 *yybottom, yytype_int16 *yytop)
 {
-	YYFPRINTF(stderr, "Stack now");
-	for (; yybottom <= yytop; yybottom++)
-	{
-		int yybot = *yybottom;
-		YYFPRINTF(stderr, " %d", yybot);
-	}
-	YYFPRINTF(stderr, "\n");
+    YYFPRINTF(stderr, "Stack now");
+    for (; yybottom <= yytop; yybottom++)
+    {
+        int yybot = *yybottom;
+        YYFPRINTF(stderr, " %d", yybot);
+    }
+    YYFPRINTF(stderr, "\n");
 }
 
 #define YY_STACK_PRINT(Bottom, Top) \
-	do \
-	{ \
-		if (yydebug) yy_stack_print((Bottom), (Top)); \
-	} while (0)
+    do \
+    { \
+        if (yydebug) yy_stack_print((Bottom), (Top)); \
+    } while (0)
 
 /*------------------------------------------------.
 | Report that the YYRULE is going to be reduced.  |
@@ -972,27 +972,25 @@ yy_stack_print(yytype_int16 *yybottom, yytype_int16 *yytop)
 static void
 yy_reduce_print(yytype_int16 *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule)
 {
-	unsigned long int yylno = yyrline[yyrule];
-	int yynrhs = yyr2[yyrule];
-	int yyi;
-	YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n", yyrule - 1, yylno);
-	/* The symbols being reduced.  */
-	for (yyi = 0; yyi < yynrhs; yyi++)
-	{
-		YYFPRINTF(stderr, "   $%d = ", yyi + 1);
-		yy_symbol_print(stderr,
-				yystos[yyssp[yyi + 1 - yynrhs]],
-				&(yyvsp[(yyi + 1) - (yynrhs)]),
-				&(yylsp[(yyi + 1) - (yynrhs)]));
-		YYFPRINTF(stderr, "\n");
-	}
+    unsigned long int yylno = yyrline[yyrule];
+    int yynrhs = yyr2[yyrule];
+    int yyi;
+    YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n", yyrule - 1, yylno);
+    /* The symbols being reduced.  */
+    for (yyi = 0; yyi < yynrhs; yyi++)
+    {
+        YYFPRINTF(stderr, "   $%d = ", yyi + 1);
+        yy_symbol_print(
+            stderr, yystos[yyssp[yyi + 1 - yynrhs]], &(yyvsp[(yyi + 1) - (yynrhs)]), &(yylsp[(yyi + 1) - (yynrhs)]));
+        YYFPRINTF(stderr, "\n");
+    }
 }
 
 #define YY_REDUCE_PRINT(Rule) \
-	do \
-	{ \
-		if (yydebug) yy_reduce_print(yyssp, yyvsp, yylsp, Rule); \
-	} while (0)
+    do \
+    { \
+        if (yydebug) yy_reduce_print(yyssp, yyvsp, yylsp, Rule); \
+    } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
@@ -1030,10 +1028,10 @@ int yydebug;
 static YYSIZE_T
 yystrlen(const char *yystr)
 {
-	YYSIZE_T yylen;
-	for (yylen = 0; yystr[yylen]; yylen++)
-		continue;
-	return yylen;
+    YYSIZE_T yylen;
+    for (yylen = 0; yystr[yylen]; yylen++)
+        continue;
+    return yylen;
 }
 #endif
 #endif
@@ -1047,13 +1045,13 @@ yystrlen(const char *yystr)
 static char *
 yystpcpy(char *yydest, const char *yysrc)
 {
-	char *yyd = yydest;
-	const char *yys = yysrc;
+    char *yyd = yydest;
+    const char *yys = yysrc;
 
-	while ((*yyd++ = *yys++) != '\0')
-		continue;
+    while ((*yyd++ = *yys++) != '\0')
+        continue;
 
-	return yyd - 1;
+    return yyd - 1;
 }
 #endif
 #endif
@@ -1069,36 +1067,36 @@ yystpcpy(char *yydest, const char *yysrc)
 static YYSIZE_T
 yytnamerr(char *yyres, const char *yystr)
 {
-	if (*yystr == '"')
-	{
-		YYSIZE_T yyn = 0;
-		char const *yyp = yystr;
+    if (*yystr == '"')
+    {
+        YYSIZE_T yyn = 0;
+        char const *yyp = yystr;
 
-		for (;;)
-			switch (*++yyp)
-			{
-			case '\'':
-			case ',':
-				goto do_not_strip_quotes;
+        for (;;)
+            switch (*++yyp)
+            {
+            case '\'':
+            case ',':
+                goto do_not_strip_quotes;
 
-			case '\\':
-				if (*++yyp != '\\') goto do_not_strip_quotes;
-				/* Fall through.  */
-			default:
-				if (yyres) yyres[yyn] = *yyp;
-				yyn++;
-				break;
+            case '\\':
+                if (*++yyp != '\\') goto do_not_strip_quotes;
+                /* Fall through.  */
+            default:
+                if (yyres) yyres[yyn] = *yyp;
+                yyn++;
+                break;
 
-			case '"':
-				if (yyres) yyres[yyn] = '\0';
-				return yyn;
-			}
-	do_not_strip_quotes:;
-	}
+            case '"':
+                if (yyres) yyres[yyn] = '\0';
+                return yyn;
+            }
+    do_not_strip_quotes:;
+    }
 
-	if (!yyres) return yystrlen(yystr);
+    if (!yyres) return yystrlen(yystr);
 
-	return yystpcpy(yyres, yystr) - yyres;
+    return yystpcpy(yyres, yystr) - yyres;
 }
 #endif
 
@@ -1113,126 +1111,124 @@ yytnamerr(char *yyres, const char *yystr)
 static int
 yysyntax_error(YYSIZE_T *yymsg_alloc, char **yymsg, yytype_int16 *yyssp, int yytoken)
 {
-	YYSIZE_T yysize0 = yytnamerr(YY_NULLPTR, yytname[yytoken]);
-	YYSIZE_T yysize = yysize0;
-	enum
-	{
-		YYERROR_VERBOSE_ARGS_MAXIMUM = 5
-	};
-	/* Internationalized format string. */
-	const char *yyformat = YY_NULLPTR;
-	/* Arguments of yyformat. */
-	char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-	/* Number of reported tokens (one for the "unexpected", one per
-	   "expected"). */
-	int yycount = 0;
+    YYSIZE_T yysize0 = yytnamerr(YY_NULLPTR, yytname[yytoken]);
+    YYSIZE_T yysize = yysize0;
+    enum
+    {
+        YYERROR_VERBOSE_ARGS_MAXIMUM = 5
+    };
+    /* Internationalized format string. */
+    const char *yyformat = YY_NULLPTR;
+    /* Arguments of yyformat. */
+    char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+    /* Number of reported tokens (one for the "unexpected", one per
+       "expected"). */
+    int yycount = 0;
 
-	/* There are many possibilities here to consider:
-	   - If this state is a consistent state with a default action, then
-	     the only way this function was invoked is if the default action
-	     is an error action.  In that case, don't check for expected
-	     tokens because there are none.
-	   - The only way there can be no lookahead present (in yychar) is if
-	     this state is a consistent state with a default action.  Thus,
-	     detecting the absence of a lookahead is sufficient to determine
-	     that there is no unexpected or expected token to report.  In that
-	     case, just report a simple "syntax error".
-	   - Don't assume there isn't a lookahead just because this state is a
-	     consistent state with a default action.  There might have been a
-	     previous inconsistent state, consistent state with a non-default
-	     action, or user semantic action that manipulated yychar.
-	   - Of course, the expected token list depends on states to have
-	     correct lookahead information, and it depends on the parser not
-	     to perform extra reductions after fetching a lookahead from the
-	     scanner and before detecting a syntax error.  Thus, state merging
-	     (from LALR or IELR) and default reductions corrupt the expected
-	     token list.  However, the list is correct for canonical LR with
-	     one exception: it will still contain any token that will not be
-	     accepted due to an error action in a later state.
-	*/
-	if (yytoken != YYEMPTY)
-	{
-		int yyn = yypact[*yyssp];
-		yyarg[yycount++] = yytname[yytoken];
-		if (!yypact_value_is_default(yyn))
-		{
-			/* Start YYX at -YYN if negative to avoid negative indexes in
-			   YYCHECK.  In other words, skip the first -YYN actions for
-			   this state because they are default actions.  */
-			int yyxbegin = yyn < 0 ? -yyn : 0;
-			/* Stay within bounds of both yycheck and yytname.  */
-			int yychecklim = YYLAST - yyn + 1;
-			int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-			int yyx;
+    /* There are many possibilities here to consider:
+       - If this state is a consistent state with a default action, then
+         the only way this function was invoked is if the default action
+         is an error action.  In that case, don't check for expected
+         tokens because there are none.
+       - The only way there can be no lookahead present (in yychar) is if
+         this state is a consistent state with a default action.  Thus,
+         detecting the absence of a lookahead is sufficient to determine
+         that there is no unexpected or expected token to report.  In that
+         case, just report a simple "syntax error".
+       - Don't assume there isn't a lookahead just because this state is a
+         consistent state with a default action.  There might have been a
+         previous inconsistent state, consistent state with a non-default
+         action, or user semantic action that manipulated yychar.
+       - Of course, the expected token list depends on states to have
+         correct lookahead information, and it depends on the parser not
+         to perform extra reductions after fetching a lookahead from the
+         scanner and before detecting a syntax error.  Thus, state merging
+         (from LALR or IELR) and default reductions corrupt the expected
+         token list.  However, the list is correct for canonical LR with
+         one exception: it will still contain any token that will not be
+         accepted due to an error action in a later state.
+    */
+    if (yytoken != YYEMPTY)
+    {
+        int yyn = yypact[*yyssp];
+        yyarg[yycount++] = yytname[yytoken];
+        if (!yypact_value_is_default(yyn))
+        {
+            /* Start YYX at -YYN if negative to avoid negative indexes in
+               YYCHECK.  In other words, skip the first -YYN actions for
+               this state because they are default actions.  */
+            int yyxbegin = yyn < 0 ? -yyn : 0;
+            /* Stay within bounds of both yycheck and yytname.  */
+            int yychecklim = YYLAST - yyn + 1;
+            int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+            int yyx;
 
-			for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-				if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR &&
-				    !yytable_value_is_error(yytable[yyx + yyn]))
-				{
-					if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-					{
-						yycount = 1;
-						yysize = yysize0;
-						break;
-					}
-					yyarg[yycount++] = yytname[yyx];
-					{
-						YYSIZE_T yysize1 = yysize + yytnamerr(YY_NULLPTR, yytname[yyx]);
-						if (!(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)) return 2;
-						yysize = yysize1;
-					}
-				}
-		}
-	}
+            for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+                if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR && !yytable_value_is_error(yytable[yyx + yyn]))
+                {
+                    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+                    {
+                        yycount = 1;
+                        yysize = yysize0;
+                        break;
+                    }
+                    yyarg[yycount++] = yytname[yyx];
+                    {
+                        YYSIZE_T yysize1 = yysize + yytnamerr(YY_NULLPTR, yytname[yyx]);
+                        if (!(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)) return 2;
+                        yysize = yysize1;
+                    }
+                }
+        }
+    }
 
-	switch (yycount)
-	{
+    switch (yycount)
+    {
 #define YYCASE_(N, S) \
-	case N: \
-		yyformat = S; \
-		break
-		YYCASE_(0, YY_("syntax error"));
-		YYCASE_(1, YY_("syntax error, unexpected %s"));
-		YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-		YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-		YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-		YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+    case N: \
+        yyformat = S; \
+        break
+        YYCASE_(0, YY_("syntax error"));
+        YYCASE_(1, YY_("syntax error, unexpected %s"));
+        YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+        YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+        YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+        YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
 #undef YYCASE_
-	}
+    }
 
-	{
-		YYSIZE_T yysize1 = yysize + yystrlen(yyformat);
-		if (!(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)) return 2;
-		yysize = yysize1;
-	}
+    {
+        YYSIZE_T yysize1 = yysize + yystrlen(yyformat);
+        if (!(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)) return 2;
+        yysize = yysize1;
+    }
 
-	if (*yymsg_alloc < yysize)
-	{
-		*yymsg_alloc = 2 * yysize;
-		if (!(yysize <= *yymsg_alloc && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-			*yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-		return 1;
-	}
+    if (*yymsg_alloc < yysize)
+    {
+        *yymsg_alloc = 2 * yysize;
+        if (!(yysize <= *yymsg_alloc && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM)) *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
+        return 1;
+    }
 
-	/* Avoid sprintf, as that infringes on the user's name space.
-	   Don't have undefined behavior even if the translation
-	   produced a string with the wrong number of "%s"s.  */
-	{
-		char *yyp = *yymsg;
-		int yyi = 0;
-		while ((*yyp = *yyformat) != '\0')
-			if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-			{
-				yyp += yytnamerr(yyp, yyarg[yyi++]);
-				yyformat += 2;
-			}
-			else
-			{
-				yyp++;
-				yyformat++;
-			}
-	}
-	return 0;
+    /* Avoid sprintf, as that infringes on the user's name space.
+       Don't have undefined behavior even if the translation
+       produced a string with the wrong number of "%s"s.  */
+    {
+        char *yyp = *yymsg;
+        int yyi = 0;
+        while ((*yyp = *yyformat) != '\0')
+            if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
+            {
+                yyp += yytnamerr(yyp, yyarg[yyi++]);
+                yyformat += 2;
+            }
+            else
+            {
+                yyp++;
+                yyformat++;
+            }
+    }
+    return 0;
 }
 #endif /* YYERROR_VERBOSE */
 
@@ -1243,306 +1239,306 @@ yysyntax_error(YYSIZE_T *yymsg_alloc, char **yymsg, yytype_int16 *yyssp, int yyt
 static void
 yydestruct(const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp)
 {
-	YYUSE(yyvaluep);
-	YYUSE(yylocationp);
-	if (!yymsg) yymsg = "Deleting";
-	YY_SYMBOL_PRINT(yymsg, yytype, yyvaluep, yylocationp);
+    YYUSE(yyvaluep);
+    YYUSE(yylocationp);
+    if (!yymsg) yymsg = "Deleting";
+    YY_SYMBOL_PRINT(yymsg, yytype, yyvaluep, yylocationp);
 
-	YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-	switch (yytype)
-	{
-	case 28:             /* geometry_no_srid  */
+    YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+    switch (yytype)
+    {
+    case 28:                 /* geometry_no_srid  */
 #line 190 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1391 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 29:             /* geometrycollection  */
+    case 29:                 /* geometrycollection  */
 #line 191 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1397 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 31:             /* multisurface  */
+    case 31:                 /* multisurface  */
 #line 198 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1403 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 32:             /* surface_list  */
+    case 32:                 /* surface_list  */
 #line 177 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1409 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 33:             /* tin  */
+    case 33:                 /* tin  */
 #line 205 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1415 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 34:             /* polyhedralsurface  */
+    case 34:                 /* polyhedralsurface  */
 #line 204 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1421 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 35:             /* multipolygon  */
+    case 35:                 /* multipolygon  */
 #line 197 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1427 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 36:             /* polygon_list  */
+    case 36:                 /* polygon_list  */
 #line 178 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1433 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 37:             /* patch_list  */
+    case 37:                 /* patch_list  */
 #line 179 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1439 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 38:             /* polygon  */
+    case 38:                 /* polygon  */
 #line 201 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1445 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 39:             /* polygon_untagged  */
+    case 39:                 /* polygon_untagged  */
 #line 203 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1451 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 40:             /* patch  */
+    case 40:                 /* patch  */
 #line 202 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1457 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 41:             /* curvepolygon  */
+    case 41:                 /* curvepolygon  */
 #line 188 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1463 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 42:             /* curvering_list  */
+    case 42:                 /* curvering_list  */
 #line 175 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1469 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 43:             /* curvering  */
+    case 43:                 /* curvering  */
 #line 189 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1475 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 44:             /* patchring_list  */
+    case 44:                 /* patchring_list  */
 #line 185 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1481 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 45:             /* ring_list  */
+    case 45:                 /* ring_list  */
 #line 184 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1487 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 46:             /* patchring  */
+    case 46:                 /* patchring  */
 #line 174 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		ptarray_free(((*yyvaluep).ptarrayvalue));
-	}
+    {
+        ptarray_free(((*yyvaluep).ptarrayvalue));
+    }
 #line 1493 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 47:             /* ring  */
+    case 47:                 /* ring  */
 #line 173 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		ptarray_free(((*yyvaluep).ptarrayvalue));
-	}
+    {
+        ptarray_free(((*yyvaluep).ptarrayvalue));
+    }
 #line 1499 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 48:             /* compoundcurve  */
+    case 48:                 /* compoundcurve  */
 #line 187 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1505 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 49:             /* compound_list  */
+    case 49:                 /* compound_list  */
 #line 183 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1511 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 50:             /* multicurve  */
+    case 50:                 /* multicurve  */
 #line 194 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1517 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 51:             /* curve_list  */
+    case 51:                 /* curve_list  */
 #line 182 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1523 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 52:             /* multilinestring  */
+    case 52:                 /* multilinestring  */
 #line 195 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1529 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 53:             /* linestring_list  */
+    case 53:                 /* linestring_list  */
 #line 181 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1535 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 54:             /* circularstring  */
+    case 54:                 /* circularstring  */
 #line 186 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1541 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 55:             /* linestring  */
+    case 55:                 /* linestring  */
 #line 192 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1547 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 56:             /* linestring_untagged  */
+    case 56:                 /* linestring_untagged  */
 #line 193 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1553 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 57:             /* triangle_list  */
+    case 57:                 /* triangle_list  */
 #line 176 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1559 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 58:             /* triangle  */
+    case 58:                 /* triangle  */
 #line 206 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1565 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 59:             /* triangle_untagged  */
+    case 59:                 /* triangle_untagged  */
 #line 207 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1571 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 60:             /* multipoint  */
+    case 60:                 /* multipoint  */
 #line 196 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1577 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 61:             /* point_list  */
+    case 61:                 /* point_list  */
 #line 180 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1583 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 62:             /* point_untagged  */
+    case 62:                 /* point_untagged  */
 #line 200 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1589 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 63:             /* point  */
+    case 63:                 /* point  */
 #line 199 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		lwgeom_free(((*yyvaluep).geometryvalue));
-	}
+    {
+        lwgeom_free(((*yyvaluep).geometryvalue));
+    }
 #line 1595 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	case 64:             /* ptarray  */
+    case 64:                 /* ptarray  */
 #line 172 "lwin_wkt_parse.y" /* yacc.c:1257  */
-	{
-		ptarray_free(((*yyvaluep).ptarrayvalue));
-	}
+    {
+        ptarray_free(((*yyvaluep).ptarrayvalue));
+    }
 #line 1601 "lwin_wkt_parse.c" /* yacc.c:1257  */
-	break;
+    break;
 
-	default:
-		break;
-	}
-	YY_IGNORE_MAYBE_UNINITIALIZED_END
+    default:
+        break;
+    }
+    YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
 /* The lookahead symbol.  */
@@ -1566,1690 +1562,1664 @@ int yynerrs;
 int
 yyparse(void)
 {
-	int yystate;
-	/* Number of tokens to shift before error messages enabled.  */
-	int yyerrstatus;
+    int yystate;
+    /* Number of tokens to shift before error messages enabled.  */
+    int yyerrstatus;
 
-	/* The stacks and their tools:
-	   'yyss': related to states.
-	   'yyvs': related to semantic values.
-	   'yyls': related to locations.
+    /* The stacks and their tools:
+       'yyss': related to states.
+       'yyvs': related to semantic values.
+       'yyls': related to locations.
 
-	   Refer to the stacks through separate pointers, to allow yyoverflow
-	   to reallocate them elsewhere.  */
+       Refer to the stacks through separate pointers, to allow yyoverflow
+       to reallocate them elsewhere.  */
 
-	/* The state stack.  */
-	yytype_int16 yyssa[YYINITDEPTH];
-	yytype_int16 *yyss;
-	yytype_int16 *yyssp;
+    /* The state stack.  */
+    yytype_int16 yyssa[YYINITDEPTH];
+    yytype_int16 *yyss;
+    yytype_int16 *yyssp;
 
-	/* The semantic value stack.  */
-	YYSTYPE yyvsa[YYINITDEPTH];
-	YYSTYPE *yyvs;
-	YYSTYPE *yyvsp;
+    /* The semantic value stack.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs;
+    YYSTYPE *yyvsp;
 
-	/* The location stack.  */
-	YYLTYPE yylsa[YYINITDEPTH];
-	YYLTYPE *yyls;
-	YYLTYPE *yylsp;
+    /* The location stack.  */
+    YYLTYPE yylsa[YYINITDEPTH];
+    YYLTYPE *yyls;
+    YYLTYPE *yylsp;
 
-	/* The locations where the error started and ended.  */
-	YYLTYPE yyerror_range[3];
+    /* The locations where the error started and ended.  */
+    YYLTYPE yyerror_range[3];
 
-	YYSIZE_T yystacksize;
+    YYSIZE_T yystacksize;
 
-	int yyn;
-	int yyresult;
-	/* Lookahead token as an internal (translated) token number.  */
-	int yytoken = 0;
-	/* The variables used to return semantic value and location from the
-	   action routines.  */
-	YYSTYPE yyval;
-	YYLTYPE yyloc;
+    int yyn;
+    int yyresult;
+    /* Lookahead token as an internal (translated) token number.  */
+    int yytoken = 0;
+    /* The variables used to return semantic value and location from the
+       action routines.  */
+    YYSTYPE yyval;
+    YYLTYPE yyloc;
 
 #if YYERROR_VERBOSE
-	/* Buffer for error messages, and its allocated size.  */
-	char yymsgbuf[128];
-	char *yymsg = yymsgbuf;
-	YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
+    /* Buffer for error messages, and its allocated size.  */
+    char yymsgbuf[128];
+    char *yymsg = yymsgbuf;
+    YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
 #define YYPOPSTACK(N) (yyvsp -= (N), yyssp -= (N), yylsp -= (N))
 
-	/* The number of symbols on the RHS of the reduced rule.
-	   Keep to zero when no symbol should be popped.  */
-	int yylen = 0;
+    /* The number of symbols on the RHS of the reduced rule.
+       Keep to zero when no symbol should be popped.  */
+    int yylen = 0;
 
-	yyssp = yyss = yyssa;
-	yyvsp = yyvs = yyvsa;
-	yylsp = yyls = yylsa;
-	yystacksize = YYINITDEPTH;
+    yyssp = yyss = yyssa;
+    yyvsp = yyvs = yyvsa;
+    yylsp = yyls = yylsa;
+    yystacksize = YYINITDEPTH;
 
-	YYDPRINTF((stderr, "Starting parse\n"));
+    YYDPRINTF((stderr, "Starting parse\n"));
 
-	yystate = 0;
-	yyerrstatus = 0;
-	yynerrs = 0;
-	yychar = YYEMPTY; /* Cause a token to be read.  */
-	yylsp[0] = yylloc;
-	goto yysetstate;
+    yystate = 0;
+    yyerrstatus = 0;
+    yynerrs = 0;
+    yychar = YYEMPTY; /* Cause a token to be read.  */
+    yylsp[0] = yylloc;
+    goto yysetstate;
 
-	/*------------------------------------------------------------.
-	| yynewstate -- Push a new state, which is found in yystate.  |
-	`------------------------------------------------------------*/
+    /*------------------------------------------------------------.
+    | yynewstate -- Push a new state, which is found in yystate.  |
+    `------------------------------------------------------------*/
 yynewstate:
-	/* In all cases, when you get here, the value and location stacks
-	   have just been pushed.  So pushing a state here evens the stacks.  */
-	yyssp++;
+    /* In all cases, when you get here, the value and location stacks
+       have just been pushed.  So pushing a state here evens the stacks.  */
+    yyssp++;
 
 yysetstate:
-	*yyssp = yystate;
+    *yyssp = yystate;
 
-	if (yyss + yystacksize - 1 <= yyssp)
-	{
-		/* Get the current used size of the three stacks, in elements.  */
-		YYSIZE_T yysize = yyssp - yyss + 1;
+    if (yyss + yystacksize - 1 <= yyssp)
+    {
+        /* Get the current used size of the three stacks, in elements.  */
+        YYSIZE_T yysize = yyssp - yyss + 1;
 
 #ifdef yyoverflow
-		{
-			/* Give user a chance to reallocate the stack.  Use copies of
-			   these so that the &'s don't force the real ones into
-			   memory.  */
-			YYSTYPE *yyvs1 = yyvs;
-			yytype_int16 *yyss1 = yyss;
-			YYLTYPE *yyls1 = yyls;
+        {
+            /* Give user a chance to reallocate the stack.  Use copies of
+               these so that the &'s don't force the real ones into
+               memory.  */
+            YYSTYPE *yyvs1 = yyvs;
+            yytype_int16 *yyss1 = yyss;
+            YYLTYPE *yyls1 = yyls;
 
-			/* Each stack pointer address is followed by the size of the
-			   data in use in that stack, in bytes.  This used to be a
-			   conditional around just the two extra args, but that might
-			   be undefined if yyoverflow is a macro.  */
-			yyoverflow(YY_("memory exhausted"),
-				   &yyss1,
-				   yysize * sizeof(*yyssp),
-				   &yyvs1,
-				   yysize * sizeof(*yyvsp),
-				   &yyls1,
-				   yysize * sizeof(*yylsp),
-				   &yystacksize);
+            /* Each stack pointer address is followed by the size of the
+               data in use in that stack, in bytes.  This used to be a
+               conditional around just the two extra args, but that might
+               be undefined if yyoverflow is a macro.  */
+            yyoverflow(YY_("memory exhausted"),
+                       &yyss1,
+                       yysize * sizeof(*yyssp),
+                       &yyvs1,
+                       yysize * sizeof(*yyvsp),
+                       &yyls1,
+                       yysize * sizeof(*yylsp),
+                       &yystacksize);
 
-			yyls = yyls1;
-			yyss = yyss1;
-			yyvs = yyvs1;
-		}
+            yyls = yyls1;
+            yyss = yyss1;
+            yyvs = yyvs1;
+        }
 #else /* no yyoverflow */
 #ifndef YYSTACK_RELOCATE
-		goto yyexhaustedlab;
+        goto yyexhaustedlab;
 #else
-		/* Extend the stack our own way.  */
-		if (YYMAXDEPTH <= yystacksize) goto yyexhaustedlab;
-		yystacksize *= 2;
-		if (YYMAXDEPTH < yystacksize) yystacksize = YYMAXDEPTH;
+        /* Extend the stack our own way.  */
+        if (YYMAXDEPTH <= yystacksize) goto yyexhaustedlab;
+        yystacksize *= 2;
+        if (YYMAXDEPTH < yystacksize) yystacksize = YYMAXDEPTH;
 
-		{
-			yytype_int16 *yyss1 = yyss;
-			union yyalloc *yyptr = (union yyalloc *)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
-			if (!yyptr) goto yyexhaustedlab;
-			YYSTACK_RELOCATE(yyss_alloc, yyss);
-			YYSTACK_RELOCATE(yyvs_alloc, yyvs);
-			YYSTACK_RELOCATE(yyls_alloc, yyls);
+        {
+            yytype_int16 *yyss1 = yyss;
+            union yyalloc *yyptr = (union yyalloc *)YYSTACK_ALLOC(YYSTACK_BYTES(yystacksize));
+            if (!yyptr) goto yyexhaustedlab;
+            YYSTACK_RELOCATE(yyss_alloc, yyss);
+            YYSTACK_RELOCATE(yyvs_alloc, yyvs);
+            YYSTACK_RELOCATE(yyls_alloc, yyls);
 #undef YYSTACK_RELOCATE
-			if (yyss1 != yyssa) YYSTACK_FREE(yyss1);
-		}
+            if (yyss1 != yyssa) YYSTACK_FREE(yyss1);
+        }
 #endif
 #endif /* no yyoverflow */
 
-		yyssp = yyss + yysize - 1;
-		yyvsp = yyvs + yysize - 1;
-		yylsp = yyls + yysize - 1;
+        yyssp = yyss + yysize - 1;
+        yyvsp = yyvs + yysize - 1;
+        yylsp = yyls + yysize - 1;
 
-		YYDPRINTF((stderr, "Stack size increased to %lu\n", (unsigned long int)yystacksize));
+        YYDPRINTF((stderr, "Stack size increased to %lu\n", (unsigned long int)yystacksize));
 
-		if (yyss + yystacksize - 1 <= yyssp) YYABORT;
-	}
+        if (yyss + yystacksize - 1 <= yyssp) YYABORT;
+    }
 
-	YYDPRINTF((stderr, "Entering state %d\n", yystate));
+    YYDPRINTF((stderr, "Entering state %d\n", yystate));
 
-	if (yystate == YYFINAL) YYACCEPT;
+    if (yystate == YYFINAL) YYACCEPT;
 
-	goto yybackup;
+    goto yybackup;
 
 /*-----------.
 | yybackup.  |
 `-----------*/
 yybackup:
 
-	/* Do appropriate processing given the current state.  Read a
-	   lookahead token if we need one and don't already have one.  */
+    /* Do appropriate processing given the current state.  Read a
+       lookahead token if we need one and don't already have one.  */
 
-	/* First try to decide what to do without reference to lookahead token.  */
-	yyn = yypact[yystate];
-	if (yypact_value_is_default(yyn)) goto yydefault;
+    /* First try to decide what to do without reference to lookahead token.  */
+    yyn = yypact[yystate];
+    if (yypact_value_is_default(yyn)) goto yydefault;
 
-	/* Not known => get a lookahead token if don't already have one.  */
+    /* Not known => get a lookahead token if don't already have one.  */
 
-	/* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
-	if (yychar == YYEMPTY)
-	{
-		YYDPRINTF((stderr, "Reading a token: "));
-		yychar = yylex();
-	}
+    /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+    if (yychar == YYEMPTY)
+    {
+        YYDPRINTF((stderr, "Reading a token: "));
+        yychar = yylex();
+    }
 
-	if (yychar <= YYEOF)
-	{
-		yychar = yytoken = YYEOF;
-		YYDPRINTF((stderr, "Now at end of input.\n"));
-	}
-	else
-	{
-		yytoken = YYTRANSLATE(yychar);
-		YY_SYMBOL_PRINT("Next token is", yytoken, &yylval, &yylloc);
-	}
+    if (yychar <= YYEOF)
+    {
+        yychar = yytoken = YYEOF;
+        YYDPRINTF((stderr, "Now at end of input.\n"));
+    }
+    else
+    {
+        yytoken = YYTRANSLATE(yychar);
+        YY_SYMBOL_PRINT("Next token is", yytoken, &yylval, &yylloc);
+    }
 
-	/* If the proper action on seeing token YYTOKEN is to reduce or to
-	   detect an error, take that action.  */
-	yyn += yytoken;
-	if (yyn < 0 || YYLAST < yyn || yycheck[yyn] != yytoken) goto yydefault;
-	yyn = yytable[yyn];
-	if (yyn <= 0)
-	{
-		if (yytable_value_is_error(yyn)) goto yyerrlab;
-		yyn = -yyn;
-		goto yyreduce;
-	}
+    /* If the proper action on seeing token YYTOKEN is to reduce or to
+       detect an error, take that action.  */
+    yyn += yytoken;
+    if (yyn < 0 || YYLAST < yyn || yycheck[yyn] != yytoken) goto yydefault;
+    yyn = yytable[yyn];
+    if (yyn <= 0)
+    {
+        if (yytable_value_is_error(yyn)) goto yyerrlab;
+        yyn = -yyn;
+        goto yyreduce;
+    }
 
-	/* Count tokens shifted since error; after three, turn off error
-	   status.  */
-	if (yyerrstatus) yyerrstatus--;
+    /* Count tokens shifted since error; after three, turn off error
+       status.  */
+    if (yyerrstatus) yyerrstatus--;
 
-	/* Shift the lookahead token.  */
-	YY_SYMBOL_PRINT("Shifting", yytoken, &yylval, &yylloc);
+    /* Shift the lookahead token.  */
+    YY_SYMBOL_PRINT("Shifting", yytoken, &yylval, &yylloc);
 
-	/* Discard the shifted token.  */
-	yychar = YYEMPTY;
+    /* Discard the shifted token.  */
+    yychar = YYEMPTY;
 
-	yystate = yyn;
-	YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-	*++yyvsp = yylval;
-	YY_IGNORE_MAYBE_UNINITIALIZED_END
-	*++yylsp = yylloc;
-	goto yynewstate;
+    yystate = yyn;
+    YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+    *++yyvsp = yylval;
+    YY_IGNORE_MAYBE_UNINITIALIZED_END
+    *++yylsp = yylloc;
+    goto yynewstate;
 
 /*-----------------------------------------------------------.
 | yydefault -- do the default action for the current state.  |
 `-----------------------------------------------------------*/
 yydefault:
-	yyn = yydefact[yystate];
-	if (yyn == 0) goto yyerrlab;
-	goto yyreduce;
+    yyn = yydefact[yystate];
+    if (yyn == 0) goto yyerrlab;
+    goto yyreduce;
 
 /*-----------------------------.
 | yyreduce -- Do a reduction.  |
 `-----------------------------*/
 yyreduce:
-	/* yyn is the number of a rule to reduce with.  */
-	yylen = yyr2[yyn];
+    /* yyn is the number of a rule to reduce with.  */
+    yylen = yyr2[yyn];
 
-	/* If YYLEN is nonzero, implement the default value of the action:
-	   '$$ = $1'.
+    /* If YYLEN is nonzero, implement the default value of the action:
+       '$$ = $1'.
 
-	   Otherwise, the following line sets YYVAL to garbage.
-	   This behavior is undocumented and Bison
-	   users should not rely upon it.  Assigning to YYVAL
-	   unconditionally makes the parser a bit smaller, and it avoids a
-	   GCC warning that YYVAL may be used uninitialized.  */
-	yyval = yyvsp[1 - yylen];
+       Otherwise, the following line sets YYVAL to garbage.
+       This behavior is undocumented and Bison
+       users should not rely upon it.  Assigning to YYVAL
+       unconditionally makes the parser a bit smaller, and it avoids a
+       GCC warning that YYVAL may be used uninitialized.  */
+    yyval = yyvsp[1 - yylen];
 
-	/* Default location.  */
-	YYLLOC_DEFAULT(yyloc, (yylsp - yylen), yylen);
-	YY_REDUCE_PRINT(yyn);
-	switch (yyn)
-	{
-	case 2:
+    /* Default location.  */
+    YYLLOC_DEFAULT(yyloc, (yylsp - yylen), yylen);
+    YY_REDUCE_PRINT(yyn);
+    switch (yyn)
+    {
+    case 2:
 #line 213 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		wkt_parser_geometry_new((yyvsp[0].geometryvalue), SRID_UNKNOWN);
-		WKT_ERROR();
-	}
+    {
+        wkt_parser_geometry_new((yyvsp[0].geometryvalue), SRID_UNKNOWN);
+        WKT_ERROR();
+    }
 #line 1889 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 3:
+    case 3:
 #line 215 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		wkt_parser_geometry_new((yyvsp[0].geometryvalue), (yyvsp[-2].integervalue));
-		WKT_ERROR();
-	}
+    {
+        wkt_parser_geometry_new((yyvsp[0].geometryvalue), (yyvsp[-2].integervalue));
+        WKT_ERROR();
+    }
 #line 1895 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 4:
+    case 4:
 #line 218 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1901 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 5:
+    case 5:
 #line 219 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1907 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 6:
+    case 6:
 #line 220 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1913 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 7:
+    case 7:
 #line 221 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1919 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 8:
+    case 8:
 #line 222 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1925 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 9:
+    case 9:
 #line 223 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1931 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 10:
+    case 10:
 #line 224 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1937 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 11:
+    case 11:
 #line 225 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1943 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 12:
+    case 12:
 #line 226 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1949 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 13:
+    case 13:
 #line 227 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1955 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 14:
+    case 14:
 #line 228 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1961 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 15:
+    case 15:
 #line 229 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1967 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 16:
+    case 16:
 #line 230 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1973 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 17:
+    case 17:
 #line 231 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1979 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 18:
+    case 18:
 #line 232 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 1985 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 19:
+    case 19:
 #line 236 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 1991 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 20:
+    case 20:
 #line 238 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(COLLECTIONTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(COLLECTIONTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 1997 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 21:
+    case 21:
 #line 240 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2003 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 22:
+    case 22:
 #line 242 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COLLECTIONTYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2009 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 23:
+    case 23:
 #line 246 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2015 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 24:
+    case 24:
 #line 248 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2021 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 25:
+    case 25:
 #line 252 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(MULTISURFACETYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTISURFACETYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2027 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 26:
+    case 26:
 #line 254 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(
-		    MULTISURFACETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(MULTISURFACETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2033 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 27:
+    case 27:
 #line 256 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTISURFACETYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTISURFACETYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2039 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 28:
+    case 28:
 #line 258 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTISURFACETYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTISURFACETYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2045 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 29:
+    case 29:
 #line 262 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2051 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 30:
+    case 30:
 #line 264 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2057 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 31:
+    case 31:
 #line 266 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2063 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 32:
+    case 32:
 #line 268 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2069 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 33:
+    case 33:
 #line 270 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2075 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 34:
+    case 34:
 #line 272 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2081 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 35:
+    case 35:
 #line 276 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2087 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 36:
+    case 36:
 #line 278 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(TINTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(TINTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2093 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 37:
+    case 37:
 #line 280 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2099 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 38:
+    case 38:
 #line 282 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(TINTYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2105 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 39:
+    case 39:
 #line 286 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2111 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 40:
+    case 40:
 #line 288 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(
-		    POLYHEDRALSURFACETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2117 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 41:
+    case 41:
 #line 290 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2123 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 42:
+    case 42:
 #line 292 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(POLYHEDRALSURFACETYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2129 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 43:
+    case 43:
 #line 296 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(MULTIPOLYGONTYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOLYGONTYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2135 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 44:
+    case 44:
 #line 298 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(
-		    MULTIPOLYGONTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(MULTIPOLYGONTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2141 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 45:
+    case 45:
 #line 300 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOLYGONTYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOLYGONTYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2147 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 46:
+    case 46:
 #line 302 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOLYGONTYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOLYGONTYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2153 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 47:
+    case 47:
 #line 306 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2159 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 48:
+    case 48:
 #line 308 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2165 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 49:
+    case 49:
 #line 312 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2171 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 50:
+    case 50:
 #line 314 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2177 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 51:
+    case 51:
 #line 318 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_finalize((yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_finalize((yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2183 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 52:
+    case 52:
 #line 320 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_finalize((yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_finalize((yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2189 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 53:
+    case 53:
 #line 322 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2195 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 54:
+    case 54:
 #line 324 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2201 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 55:
+    case 55:
 #line 328 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[-1].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[-1].geometryvalue);
+    }
 #line 2207 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 56:
+    case 56:
 #line 330 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_finalize(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2213 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 57:
+    case 57:
 #line 333 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[-1].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[-1].geometryvalue);
+    }
 #line 2219 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 58:
+    case 58:
 #line 337 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_curvepolygon_finalize((yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_finalize((yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2225 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 59:
+    case 59:
 #line 339 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_curvepolygon_finalize((yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_finalize((yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2231 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 60:
+    case 60:
 #line 341 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_curvepolygon_finalize(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_finalize(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2237 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 61:
+    case 61:
 #line 343 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_curvepolygon_finalize(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_finalize(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2243 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 62:
+    case 62:
 #line 347 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_curvepolygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2249 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 63:
+    case 63:
 #line 349 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_curvepolygon_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_curvepolygon_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2255 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 64:
+    case 64:
 #line 352 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 2261 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 65:
+    case 65:
 #line 353 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 2267 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 66:
+    case 66:
 #line 354 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 2273 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 67:
+    case 67:
 #line 355 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = (yyvsp[0].geometryvalue);
-	}
+    {
+        (yyval.geometryvalue) = (yyvsp[0].geometryvalue);
+    }
 #line 2279 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 68:
+    case 68:
 #line 359 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_polygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].ptarrayvalue), 'Z');
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].ptarrayvalue), 'Z');
+        WKT_ERROR();
+    }
 #line 2285 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 69:
+    case 69:
 #line 361 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_new((yyvsp[0].ptarrayvalue), 'Z');
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_new((yyvsp[0].ptarrayvalue), 'Z');
+        WKT_ERROR();
+    }
 #line 2291 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 70:
+    case 70:
 #line 365 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_polygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].ptarrayvalue), '2');
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_add_ring((yyvsp[-2].geometryvalue), (yyvsp[0].ptarrayvalue), '2');
+        WKT_ERROR();
+    }
 #line 2297 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 71:
+    case 71:
 #line 367 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_polygon_new((yyvsp[0].ptarrayvalue), '2');
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_polygon_new((yyvsp[0].ptarrayvalue), '2');
+        WKT_ERROR();
+    }
 #line 2303 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 72:
+    case 72:
 #line 370 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.ptarrayvalue) = (yyvsp[-1].ptarrayvalue);
-	}
+    {
+        (yyval.ptarrayvalue) = (yyvsp[-1].ptarrayvalue);
+    }
 #line 2309 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 73:
+    case 73:
 #line 373 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.ptarrayvalue) = (yyvsp[-1].ptarrayvalue);
-	}
+    {
+        (yyval.ptarrayvalue) = (yyvsp[-1].ptarrayvalue);
+    }
 #line 2315 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 74:
+    case 74:
 #line 377 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2321 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 75:
+    case 75:
 #line 379 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(COMPOUNDTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(COMPOUNDTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2327 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 76:
+    case 76:
 #line 381 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2333 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 77:
+    case 77:
 #line 383 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(COMPOUNDTYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2339 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 78:
+    case 78:
 #line 387 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2345 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 79:
+    case 79:
 #line 389 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2351 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 80:
+    case 80:
 #line 391 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2357 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 81:
+    case 81:
 #line 393 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2363 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 82:
+    case 82:
 #line 395 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2369 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 83:
+    case 83:
 #line 397 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_compound_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2375 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 84:
+    case 84:
 #line 401 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2381 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 85:
+    case 85:
 #line 403 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(MULTICURVETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(MULTICURVETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2387 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 86:
+    case 86:
 #line 405 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2393 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 87:
+    case 87:
 #line 407 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTICURVETYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2399 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 88:
+    case 88:
 #line 411 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2405 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 89:
+    case 89:
 #line 413 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2411 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 90:
+    case 90:
 #line 415 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2417 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 91:
+    case 91:
 #line 417 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2423 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 92:
+    case 92:
 #line 419 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2429 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 93:
+    case 93:
 #line 421 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2435 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 94:
+    case 94:
 #line 423 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2441 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 95:
+    case 95:
 #line 425 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2447 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 96:
+    case 96:
 #line 429 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2453 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 97:
+    case 97:
 #line 431 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(MULTILINETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(MULTILINETYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2459 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 98:
+    case 98:
 #line 433 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2465 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 99:
+    case 99:
 #line 435 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTILINETYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2471 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 100:
+    case 100:
 #line 439 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2477 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 101:
+    case 101:
 #line 441 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2483 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 102:
+    case 102:
 #line 445 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_circularstring_new((yyvsp[-1].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_circularstring_new((yyvsp[-1].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2489 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 103:
+    case 103:
 #line 447 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_circularstring_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_circularstring_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2495 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 104:
+    case 104:
 #line 449 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_circularstring_new(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_circularstring_new(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2501 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 105:
+    case 105:
 #line 451 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_circularstring_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_circularstring_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2507 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 106:
+    case 106:
 #line 455 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2513 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 107:
+    case 107:
 #line 457 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2519 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 108:
+    case 108:
 #line 459 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2525 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 109:
+    case 109:
 #line 461 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2531 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 110:
+    case 110:
 #line 465 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new((yyvsp[-1].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2537 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 111:
+    case 111:
 #line 467 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_linestring_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_linestring_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2543 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 112:
+    case 112:
 #line 471 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2549 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 113:
+    case 113:
 #line 473 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2555 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 114:
+    case 114:
 #line 477 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2561 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 115:
+    case 115:
 #line 479 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), (yyvsp[-5].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), (yyvsp[-5].stringvalue));
+        WKT_ERROR();
+    }
 #line 2567 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 116:
+    case 116:
 #line 481 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_triangle_new(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_triangle_new(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2573 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 117:
+    case 117:
 #line 483 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_triangle_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_triangle_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2579 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 118:
+    case 118:
 #line 487 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_triangle_new((yyvsp[-2].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2585 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 119:
+    case 119:
 #line 491 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, (yyvsp[-1].geometryvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, (yyvsp[-1].geometryvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2591 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 120:
+    case 120:
 #line 493 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_finalize(MULTIPOINTTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) =
+            wkt_parser_collection_finalize(MULTIPOINTTYPE, (yyvsp[-1].geometryvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2597 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 121:
+    case 121:
 #line 495 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2603 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 122:
+    case 122:
 #line 497 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_finalize(MULTIPOINTTYPE, NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2609 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 123:
+    case 123:
 #line 501 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) =
-		    wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_add_geom((yyvsp[-2].geometryvalue), (yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2615 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 124:
+    case 124:
 #line 503 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_collection_new((yyvsp[0].geometryvalue));
+        WKT_ERROR();
+    }
 #line 2621 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 125:
+    case 125:
 #line 507 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new(wkt_parser_ptarray_new((yyvsp[0].coordinatevalue)), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new(wkt_parser_ptarray_new((yyvsp[0].coordinatevalue)), NULL);
+        WKT_ERROR();
+    }
 #line 2627 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 126:
+    case 126:
 #line 509 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new(wkt_parser_ptarray_new((yyvsp[-1].coordinatevalue)), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new(wkt_parser_ptarray_new((yyvsp[-1].coordinatevalue)), NULL);
+        WKT_ERROR();
+    }
 #line 2633 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 127:
+    case 127:
 #line 511 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2639 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 128:
+    case 128:
 #line 515 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new((yyvsp[-1].ptarrayvalue), NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new((yyvsp[-1].ptarrayvalue), NULL);
+        WKT_ERROR();
+    }
 #line 2645 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 129:
+    case 129:
 #line 517 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new((yyvsp[-1].ptarrayvalue), (yyvsp[-3].stringvalue));
+        WKT_ERROR();
+    }
 #line 2651 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 130:
+    case 130:
 #line 519 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new(NULL, (yyvsp[-1].stringvalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new(NULL, (yyvsp[-1].stringvalue));
+        WKT_ERROR();
+    }
 #line 2657 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 131:
+    case 131:
 #line 521 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.geometryvalue) = wkt_parser_point_new(NULL, NULL);
-		WKT_ERROR();
-	}
+    {
+        (yyval.geometryvalue) = wkt_parser_point_new(NULL, NULL);
+        WKT_ERROR();
+    }
 #line 2663 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 132:
+    case 132:
 #line 525 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.ptarrayvalue) =
-		    wkt_parser_ptarray_add_coord((yyvsp[-2].ptarrayvalue), (yyvsp[0].coordinatevalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.ptarrayvalue) = wkt_parser_ptarray_add_coord((yyvsp[-2].ptarrayvalue), (yyvsp[0].coordinatevalue));
+        WKT_ERROR();
+    }
 #line 2669 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 133:
+    case 133:
 #line 527 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.ptarrayvalue) = wkt_parser_ptarray_new((yyvsp[0].coordinatevalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.ptarrayvalue) = wkt_parser_ptarray_new((yyvsp[0].coordinatevalue));
+        WKT_ERROR();
+    }
 #line 2675 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 134:
+    case 134:
 #line 531 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.coordinatevalue) = wkt_parser_coord_2((yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.coordinatevalue) = wkt_parser_coord_2((yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
+        WKT_ERROR();
+    }
 #line 2681 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 135:
+    case 135:
 #line 533 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.coordinatevalue) =
-		    wkt_parser_coord_3((yyvsp[-2].doublevalue), (yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.coordinatevalue) =
+            wkt_parser_coord_3((yyvsp[-2].doublevalue), (yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
+        WKT_ERROR();
+    }
 #line 2687 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
-	case 136:
+    case 136:
 #line 535 "lwin_wkt_parse.y" /* yacc.c:1646  */
-	{
-		(yyval.coordinatevalue) = wkt_parser_coord_4(
-		    (yyvsp[-3].doublevalue), (yyvsp[-2].doublevalue), (yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
-		WKT_ERROR();
-	}
+    {
+        (yyval.coordinatevalue) = wkt_parser_coord_4(
+            (yyvsp[-3].doublevalue), (yyvsp[-2].doublevalue), (yyvsp[-1].doublevalue), (yyvsp[0].doublevalue));
+        WKT_ERROR();
+    }
 #line 2693 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	break;
+    break;
 
 #line 2697 "lwin_wkt_parse.c" /* yacc.c:1646  */
-	default:
-		break;
-	}
-	/* User semantic actions sometimes alter yychar, and that requires
-	   that yytoken be updated with the new translation.  We take the
-	   approach of translating immediately before every use of yytoken.
-	   One alternative is translating here after every semantic action,
-	   but that translation would be missed if the semantic action invokes
-	   YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-	   if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-	   incorrect destructor might then be invoked immediately.  In the
-	   case of YYERROR or YYBACKUP, subsequent parser actions might lead
-	   to an incorrect destructor call or verbose syntax error message
-	   before the lookahead is translated.  */
-	YY_SYMBOL_PRINT("-> $$ =", yyr1[yyn], &yyval, &yyloc);
+    default:
+        break;
+    }
+    /* User semantic actions sometimes alter yychar, and that requires
+       that yytoken be updated with the new translation.  We take the
+       approach of translating immediately before every use of yytoken.
+       One alternative is translating here after every semantic action,
+       but that translation would be missed if the semantic action invokes
+       YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
+       if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
+       incorrect destructor might then be invoked immediately.  In the
+       case of YYERROR or YYBACKUP, subsequent parser actions might lead
+       to an incorrect destructor call or verbose syntax error message
+       before the lookahead is translated.  */
+    YY_SYMBOL_PRINT("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
-	YYPOPSTACK(yylen);
-	yylen = 0;
-	YY_STACK_PRINT(yyss, yyssp);
+    YYPOPSTACK(yylen);
+    yylen = 0;
+    YY_STACK_PRINT(yyss, yyssp);
 
-	*++yyvsp = yyval;
-	*++yylsp = yyloc;
+    *++yyvsp = yyval;
+    *++yylsp = yyloc;
 
-	/* Now 'shift' the result of the reduction.  Determine what state
-	   that goes to, based on the state we popped back to and the rule
-	   number reduced by.  */
+    /* Now 'shift' the result of the reduction.  Determine what state
+       that goes to, based on the state we popped back to and the rule
+       number reduced by.  */
 
-	yyn = yyr1[yyn];
+    yyn = yyr1[yyn];
 
-	yystate = yypgoto[yyn - YYNTOKENS] + *yyssp;
-	if (0 <= yystate && yystate <= YYLAST && yycheck[yystate] == *yyssp)
-		yystate = yytable[yystate];
-	else
-		yystate = yydefgoto[yyn - YYNTOKENS];
+    yystate = yypgoto[yyn - YYNTOKENS] + *yyssp;
+    if (0 <= yystate && yystate <= YYLAST && yycheck[yystate] == *yyssp)
+        yystate = yytable[yystate];
+    else
+        yystate = yydefgoto[yyn - YYNTOKENS];
 
-	goto yynewstate;
+    goto yynewstate;
 
 /*--------------------------------------.
 | yyerrlab -- here on detecting error.  |
 `--------------------------------------*/
 yyerrlab:
-	/* Make sure we have latest lookahead translation.  See comments at
-	   user semantic actions for why this is necessary.  */
-	yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE(yychar);
+    /* Make sure we have latest lookahead translation.  See comments at
+       user semantic actions for why this is necessary.  */
+    yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE(yychar);
 
-	/* If not already recovering from an error, report this error.  */
-	if (!yyerrstatus)
-	{
-		++yynerrs;
+    /* If not already recovering from an error, report this error.  */
+    if (!yyerrstatus)
+    {
+        ++yynerrs;
 #if !YYERROR_VERBOSE
-		yyerror(YY_("syntax error"));
+        yyerror(YY_("syntax error"));
 #else
 #define YYSYNTAX_ERROR yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
-		{
-			char const *yymsgp = YY_("syntax error");
-			int yysyntax_error_status;
-			yysyntax_error_status = YYSYNTAX_ERROR;
-			if (yysyntax_error_status == 0)
-				yymsgp = yymsg;
-			else if (yysyntax_error_status == 1)
-			{
-				if (yymsg != yymsgbuf) YYSTACK_FREE(yymsg);
-				yymsg = (char *)YYSTACK_ALLOC(yymsg_alloc);
-				if (!yymsg)
-				{
-					yymsg = yymsgbuf;
-					yymsg_alloc = sizeof yymsgbuf;
-					yysyntax_error_status = 2;
-				}
-				else
-				{
-					yysyntax_error_status = YYSYNTAX_ERROR;
-					yymsgp = yymsg;
-				}
-			}
-			yyerror(yymsgp);
-			if (yysyntax_error_status == 2) goto yyexhaustedlab;
-		}
+        {
+            char const *yymsgp = YY_("syntax error");
+            int yysyntax_error_status;
+            yysyntax_error_status = YYSYNTAX_ERROR;
+            if (yysyntax_error_status == 0)
+                yymsgp = yymsg;
+            else if (yysyntax_error_status == 1)
+            {
+                if (yymsg != yymsgbuf) YYSTACK_FREE(yymsg);
+                yymsg = (char *)YYSTACK_ALLOC(yymsg_alloc);
+                if (!yymsg)
+                {
+                    yymsg = yymsgbuf;
+                    yymsg_alloc = sizeof yymsgbuf;
+                    yysyntax_error_status = 2;
+                }
+                else
+                {
+                    yysyntax_error_status = YYSYNTAX_ERROR;
+                    yymsgp = yymsg;
+                }
+            }
+            yyerror(yymsgp);
+            if (yysyntax_error_status == 2) goto yyexhaustedlab;
+        }
 #undef YYSYNTAX_ERROR
 #endif
-	}
+    }
 
-	yyerror_range[1] = yylloc;
+    yyerror_range[1] = yylloc;
 
-	if (yyerrstatus == 3)
-	{
-		/* If just tried and failed to reuse lookahead token after an
-		   error, discard it.  */
+    if (yyerrstatus == 3)
+    {
+        /* If just tried and failed to reuse lookahead token after an
+           error, discard it.  */
 
-		if (yychar <= YYEOF)
-		{
-			/* Return failure if at end of input.  */
-			if (yychar == YYEOF) YYABORT;
-		}
-		else
-		{
-			yydestruct("Error: discarding", yytoken, &yylval, &yylloc);
-			yychar = YYEMPTY;
-		}
-	}
+        if (yychar <= YYEOF)
+        {
+            /* Return failure if at end of input.  */
+            if (yychar == YYEOF) YYABORT;
+        }
+        else
+        {
+            yydestruct("Error: discarding", yytoken, &yylval, &yylloc);
+            yychar = YYEMPTY;
+        }
+    }
 
-	/* Else will try to reuse lookahead token after shifting the error
-	   token.  */
-	goto yyerrlab1;
+    /* Else will try to reuse lookahead token after shifting the error
+       token.  */
+    goto yyerrlab1;
 
 /*---------------------------------------------------.
 | yyerrorlab -- error raised explicitly by YYERROR.  |
 `---------------------------------------------------*/
 yyerrorlab:
 
-	/* Pacify compilers like GCC when the user code never invokes
-	   YYERROR and the label yyerrorlab therefore never appears in user
-	   code.  */
-	if (/*CONSTCOND*/ 0) goto yyerrorlab;
+    /* Pacify compilers like GCC when the user code never invokes
+       YYERROR and the label yyerrorlab therefore never appears in user
+       code.  */
+    if (/*CONSTCOND*/ 0) goto yyerrorlab;
 
-	yyerror_range[1] = yylsp[1 - yylen];
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYERROR.  */
-	YYPOPSTACK(yylen);
-	yylen = 0;
-	YY_STACK_PRINT(yyss, yyssp);
-	yystate = *yyssp;
-	goto yyerrlab1;
+    yyerror_range[1] = yylsp[1 - yylen];
+    /* Do not reclaim the symbols of the rule whose action triggered
+       this YYERROR.  */
+    YYPOPSTACK(yylen);
+    yylen = 0;
+    YY_STACK_PRINT(yyss, yyssp);
+    yystate = *yyssp;
+    goto yyerrlab1;
 
 /*-------------------------------------------------------------.
 | yyerrlab1 -- common code for both syntax error and YYERROR.  |
 `-------------------------------------------------------------*/
 yyerrlab1:
-	yyerrstatus = 3; /* Each real token shifted decrements this.  */
+    yyerrstatus = 3; /* Each real token shifted decrements this.  */
 
-	for (;;)
-	{
-		yyn = yypact[yystate];
-		if (!yypact_value_is_default(yyn))
-		{
-			yyn += YYTERROR;
-			if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-			{
-				yyn = yytable[yyn];
-				if (0 < yyn) break;
-			}
-		}
+    for (;;)
+    {
+        yyn = yypact[yystate];
+        if (!yypact_value_is_default(yyn))
+        {
+            yyn += YYTERROR;
+            if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+            {
+                yyn = yytable[yyn];
+                if (0 < yyn) break;
+            }
+        }
 
-		/* Pop the current state because it cannot handle the error token.  */
-		if (yyssp == yyss) YYABORT;
+        /* Pop the current state because it cannot handle the error token.  */
+        if (yyssp == yyss) YYABORT;
 
-		yyerror_range[1] = *yylsp;
-		yydestruct("Error: popping", yystos[yystate], yyvsp, yylsp);
-		YYPOPSTACK(1);
-		yystate = *yyssp;
-		YY_STACK_PRINT(yyss, yyssp);
-	}
+        yyerror_range[1] = *yylsp;
+        yydestruct("Error: popping", yystos[yystate], yyvsp, yylsp);
+        YYPOPSTACK(1);
+        yystate = *yyssp;
+        YY_STACK_PRINT(yyss, yyssp);
+    }
 
-	YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-	*++yyvsp = yylval;
-	YY_IGNORE_MAYBE_UNINITIALIZED_END
+    YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+    *++yyvsp = yylval;
+    YY_IGNORE_MAYBE_UNINITIALIZED_END
 
-	yyerror_range[2] = yylloc;
-	/* Using YYLLOC is tempting, but would change the location of
-	   the lookahead.  YYLOC is available though.  */
-	YYLLOC_DEFAULT(yyloc, yyerror_range, 2);
-	*++yylsp = yyloc;
+    yyerror_range[2] = yylloc;
+    /* Using YYLLOC is tempting, but would change the location of
+       the lookahead.  YYLOC is available though.  */
+    YYLLOC_DEFAULT(yyloc, yyerror_range, 2);
+    *++yylsp = yyloc;
 
-	/* Shift the error token.  */
-	YY_SYMBOL_PRINT("Shifting", yystos[yyn], yyvsp, yylsp);
+    /* Shift the error token.  */
+    YY_SYMBOL_PRINT("Shifting", yystos[yyn], yyvsp, yylsp);
 
-	yystate = yyn;
-	goto yynewstate;
+    yystate = yyn;
+    goto yynewstate;
 
 /*-------------------------------------.
 | yyacceptlab -- YYACCEPT comes here.  |
 `-------------------------------------*/
 yyacceptlab:
-	yyresult = 0;
-	goto yyreturn;
+    yyresult = 0;
+    goto yyreturn;
 
 /*-----------------------------------.
 | yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
 yyabortlab:
-	yyresult = 1;
-	goto yyreturn;
+    yyresult = 1;
+    goto yyreturn;
 
 #if !defined yyoverflow || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-	yyerror(YY_("memory exhausted"));
-	yyresult = 2;
-	/* Fall through.  */
+    yyerror(YY_("memory exhausted"));
+    yyresult = 2;
+    /* Fall through.  */
 #endif
 
 yyreturn:
-	if (yychar != YYEMPTY)
-	{
-		/* Make sure we have latest lookahead translation.  See comments at
-		   user semantic actions for why this is necessary.  */
-		yytoken = YYTRANSLATE(yychar);
-		yydestruct("Cleanup: discarding lookahead", yytoken, &yylval, &yylloc);
-	}
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYABORT or YYACCEPT.  */
-	YYPOPSTACK(yylen);
-	YY_STACK_PRINT(yyss, yyssp);
-	while (yyssp != yyss)
-	{
-		yydestruct("Cleanup: popping", yystos[*yyssp], yyvsp, yylsp);
-		YYPOPSTACK(1);
-	}
+    if (yychar != YYEMPTY)
+    {
+        /* Make sure we have latest lookahead translation.  See comments at
+           user semantic actions for why this is necessary.  */
+        yytoken = YYTRANSLATE(yychar);
+        yydestruct("Cleanup: discarding lookahead", yytoken, &yylval, &yylloc);
+    }
+    /* Do not reclaim the symbols of the rule whose action triggered
+       this YYABORT or YYACCEPT.  */
+    YYPOPSTACK(yylen);
+    YY_STACK_PRINT(yyss, yyssp);
+    while (yyssp != yyss)
+    {
+        yydestruct("Cleanup: popping", yystos[*yyssp], yyvsp, yylsp);
+        YYPOPSTACK(1);
+    }
 #ifndef yyoverflow
-	if (yyss != yyssa) YYSTACK_FREE(yyss);
+    if (yyss != yyssa) YYSTACK_FREE(yyss);
 #endif
 #if YYERROR_VERBOSE
-	if (yymsg != yymsgbuf) YYSTACK_FREE(yymsg);
+    if (yymsg != yymsgbuf) YYSTACK_FREE(yymsg);
 #endif
-	return yyresult;
+    return yyresult;
 }
 #line 537 "lwin_wkt_parse.y" /* yacc.c:1906  */

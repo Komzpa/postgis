@@ -36,11 +36,11 @@
 
 typedef struct
 {
-	size_t capacity;
-	uint8_t *buf_start;
-	uint8_t *writecursor;
-	uint8_t *readcursor;
-	uint8_t buf_static[BYTEBUFFER_STATICSIZE];
+    size_t capacity;
+    uint8_t *buf_start;
+    uint8_t *writecursor;
+    uint8_t *readcursor;
+    uint8_t buf_static[BYTEBUFFER_STATICSIZE];
 } bytebuffer_t;
 
 void bytebuffer_init_with_size(bytebuffer_t *b, size_t size);
