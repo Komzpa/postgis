@@ -194,36 +194,6 @@ char* gserialized_to_string(const GSERIALIZED *g)
 	return lwgeom_to_wkt(lwgeom_from_gserialized(g), WKT_ISO, 12, 0);
 }
 
-/* Unfortunately including advanced instructions is something that
-only helps a small sliver of users who can build their own
-knowing the target system they will be running on. Packagers
-have to aim for the lowest common denominator. So this is
-dead code for the forseeable future. */
-#define HAVE_PDEP 0
-#if HAVE_PDEP
-/* http://www.joshbarczak.com/blog/?p=454 */
-static uint64_t uint32_interleave_2(uint32_t u1, uint32_t u2)
-{
-    uint64_t x = u1;
-    uint64_t y = u2;
-    uint64_t x_mask = 0x5555555555555555;
-    uint64_t y_mask = 0xAAAAAAAAAAAAAAAA;
-    return _pdep_u64(x, x_mask) | _pdep_u64(y, y_mask);
-}
-
-static uint64_t uint32_interleave_3(uint32_t u1, uint32_t u2, uint32_t u3)
-{
-    /* only look at the first 21 bits */
-    uint64_t x = u1 & 0x1FFFFF;
-    uint64_t y = u2 & 0x1FFFFF;
-    uint64_t z = u3 & 0x1FFFFF;
-    uint64_t x_mask = 0x9249249249249249;
-    uint64_t y_mask = 0x2492492492492492;
-    uint64_t z_mask = 0x4924924924924924;
-    return _pdep_u64(x, x_mask) | _pdep_u64(y, y_mask) | _pdep_u64(z, z_mask);
-}
-
-#else
 static uint64_t uint32_interleave_2(uint32_t u1, uint32_t u2)
 {
     uint64_t x = u1;
@@ -248,16 +218,88 @@ static uint64_t uint32_interleave_2(uint32_t u1, uint32_t u2)
 
     return x | (y << 1);
 }
-#endif
 
 union floatuint {
 	uint32_t u;
 	float f;
 };
 
+uint64_t get_sortable_hash(double px, double py);
+// thanks http://threadlocalmutex.com/?p=126
+uint64_t get_sortable_hash(double px, double py)
+{
+	union floatuint fux, fuy;
+  	uint32_t A, B, C, D, x, y;
+	fux.f = px;
+	x = fux.u;
+	fuy.f = py;
+	y = fuy.u;
+
+  // Initial prefix scan round, prime with x and y
+  {
+    uint32_t a = x ^ y;
+    uint32_t b = 0xFFFF ^ a;
+    uint32_t c = 0xFFFF ^ (x | y);
+    uint32_t d = x & (y ^ 0xFFFF);
+
+    A = a | (b >> 1);
+    B = (a >> 1) ^ a;
+
+    C = ((c >> 1) ^ (b & (d >> 1))) ^ c;
+    D = ((a & (c >> 1)) ^ (d >> 1)) ^ d;
+  }
+
+  {
+    uint32_t a = A;
+    uint32_t b = B;
+    uint32_t c = C;
+    uint32_t d = D;
+
+    A = ((a & (a >> 2)) ^ (b & (b >> 2)));
+    B = ((a & (b >> 2)) ^ (b & ((a ^ b) >> 2)));
+
+    C ^= ((a & (c >> 2)) ^ (b & (d >> 2)));
+    D ^= ((b & (c >> 2)) ^ ((a ^ b) & (d >> 2)));
+  }
+
+  {
+    uint32_t a = A;
+    uint32_t b = B;
+    uint32_t c = C;
+    uint32_t d = D;
+
+    A = ((a & (a >> 4)) ^ (b & (b >> 4)));
+    B = ((a & (b >> 4)) ^ (b & ((a ^ b) >> 4)));
+
+    C ^= ((a & (c >> 4)) ^ (b & (d >> 4)));
+    D ^= ((b & (c >> 4)) ^ ((a ^ b) & (d >> 4)));
+  }
+
+  // Final round and projection
+  {
+    uint32_t a = A;
+    uint32_t b = B;
+    uint32_t c = C;
+    uint32_t d = D;
+
+    C ^= ((a & (c >> 8)) ^ (b & (d >> 8)));
+    D ^= ((b & (c >> 8)) ^ ((a ^ b) & (d >> 8)));
+  }
+
+  // Undo transformation prefix scan
+  uint32_t a = C ^ (C >> 1);
+  uint32_t b = D ^ (D >> 1);
+
+  // Recover index bits
+  uint32_t i0 = x ^ y;
+  uint32_t i1 = b | (0xFFFF ^ (i0 | a));
+
+  return uint32_interleave_2(i0, i1);
+}
+
 uint64_t gbox_get_sortable_hash(const GBOX *g)
 {
-	union floatuint x, y;
+	double x, y;
 
 	/*
 	* Since in theory the bitwise representation of an IEEE
@@ -274,8 +316,8 @@ uint64_t gbox_get_sortable_hash(const GBOX *g)
 		p.z = (g->zmax + g->zmin) / 2.0;
 		normalize(&p);
 		cart2geog(&p, &gpt);
-		x.f = gpt.lon;
-		y.f = gpt.lat;
+		x = gpt.lon;
+		y = gpt.lat;
 	}
 	else
 	{
@@ -284,11 +326,12 @@ uint64_t gbox_get_sortable_hash(const GBOX *g)
 		* Since it's just a sortable bit representation we can omit division from (A+B)/2.
 		* All it should do is subtract 1 from exponent anyways.
 		*/
-		x.f = g->xmax + g->xmin;
-		y.f = g->ymax + g->ymin;
+		x = g->xmax + g->xmin;
+		y = g->ymax + g->ymin;
 	}
-	return uint32_interleave_2(x.u, y.u);
+	return get_sortable_hash(x, y);
 }
+
 
 int gserialized_cmp(const GSERIALIZED *g1, const GSERIALIZED *g2)
 {
@@ -298,42 +341,6 @@ int gserialized_cmp(const GSERIALIZED *g1, const GSERIALIZED *g2)
 	size_t sz1 = SIZE_GET(g1->size);
 	size_t sz2 = SIZE_GET(g2->size);
 	union floatuint x, y;
-
-	/*
-	* For two non-same points, we can skip a lot of machinery.
-	*/
-	if (
-		sz1 > 16 && // 16 is size of EMPTY, if it's larger - it has coordinates
-		sz2 > 16 &&
-		!FLAGS_GET_BBOX(g1->flags) &&
-		!FLAGS_GET_BBOX(g2->flags) &&
-		*(uint32_t*)(g1+8) == POINTTYPE &&
-		*(uint32_t*)(g2+8) == POINTTYPE
-	)
-	{
-		double *dptr = (double*)(g1->data + sizeof(double));
-		x.f = 2.0 * dptr[0];
-		y.f = 2.0 * dptr[1];
-		hash1 = uint32_interleave_2(x.u, y.u);
-
-		dptr = (double*)(g2->data + sizeof(double));
-		x.f = 2.0 * dptr[0];
-		y.f = 2.0 * dptr[1];
-		hash2 = uint32_interleave_2(x.u, y.u);
-
-		/* If the SRIDs are the same, we can use hash inequality */
-		/* to jump us out of this function early. Otherwise we still */
-		/* have to do the full calculation */
-		if ( gserialized_cmp_srid(g1, g2) == 0 )
-		{
-			if ( hash1 > hash2 )
-				return 1;
-			if ( hash1 < hash2 )
-				return -1;
-		}
-
-		/* if hashes happen to be the same, go to full compare. */
-	}
 
 	size_t hsz1 = gserialized_header_size(g1);
 	size_t hsz2 = gserialized_header_size(g2);
