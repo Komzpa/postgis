@@ -2318,8 +2318,7 @@ distance2d_pt_pt(const POINT2D *p1, const POINT2D *p2)
 	double hside = p2->x - p1->x;
 	double vside = p2->y - p1->y;
 
-	return sqrt ( hside*hside + vside*vside );
-
+	return hypot(hside, vside);
 }
 
 double
@@ -2329,7 +2328,6 @@ distance2d_sqr_pt_pt(const POINT2D *p1, const POINT2D *p2)
 	double vside = p2->y - p1->y;
 
 	return  hside*hside + vside*vside;
-
 }
 
 
