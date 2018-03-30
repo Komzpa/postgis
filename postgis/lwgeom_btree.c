@@ -153,5 +153,21 @@ Datum lwgeom_hash(PG_FUNCTION_ARGS)
 	PG_RETURN_DATUM(hval);
 }
 
+static Datum
+gserialized_abbrev_convert(Datum original, SortSupport ssup)
+{
+	GSERIALIZED *g = (GSERIALIZED*) original);
+	uint8_t		g1_is_empty;
+	GBOX 		box1;
+	Datum		res;
+
+	assert(sizeof(Datum) == 8);
+	g1_is_empty = (gserialized_get_gbox_p(g1, &box1) == LW_FAILURE);
+
+	if (g1_is_empty) return 0;
+
+
+	return res;
+}
 
 
