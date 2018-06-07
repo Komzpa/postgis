@@ -20,7 +20,7 @@ before_install:
   - curl -sSfL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
   - echo "deb https://apt.postgresql.org/pub/repos/apt trusty-pgdg main 11" | sudo tee --append /etc/apt/sources.list > /dev/null
   - sudo apt-get update -qq
-  - sudo apt-get install postgresql-11 postgresql-server-dev-11
+  - sudo apt-get install -y postgresql-11 postgresql-server-dev-11
   - sudo service postgresql stop 11
   - sudo chown -hRL --from=postgres travis:travis /etc /var /tmp
   - sudo usermod -u 1000 postgres
