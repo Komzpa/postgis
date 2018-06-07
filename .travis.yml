@@ -21,12 +21,15 @@ before_install:
   - echo "deb https://apt.postgresql.org/pub/repos/apt trusty-pgdg main 11" | sudo tee --append /etc/apt/sources.list > /dev/null
   - sudo apt-get update -qq
   - sudo apt-get install -y postgresql-11 postgresql-server-dev-11
-  - sudo -u postgres createuser -s travis
+  - sudo service postgresql status 11
   - sudo service postgresql stop 11
   - sudo chown -hRL --from=postgres travis:travis /etc /var /tmp
   - sudo usermod -u 1000 postgres
   - sudo adduser travis ssl-cert
   - sudo service postgresql start 11
+  - sudo service postgresql status 11
+  - sudo -u postgres createuser -s travis
+  - sudo -u postgres createdb -O travis travis
   - sudo add-apt-repository --yes ppa:ubuntugis/ppa
   - sudo add-apt-repository --yes ppa:ubuntugis/ubuntugis-unstable
   - sudo apt-get update -qq
