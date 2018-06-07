@@ -28,7 +28,8 @@ before_install:
   - sudo adduser travis ssl-cert
   - sudo service postgresql start 11
   - sudo service postgresql status 11
-  - sudo -u postgres createuser -s travis
+  - sudo su -c 'createuser -s -h localhost -p 5433 travis' postgres
+  - sudo su -c 'createdb -O travis -h localhost -p 5433 travis' postgres
   - sudo -u postgres createdb -O travis travis
   - sudo add-apt-repository --yes ppa:ubuntugis/ppa
   - sudo add-apt-repository --yes ppa:ubuntugis/ubuntugis-unstable
