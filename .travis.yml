@@ -6,7 +6,7 @@ env:
     - CFLAGS="-g -O0 --coverage -fprofile-arcs -ftest-coverage" LDFLAGS="--coverage -fprofile-arcs -ftest-coverage" CONFIGURE_FLAGS="--enable-debug"
 
 addons:
-  postgresql: "9.6"
+  postgresql: "11"
   apt:
     packages:
       - eatmydata
@@ -17,16 +17,17 @@ before_install:
   - curl -sSfL https://github.com/mapbox/logbt/archive/v2.0.3.tar.gz | sudo tar --gunzip --extract --strip-components=1 --exclude="*md" --exclude="test*" --directory=/usr/local
   - curl -sSfL https://raw.githubusercontent.com/mapbox/logbt/30c554dd37b6c96c23fc424f75910fc6d6696f00/bin/logbt | sudo tee /usr/local/bin/logbt > /dev/null
   - sudo logbt --setup
-  - sudo service postgresql stop 9.6
+  - curl -sSfL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  - sudo echo "deb https://apt.postgresql.org/pub/repos/apt trusty-pgdg main 11" >> /etc/apt/source.list
+  - sudo apt-get update -qq
+  - sudo apt-get install postgresql-11 postgresql-server-dev-11
+  - sudo service postgresql stop 11
   - sudo chown -hRL --from=postgres travis:travis /etc /var /tmp
   - sudo usermod -u 1000 postgres
   - sudo adduser travis ssl-cert
-  - sudo service postgresql start 9.6
-  - sudo add-apt-repository --yes ppa:ubuntugis/ppa
-  - sudo add-apt-repository --yes ppa:ubuntugis/ubuntugis-unstable
-  - sudo apt-get update -qq
+  - sudo service postgresql start 11
   - mkdir -p /home/travis/deb && touch /home/travis/deb/__ && sudo cp -n /home/travis/deb/* /var/cache/apt/archives || true
-  - sudo apt-get install -y --allow-unauthenticated --no-install-recommends --no-install-suggests libsfcgal1 libsfcgal-dev postgresql-server-dev-9.6 libxml2-utils libcunit1-dev xsltproc docbook-xsl docbook-mathml dblatex libgeos-dev libjson0-dev libprotobuf-c0-dev libgdal-dev gdb libc6-dbg
+  - sudo apt-get install -y --allow-unauthenticated --no-install-recommends --no-install-suggests libsfcgal1 libsfcgal-dev libxml2-utils libcunit1-dev xsltproc docbook-xsl docbook-mathml dblatex libgeos-dev libjson0-dev libprotobuf-c0-dev libgdal-dev gdb libc6-dbg
   - sudo sh -c "echo deb http://archive.ubuntu.com/ubuntu/ artful main restricted universe multiverse >> /etc/apt/sources.list"
   - sudo apt-get update -qq
   - sudo apt-get install -y --allow-unauthenticated --no-install-recommends --no-install-suggests binutils libproj-dev
@@ -36,7 +37,7 @@ before_install:
   - ./autogen.sh
 
 after_failure:
-  - sudo head -n1000 /var/log/postgresql/postgresql-9.6-main.log
+  - sudo head -n1000 /var/log/postgresql/postgresql-11-main.log
 
 after_success:
   - bash .github/codecov.bash
