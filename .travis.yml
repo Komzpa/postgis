@@ -26,6 +26,9 @@ before_install:
   - sudo usermod -u 1000 postgres
   - sudo adduser travis ssl-cert
   - sudo service postgresql start 11
+  - sudo add-apt-repository --yes ppa:ubuntugis/ppa
+  - sudo add-apt-repository --yes ppa:ubuntugis/ubuntugis-unstable
+  - sudo apt-get update -qq
   - mkdir -p /home/travis/deb && touch /home/travis/deb/__ && sudo cp -n /home/travis/deb/* /var/cache/apt/archives || true
   - sudo apt-get install -y --allow-unauthenticated --no-install-recommends --no-install-suggests libsfcgal1 libsfcgal-dev libxml2-utils libcunit1-dev xsltproc docbook-xsl docbook-mathml dblatex libgeos-dev libjson0-dev libprotobuf-c0-dev libgdal-dev gdb libc6-dbg
   - sudo sh -c "echo deb http://archive.ubuntu.com/ubuntu/ artful main restricted universe multiverse >> /etc/apt/sources.list"
