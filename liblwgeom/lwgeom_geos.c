@@ -658,6 +658,41 @@ lwgeom_linemerge(const LWGEOM* geom)
 	return result;
 }
 
+LWGEOM *
+lwgeom_buffer(const LWGEOM *geom, double radius)
+{
+	LWGEOM *result;
+	int32_t srid = RESULT_SRID(geom);
+	uint8_t is3d = FLAGS_GET_Z(geom->flags);
+	GEOSGeometry *g1;
+	GEOSGeometry *g3;
+
+	if (srid == SRID_INVALID)
+		return NULL;
+
+	/* Empty.Buffer() == Empty */
+	if (lwgeom_is_empty(geom))
+		return lwgeom_clone_deep(geom);
+
+	initGEOS(lwnotice, lwgeom_geos_error);
+
+	if (!(g1 = LWGEOM2GEOS(geom, AUTOFIX)))
+		GEOS_FAIL();
+
+	g3 = GEOSBuffer(g1, radius, 8);
+
+	if (!g3)
+		GEOS_FREE_AND_FAIL(g1);
+	GEOSSetSRID(g3, srid);
+
+	if (!(result = GEOS2LWGEOM(g3, is3d)))
+		GEOS_FREE_AND_FAIL(g1, g3);
+
+	GEOS_FREE(g1, g3);
+
+	return result;
+}
+
 LWGEOM*
 lwgeom_unaryunion(const LWGEOM* geom)
 {
@@ -857,33 +892,11 @@ lwgeom_union(const LWGEOM* geom1, const LWGEOM* geom2)
 LWGEOM *
 lwgeom_clip_by_rect(const LWGEOM *geom1, double x1, double y1, double x2, double y2)
 {
-	LWGEOM *result;
-	GEOSGeometry *g1, *g3;
-	int is3d;
+	LWGEOM *result, *a;
 
-	/* A.Intersection(Empty) == Empty */
-	if ( lwgeom_is_empty(geom1) )
-		return lwgeom_clone_deep(geom1);
-
-	is3d = FLAGS_GET_Z(geom1->flags);
-
-	initGEOS(lwnotice, lwgeom_geos_error);
-
-	if (!(g1 = LWGEOM2GEOS(geom1, AUTOFIX)))
-		GEOS_FAIL();
-
-	if (!(g3 = GEOSClipByRect(g1, x1, y1, x2, y2)))
-		GEOS_FREE_AND_FAIL(g1);
-
-	GEOS_FREE(g1);
-	result = GEOS2LWGEOM(g3, is3d);
-	GEOS_FREE(g3);
-
-	if (!result)
-		GEOS_FAIL();
-
-	result->srid = geom1->srid;
-
+	a = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(geom1, 'X', x1, x2, 0, LW_FALSE);
+	result = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(a, 'Y', y1, y2, 0, LW_TRUE);
+	lwgeom_free(a);
 	return result;
 }
 

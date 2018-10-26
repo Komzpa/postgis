@@ -113,7 +113,7 @@ Datum ST_LocateBetween(PG_FUNCTION_ARGS)
 	double from = PG_GETARG_FLOAT8(1);
 	double to = PG_GETARG_FLOAT8(2);
 	double offset = PG_GETARG_FLOAT8(3);
-	LWCOLLECTION *geom_out = NULL;
+	LWGEOM *geom_out = NULL;
 	LWGEOM *line_in = NULL;
 	static char ordinate = 'M'; /* M */
 
@@ -130,7 +130,7 @@ Datum ST_LocateBetween(PG_FUNCTION_ARGS)
 	}
 
 	line_in = lwgeom_from_gserialized(geom_in);
-	geom_out = lwgeom_clip_to_ordinate_range(line_in,  ordinate, from, to, offset);
+	geom_out = lwgeom_clip_to_ordinate_range_and_offset(line_in, ordinate, from, to, offset, LW_TRUE);
 	lwgeom_free(line_in);
 	PG_FREE_IF_COPY(geom_in, 0);
 
@@ -153,7 +153,7 @@ Datum ST_LocateBetweenElevations(PG_FUNCTION_ARGS)
 	GSERIALIZED *geom_in = PG_GETARG_GSERIALIZED_P(0);
 	double from = PG_GETARG_FLOAT8(1);
 	double to = PG_GETARG_FLOAT8(2);
-	LWCOLLECTION *geom_out = NULL;
+	LWGEOM *geom_out = NULL;
 	LWGEOM *line_in = NULL;
 	static char ordinate = 'Z'; /* Z */
 	static double offset = 0.0;
@@ -165,7 +165,7 @@ Datum ST_LocateBetweenElevations(PG_FUNCTION_ARGS)
 	}
 
 	line_in = lwgeom_from_gserialized(geom_in);
-	geom_out = lwgeom_clip_to_ordinate_range(line_in,  ordinate, from, to, offset);
+	geom_out = lwgeom_clip_to_ordinate_range_and_offset(line_in, ordinate, from, to, offset, LW_TRUE);
 	lwgeom_free(line_in);
 	PG_FREE_IF_COPY(geom_in, 0);
 

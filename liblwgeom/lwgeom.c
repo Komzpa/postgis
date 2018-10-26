@@ -2350,11 +2350,18 @@ lwgeom_subdivide_recursive(const LWGEOM *geom,
 	{
 		//#pragma omp section
 		{
-			LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
-			    geom->srid, subbox1.xmin, subbox1.ymin, subbox1.xmax, subbox1.ymax);
-			LWGEOM *clipped = lwgeom_intersection(geom, subbox);
+			//	LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
+			//			    geom->srid, subbox1.xmin, subbox1.ymin, subbox1.xmax, subbox1.ymax);
+			//			LWGEOM *clipped = lwgeom_intersection(geom, subbox);
+			LWGEOM *clipped;
+			if (split_ordinate == 1)
+				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+				    geom, 'X', -INFINITY, pivot, 0, LW_TRUE);
+			else
+				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+				    geom, 'Y', -INFINITY, pivot, 0, LW_TRUE);
 			lwgeom_simplify_in_place(clipped, 0.0, LW_TRUE);
-			lwgeom_free(subbox);
+			// lwgeom_free(subbox);
 			if (clipped)
 			{
 				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col1);
@@ -2363,11 +2370,18 @@ lwgeom_subdivide_recursive(const LWGEOM *geom,
 		}
 		//#pragma omp section
 		{
-			LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
-			    geom->srid, subbox2.xmin, subbox2.ymin, subbox2.xmax, subbox2.ymax);
-			LWGEOM *clipped = lwgeom_intersection(geom, subbox);
+			// LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
+			//  geom->srid, subbox2.xmin, subbox2.ymin, subbox2.xmax, subbox2.ymax);
+			// LWGEOM *clipped = lwgeom_intersection(geom, subbox);
+			LWGEOM *clipped;
+			if (split_ordinate == 1)
+				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+				    geom, 'X', pivot, INFINITY, 0, LW_TRUE);
+			else
+				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+				    geom, 'Y', pivot, INFINITY, 0, LW_TRUE);
 			lwgeom_simplify_in_place(clipped, 0.0, LW_TRUE);
-			lwgeom_free(subbox);
+			// lwgeom_free(subbox);
 			if (clipped)
 			{
 				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col2);

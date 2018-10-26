@@ -755,7 +755,7 @@ lwline_clip_to_ordinate_range(const LWLINE *line, char ordinate, double from, do
  * Clip an input LWPOLY between two values, on any ordinate input.
  */
 static inline LWCOLLECTION *
-lwpoly_clip_to_ordinate_range(const LWPOLY *poly, char ordinate, double from, double to)
+lwpoly_clip_to_ordinate_range(const LWPOLY *poly, char ordinate, double from, double to, char try_valid)
 {
 	LWCOLLECTION *lwgeom_out = NULL;
 	uint32_t i, nrings;
@@ -780,16 +780,66 @@ lwpoly_clip_to_ordinate_range(const LWPOLY *poly, char ordinate, double from, do
 				break;
 		}
 	}
-	lwgeom_out = lwcollection_add_lwgeom(lwgeom_out, (LWGEOM *)poly_res);
+	if (try_valid)
+	{
+		LWGEOM *poly_fixed = lwgeom_buffer((LWGEOM *)poly_res, 0);
+		lwpoly_free(poly_res);
+		if (lwgeom_is_collection(poly_fixed))
+		{
+			lwgeom_out = lwcollection_concat_in_place(lwgeom_out, (LWCOLLECTION *)poly_fixed);
+			lwgeom_release(poly_fixed);
+		}
+		else
+			lwgeom_out = lwcollection_add_lwgeom(lwgeom_out, poly_fixed);
+		return lwgeom_out;
+	}
+	return lwcollection_add_lwgeom(lwgeom_out, (LWGEOM *)poly_res);
+}
 
-	return lwgeom_out;
+static inline LWCOLLECTION *
+lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, double from, double to, char try_valid);
+
+static inline LWCOLLECTION *
+lwgeom_clip_to_ordinate_range(const LWGEOM *lwin, char ordinate, double from, double to, char try_valid)
+{
+	LWCOLLECTION *out_col;
+
+	switch (lwin->type)
+	{
+	case LINETYPE:
+		out_col = lwline_clip_to_ordinate_range((LWLINE *)lwin, ordinate, from, to);
+		break;
+	case MULTIPOINTTYPE:
+		out_col = lwmpoint_clip_to_ordinate_range((LWMPOINT *)lwin, ordinate, from, to);
+		break;
+	case POINTTYPE:
+		out_col = lwpoint_clip_to_ordinate_range((LWPOINT *)lwin, ordinate, from, to);
+		break;
+	case POLYGONTYPE:
+		out_col = lwpoly_clip_to_ordinate_range((LWPOLY *)lwin, ordinate, from, to, try_valid);
+		break;
+	// case TRIANGLETYPE:
+	// 	out_col = lwtriangle_clip_to_ordinate_range((LWTRIANGLE*)lwin, ordinate, from, to);
+	// 	break;
+	case TINTYPE:
+	case MULTILINETYPE:
+	case MULTIPOLYGONTYPE:
+	case COLLECTIONTYPE:
+		out_col = lwcollection_clip_to_ordinate_range((LWCOLLECTION *)lwin, ordinate, from, to, try_valid);
+		break;
+	default:
+		lwerror("This function does not accept %s geometries.", lwtype_name(lwin->type));
+		return NULL;
+	}
+
+	return out_col;
 }
 
 /**
  * Clip an input COLLECTION between two values, on any ordinate input.
  */
 static inline LWCOLLECTION *
-lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, double from, double to)
+lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, double from, double to, char try_valid)
 {
 	LWCOLLECTION *lwgeom_out = NULL;
 
@@ -798,17 +848,8 @@ lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, dou
 		lwerror("Null input geometry.");
 		return NULL;
 	}
-
-	/* Ensure 'from' is less than 'to'. */
-	if (to < from)
-	{
-		double t = from;
-		from = to;
-		to = t;
-	}
-
 	if (icol->ngeoms == 1)
-		lwgeom_out = lwgeom_clip_to_ordinate_range(icol->geoms[0], ordinate, from, to, 0);
+		lwgeom_out = lwgeom_clip_to_ordinate_range(icol->geoms[0], ordinate, from, to, try_valid);
 	else
 	{
 		LWCOLLECTION *col;
@@ -820,7 +861,7 @@ lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, dou
 		FLAGS_SET_M(lwgeom_out->flags, hasm);
 		for (i = 0; i < icol->ngeoms; i++)
 		{
-			col = lwgeom_clip_to_ordinate_range(icol->geoms[i], ordinate, from, to, 0);
+			col = lwgeom_clip_to_ordinate_range(icol->geoms[i], ordinate, from, to, try_valid);
 			if (col)
 			{
 				if (col->type != icol->type)
@@ -835,92 +876,56 @@ lwcollection_clip_to_ordinate_range(const LWCOLLECTION *icol, char ordinate, dou
 	return lwgeom_out;
 }
 
-LWCOLLECTION*
-lwgeom_clip_to_ordinate_range(const LWGEOM *lwin, char ordinate, double from, double to, double offset)
+LWGEOM *
+lwgeom_clip_to_ordinate_range_and_offset(const LWGEOM *lwin,
+					 char ordinate,
+					 double from,
+					 double to,
+					 double offset,
+					 char try_valid)
 {
 	LWCOLLECTION *out_col;
-	LWCOLLECTION *out_offset;
-	uint32_t i;
+	LWGEOM *out_homo;
 
-	if ( ! lwin )
-		lwerror("lwgeom_clip_to_ordinate_range: null input geometry!");
-
-	switch ( lwin->type )
+	/* Ensure 'from' is less than 'to'. */
+	if (to < from)
 	{
-	case LINETYPE:
-		out_col = lwline_clip_to_ordinate_range((LWLINE*)lwin, ordinate, from, to);
-		break;
-	case MULTIPOINTTYPE:
-		out_col = lwmpoint_clip_to_ordinate_range((LWMPOINT*)lwin, ordinate, from, to);
-		break;
-	case POINTTYPE:
-		out_col = lwpoint_clip_to_ordinate_range((LWPOINT*)lwin, ordinate, from, to);
-		break;
-	case POLYGONTYPE:
-		out_col = lwpoly_clip_to_ordinate_range((LWPOLY *)lwin, ordinate, from, to);
-		break;
-	// case TRIANGLETYPE:
-	// 	out_col = lwtriangle_clip_to_ordinate_range((LWTRIANGLE*)lwin, ordinate, from, to);
-	// 	break;
-	case TINTYPE:
-	case MULTILINETYPE:
-	case MULTIPOLYGONTYPE:
-	case COLLECTIONTYPE:
-		out_col = lwcollection_clip_to_ordinate_range((LWCOLLECTION *)lwin, ordinate, from, to);
-		break;
-	default:
-		lwerror("This function does not accept %s geometries.", lwtype_name(lwin->type));
-		return NULL;
+		double t = from;
+		from = to;
+		to = t;
 	}
 
+	if (!lwin)
+		lwerror("lwgeom_clip_to_ordinate_range: null input geometry!");
+
+	out_col = lwgeom_clip_to_ordinate_range(lwin, ordinate, from, to, try_valid);
 	/* Stop if result is NULL */
 	if (!out_col)
 		lwerror("lwgeom_clip_to_ordinate_range clipping routine returned NULL");
 
-	/* Return if we aren't going to offset the result */
-	if (FP_IS_ZERO(offset) ||
-	    lwgeom_is_empty(lwcollection_as_lwgeom(out_col)))
-		return out_col;
+	out_homo = lwgeom_homogenize((LWGEOM *)out_col);
+	lwcollection_release(out_col);
 
-	/* Construct a collection to hold our outputs. */
-	/* Things get ugly: GEOS offset drops Z's and M's so we have to drop ours */
-	out_offset = lwcollection_construct_empty(MULTILINETYPE, lwin->srid, 0, 0);
+	/* Return if we aren't going to offset the result */
+	if (FP_IS_ZERO(offset) || lwgeom_is_empty(out_homo))
+		return out_homo;
 
 	/* Try and offset the linear portions of the return value */
-	for ( i = 0; i < out_col->ngeoms; i++ )
-	{
-		int type = out_col->geoms[i]->type;
-		if ( type == POINTTYPE )
-		{
-			lwnotice("lwgeom_clip_to_ordinate_range cannot offset a clipped point");
-			continue;
-		}
-		else if ( type == LINETYPE )
-		{
-			/* lwgeom_offsetcurve(line, offset, quadsegs, joinstyle (round), mitrelimit) */
-			LWGEOM *lwoff = lwgeom_offsetcurve(out_col->geoms[i], offset, 8, 1, 5.0);
-			if ( ! lwoff )
-			{
-				lwerror("lwgeom_offsetcurve returned null");
-			}
-			lwcollection_add_lwgeom(out_offset, lwoff);
-		}
-		else
-		{
-			lwerror("lwgeom_clip_to_ordinate_range found an unexpected type (%s) in the offset routine",lwtype_name(type));
-		}
-	}
+	/* lwgeom_offsetcurve(line, offset, quadsegs, joinstyle (round), mitrelimit) */
+	LWGEOM *lwoff = lwgeom_offsetcurve(out_homo, offset, 8, 1, 5.0);
+	if (!lwoff)
+		lwerror("lwgeom_offsetcurve returned null");
 
-	return out_offset;
+	return lwoff;
 }
 
-LWCOLLECTION*
+LWGEOM *
 lwgeom_locate_between(const LWGEOM *lwin, double from, double to, double offset)
 {
 	if ( ! lwgeom_has_m(lwin) )
 		lwerror("Input geometry does not have a measure dimension");
 
-	return lwgeom_clip_to_ordinate_range(lwin, 'M', from, to, offset);
+	return lwgeom_clip_to_ordinate_range_and_offset(lwin, 'M', from, to, offset, LW_TRUE);
 }
 
 double
