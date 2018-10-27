@@ -1,7 +1,7 @@
 ERROR:  Input geometry does not have a measure dimension
 ERROR:  Input geometry does not have a measure dimension
 PNTM_1|MULTIPOINT M EMPTY
-PNTM_2|POINT M (1 2 3)
+PNTM_2|MULTIPOINT M (1 2 3)
 PNTM_3|POINT M (1 2 3)
 PNTM_4|POINT M (1 2 3)
 PNTM_5|MULTIPOINT M EMPTY

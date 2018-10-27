@@ -425,7 +425,7 @@ lwmpoint_clip_to_ordinate_range(const LWMPOINT *mpoint, char ordinate, double fr
 		lwpoint_getPoint4d_p(mpoint->geoms[i], &p4d);
 		ordinate_value = lwpoint_get_ordinate(&p4d, ordinate);
 
-		if ( from <= ordinate_value && to >= ordinate_value )
+		if (from <= ordinate_value && ordinate_value <= to)
 		{
 			LWPOINT *lwp = lwpoint_clone(mpoint->geoms[i]);
 			lwcollection_add_lwgeom(lwgeom_out, lwpoint_as_lwgeom(lwp));
@@ -440,7 +440,7 @@ lwmpoint_clip_to_ordinate_range(const LWMPOINT *mpoint, char ordinate, double fr
 }
 
 static inline POINTARRAY *
-ptarray_clamp_to_ordinate_range(const POINTARRAY *ipa, char ordinate, double from, double to)
+ptarray_clamp_to_ordinate_range(const POINTARRAY *ipa, char ordinate, double from, double to, char is_closed)
 {
 	POINT4D p1, p2;
 	POINTARRAY *opa;
@@ -524,7 +524,7 @@ ptarray_clamp_to_ordinate_range(const POINTARRAY *ipa, char ordinate, double fro
 		LW_ON_INTERRUPT(ptarray_free(opa); return NULL);
 	}
 
-	if (ptarray_is_closed(ipa) && opa->npoints > 0)
+	if (is_closed && opa->npoints > 0)
 	{
 		getPoint4d_p(opa, 0, &p1);
 		ptarray_append_point(opa, &p1, LW_FALSE);
@@ -769,7 +769,7 @@ lwpoly_clip_to_ordinate_range(const LWPOLY *poly, char ordinate, double from, do
 	for (i = 0; i < nrings; i++)
 	{
 		/* Ret number of points */
-		POINTARRAY *pa = ptarray_clamp_to_ordinate_range(poly->rings[i], ordinate, from, to);
+		POINTARRAY *pa = ptarray_clamp_to_ordinate_range(poly->rings[i], ordinate, from, to, LW_TRUE);
 
 		if (pa->npoints >= 4)
 			lwpoly_add_ring(poly_res, pa);
@@ -782,12 +782,15 @@ lwpoly_clip_to_ordinate_range(const LWPOLY *poly, char ordinate, double from, do
 	}
 	if (try_valid)
 	{
-		LWGEOM *poly_fixed = lwgeom_buffer((LWGEOM *)poly_res, 0);
+		LWGEOM *poly_fixed = lwgeom_make_valid((LWGEOM *)poly_res);
+
 		lwpoly_free(poly_res);
 		if (lwgeom_is_collection(poly_fixed))
 		{
-			lwgeom_out = lwcollection_concat_in_place(lwgeom_out, (LWCOLLECTION *)poly_fixed);
+			LWCOLLECTION *t = lwcollection_extract((LWCOLLECTION *)poly_fixed, POLYGONTYPE);
+			lwgeom_out = lwcollection_concat_in_place(lwgeom_out, t);
 			lwgeom_release(poly_fixed);
+			lwcollection_release(t);
 		}
 		else
 			lwgeom_out = lwcollection_add_lwgeom(lwgeom_out, poly_fixed);
@@ -899,11 +902,13 @@ lwgeom_clip_to_ordinate_range_and_offset(const LWGEOM *lwin,
 		lwerror("lwgeom_clip_to_ordinate_range: null input geometry!");
 
 	out_col = lwgeom_clip_to_ordinate_range(lwin, ordinate, from, to, try_valid);
+
 	/* Stop if result is NULL */
 	if (!out_col)
 		lwerror("lwgeom_clip_to_ordinate_range clipping routine returned NULL");
 
 	out_homo = lwgeom_homogenize((LWGEOM *)out_col);
+
 	lwcollection_release(out_col);
 
 	/* Return if we aren't going to offset the result */

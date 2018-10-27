@@ -895,7 +895,7 @@ lwgeom_clip_by_rect(const LWGEOM *geom1, double x1, double y1, double x2, double
 	LWGEOM *result, *a;
 
 	a = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(geom1, 'X', x1, x2, 0, LW_FALSE);
-	result = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(a, 'Y', y1, y2, 0, LW_TRUE);
+	result = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(a, 'Y', y1, y2, 0, LW_FALSE);
 	lwgeom_free(a);
 	return result;
 }

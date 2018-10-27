@@ -2204,7 +2204,7 @@ lwgeom_subdivide_recursive(const LWGEOM *geom,
 			   LWCOLLECTION *col)
 {
 	const uint32_t maxdepth = 50;
-	GBOX clip, subbox1, subbox2;
+	GBOX clip;
 	uint32_t nvertices = 0;
 	uint32_t i;
 	uint32_t split_ordinate;
@@ -2330,69 +2330,43 @@ lwgeom_subdivide_recursive(const LWGEOM *geom,
 		}
 	}
 
-	gbox_duplicate(&clip, &subbox1);
-	gbox_duplicate(&clip, &subbox2);
-
-	if (pivot == DBL_MAX) pivot = center;
-
-	if (split_ordinate == 0)
-		subbox1.xmax = subbox2.xmin = pivot;
-	else
-		subbox1.ymax = subbox2.ymin = pivot;
+	if (pivot == DBL_MAX)
+		pivot = center;
 
 	++depth;
 
-	LWCOLLECTION *col1 =
-	    lwcollection_construct_empty(COLLECTIONTYPE, geom->srid, lwgeom_has_z(geom), lwgeom_has_m(geom));
-	LWCOLLECTION *col2 =
-	    lwcollection_construct_empty(COLLECTIONTYPE, geom->srid, lwgeom_has_z(geom), lwgeom_has_m(geom));
-	//#pragma omp parallel sections
 	{
-		//#pragma omp section
+		LWGEOM *clipped;
+		if (split_ordinate == 0)
+			clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+			    geom, 'X', clip.xmin, pivot, 0, LW_FALSE);
+		else
+			clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+			    geom, 'Y', clip.ymin, pivot, 0, LW_FALSE);
+		lwgeom_simplify_in_place(clipped, 0.0, LW_FALSE);
+		if (clipped)
 		{
-			//	LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
-			//			    geom->srid, subbox1.xmin, subbox1.ymin, subbox1.xmax, subbox1.ymax);
-			//			LWGEOM *clipped = lwgeom_intersection(geom, subbox);
-			LWGEOM *clipped;
-			if (split_ordinate == 1)
-				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
-				    geom, 'X', -INFINITY, pivot, 0, LW_TRUE);
-			else
-				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
-				    geom, 'Y', -INFINITY, pivot, 0, LW_TRUE);
-			lwgeom_simplify_in_place(clipped, 0.0, LW_TRUE);
-			// lwgeom_free(subbox);
-			if (clipped)
-			{
-				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col1);
-				lwgeom_free(clipped);
-			}
-		}
-		//#pragma omp section
-		{
-			// LWGEOM *subbox = (LWGEOM *)lwpoly_construct_envelope(
-			//  geom->srid, subbox2.xmin, subbox2.ymin, subbox2.xmax, subbox2.ymax);
-			// LWGEOM *clipped = lwgeom_intersection(geom, subbox);
-			LWGEOM *clipped;
-			if (split_ordinate == 1)
-				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
-				    geom, 'X', pivot, INFINITY, 0, LW_TRUE);
-			else
-				clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
-				    geom, 'Y', pivot, INFINITY, 0, LW_TRUE);
-			lwgeom_simplify_in_place(clipped, 0.0, LW_TRUE);
-			// lwgeom_free(subbox);
-			if (clipped)
-			{
-				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col2);
-				lwgeom_free(clipped);
-			}
+			if (!lwgeom_is_empty(clipped))
+				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col);
+			lwgeom_free(clipped);
 		}
 	}
-	col = lwcollection_concat_in_place(col, col1);
-	lwcollection_release(col1);
-	col = lwcollection_concat_in_place(col, col2);
-	lwcollection_release(col2);
+	{
+		LWGEOM *clipped;
+		if (split_ordinate == 0)
+			clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+			    geom, 'X', pivot, clip.xmax, 0, LW_FALSE);
+		else
+			clipped = (LWGEOM *)lwgeom_clip_to_ordinate_range_and_offset(
+			    geom, 'Y', pivot, clip.ymax, 0, LW_FALSE);
+		lwgeom_simplify_in_place(clipped, 0.0, LW_FALSE);
+		if (clipped)
+		{
+			if (!lwgeom_is_empty(clipped))
+				lwgeom_subdivide_recursive(clipped, dimension, maxvertices, depth, col);
+			lwgeom_free(clipped);
+		}
+	}
 }
 
 LWCOLLECTION *
