@@ -197,23 +197,11 @@ union_intersecting_pairs(GEOSGeometry** geoms, uint32_t num_geoms, UNIONFIND* uf
 				int geos_type = GEOSGeomTypeId(geoms[p]);
 				int geos_result;
 
-				/* Don't build prepared a geometry around a Point or MultiPoint -
-				 * there are some problems in the implementation, and it's not clear
-				 * there would be a performance benefit in any case.  (See #3433)
-				 */
-				if (geos_type != GEOS_POINT && geos_type != GEOS_MULTIPOINT)
-				{
-					/* Lazy initialize prepared geometry */
-					if (prep == NULL)
-					{
-						prep = GEOSPrepare(geoms[p]);
-					}
-					geos_result = GEOSPreparedIntersects(prep, geoms[q]);
-				}
-				else
-				{
-					geos_result = GEOSIntersects(geoms[p], geoms[q]);
-				}
+				/* Lazy initialize prepared geometry */
+				if (!prep)
+					prep = GEOSPrepare(geoms[p]);
+				geos_result = GEOSPreparedIntersects(prep, geoms[q]);
+
 				if (geos_result > 1)
 				{
 					success = LW_FAILURE;
