@@ -39,6 +39,7 @@
 
 extern Datum ST_ClusterDBSCAN(PG_FUNCTION_ARGS);
 extern Datum ST_ClusterKMeans(PG_FUNCTION_ARGS);
+extern Datum ST_ClusterWithin(PG_FUNCTION_ARGS);
 
 typedef struct {
 	bool	isdone;
@@ -79,6 +80,82 @@ read_lwgeom_from_partition(WindowObject win_obj, uint32_t i, bool* is_null)
 	return lwgeom_from_gserialized(g);
 }
 
+PG_FUNCTION_INFO_V1(ST_ClusterWithin);
+Datum ST_ClusterWithin(PG_FUNCTION_ARGS)
+{
+	WindowObject win_obj = PG_WINDOW_OBJECT();
+	uint32_t row = WinGetCurrentPosition(win_obj);
+	uint32_t ngeoms = WinGetPartitionRowCount(win_obj);
+	dbscan_context *context =
+	    WinGetPartitionLocalMemory(win_obj, sizeof(dbscan_context) + ngeoms * sizeof(dbscan_cluster_result));
+
+	if (row == 0) /* beginning of the partition; do all of the work now */
+	{
+		uint32_t i;
+		uint32_t *result_ids;
+		LWGEOM **geoms;
+		char *is_in_cluster = NULL;
+		UNIONFIND *uf;
+		bool tolerance_is_null;
+		Datum tolerance_datum = WinGetFuncArgCurrent(win_obj, 1, &tolerance_is_null);
+		double tolerance = DatumGetFloat8(tolerance_datum);
+		int minpoints = 1;
+
+		context->is_error = LW_TRUE; /* until proven otherwise */
+
+		/* Validate input parameters */
+		if (tolerance_is_null || tolerance < 0)
+		{
+			lwpgerror("Tolerance must be a positive number", tolerance);
+			PG_RETURN_NULL();
+		}
+
+		initGEOS(lwnotice, lwgeom_geos_error);
+		geoms = lwalloc(ngeoms * sizeof(LWGEOM *));
+		uf = UF_create(ngeoms);
+		for (i = 0; i < ngeoms; i++)
+		{
+			geoms[i] =
+			    read_lwgeom_from_partition(win_obj, i, (bool *)&(context->cluster_assignments[i].is_null));
+
+			if (!geoms[i])
+			{
+				/* TODO release memory ? */
+				lwpgerror("Error reading geometry.");
+				PG_RETURN_NULL();
+			}
+		}
+
+		if (union_dbscan_minpoints_1(geoms, ngeoms, uf, tolerance, NULL) == LW_SUCCESS)
+			context->is_error = LW_FALSE;
+
+		for (i = 0; i < ngeoms; i++)
+			lwgeom_free(geoms[i]);
+		lwfree(geoms);
+
+		if (context->is_error)
+		{
+			UF_destroy(uf);
+			if (is_in_cluster)
+				lwfree(is_in_cluster);
+			lwpgerror("Error during clustering");
+			PG_RETURN_NULL();
+		}
+
+		result_ids = UF_get_collapsed_cluster_ids(uf, is_in_cluster);
+		for (i = 0; i < ngeoms; i++)
+			context->cluster_assignments[i].cluster_id = result_ids[i];
+
+		lwfree(result_ids);
+		UF_destroy(uf);
+	}
+
+	if (context->cluster_assignments[row].is_null)
+		PG_RETURN_NULL();
+
+	PG_RETURN_INT32(context->cluster_assignments[row].cluster_id);
+}
+
 PG_FUNCTION_INFO_V1(ST_ClusterDBSCAN);
 Datum ST_ClusterDBSCAN(PG_FUNCTION_ARGS)
 {
@@ -110,9 +187,7 @@ Datum ST_ClusterDBSCAN(PG_FUNCTION_ARGS)
 			PG_RETURN_NULL();
 		}
 		if (minpoints_is_null || minpoints < 0)
-		{
 			lwpgerror("Minpoints must be a positive number", minpoints);
-		}
 
 		initGEOS(lwnotice, lwgeom_geos_error);
 		geoms = lwalloc(ngeoms * sizeof(LWGEOM*));
@@ -132,9 +207,7 @@ Datum ST_ClusterDBSCAN(PG_FUNCTION_ARGS)
 			context->is_error = LW_FALSE;
 
 		for (i = 0; i < ngeoms; i++)
-		{
 			lwgeom_free(geoms[i]);
-		}
 		lwfree(geoms);
 
 		if (context->is_error)
@@ -150,13 +223,9 @@ Datum ST_ClusterDBSCAN(PG_FUNCTION_ARGS)
 		for (i = 0; i < ngeoms; i++)
 		{
 			if (minpoints > 1 && !is_in_cluster[i])
-			{
 				context->cluster_assignments[i].is_null = LW_TRUE;
-			}
 			else
-			{
 				context->cluster_assignments[i].cluster_id = result_ids[i];
-			}
 		}
 
 		lwfree(result_ids);
@@ -188,7 +257,7 @@ Datum ST_ClusterKMeans(PG_FUNCTION_ARGS)
 		LWGEOM    **geoms;
 		int       *r;
 
-		/* What is K? If it's NULL or invalid, we can't procede */
+		/* What is K? If it's NULL or invalid, we can't proceed */
 		k = DatumGetInt32(WinGetFuncArgCurrent(winobj, 1, &isnull));
 		if (isnull || k <= 0)
 		{
@@ -208,9 +277,7 @@ Datum ST_ClusterKMeans(PG_FUNCTION_ARGS)
 
 		/* Error out if N < K */
 		if (N<k)
-		{
 			lwpgerror("K (%d) must be smaller than the number of rows in the group (%d)", k, N);
-		}
 
 		/* Read all the geometries from the partition window into a list */
 		geoms = palloc(sizeof(LWGEOM*) * N);
@@ -238,7 +305,6 @@ Datum ST_ClusterKMeans(PG_FUNCTION_ARGS)
 		for (i = 0; i < N; i++)
 			if (geoms[i])
 				lwgeom_free(geoms[i]);
-
 		pfree(geoms);
 
 		if (!r)
