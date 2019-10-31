@@ -126,7 +126,7 @@ Datum ST_ClusterWithin(PG_FUNCTION_ARGS)
 			}
 		}
 
-		if (union_dbscan_minpoints_1(geoms, ngeoms, uf, tolerance, NULL) == LW_SUCCESS)
+		if (union_dbscan(geoms, ngeoms, uf, tolerance, 1, NULL) == LW_SUCCESS)
 			context->is_error = LW_FALSE;
 
 		for (i = 0; i < ngeoms; i++)

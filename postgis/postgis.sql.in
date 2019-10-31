@@ -1729,11 +1729,11 @@ CREATE OR REPLACE FUNCTION ST_ClusterIntersecting(geometry[])
     LANGUAGE 'c' IMMUTABLE STRICT _PARALLEL
     _COST_HIGH;
 
--- Availability: 2.2
-CREATE OR REPLACE FUNCTION ST_ClusterWithin(geometry[], float8)
-    RETURNS geometry[]
-    AS 'MODULE_PATHNAME',  'cluster_within_distance_garray'
-    LANGUAGE 'c' IMMUTABLE STRICT _PARALLEL
+-- Availability: 3.0.0
+CREATE OR REPLACE FUNCTION ST_ClusterWithin(geometry, radius float8)
+    RETURNS int
+    AS 'MODULE_PATHNAME',  'ST_ClusterWithin'
+    LANGUAGE 'c' IMMUTABLE STRICT WINDOW _PARALLEL
     _COST_HIGH;
 
 -- Availability: 2.3
@@ -3869,13 +3869,6 @@ CREATE OR REPLACE FUNCTION pgis_geometry_clusterintersecting_finalfn(internal)
 	AS 'MODULE_PATHNAME'
 	LANGUAGE 'c' _PARALLEL;
 
--- Availability: 2.2
--- Changed: 2.5.0 use 'internal' transfer type
-CREATE OR REPLACE FUNCTION pgis_geometry_clusterwithin_finalfn(internal)
-	RETURNS geometry[]
-	AS 'MODULE_PATHNAME'
-	LANGUAGE 'c' _PARALLEL;
-
 -- Availability: 1.4.0
 -- Changed: 2.5.0 use 'internal' transfer type
 CREATE OR REPLACE FUNCTION pgis_geometry_makeline_finalfn(internal)
@@ -3926,18 +3919,6 @@ CREATE AGGREGATE ST_ClusterIntersecting (geometry) (
 	parallel = safe,
 #endif
 	FINALFUNC = pgis_geometry_clusterintersecting_finalfn
-	);
-
--- Availability: 2.2
--- Changed: 2.4.0 marked parallel safe
--- Changed: 2.5.0 use 'internal' stype
-CREATE AGGREGATE ST_ClusterWithin (geometry, float8) (
-	SFUNC = pgis_geometry_accum_transfn,
-	STYPE = internal,
-#if POSTGIS_PGSQL_VERSION >= 96
-	parallel = safe,
-#endif
-	FINALFUNC = pgis_geometry_clusterwithin_finalfn
 	);
 
 -- Availability: 1.2.2
