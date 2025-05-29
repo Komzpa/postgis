@@ -1291,4 +1291,7 @@ SELECT 'double_31', ST_AsEWKT(ST_GeomFromGML('<gml:Point><gml:pos>1 $0%@#$^%#</g
 -- #4652
 SELECT '#4652', ST_AsEWKT(ST_GeomFromGML('<gml:Curve id="id-69b216c9-2c07-434d-8664-e321b3697725-0" srsDimension="2" srsName="urn:x-ogc:def:crs:EPSG:28992"> <gml:segments> <gml:LineStringSegment> <gml:posList>119675.91899999976 526436.1209999993 119676.54699999839 526439.4930000007 119676.44299999997 526439.5130000003 119676.03299999982 526439.6220000014 119675.38500000164 526439.868999999</gml:posList> </gml:LineStringSegment> <gml:LineStringSegment> <gml:posList>119675.38500000164 526439.868999999 119675.15500452081 526439.9735735222 119674.92922525379 526440.0869634049 119674.70800000057 526440.2089999989</gml:posList> </gml:LineStringSegment> <gml:LineStringSegment> <gml:posList>119674.70800000057 526440.2089999989 119674.01347910661 526440.6575801083 119673.38748824484 526441.1976901226</gml:posList> </gml:LineStringSegment> </gml:segments> </gml:Curve>',28992));
 
+-- ERROR: xlink attributes on root element
+SELECT 'xlink_root', ST_AsEWKT(ST_GeomFromGML('<gml:Tin xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="#gml"></gml:Tin>'));
+
 DELETE FROM spatial_ref_sys WHERE srid BETWEEN 1 and 7;

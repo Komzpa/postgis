@@ -250,12 +250,18 @@ static bool is_xlink(xmlNodePtr node)
  */
 static xmlNodePtr get_xlink_node(xmlNodePtr xnode)
 {
-	char *id;
-	xmlNsPtr *ns, *n;
-	xmlXPathContext *ctx;
-	xmlXPathObject *xpath;
-	xmlNodePtr node, ret_node;
-	xmlChar *href, *p, *node_id;
+        char *id;
+        xmlNsPtr *ns, *n;
+        xmlXPathContext *ctx;
+        xmlXPathObject *xpath;
+        xmlNodePtr node, ret_node;
+        xmlChar *href, *p, *node_id;
+
+        if (xnode->ns == NULL || xnode->ns->prefix == NULL)
+        {
+                gml_lwpgerror("invalid GML representation", 58);
+                return NULL;
+        }
 
 	href = xmlGetNsProp(xnode, (xmlChar *)"href", (xmlChar *) XLINK_NS);
 	id = lwalloc((xmlStrlen(xnode->ns->prefix) * 2 + xmlStrlen(xnode->name)
