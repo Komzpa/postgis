@@ -5086,6 +5086,92 @@ compare_scored_pointer(const void *si1, const void *si2)
  *
  */
 static LWT_ELEMID
+_lwt_GetEqualEdge( LWT_TOPOLOGY *topo, LWLINE *edge, int *forward );
+
+/*
+ * As _lwt_GetEqualEdge but considers a tolerance when comparing.
+ */
+static LWT_ELEMID
+_lwt_GetEqualEdgeTol( LWT_TOPOLOGY *topo, LWLINE *edge, double tol, int *forward )
+{
+    LWT_ELEMID id = _lwt_GetEqualEdge(topo, edge, forward);
+    if ( id || tol <= 0 || id == -1 )
+        return id;
+
+    LWT_ISO_EDGE *edges;
+    uint64_t num, i;
+    const GBOX *qbox = lwgeom_get_bbox(lwline_as_lwgeom(edge));
+    GEOSGeometry *edgeg;
+    const int flds = LWT_COL_EDGE_EDGE_ID|LWT_COL_EDGE_GEOM;
+
+    edges = lwt_be_getEdgeWithinBox2D( topo, qbox, &num, flds, 0 );
+    if ( num == UINT64_MAX )
+    {
+        PGTOPO_BE_ERROR();
+        return -1;
+    }
+    if ( ! num )
+        return 0;
+
+    initGEOS(lwnotice, lwgeom_geos_error);
+    edgeg = LWGEOM2GEOS( lwline_as_lwgeom(edge), 0 );
+    if ( ! edgeg )
+    {
+        _lwt_release_edges(edges, num);
+        lwerror("Could not convert edge geometry to GEOS: %s", lwgeom_geos_errmsg);
+        return -1;
+    }
+
+    for ( i=0; i<num; ++i )
+    {
+        LWT_ISO_EDGE *e = &(edges[i]);
+        GEOSGeometry *gg = LWGEOM2GEOS( lwline_as_lwgeom(e->geom), 0 );
+        if ( ! gg )
+        {
+            GEOSGeom_destroy(edgeg);
+            _lwt_release_edges(edges, num);
+            lwerror("Could not convert edge geometry to GEOS: %s", lwgeom_geos_errmsg);
+            return -1;
+        }
+        double dist = 0.0;
+        if ( ! GEOSDistance(edgeg, gg, &dist) )
+        {
+            GEOSGeom_destroy(gg);
+            GEOSGeom_destroy(edgeg);
+            _lwt_release_edges(edges, num);
+            lwerror("GEOSDistance error: %s", lwgeom_geos_errmsg);
+            return -1;
+        }
+        GEOSGeom_destroy(gg);
+
+        if ( dist < tol )
+        {
+            id = e->edge_id;
+            if ( forward )
+            {
+                if ( lwline_is_closed(edge) )
+                {
+                    *forward = (ptarray_isccw(edge->points) == ptarray_isccw(e->geom->points));
+                }
+                else
+                {
+                    *forward = (memcmp(getPoint_internal(edge->points,0),
+                                       getPoint_internal(e->geom->points,0),
+                                       sizeof(POINT2D)) == 0);
+                }
+            }
+            GEOSGeom_destroy(edgeg);
+            _lwt_release_edges(edges, num);
+            return id;
+        }
+    }
+    GEOSGeom_destroy(edgeg);
+    _lwt_release_edges(edges, num);
+
+    return 0;
+}
+
+static LWT_ELEMID
 _lwt_GetEqualEdge( LWT_TOPOLOGY *topo, LWLINE *edge, int *forward )
 {
   LWT_ELEMID id;
@@ -5364,7 +5450,7 @@ _lwt_SnapEdgeToExistingNode(
   {
     int forward;
     /* TODO: directly get full existing edge rather than just id * */
-    LWT_ELEMID existingEdgeId = _lwt_GetEqualEdge( topo, lwgeom_as_lwline(splitC->geoms[n]), &forward );
+    LWT_ELEMID existingEdgeId = _lwt_GetEqualEdgeTol( topo, lwgeom_as_lwline(splitC->geoms[n]), tol, &forward );
     if ( existingEdgeId == -1 )
     {
       /* probably too late, due to internal lwerror */
@@ -7022,8 +7108,8 @@ _lwt_AddLineEdge( LWT_TOPOLOGY* topo, LWLINE* edge, double tol,
   }
 
   /* check if the so-snapped edge _now_ exists */
-  id = _lwt_GetEqualEdge ( topo, edge, forward );
-  LWDEBUGF(1, "_lwt_GetEqualEdge returned %" LWTFMT_ELEMID, id);
+  id = _lwt_GetEqualEdgeTol ( topo, edge, tol, forward );
+  LWDEBUGF(1, "_lwt_GetEqualEdgeTol returned %" LWTFMT_ELEMID, id);
   if ( id == -1 )
   {
     if ( tmp ) lwgeom_free(tmp); /* probably too late, due to internal lwerror */
@@ -7056,8 +7142,8 @@ _lwt_AddLineEdge( LWT_TOPOLOGY* topo, LWLINE* edge, double tol,
     }
 
     /* check if the so-decimated edge _now_ exists */
-    id = _lwt_GetEqualEdge ( topo, edge, forward );
-    LWDEBUGF(1, "_lwt_GetEqualEdge returned %" LWTFMT_ELEMID, id);
+    id = _lwt_GetEqualEdgeTol ( topo, edge, tol, forward );
+    LWDEBUGF(1, "_lwt_GetEqualEdgeTol returned %" LWTFMT_ELEMID, id);
     if ( id == -1 )
     {
       lwgeom_free(tmp); /* probably too late, due to internal lwerror */
