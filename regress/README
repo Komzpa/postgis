@@ -13,6 +13,12 @@ run_test.pl requires the following Perl modules to be installed
 
 Most distributions of Perl will have everything
 
+The harness now resolves the PostgreSQL client executables (psql, createdb,
+dropdb) once up-front using pg_config so repeated invocations reuse the same
+absolute paths without depending on PATH order. It also implements diffs and
+log filtering in Perl to avoid forking external diff/grep/sed helpers while
+preserving the existing output format.
+
 
 How to add a regression test
 ----------------------------

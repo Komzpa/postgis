@@ -14,7 +14,7 @@
 
 #$| = 1;
 use File::Basename(dirname,fileparse,basename);
-use File::Temp 'tempdir';
+use File::Temp qw(tempdir tempfile);
 use Time::HiRes qw(time);
 use File::Copy;
 use File::Path(mkpath);
@@ -51,12 +51,11 @@ our $DB = $ENV{"POSTGIS_REGRESS_DB"} || "postgis_reg";
 our $REGDIR = $ENV{"POSTGIS_REGRESS_DIR"} || abs_path(dirname($0));
 our $DB_OWNER = $ENV{"POSTGIS_REGRESS_DB_OWNER"};
 our $DB_ROLE_EXT_MKR = $ENV{"POSTGIS_REGRESS_ROLE_EXT_CREATOR"} || $DB_OWNER;
+our ($TMPDIR, $REGRESS_LOG);
 
 our $TOP_SOURCEDIR = ${REGDIR} . '/..';
 our $ABS_TOP_SOURCEDIR = abs_path(${TOP_SOURCEDIR});
 our $TOP_BUILDDIR = $ENV{"POSTGIS_TOP_BUILD_DIR"};
-our $sysdiff = !system("diff --strip-trailing-cr $0 $0 2> /dev/null");
-
 ##################################################################
 # Set up some global variables
 ##################################################################
@@ -128,8 +127,12 @@ GetOptions (
 
 if ( @ARGV < 1 )
 {
-	usage();
+        usage();
 }
+
+my $PSQL = shell_quote(psql_bin());
+my $CREATEDB = shell_quote(createdb_bin());
+my $DROPDB = shell_quote(dropdb_bin());
 
 sub findOrDie
 {
@@ -151,6 +154,94 @@ sub findOrDie
     print STDERR "Unable to find $exec executable.\n";
     print STDERR "PATH is " . $ENV{"PATH"} . "\n";
     die "HINT: use POSTGIS_TOP_BUILD_DIR env or --build-dir switch the specify top build dir.\n";
+}
+
+
+# Quote shell arguments so resolved PostgreSQL binaries survive spaces in their
+# absolute paths while we keep using the traditional string-based system calls.
+sub shell_quote
+{
+    my $arg = shift;
+    return "''" unless defined $arg && length $arg;
+    $arg =~ s/'/'\\''/g;
+    return "'${arg}'";
+}
+
+# Cache PostgreSQL client binary locations to avoid repeated PATH scans.
+our %PG_BIN_CACHE;
+our $PG_BINDIR;
+
+sub detect_pg_bindir
+{
+    return $PG_BINDIR if defined $PG_BINDIR;
+
+    if ( my $override = $ENV{'POSTGIS_PG_BINDIR'} )
+    {
+        $PG_BINDIR = $override if -d $override;
+        return $PG_BINDIR;
+    }
+
+    # Ask pg_config for the actual client bindir so we bypass wrapper scripts.
+    my $pg_config = $ENV{'PG_CONFIG'} || 'pg_config';
+    my $bindir = `$pg_config --bindir 2>/dev/null`;
+    if ( $? == 0 )
+    {
+        chomp $bindir;
+        $PG_BINDIR = $bindir if -d $bindir;
+    }
+
+    return $PG_BINDIR;
+}
+
+sub resolve_pg_binary
+{
+    my $binary = shift;
+    return $PG_BIN_CACHE{$binary} if exists $PG_BIN_CACHE{$binary};
+
+    if ( my $bindir = detect_pg_bindir() )
+    {
+        my $candidate = $bindir . '/' . $binary;
+        if ( -x $candidate )
+        {
+            $PG_BIN_CACHE{$binary} = $candidate;
+            return $candidate;
+        }
+    }
+
+    my $fallback = findOrDie($binary, $VERBOSE);
+    $PG_BIN_CACHE{$binary} = $fallback;
+    return $fallback;
+}
+
+sub psql_bin    { return resolve_pg_binary('psql'); }
+sub createdb_bin{ return resolve_pg_binary('createdb'); }
+sub dropdb_bin  { return resolve_pg_binary('dropdb'); }
+
+# Write statements to a temporary file and invoke psql once so phases that
+# previously spawned multiple clients now reuse a single backend connection.
+sub run_psql_batch
+{
+    my %args = @_;
+    my $statements = $args{statements} || [];
+    return 1 unless @$statements;
+
+    my $db = $args{db} || $DB;
+    my $psql_opts = $args{psql_opts} || '--quiet --no-psqlrc --variable ON_ERROR_STOP=true';
+    my ($fh, $filename) = tempfile('pgis-batchXXXX', SUFFIX => '.sql', DIR => $TMPDIR);
+    foreach my $stmt (@$statements)
+    {
+        next unless defined $stmt && length $stmt;
+        $stmt =~ s/;\s*$//;
+        print $fh $stmt, ";\n";
+    }
+    close($fh);
+
+    my $log = $args{log} || $REGRESS_LOG;
+    my $cmd = "$PSQL $psql_opts -X -f " . shell_quote($filename) . ' ' . shell_quote($db) .
+        ' >> ' . shell_quote($log) . ' 2>&1';
+    my $rv = system($cmd);
+    unlink $filename;
+    return $rv == 0;
 }
 
 
@@ -273,7 +364,7 @@ foreach $TEST (@ARGV)
 # Set up the temporary directory
 ##################################################################
 
-my $TMPDIR;
+$TMPDIR;
 if ( $ENV{'PGIS_REG_TMPDIR'} )
 {
 	$TMPDIR = $ENV{'PGIS_REG_TMPDIR'};
@@ -290,7 +381,7 @@ else
 mkpath $TMPDIR; # make sure tmp dir exists
 
 # Set log name
-my $REGRESS_LOG = "${TMPDIR}/regress_log";
+$REGRESS_LOG = "${TMPDIR}/regress_log";
 
 # Report
 print "TMPDIR is $TMPDIR\n" if $VERBOSE gt 1;
@@ -299,22 +390,23 @@ print "TMPDIR is $TMPDIR\n" if $VERBOSE gt 1;
 # Prepare the database
 ##################################################################
 
-my @dblist = grep(/1/, split(/\n/, `
-psql -tAc "
+my $db_exists_sql = <<"SQL";
     SELECT 1 FROM pg_catalog.pg_database
     WHERE datname = '${DB}'
-" template1
+SQL
+my @dblist = grep(/1/, split(/\n/, `
+$PSQL -tAc "${db_exists_sql}" template1
 `));
 
 my $pgvernum = `
-psql -tAc "SELECT current_setting('server_version_num')" template1
+$PSQL -tAc "SELECT current_setting('server_version_num')" template1
 `;
 
 my $defextver = `
-psql -XtAc "
-	SELECT default_version
-	FROM pg_catalog.pg_available_extensions
-	WHERE name = 'postgis'
+$PSQL -XtAc "
+        SELECT default_version
+        FROM pg_catalog.pg_available_extensions
+        WHERE name = 'postgis'
 " template1
 `;
 chop $defextver;
@@ -342,8 +434,8 @@ else
 	}
 	else
 	{
-		print STDERR "Database $DB already exists, dropping.\n";
-		`dropdb $DB`;
+                print STDERR "Database $DB already exists, dropping.\n";
+                `$DROPDB $DB`;
 		create_spatial();
 	}
 }
@@ -361,7 +453,7 @@ unless ( $OPT_NOCREATE )
 my $libver = sql("select postgis_lib_version()");
 if ( ! $libver )
 {
-	`dropdb $DB`;
+        `$DROPDB $DB`;
 	print "\nSomething went wrong (no PostGIS installed in $DB).\n";
 	print "For details, check $REGRESS_LOG\n\n";
 	exit(1);
@@ -438,7 +530,7 @@ if ( $OPT_DUMPRESTORE )
     die unless defined $DBDUMP;
 
     print "Dropping db '${DB}'\n";
-    my $rv = system("dropdb ${DB} >> $REGRESS_LOG 2>&1");
+    my $rv = system("$DROPDB ${DB} >> " . shell_quote($REGRESS_LOG) . " 2>&1");
     if ( $rv ) {
         fail("Could not drop ${DB}", $REGRESS_LOG);
         die;
@@ -520,7 +612,14 @@ print "  SFCGAL: $sfcgalver\n" if $sfcgalver;
 print "  GDAL: $gdalver\n" if $gdalver;
 
 # allow hook scripts to perform arbitrary reports via output of INFO strings
-system("grep INFO $REGRESS_LOG | sed 's/INFO://'");
+if ( open(my $info_fh, '<', $REGRESS_LOG) )
+{
+    while ( my $line = <$info_fh> )
+    {
+        print $1 if $line =~ /^INFO:(.*)/;
+    }
+    close($info_fh);
+}
 
 
 ##################################################################
@@ -540,7 +639,7 @@ foreach $TEST (@ARGV)
 		my $scriptdir = scriptdir($libver, $OPT_EXTENSIONS);
 		print "-- Entering interactive shell --\n";
 		# TODO: add more variables?
-		my $cmd = "psql -Xq"
+                my $cmd = "$PSQL -Xq"
 		  . " -v \"regdir=$REGDIR\""
 		  . " -v \"top_builddir=$TOP_BUILDDIR\""
 		  . " -v \"scriptdir=$scriptdir\""
@@ -689,7 +788,7 @@ if ( $OPT_CLEAN )
 
 if ( ! ($OPT_NODROP || $OPT_NOCREATE) )
 {
-	system("dropdb $DB");
+        system("$DROPDB $DB");
 }
 else
 {
@@ -868,10 +967,10 @@ sub run_simple_sql
 
 	# Dump output to a temp file.
 	my $tmpfile = sprintf("%s/test_%s_tmp", $TMPDIR, $RUN);
-	my $cmd = "psql -v \"VERBOSITY=terse\" "
-		. " -v \"regdir=$REGDIR\""
-		. " -v \"top_builddir=$TOP_BUILDDIR\""
-		. " -tXAq $DB < $sql > $tmpfile 2>&1";
+        my $cmd = "$PSQL -v \"VERBOSITY=terse\" "
+                . " -v \"regdir=$REGDIR\""
+                . " -v \"top_builddir=$TOP_BUILDDIR\""
+                . " -tXAq $DB < $sql > $tmpfile 2>&1";
 	#print($cmd);
 	my $rv = system($cmd);
 	# Check if psql errored out.
@@ -900,18 +999,21 @@ sub run_simple_sql
 sub drop_table
 {
 	my $tblname = shift;
-	my $cmd = "psql -tXAq -d $DB -c \"DROP TABLE IF EXISTS $tblname\" >> $REGRESS_LOG 2>&1";
+        my $cmd = "$PSQL -tXAq -d $DB -c \"DROP TABLE IF EXISTS $tblname\" >> " . shell_quote($REGRESS_LOG) . " 2>&1";
 	my $rv = system($cmd);
 	die "Could not run: $cmd\n" if $rv;
 }
 
 sub sql
 {
-	my $sql = shift;
-	# TODO: capture or discard stderr ?
-	my $result = `psql -qtXA -d $DB -c 'SET search_path TO public,$OPT_SCHEMA' -c "$sql" | sed '/^SET\$/d'`;
-	$result =~ s/[\n\r]*$//;
-	$result;
+    my $sql = shift;
+    # We rely on PGOPTIONS to keep the schema in place so the query runs in one
+    # round-trip instead of sending an extra SET command per call.
+    local $ENV{PGOPTIONS} = join(' ', grep { length } ($ENV{PGOPTIONS} || '', "-c search_path=public,$OPT_SCHEMA"));
+    my $cmd = "$PSQL -qtXA --no-psqlrc -c " . shell_quote($sql) . ' ' . shell_quote($DB);
+    my $result = `$cmd`;
+    $result =~ s/[\n\r]*$//;
+    $result;
 }
 
 sub eval_file
@@ -965,15 +1067,15 @@ sub run_simple_test
 	my $scriptdir = scriptdir($libver, $OPT_EXTENSIONS);
 
 	my ($sqlfile,$sqldir) = fileparse($sql);
-	my $cmd = "cd $sqldir; psql -v \"VERBOSITY=terse\""
+        local $ENV{PGOPTIONS} = join(' ', grep { length } ($ENV{PGOPTIONS} || '', "-c search_path=public,$OPT_SCHEMA,topology"));
+        my $cmd = "cd $sqldir; $PSQL -v \"VERBOSITY=terse\""
           . " -v \"tmpfile='$tmpfile'\""
           . " -v \"scriptdir=$scriptdir\""
           . " -v \"regdir=$REGDIR\""
           . " -v \"top_builddir=$TOP_BUILDDIR\""
           . " -v \"schema=$OPT_SCHEMA.\""
-          . " -c \"SET search_path TO public,$OPT_SCHEMA,topology\""
           . " -tXAq -f $sqlfile $DB > $outfile 2>&1";
-	my $rv = system($cmd);
+        my $rv = system($cmd);
     if ( $rv ) {
         fail "psql exited with an error", $outfile;
         die;
@@ -1096,7 +1198,7 @@ sub run_loader_and_check_output
 
 		# Run the loader SQL script.
 		show_progress();
-		$cmd = "psql $psql_opts -f $outfile $DB > $errfile 2>&1";
+                $cmd = "$PSQL $psql_opts -f $outfile $DB > $errfile 2>&1";
 		$rv = system($cmd);
 		if ( $rv )
 		{
@@ -1229,7 +1331,7 @@ sub run_raster_loader_and_check_output
 
 		# Run the loader SQL script.
 		show_progress();
-		$cmd = "psql $psql_opts -f $outfile $DB > $errfile 2>&1";
+                $cmd = "$PSQL $psql_opts -f $outfile $DB > $errfile 2>&1";
     	$rv = system($cmd);
     	if ( $rv )
     	{
@@ -1517,14 +1619,14 @@ sub count_postgis_objects
 ##################################################################
 sub create_db
 {
-	my $createcmd = "createdb --encoding=UTF-8 --template=template0 --lc-collate=C";
+        my $createcmd = "$CREATEDB --encoding=UTF-8 --template=template0 --lc-collate=C";
 	if ( $pgvernum ge 150000 ) {
 		$createcmd .= " --locale=C --locale-provider=libc";
 	}
 	if ( $DB_OWNER ) {
 		$createcmd .= " --owner $DB_OWNER";
 	}
-	$createcmd .= " $DB > $REGRESS_LOG 2>&1";
+        $createcmd .= " $DB > " . shell_quote($REGRESS_LOG) . " 2>&1";
 
 	return 0 if system($createcmd);
 
@@ -1585,13 +1687,13 @@ sub load_sql_file
 
     if ( -e $file )
     {
-        # ON_ERROR_STOP is used by psql to return non-0 on an error
+        # ON_ERROR_STOP is used by psql to return non-0 on an error.
         my $psql_opts = "--quiet --no-psqlrc --variable ON_ERROR_STOP=true";
-        my $cmd = "psql $psql_opts -c 'CREATE SCHEMA IF NOT EXISTS $OPT_SCHEMA' ";
-        $cmd .= "-c 'SET search_path TO $OPT_SCHEMA,topology'";
+        local $ENV{PGOPTIONS} = join(' ', grep { length } ($ENV{PGOPTIONS} || '', "-c search_path=$OPT_SCHEMA,topology"));
+        my $cmd = "$PSQL $psql_opts -c 'CREATE SCHEMA IF NOT EXISTS $OPT_SCHEMA'";
         $cmd .= " -v \"opt_dumprestore=${OPT_DUMPRESTORE}\"";
         $cmd .= " -v \"regdir=$REGDIR\"";
-        $cmd .= " -Xf $file $DB > $tmplog 2>&1";
+        $cmd .= " -Xf $file $DB > " . shell_quote($tmplog) . " 2>&1";
         #print "  $file\n" if $VERBOSE;
         my $rv = system($cmd);
         if ( $rv )
@@ -1602,10 +1704,24 @@ sub load_sql_file
 
         if ( $werror )
         {
-            if ( system("grep -A3 WARNING $tmplog") == 0 )
+            if ( open(my $warn_fh, '<', $tmplog) )
             {
-                fail "Warnings encountered loading $file", $tmplog;
-                return 0;
+                my @log_lines = <$warn_fh>;
+                close($warn_fh);
+                my @warning_idx = grep { $log_lines[$_] =~ /WARNING/ } 0 .. $#log_lines;
+                if ( @warning_idx )
+                {
+                    for my $pos (0 .. $#warning_idx)
+                    {
+                        my $start = $warning_idx[$pos];
+                        my $end = $start + 3;
+                        $end = $#log_lines if $end > $#log_lines;
+                        print @log_lines[$start .. $end];
+                        print "--\n" if $pos < $#warning_idx;
+                    }
+                    fail "Warnings encountered loading $file", $tmplog;
+                    return 0;
+                }
             }
         }
 
@@ -1623,125 +1739,77 @@ sub load_sql_file
 # Prepare the database for spatial operations (extension method)
 sub prepare_spatial_extensions
 {
-	# ON_ERROR_STOP is used by psql to return non-0 on an error
-	my $psql_opts = "--no-psqlrc --variable ON_ERROR_STOP=true";
+        my @statements;
+        my $psql_opts = '--no-psqlrc --variable ON_ERROR_STOP=true';
 
-	if ( $DB_ROLE_EXT_MKR ) {
-		print "Using role '$DB_ROLE_EXT_MKR' for spatial extensions creation.\n";
-		$psql_opts .= " -c \"set role='$DB_ROLE_EXT_MKR'\"";
-	}
+        if ( $DB_ROLE_EXT_MKR ) {
+                print "Using role '$DB_ROLE_EXT_MKR' for spatial extensions creation.\n";
+                push @statements, "SET ROLE '$DB_ROLE_EXT_MKR'";
+        }
 
-	my $sql = "CREATE SCHEMA IF NOT EXISTS ${OPT_SCHEMA}";
-	my $cmd = "psql $psql_opts -c \"". $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-	my $rv = system($cmd);
-	if ( $rv ) {
-	  fail "Error encountered creating target schema ${OPT_SCHEMA}", $REGRESS_LOG;
-	  return 0;
-	}
+        push @statements, "CREATE SCHEMA IF NOT EXISTS ${OPT_SCHEMA}";
 
-	my $sql = "CREATE EXTENSION postgis";
+        my $sql = "CREATE EXTENSION postgis";
+        if ( $OPT_UPGRADE_FROM ) {
+                if ( $OPT_UPGRADE_FROM =~ /^unpackaged(.*)/ ) {
+                        return prepare_spatial($1);
+                }
+                $sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
+        }
+        $sql .= " SCHEMA " . $OPT_SCHEMA;
+        print "Preparing db '${DB}' using: ${sql}\n";
+        push @statements, $sql;
 
-	if ( $OPT_UPGRADE_FROM ) {
-		if ( $OPT_UPGRADE_FROM =~ /^unpackaged(.*)/ ) {
-			return prepare_spatial($1);
-		}
-		$sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
-	}
+        my $extver = $OPT_UPGRADE_FROM ? $OPT_UPGRADE_FROM : $OPT_UPGRADE_TO ? $OPT_UPGRADE_TO : $defextver;
 
-	$sql .= " SCHEMA " . $OPT_SCHEMA;
+        if ( $OPT_WITH_TOPO )
+        {
+                my $topo_sql = "CREATE EXTENSION postgis_topology";
+                $topo_sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'" if $OPT_UPGRADE_FROM;
+                print "Preparing db '${DB}' using: ${topo_sql}\n";
+                push @statements, $topo_sql;
+        }
 
-	print "Preparing db '${DB}' using: ${sql}\n";
+        if ( $OPT_WITH_TIGER )
+        {
+                my $tiger_sql = "CREATE EXTENSION postgis_tiger_geocoder CASCADE";
+                $tiger_sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'" if $OPT_UPGRADE_FROM;
+                print "Preparing db '${DB}' using: ${tiger_sql}\n";
+                push @statements, $tiger_sql;
+        }
 
-	my $cmd = "psql $psql_opts -c \"". $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-	my $rv = system($cmd);
+        if ( $OPT_WITH_RASTER && has_split_raster_ext($extver) )
+        {
+                my $raster_sql = "CREATE EXTENSION postgis_raster";
+                $raster_sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'" if $OPT_UPGRADE_FROM;
+                $raster_sql .= " SCHEMA " . $OPT_SCHEMA;
+                print "Preparing db '${DB}' using: ${raster_sql}\n";
+                push @statements, $raster_sql;
+        }
 
-    if ( $rv ) {
-        fail "Error encountered creating EXTENSION POSTGIS", $REGRESS_LOG;
+        if ( $OPT_WITH_SFCGAL )
+        {
+                my $sfcgal_sql = "CREATE EXTENSION postgis_sfcgal";
+                if ( $OPT_UPGRADE_FROM ) {
+                        if ( semver_lessthan($OPT_UPGRADE_FROM, "2.2.0") )
+                        {
+                                print "NOTICE: skipping SFCGAL extension create as not available in version '$OPT_UPGRADE_FROM'\n";
+                                $sfcgal_sql = '';
+                        }
+                        else {
+                                $sfcgal_sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
+                        }
+                }
+                if ( length $sfcgal_sql ) {
+                        $sfcgal_sql .= " SCHEMA " . $OPT_SCHEMA;
+                        print "Preparing db '${DB}' using: ${sfcgal_sql}\n";
+                        push @statements, $sfcgal_sql;
+                }
+        }
+
+        return 1 if run_psql_batch(statements => \@statements, psql_opts => $psql_opts);
+        fail "Error encountered creating extensions", $REGRESS_LOG;
         return 0;
-	}
-
-	if ( $OPT_WITH_TOPO )
-	{
-		my $sql = "CREATE EXTENSION postgis_topology";
-		if ( $OPT_UPGRADE_FROM ) {
-			$sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
-		}
-
-		print "Preparing db '${DB}' using: ${sql}\n";
-
- 		$cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-		$rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered creating EXTENSION POSTGIS_TOPOLOGY", $REGRESS_LOG;
-            return 0;
-		}
- 	}
-
-	if ( $OPT_WITH_TIGER )
-	{
-		my $sql = "CREATE EXTENSION postgis_tiger_geocoder CASCADE";
-		if ( $OPT_UPGRADE_FROM ) {
-			$sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
-		}
-
-		print "Preparing db '${DB}' using: ${sql}\n";
-
- 		$cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-		$rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered creating EXTENSION POSTGIS_TIGER_GEOCODER", $REGRESS_LOG;
-            return 0;
-		}
- 	}
-
-	my $extver = $OPT_UPGRADE_FROM ? $OPT_UPGRADE_FROM : $OPT_UPGRADE_TO ? $OPT_UPGRADE_TO : $defextver;
-	if ( $OPT_WITH_RASTER && has_split_raster_ext($extver) )
-	{
-		my $sql = "CREATE EXTENSION postgis_raster";
-		if ( $OPT_UPGRADE_FROM ) {
-			$sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
-		}
-
-		$sql .= " SCHEMA " . $OPT_SCHEMA;
-
-		print "Preparing db '${DB}' using: ${sql}\n";
-
- 		$cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-		$rv = system($cmd);
-		if ( $rv ) {
-			fail "Error encountered creating EXTENSION POSTGIS_RASTER", $REGRESS_LOG;
-			return 0;
-		}
- 	}
-
-	if ( $OPT_WITH_SFCGAL )
-	{
-		{
-			my $sql = "CREATE EXTENSION postgis_sfcgal";
-			if ( $OPT_UPGRADE_FROM ) {
-				if ( semver_lessthan($OPT_UPGRADE_FROM, "2.2.0") )
-				{
-					print "NOTICE: skipping SFCGAL extension create "
-							. "as not available in version '$OPT_UPGRADE_FROM'\n";
-					last;
-				}
-				$sql .= " VERSION '" . $OPT_UPGRADE_FROM . "'";
-			}
-
-			$sql .= " SCHEMA " . $OPT_SCHEMA;
-
-			print "Preparing db '${DB}' using: ${sql}\n";
-
-			$cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-			$rv = system($cmd);
-			if ( $rv ) {
-				fail "Error encountered creating EXTENSION POSTGIS_SFCGAL", $REGRESS_LOG;
-				return 0;
-			}
-		}
-	}
-
- 	return 1;
 }
 
 # Prepare the database for spatial operations (old method)
@@ -1856,14 +1924,13 @@ sub upgrade_spatial
 # Upgrade an existing database (soft upgrade, extension method)
 sub upgrade_spatial_extensions
 {
-    # ON_ERROR_STOP is used by psql to return non-0 on an error
-    my $psql_opts = "--no-psqlrc --variable ON_ERROR_STOP=true";
-    my $sql;
+    my $psql_opts = '--no-psqlrc --variable ON_ERROR_STOP=true';
+    my @statements;
     my $upgrade_via_function = 0;
 
     if ( $DB_ROLE_EXT_MKR ) {
       print "Using role '$DB_ROLE_EXT_MKR' for spatial extensions upgrade.\n";
-      $psql_opts .= " -c \"set role='$DB_ROLE_EXT_MKR'\"";
+      push @statements, "SET ROLE '$DB_ROLE_EXT_MKR'";
     }
 
     if ( $OPT_UPGRADE_TO =~ /!$/ )
@@ -1889,11 +1956,18 @@ sub upgrade_spatial_extensions
     }
 
     my $nextver = $OPT_UPGRADE_TO ? "${OPT_UPGRADE_TO}" : "${libver}";
+    my $sql;
 
     if ( $upgrade_via_function )
     {
-        # TODO: pass ${nextver} if supported by OPT_UPGRADE_FROM ?
         $sql = "SELECT postgis_extensions_upgrade()";
+        print "Upgrading PostGIS in '${DB}' using: ${sql}\n" ;
+        push @statements, $sql;
+        if ( run_psql_batch(statements => \@statements, psql_opts => $psql_opts) ) {
+            return 1;
+        }
+        fail "Error encountered updating EXTENSION POSTGIS", $REGRESS_LOG;
+        return 0;
     }
     elsif ( $OPT_UPGRADE_FROM =~ /^unpackaged/ )
     {
@@ -1905,35 +1979,16 @@ sub upgrade_spatial_extensions
     }
 
     print "Upgrading PostGIS in '${DB}' using: ${sql}\n" ;
+    push @statements, $sql;
 
-    my $cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-    #print "CMD: " . $cmd . "\n";
-    my $rv = system($cmd);
-    if ( $rv ) {
-      fail "Error encountered updating EXTENSION POSTGIS", $REGRESS_LOG;
-      return 0;
-    }
-
-    # Handle raster split if coming from pre-split extension
-    # and going to split raster
     if ( $OPT_UPGRADE_FROM &&
          ( not $OPT_UPGRADE_FROM =~ /^unpackaged/ ) &&
          has_split_raster_ext($OPT_UPGRADE_TO) &&
          not has_split_raster_ext($OPT_UPGRADE_FROM) )
     {
-      # upgrade of postgis must have unpackaged raster, so
-      # we create it again here
-      my $sql = package_extension_sql('postgis_raster', ${nextver});
-
-      print "Packaging PostGIS Raster in '${DB}' using: ${sql}\n" ;
-
-      my $cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-      my $rv = system($cmd);
-      if ( $rv ) {
-        fail "Error encountered creating EXTENSION POSTGIS_RASTER from unpackaged on upgrade", $REGRESS_LOG;
-        return 0;
-      }
-
+      my $pack_sql = package_extension_sql('postgis_raster', ${nextver});
+      print "Packaging PostGIS Raster in '${DB}' using: ${pack_sql}\n" ;
+      push @statements, $pack_sql;
       if ( ! $OPT_WITH_RASTER )
       {
         print "Marking PostGIS Raster as present for later drop\n";
@@ -1941,84 +1996,65 @@ sub upgrade_spatial_extensions
       }
     }
 
-    if ( $upgrade_via_function )
-    {
-      # The function does everything
-      return 1;
-    }
-
     if ( $OPT_WITH_RASTER && has_split_raster_ext(${nextver}) )
     {
-        my $sql;
+        my $raster_sql;
 
         if ( $OPT_UPGRADE_FROM =~ /^unpackaged/ ) {
-            $sql = package_extension_sql('postgis_raster', ${nextver});
+            $raster_sql = package_extension_sql('postgis_raster', ${nextver});
         }
         else {
-            $sql = upgrade_extension_sql('postgis_raster', ${libver}, ${nextver});
+            $raster_sql = upgrade_extension_sql('postgis_raster', ${libver}, ${nextver});
         }
 
-        print "Upgrading PostGIS Raster in '${DB}' using: ${sql}\n" ;
-
-        my $cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-        my $rv = system($cmd);
-        if ( $rv ) {
-          fail "Error encountered updating EXTENSION POSTGIS_RASTER", $REGRESS_LOG;
-          return 0;
-        }
+        print "Upgrading PostGIS Raster in '${DB}' using: ${raster_sql}\n" ;
+        push @statements, $raster_sql;
     }
 
     if ( $OPT_WITH_TOPO )
     {
-        my $sql;
+        my $topo_sql;
 
         if ( $OPT_UPGRADE_FROM =~ /^unpackaged/ ) {
-            $sql = package_extension_sql('postgis_topology', ${nextver});
+            $topo_sql = package_extension_sql('postgis_topology', ${nextver});
         }
         else {
-            $sql = upgrade_extension_sql('postgis_topology', ${libver}, ${nextver});
+            $topo_sql = upgrade_extension_sql('postgis_topology', ${libver}, ${nextver});
         }
 
-        print "Upgrading PostGIS Topology in '${DB}' using: ${sql}\n";
-
-        my $cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
-        my $rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered updating EXTENSION POSTGIS_TOPOLOGY", $REGRESS_LOG;
-            return 0;
-        }
+        print "Upgrading PostGIS Topology in '${DB}' using: ${topo_sql}\n";
+        push @statements, $topo_sql;
     }
 
     if ( $OPT_WITH_SFCGAL )
     {
-        my $sql;
+        my $sfcgal_sql;
 
         if ( $OPT_UPGRADE_FROM =~ /^unpackaged/ ) {
-            $sql = package_extension_sql('postgis_sfcgal', ${nextver});
+            $sfcgal_sql = package_extension_sql('postgis_sfcgal', ${nextver});
         }
         elsif ( $OPT_UPGRADE_FROM && semver_lessthan($OPT_UPGRADE_FROM, "2.2.0") )
         {
-            print "NOTICE: installing SFCGAL extension on upgrade "
-                . "as it was not available in version '$OPT_UPGRADE_FROM'\n";
-            $sql = "CREATE EXTENSION postgis_sfcgal VERSION '${nextver}'";
+            print "NOTICE: skipping SFCGAL extension upgrade as not available in version '$OPT_UPGRADE_FROM'\n";
+            $sfcgal_sql = '';
         }
-        else
-        {
-            $sql = upgrade_extension_sql('postgis_sfcgal', ${libver}, ${nextver});
+        else {
+            $sfcgal_sql = upgrade_extension_sql('postgis_sfcgal', ${libver}, ${nextver});
         }
-        $cmd = "psql $psql_opts -c \"" . $sql . "\" $DB >> $REGRESS_LOG 2>&1";
 
-        print "Upgrading PostGIS SFCGAL in '${DB}' using: ${sql}\n" ;
-
-        $rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered creating EXTENSION POSTGIS_SFCGAL", $REGRESS_LOG;
-            return 0;
+        if ( $sfcgal_sql ) {
+            print "Upgrading PostGIS SFCGAL in '${DB}' using: ${sfcgal_sql}\n";
+            push @statements, $sfcgal_sql;
         }
     }
 
-    return 1;
+    if ( run_psql_batch(statements => \@statements, psql_opts => $psql_opts) ) {
+        return 1;
+    }
+    fail "Error encountered updating extensions", $REGRESS_LOG;
+    return 0;
 }
+
 
 sub drop_spatial
 {
@@ -2049,63 +2085,32 @@ sub drop_spatial_extensions
 {
     # ON_ERROR_STOP is used by psql to return non-0 on an error
     my $psql_opts="--no-psqlrc --variable ON_ERROR_STOP=true";
-    my ($cmd, $rv);
+    my @statements;
 
     if ( $OPT_WITH_TOPO )
     {
         # NOTE: "manually" dropping topology schema as EXTENSION does not
         #       take care of that itself, see
         #       http://trac.osgeo.org/postgis/ticket/2138
-        $cmd = "psql $psql_opts -c \"DROP EXTENSION postgis_topology; DROP SCHEMA topology;\" $DB >> $REGRESS_LOG 2>&1";
-        $rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered dropping EXTENSION postgis_topology", $REGRESS_LOG;
-            return 0;
-        }
+        push @statements, "DROP EXTENSION postgis_topology; DROP SCHEMA topology";
     }
 
-    if ( $OPT_WITH_SFCGAL )
-    {
-        $cmd = "psql $psql_opts -c \"DROP EXTENSION postgis_sfcgal;\" $DB >> $REGRESS_LOG 2>&1";
-        $rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered dropping EXTENSION postgis_sfcgal", $REGRESS_LOG;
-            return 0;
-        }
-    }
+    push @statements, "DROP EXTENSION postgis_sfcgal" if $OPT_WITH_SFCGAL;
+    push @statements, "DROP EXTENSION IF EXISTS postgis_raster" if $OPT_WITH_RASTER;
 
-    if ( $OPT_WITH_RASTER )
-    {
-        $cmd = "psql $psql_opts -c \"DROP EXTENSION IF EXISTS postgis_raster;\" $DB >> $REGRESS_LOG 2>&1";
-        $rv = system($cmd);
-        if ( $rv ) {
-            fail "Error encountered dropping EXTENSION postgis_raster", $REGRESS_LOG;
-            return 0;
-        }
-    }
     if ( $OPT_WITH_TIGER )
     {
-        $cmd = "psql $psql_opts -c \"DROP EXTENSION IF EXISTS postgis_tiger_geocoder;
-                DROP EXTENSION IF EXISTS fuzzystrmatch;
-                DROP SCHEMA IF EXISTS tiger;
-                DROP SCHEMA IF EXISTS tiger_data;
-                \" $DB >> $REGRESS_LOG 2>&1";
-        $rv = system($cmd);
-      	return 0 if $rv;
-        if ( $rv ) {
-            fail "Error encountered dropping EXTENSION postgis_tiger_geocoder", $REGRESS_LOG;
-            return 0;
-        }
+        push @statements, "DROP EXTENSION IF EXISTS postgis_tiger_geocoder; DROP EXTENSION IF EXISTS fuzzystrmatch; DROP SCHEMA IF EXISTS tiger; DROP SCHEMA IF EXISTS tiger_data";
     }
 
-    $cmd = "psql $psql_opts -c \"DROP EXTENSION postgis\" $DB >> $REGRESS_LOG 2>&1";
-    $rv = system($cmd);
-    if ( $rv ) {
-        fail "Error encountered dropping EXTENSION POSTGIS", $REGRESS_LOG;
-      	return 0;
+    push @statements, "DROP EXTENSION postgis";
+
+    if ( run_psql_batch(statements => \@statements, psql_opts => $psql_opts) ) {
+        return 1;
     }
 
-    return 1;
+    fail "Error encountered dropping extensions", $REGRESS_LOG;
+    return 0;
 }
 
 # Drop spatial from an existing database
@@ -2207,7 +2212,7 @@ sub restore_db
         $rv = system("pg_restore -d ${DB} ${DBDUMP} >> $REGRESS_LOG 2>&1");
     } else {
         print "Restoring database '${DB}' using postgis_restore.pl\n";
-        my $cmd = postgis_restore() . " ${DBDUMP} | psql --set ON_ERROR_STOP=1 -X ${DB} >> $REGRESS_LOG 2>&1";
+        my $cmd = postgis_restore() . " ${DBDUMP} | $PSQL --set ON_ERROR_STOP=1 -X ${DB} >> " . shell_quote($REGRESS_LOG) . " 2>&1";
         $rv = system($cmd);
     }
     if ( $rv ) {
@@ -2220,7 +2225,7 @@ sub restore_db
         # We need to re-add "topology" to the search_path as it is lost
         # on dump/reload, see https://trac.osgeo.org/postgis/ticket/3454
         my $psql_opts = "--no-psqlrc --variable ON_ERROR_STOP=true";
-        my $cmd = "psql $psql_opts -c \"SELECT topology.AddToSearchPath('topology')\" $DB >> $REGRESS_LOG 2>&1";
+        my $cmd = "$PSQL $psql_opts -c \"SELECT topology.AddToSearchPath('topology')\" $DB >> " . shell_quote($REGRESS_LOG) . " 2>&1";
         $rv = system($cmd);
         if ( $rv ) {
             fail("Error encountered adding topology to search path after restore", $REGRESS_LOG);
@@ -2240,31 +2245,163 @@ sub restore_db
 # Dump and restore the database
 sub diff
 {
-	my ($expected_file, $obtained_file) = @_;
-	my $diffstr = '';
+    my ($expected_file, $obtained_file) = @_;
 
-	if ( $sysdiff ) {
-		$diffstr = `diff --strip-trailing-cr -u $expected_file $obtained_file 2>&1`;
-		return $diffstr;
-	}
+    open(my $exp_fh, '<', $expected_file) || return "Cannot open $expected_file\n";
+    my $expected_content = do { local $/; <$exp_fh> };
+    close($exp_fh);
+    $expected_content = '' unless defined $expected_content;
 
-	open(OBT, $obtained_file) || return "Cannot open $obtained_file\n";
-	open(EXP, $expected_file) || return "Cannot open $expected_file\n";
-	my $lineno = 0;
-	while (!eof(OBT) or !eof(EXP)) {
-		# TODO: check for premature end of one or the other ?
-		my $obtline=<OBT>;
-		my $expline=<EXP>;
-		$obtline =~ s/\r?\n$//; # Strip line endings
-		$expline =~ s/\r?\n$//; # Strip line endings
-		$lineno++;
-		if ( $obtline ne $expline ) {
-			my $diffln .= "$lineno.OBT: $obtline\n";
-			$diffln .= "$lineno.EXP: $expline\n";
-			$diffstr .= $diffln;
-		}
-	}
-	close(OBT);
-	close(EXP);
-	return $diffstr;
+    open(my $obt_fh, '<', $obtained_file) || return "Cannot open $obtained_file\n";
+    my $obtained_content = do { local $/; <$obt_fh> };
+    close($obt_fh);
+    $obtained_content = '' unless defined $obtained_content;
+
+    return '' if $expected_content eq $obtained_content;
+
+    my @expected_lines = $expected_content eq '' ? () : $expected_content =~ /(.*\n|.+$)/g;
+    my @obtained_lines = $obtained_content eq '' ? () : $obtained_content =~ /(.*\n|.+$)/g;
+    my $expected_trailing_newline = ($expected_content eq '' || $expected_content =~ /\n\z/);
+    my $obtained_trailing_newline = ($obtained_content eq '' || $obtained_content =~ /\n\z/);
+
+    my $m = scalar @expected_lines;
+    my $n = scalar @obtained_lines;
+    my @lcs = map { [(0) x ($n + 1)] } 0 .. $m;
+    for (my $i = $m - 1; $i >= 0; $i--)
+    {
+        for (my $j = $n - 1; $j >= 0; $j--)
+        {
+            if ( $expected_lines[$i] eq $obtained_lines[$j] )
+            {
+                $lcs[$i][$j] = $lcs[$i + 1][$j + 1] + 1;
+            }
+            else
+            {
+                $lcs[$i][$j] = $lcs[$i + 1][$j] > $lcs[$i][$j + 1] ? $lcs[$i + 1][$j] : $lcs[$i][$j + 1];
+            }
+        }
+    }
+
+    my @records;
+    my ($i, $j) = (0, 0);
+    while ( $i < $m || $j < $n )
+    {
+        if ( $i < $m && $j < $n && $expected_lines[$i] eq $obtained_lines[$j] )
+        {
+            push @records, { type => ' ', text => $expected_lines[$i], exp => $i + 1, obt => $j + 1 };
+            $i++; $j++;
+        }
+        elsif ( $j < $n && ( $i == $m || $lcs[$i][$j + 1] >= $lcs[$i + 1][$j] ) )
+        {
+            push @records, { type => '+', text => $obtained_lines[$j], exp => undef, obt => $j + 1 };
+            $j++;
+        }
+        else
+        {
+            push @records, { type => '-', text => $expected_lines[$i], exp => $i + 1, obt => undef };
+            $i++;
+        }
+    }
+
+    my $context = 3;
+    my $total = scalar @records;
+    my @chunks;
+    my $idx = 0;
+    while ( $idx < $total )
+    {
+        $idx++ while $idx < $total && $records[$idx]{type} eq ' ';
+        last if $idx >= $total;
+        my $chunk_start = $idx > $context ? $idx - $context : 0;
+        my $chunk_end = $idx;
+        my $last_diff = $idx;
+        while ( $chunk_end < $total )
+        {
+            if ( $records[$chunk_end]{type} ne ' ' )
+            {
+                $last_diff = $chunk_end;
+            }
+            elsif ( $chunk_end - $last_diff > $context )
+            {
+                last;
+            }
+            $chunk_end++;
+        }
+        $chunk_end = $last_diff + $context;
+        $chunk_end = $total - 1 if $chunk_end >= $total;
+        push @chunks, [$chunk_start, $chunk_end];
+        $idx = $chunk_end + 1;
+    }
+
+    my $format_range = sub {
+        my ($start, $count) = @_;
+        $start = 0 unless defined $start;
+        return $start if $count == 1;
+        return $start . ',0' if $count == 0;
+        return $start . ',' . $count;
+    };
+
+    my $diff_output = '--- ' . $expected_file . "\n" . '+++ ' . $obtained_file . "\n";
+    my $last_exp_line = 0;
+    my $last_obt_line = 0;
+    my $exp_line_total = scalar @expected_lines;
+    my $obt_line_total = scalar @obtained_lines;
+    my $exp_newline_reported = 0;
+    my $obt_newline_reported = 0;
+
+    foreach my $chunk (@chunks)
+    {
+        my ($start_idx, $end_idx) = @$chunk;
+        my ($chunk_exp_start, $chunk_obt_start);
+        my ($exp_count, $obt_count) = (0, 0);
+        my $chunk_last_exp = $last_exp_line;
+        my $chunk_last_obt = $last_obt_line;
+
+        for my $pos ($start_idx .. $end_idx)
+        {
+            my $rec = $records[$pos];
+            if ( defined $rec->{exp} )
+            {
+                $chunk_exp_start = $rec->{exp} unless defined $chunk_exp_start;
+                $exp_count++;
+                $chunk_last_exp = $rec->{exp};
+            }
+            if ( defined $rec->{obt} )
+            {
+                $chunk_obt_start = $rec->{obt} unless defined $chunk_obt_start;
+                $obt_count++;
+                $chunk_last_obt = $rec->{obt};
+            }
+        }
+
+        $chunk_exp_start = defined $chunk_exp_start ? $chunk_exp_start : $last_exp_line;
+        $chunk_obt_start = defined $chunk_obt_start ? $chunk_obt_start : $last_obt_line;
+        $diff_output .= '@@ -' . $format_range->($chunk_exp_start, $exp_count) .
+                        ' +' . $format_range->($chunk_obt_start, $obt_count) . " @@\n";
+
+        for my $pos ($start_idx .. $end_idx)
+        {
+            my $rec = $records[$pos];
+            my $text = $rec->{text} // '';
+            my $has_newline = ($text =~ /\n\z/);
+            $diff_output .= $rec->{type} . $text;
+            $diff_output .= "\n" unless $has_newline;
+            if ( defined $rec->{exp} && !$expected_trailing_newline && !$exp_newline_reported && $rec->{exp} == $exp_line_total )
+            {
+                $diff_output .= "\ No newline at end of file\n";
+                $exp_newline_reported = 1;
+            }
+            if ( defined $rec->{obt} && !$obtained_trailing_newline && !$obt_newline_reported && $rec->{obt} == $obt_line_total )
+            {
+                $diff_output .= "\ No newline at end of file\n";
+                $obt_newline_reported = 1;
+            }
+        }
+
+        $last_exp_line = $chunk_last_exp if $exp_count;
+        $last_obt_line = $chunk_last_obt if $obt_count;
+    }
+
+    return $diff_output;
 }
+
+
