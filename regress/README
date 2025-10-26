@@ -8,10 +8,17 @@ run_test.pl requires the following Perl modules to be installed
  File::Temp
  File::Copy
  File::Path
+ File::Compare
  Cwd
  Getopt::Long
 
 Most distributions of Perl will have everything
+
+
+The harness resolves PostgreSQL client binaries once at startup. It prefers
+`pg_config --bindir` when available and falls back to the executables found on
+`PATH`, so ensure `pg_config` is reachable when testing against custom
+installations.
 
 
 How to add a regression test
