@@ -41,3 +41,12 @@ regression tests. Run it without parameters for info about its usage.
 
 Note that tests run in a staged install which is created by running
 make staged-install. This step is a part of the complete make check.
+
+Additional harness controls
+---------------------------
+
+The regression driver resolves the PostgreSQL client tools once per run.
+Override the discovery order (pg_config --bindir, PATH) by exporting
+POSTGIS_PG_BINDIR with an absolute directory. The resolved tool paths are
+printed at startup; use --verbose to see which psql statements were
+batched together.
