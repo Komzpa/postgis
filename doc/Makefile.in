@@ -112,11 +112,11 @@ XSLTPROC_COMMONOPTS= \
 	$(XSLTPROCFLAGS)
 
 XSLTPROC_CHUNKED_HTML_OPTS = \
-	--stringparam chunker.output.encoding UTF-8 \
-	--stringparam chunker.output.indent yes \
-	--stringparam admon.graphics.path ../images/ \
-	--stringparam img.src.path ../ \
-	--stringparam html.stylesheet ../style.css
+        --stringparam chunker.output.encoding UTF-8 \
+        --stringparam chunker.output.indent yes \
+        --stringparam admon.graphics.path ../images/ \
+        --stringparam img.src.path ../ \
+        --stringparam html.stylesheet ../style.css
 
 HTML_DOCBOOK_XSL=$(XSLBASE)/xhtml5/docbook.xsl
 CHUNK_HTML_DOCBOOK_XSL=$(XSLBASE)/xhtml5/chunk.xsl

@@ -74,7 +74,13 @@ Denys Kovshun (Ukrainian Team)
   - #3110, GT-242 [topology] Support for bigint (Ayo Adesugba, U.S. Census Bureau)
   - [raster] Add ST_ReclassExact to quickly remap values in raster (Paul Ramsey)
   - #5963, [raster] add ST_IntersectionFractions - Requires GEOS 3.14 (Paul Ramsey)
-  - #5971, Option to build --without-tiger (Regina Obe)
+ - #5971, Option to build --without-tiger (Regina Obe)
+
+
+* Bug Fixes *
+
+  - #5645, Docs: keep code operators (e.g., "=>") intact in translated manuals
+        by enforcing verbatim CSS (Darafei Praliaskouski)
 
 
 PostGIS 3.5.0
