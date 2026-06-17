@@ -171,6 +171,16 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
           (Darafei Praliaskouski)
  - #2808, Clarify postgis_full_version() output when installed component
           scripts are newer than core scripts (Darafei Praliaskouski)
+ - #5948, [topology] Prevent MakeTopologyPrecise from erasing edges when
+          grid size exceeds their extent (Darafei Praliaskouski)
+ - #5864, [topology] Keep the universal face out of face delete callbacks
+          (Darafei Praliaskouski)
+ - #5959, Prevent histogram target overflow when analysing massive tables (Darafei Praliaskouski)
+ - #4828, geometry_columns handles NOT VALID SRID checks without errors (Darafei Praliaskouski)
+ - #6048, [raster] ST_Clip no longer crashes when clipping sparse band
+          selections (Darafei Praliaskouski)
+ - #5645, Docs: keep code operators ("=>") intact in translated manuals
+          by enforcing verbatim CSS (Darafei Praliaskouski)
  - #5593, Docs: render manual images with GraphicsMagick without temporary files,
           enabling parallel builds, keeping ImageMagick fallbacks working, and
           documenting the generator workflow for contributors (Darafei Praliaskouski)
