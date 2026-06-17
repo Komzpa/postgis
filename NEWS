@@ -9,6 +9,10 @@ These are only changes since 3.7.0beta2.
 * Bug Fixes *
 
 
+* Enhancements *
+
+ - #2023, Add regclass overloads for AddGeometryColumn and
+          AddTopoGeometryColumn (Darafei Praliaskouski)
 
 
 PostGIS 3.7.0beta2
@@ -84,7 +88,6 @@ These are only changes since 3.7.0beta1.
    in geometry_columns and geography_columns views (Regina Obe)
 
 * Enhancements *
-
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
 
