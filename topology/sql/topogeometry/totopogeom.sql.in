@@ -156,8 +156,9 @@ BEGIN
   alayer := layer_id(tg);
   atopology := topology_info.name;
 
-  -- Preserve exact and automatic tolerance semantics for each dumped component.
-  tolerance := atolerance;
+  -- Preserve exact numeric tolerances, but pass automatic tolerance as the
+  -- sentinel expected by the C loaders.
+  tolerance := CASE WHEN atolerance = 0 THEN -1 ELSE atolerance END;
 
   -- Get layer information
   BEGIN
