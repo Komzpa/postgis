@@ -19,9 +19,9 @@
  **********************************************************************
  *
  * Copyright (C) 2001-2005 Refractions Research Inc.
+ * Copyright 2026 Darafei Praliaskouski <me@komzpa.net>
  *
  **********************************************************************/
-
 
 #include "postgres.h"
 #include "funcapi.h"
@@ -536,9 +536,10 @@ Datum ST_LineCrossingDirection(PG_FUNCTION_ARGS)
  ***********************************************************************/
 
 Datum LWGEOM_line_substring(PG_FUNCTION_ARGS);
+Datum ST_3DLineSubstring(PG_FUNCTION_ARGS);
 
-PG_FUNCTION_INFO_V1(LWGEOM_line_substring);
-Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
+static Datum
+line_substring(PG_FUNCTION_ARGS, int use_3d)
 {
 	GSERIALIZED *geom = PG_GETARG_GSERIALIZED_P(0);
 	double from = PG_GETARG_FLOAT8(1);
@@ -580,7 +581,7 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 
 		ipa = iline->points;
 
-		opa = ptarray_substring(ipa, from, to, 0);
+		opa = use_3d ? ptarray_substring_3d(ipa, from, to, 0) : ptarray_substring(ipa, from, to, 0);
 
 		if ( opa->npoints == 1 ) /* Point returned */
 			olwgeom = (LWGEOM *)lwpoint_construct(iline->srid, NULL, opa);
@@ -611,7 +612,7 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 		{
 			LWLINE *subline = (LWLINE*)iline->geoms[i];
 			if ( subline->points && subline->points->npoints > 1 )
-				length += ptarray_length_2d(subline->points);
+				length += use_3d ? ptarray_length(subline->points) : ptarray_length_2d(subline->points);
 		}
 
 		geoms = lwalloc(sizeof(LWGEOM*) * iline->ngeoms);
@@ -623,7 +624,8 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 			double subfrom = 0.0, subto = 0.0;
 
 			if ( subline->points && subline->points->npoints > 1 )
-				sublength += ptarray_length_2d(subline->points);
+				sublength +=
+				    use_3d ? ptarray_length(subline->points) : ptarray_length_2d(subline->points);
 
 			/* Calculate proportions for this subline */
 			minprop = maxprop;
@@ -645,8 +647,10 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 			if ( to < maxprop && to >= minprop )
 				subto = (to - minprop) / (maxprop - minprop);
 
-
-			opa = ptarray_substring(subline->points, subfrom, subto, 0);
+			if (use_3d)
+				opa = ptarray_substring_3d(subline->points, subfrom, subto, 0);
+			else
+				opa = ptarray_substring(subline->points, subfrom, subto, 0);
 			if ( opa && opa->npoints > 0 )
 			{
 				if ( opa->npoints == 1 ) /* Point returned */
@@ -683,6 +687,19 @@ Datum LWGEOM_line_substring(PG_FUNCTION_ARGS)
 
 }
 
+PG_FUNCTION_INFO_V1(LWGEOM_line_substring);
+Datum
+LWGEOM_line_substring(PG_FUNCTION_ARGS)
+{
+	return line_substring(fcinfo, LW_FALSE);
+}
+
+PG_FUNCTION_INFO_V1(ST_3DLineSubstring);
+Datum
+ST_3DLineSubstring(PG_FUNCTION_ARGS)
+{
+	return line_substring(fcinfo, LW_TRUE);
+}
 
 /**********************************************************************
  *
@@ -927,4 +944,3 @@ Datum ST_IsPolygonCCW(PG_FUNCTION_ARGS)
 	geom = PG_GETARG_GSERIALIZED_P(0);
 	PG_RETURN_BOOL(lwgeom_has_orientation(lwgeom_from_gserialized(geom), LW_COUNTERCLOCKWISE));
 }
-
