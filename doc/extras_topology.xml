@@ -343,6 +343,9 @@ being defined.
                  <para>This is the more verbose equivalent.</para>
                  <programlisting>SELECT ARRAY[ARRAY[1, 2], ARRAY[4, 3]]::topology.topoelementarray AS tea;</programlisting>
 <screen>{{1,2},{4,3}}</screen>
+                 <para>Construct a TopoElementArray from a single TopoElement.</para>
+                 <programlisting>SELECT topology.TopoElementArray(ARRAY[1, 2]::topology.topoelement) AS tea;</programlisting>
+<screen>{{1,2}}</screen>
                  <para>This example uses the array aggregate function packaged with topology.</para>
                  <programlisting>
 SELECT topology.TopoElementArray_Agg(ARRAY[e, t] ORDER BY e, t) As tea
@@ -3762,6 +3765,7 @@ are expanded to include merged faces (upon removing edges) or healed edges
                 <para>punctal layers are formed from set of nodes, lineal layers are formed from a set of edges, areal layers are formed from a set of faces,
 	and collections can be formed from a mixture of nodes, edges, and faces.</para>
                 <para>Omitting the array of components generates an empty TopoGeometry object.</para>
+                <para>A single <varname>TopoElement</varname> may be supplied where a one-element <varname>TopoElementArray</varname> is expected.</para>
                 <!-- use this format if new function -->
                 <para role="availability" conformance="1.1">Availability: 1.1</para>
 			</refsection>
