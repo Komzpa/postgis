@@ -160,11 +160,9 @@ BEGIN
     RAISE EXCEPTION 'Tolerance must be -1 or >=0';
   END IF;
 
-  IF atolerance = -1 THEN
-    tolerance := topology._st_mintolerance(topology_info.name, ageom);
-  ELSE
-    tolerance := atolerance;
-  END IF;
+  -- Preserve exact numeric tolerances, including zero, but pass automatic
+  -- tolerance as the sentinel expected by the C loaders.
+  tolerance := atolerance;
 
   -- Get layer information
   BEGIN
