@@ -204,7 +204,7 @@ BEGIN
       ''
     ) LIKE '%postgis-topology-domain-storage-repaired-306%'
   THEN
-    RAISE EXCEPTION 'topoelement repair marker was set despite skipped materialized view storage';
+    RAISE EXCEPTION 'topoelement repair marker was set despite skipped storage';
   END IF;
 
   IF COALESCE(
@@ -216,7 +216,7 @@ BEGIN
       ''
     ) LIKE '%postgis-topology-domain-storage-repaired-306%'
   THEN
-    RAISE EXCEPTION 'topoelementarray repair marker was set despite skipped materialized view storage';
+    RAISE EXCEPTION 'topoelementarray repair marker was set despite skipped storage';
   END IF;
 END
 $$;
@@ -317,6 +317,14 @@ BEGIN
 
   IF (SELECT count(*) FROM upgrade_test.domain_blocked_inherit_grandchild_view) != 1 THEN
     RAISE EXCEPTION 'dependent topology domain inherited grandchild view was not preserved during upgrade';
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF (SELECT count(*) FROM upgrade_test.domain_nested_type_test) != 1 THEN
+    RAISE EXCEPTION 'nested topology domain storage fixture was not preserved during upgrade';
   END IF;
 END
 $$;
