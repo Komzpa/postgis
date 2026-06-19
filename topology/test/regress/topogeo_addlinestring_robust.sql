@@ -217,17 +217,90 @@ SELECT * FROM runTest('#5886-prec',
   0.0000001
 ) WHERE true ;
 
-SELECT * FROM runTest('#5886-totopogeom-zero',
+SELECT * FROM runTest('#5886-totopogeom-automatic',
   ARRAY[
     'LINESTRING(22.780107846871616 70.70515928614921, 22.779899976871615 70.7046262461492)',
     'LINESTRING(22.79217056687162 70.70247684614921, 22.779969266871618 70.70480392614921, 22.780038556871617 70.7049816061492, 22.796764346871615 70.7044482361492)'
   ],
   'LINESTRING(22.780038556871617 70.7049816061492, 22.789676156871618 70.7072799361492)',
-  0,
+  -1,
   false,
   0.0000001,
   true
 ) WHERE true ;
+
+DO $$
+BEGIN
+  IF EXISTS ( SELECT * FROM topology.topology WHERE name = 'topo' )
+  THEN
+    PERFORM topology.DropTopology('topo');
+  END IF;
+
+  PERFORM topology.CreateTopology('topo');
+  CREATE TABLE topo.fl(lbl text, g geometry);
+  PERFORM topology.AddTopoGeometryColumn('topo', 'topo', 'fl', 'tg', 'LINESTRING');
+  PERFORM topology.TopoGeo_addLinestring('topo', 'LINESTRING(0 0, 10 0)', -1);
+
+  PERFORM topology.toTopoGeom(
+    'MULTILINESTRING((1000000000000 0, 1000000000001 0), (5 0.001, 5 2))'::geometry,
+    'topo',
+    1,
+    -1
+  );
+END;
+$$;
+
+SELECT '#5886-totopogeom-automatic-multiline',
+  count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5 0)'::geometry, 1e-9)),
+  count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5 0.001)'::geometry, 1e-9))
+FROM topo.node;
+
+SELECT topology.DropTopology('topo');
+
+DO $$
+BEGIN
+  PERFORM topology.CreateTopology('topo');
+  CREATE TABLE topo.fl(lbl text, g geometry);
+  PERFORM topology.AddTopoGeometryColumn('topo', 'topo', 'fl', 'tg', 'LINESTRING');
+  PERFORM topology.TopoGeo_addLinestring('topo', 'LINESTRING(0 0, 10 0)', -1);
+
+  PERFORM topology.toTopoGeom(
+    'MULTILINESTRING((1000000000000 0, 1000000000001 0), (5 0.001, 5 2))'::geometry,
+    'topo',
+    1,
+    0
+  );
+END;
+$$;
+
+SELECT '#5886-totopogeom-zero-exact',
+  count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5 0)'::geometry, 1e-9)),
+  count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5 0.001)'::geometry, 1e-9))
+FROM topo.node;
+
+SELECT topology.DropTopology('topo');
+
+DO $$
+BEGIN
+  IF EXISTS ( SELECT * FROM topology.topology WHERE name = 'topo' )
+  THEN
+    PERFORM topology.DropTopology('topo');
+  END IF;
+
+  PERFORM topology.CreateTopology('topo');
+END;
+$$;
+
+SELECT '#5886-public-negative-point',
+  topology.TopoGeo_AddPoint('topo', 'POINT(0 0)', -2);
+
+SELECT '#5886-public-negative-line',
+  count(*) FROM topology.TopoGeo_AddLinestring('topo', 'LINESTRING(0 0, 1 1)', -2);
+
+SELECT '#5886-public-negative-polygon',
+  count(*) FROM topology.TopoGeo_AddPolygon('topo', 'POLYGON((0 0,0 1,1 1,1 0,0 0))', -2);
+
+SELECT topology.DropTopology('topo');
 
 SELECT * FROM runTest('#5886-near-end',
   ARRAY[
@@ -287,6 +360,45 @@ $$;
 SELECT '#5886-isolated-node',
   count(*) FILTER (WHERE ST_Equals(geom, 'POINT(5 1.2)'::geometry) AND containing_face IS NULL),
   count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5.4 0)'::geometry, 1e-9))
+FROM topo.node;
+
+SELECT topology.DropTopology('topo');
+
+DO $$
+BEGIN
+  IF EXISTS ( SELECT * FROM topology.topology WHERE name = 'topo' )
+  THEN
+    PERFORM topology.DropTopology('topo');
+  END IF;
+
+  PERFORM topology.CreateTopology('topo', 0, 1, true);
+  PERFORM topology.TopoGeo_addLinestring('topo', 'LINESTRING ZM (0 0 10 100, 10 0 20 200)', -1);
+  PERFORM topology.TopoGeo_addLinestring('topo', 'LINESTRING ZM (5 0.4 99 999, 5 2 98 998)', -1);
+END;
+$$;
+
+SELECT '#5886-preserve-zm',
+  ST_AsEWKT(geom)
+FROM topo.node
+WHERE ST_DWithin(geom, 'POINT(5 0)'::geometry, 1e-9);
+
+SELECT topology.DropTopology('topo');
+
+DO $$
+BEGIN
+  IF EXISTS ( SELECT * FROM topology.topology WHERE name = 'topo' )
+  THEN
+    PERFORM topology.DropTopology('topo');
+  END IF;
+
+  PERFORM topology.CreateTopology('topo', 0, 1);
+  PERFORM topology.TopoGeo_addLinestring('topo', 'LINESTRING(0 0, 10 0)', -1);
+  PERFORM topology.TopoGeo_addPolygon('topo', 'POLYGON((5 0.4, 5 2, 7 2, 7 -2, 5 -2, 5 0.4))', -1);
+END;
+$$;
+
+SELECT '#5886-polygon-ring',
+  count(*) FILTER (WHERE ST_DWithin(geom, 'POINT(5 0)'::geometry, 1e-9))
 FROM topo.node;
 
 SELECT topology.DropTopology('topo');

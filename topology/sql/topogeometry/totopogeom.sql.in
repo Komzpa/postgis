@@ -160,9 +160,16 @@ BEGIN
     RAISE EXCEPTION 'Tolerance must be -1 or >=0';
   END IF;
 
-  -- Preserve exact numeric tolerances, including zero, but pass automatic
-  -- tolerance as the sentinel expected by the C loaders.
-  tolerance := atolerance;
+  -- Simple inputs can delegate automatic tolerance to the C loader.  Dumped
+  -- multi-geometries use a private negative sentinel so each component keeps
+  -- the whole-input automatic tolerance while still following the automatic-
+  -- tolerance snapping path in the loader.
+  tolerance := CASE
+    WHEN atolerance = -1 AND ST_NumGeometries(ageom) > 1 THEN
+      -(1 + topology._st_mintolerance(topology_info.name, ageom))
+    WHEN atolerance = -1 THEN -1
+    ELSE atolerance
+  END;
 
   -- Get layer information
   BEGIN
@@ -247,13 +254,13 @@ BEGIN
     FOR rec2 IN SELECT primitive
           FROM
             (
-              SELECT topology.topogeo_addPoint(atopology, rec.geom, tolerance)
+              SELECT topology._topogeo_addPoint(atopology, rec.geom, tolerance)
                 WHERE rec.dims = 0
               UNION ALL
-              SELECT topology.topogeo_addLineString(atopology, rec.geom, tolerance)
+              SELECT topology._topogeo_addLineString(atopology, rec.geom, tolerance)
                 WHERE rec.dims = 1
               UNION ALL
-              SELECT topology.topogeo_addPolygon(atopology, rec.geom, tolerance)
+              SELECT topology._topogeo_addPolygon(atopology, rec.geom, tolerance)
                 WHERE rec.dims = 2
             ) AS f(primitive)
     LOOP
