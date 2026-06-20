@@ -9,6 +9,10 @@ These are only changes since 3.7.0beta2.
 * Bug Fixes *
 
 
+* Enhancements *
+
+ - #2038, [topology] Split existing edges before adding lines that start on
+          the edge and leave it (Darafei Praliaskouski)
 
 
 PostGIS 3.7.0beta2
