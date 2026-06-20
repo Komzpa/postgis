@@ -6,6 +6,11 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
 
 These are only changes since 3.7.0beta1.
 
+* New Features *
+
+ - #4861, [topology] Add PointOnFace helper for topology faces
+          (Darafei Praliaskouski)
+
 * Bug Fixes *
 
  - OSSFuzz 544223869, compare GSERIALIZED bytea round trips by geometry
