@@ -92,6 +92,9 @@ These are only changes since 3.7.0alpha1.
 
 * Bug Fixes *
 
+ - #5722, [topology] Use component-scale tolerance when adding
+          noded TopoGeo_AddLineString edges (Sandro Santilli)
+
  - GH-1160, Adapt topology, regression expectations, and manual examples
           to GEOS 3.15 overlay line merging (Paul Ramsey, Darafei Praliaskouski)
  - #6093, Fix SQL generation on ppc64el when NURBS comments are

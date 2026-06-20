@@ -5192,7 +5192,8 @@ _lwt_minToleranceDouble( double d )
 }
 
 /* Return the smallest delta that can perturb
- * the given point
+ * the given point.
+ */
 static inline double
 _lwt_minTolerancePoint2d( const POINT2D* p )
 {
@@ -5200,7 +5201,22 @@ _lwt_minTolerancePoint2d( const POINT2D* p )
   if ( max < FP_ABS(p->y) ) max = FP_ABS(p->y);
   return _lwt_minToleranceDouble(max);
 }
-*/
+
+/* Return the smallest delta that can perturb
+ * the given segment.
+ */
+static inline double
+_lwt_minToleranceSegment2d(const POINT2D *p1, const POINT2D *p2)
+{
+	double max = FP_ABS(p1->x);
+	if (max < FP_ABS(p1->y))
+		max = FP_ABS(p1->y);
+	if (max < FP_ABS(p2->x))
+		max = FP_ABS(p2->x);
+	if (max < FP_ABS(p2->y))
+		max = FP_ABS(p2->y);
+	return _lwt_minToleranceDouble(max);
+}
 
 /* Return the smallest delta that can perturb
  * the maximum absolute value of a geometry ordinate
@@ -7122,6 +7138,10 @@ _lwt_AddLineEndpointRepairTol(LWPOINT *point, int exactNodeSnap)
  *                    the number of new edges resulting from this
  *                    incoming new edge, taking into account edges
  *                    created due to splitting of existing edges.
+ * @param startEndpointTol repair tolerance for the start endpoint when it is
+ *                         not an original exact-snap endpoint.
+ * @param endEndpointTol repair tolerance for the end endpoint when it is
+ *                       not an original exact-snap endpoint.
  * @param startExactNodeSnap if non-zero, insert the start endpoint with
  *                           exact node tolerance.
  * @param endExactNodeSnap if non-zero, insert the end endpoint with
@@ -7132,6 +7152,8 @@ static LWT_ELEMID
 _lwt_AddLineEdge(LWT_TOPOLOGY *topo,
 		 LWLINE *edge,
 		 double tol,
+		 double startEndpointTol,
+		 double endEndpointTol,
 		 int startExactNodeSnap,
 		 int endExactNodeSnap,
 		 int handleFaceSplit,
@@ -7171,7 +7193,8 @@ _lwt_AddLineEdge(LWT_TOPOLOGY *topo,
    * use local tolerance for both so GEOS intersection coordinates can rejoin
    * existing topology nodes.
    */
-  endpoint_edge_tol = _lwt_AddLineEndpointRepairTol(start_point, startExactNodeSnap);
+  endpoint_edge_tol =
+      startExactNodeSnap ? _lwt_AddLineEndpointRepairTol(start_point, startExactNodeSnap) : startEndpointTol;
   endpoint_node_tol = startExactNodeSnap ? 0.0 : endpoint_edge_tol;
   nid[0] =
       _lwt_AddPoint(topo, start_point, endpoint_node_tol, endpoint_edge_tol, handleFaceSplit, &mm, &pointSplitEdges);
@@ -7189,7 +7212,7 @@ _lwt_AddLineEdge(LWT_TOPOLOGY *topo,
             "after successfully getting first point !?");
     return -1;
   }
-  endpoint_edge_tol = _lwt_AddLineEndpointRepairTol(end_point, endExactNodeSnap);
+  endpoint_edge_tol = endExactNodeSnap ? _lwt_AddLineEndpointRepairTol(end_point, endExactNodeSnap) : endEndpointTol;
   endpoint_node_tol = endExactNodeSnap ? 0.0 : endpoint_edge_tol;
   nid[1] = _lwt_AddPoint(topo, end_point, endpoint_node_tol, endpoint_edge_tol, handleFaceSplit, &mm, &pointSplitEdges);
   lwpoint_free(end_point); /* too late if lwt_AddPoint calls lwerror */
@@ -7806,6 +7829,8 @@ _lwt_AddLine(LWT_TOPOLOGY* topo, LWLINE* line, double tol, int* nedges,
     const LWLINE *edge_line = lwgeom_as_lwline(g);
     int startExactNodeSnap = 0;
     int endExactNodeSnap = 0;
+    double start_endpoint_tol = _lwt_minTolerance(g);
+    double end_endpoint_tol = start_endpoint_tol;
     g->srid = noded->srid;
 
 #if POSTGIS_DEBUG_LEVEL > 0
@@ -7817,17 +7842,46 @@ _lwt_AddLine(LWT_TOPOLOGY* topo, LWLINE* line, double tol, int* nedges,
     }
 #endif
 
-    if (input_tol_was_zero && edge_line && edge_line->points->npoints > 0)
+    if (edge_line && edge_line->points->npoints > 0)
     {
+	    uint32_t npoints = edge_line->points->npoints;
 	    const POINT2D *start = getPoint2d_cp(edge_line->points, 0);
-	    const POINT2D *end = getPoint2d_cp(edge_line->points, edge_line->points->npoints - 1);
-	    startExactNodeSnap = p2d_same(start, original_start) || p2d_same(start, original_end);
-	    endExactNodeSnap = p2d_same(end, original_start) || p2d_same(end, original_end);
+	    const POINT2D *end = getPoint2d_cp(edge_line->points, npoints - 1);
+	    if (npoints > 1)
+	    {
+		    const POINT2D *after_start = getPoint2d_cp(edge_line->points, 1);
+		    const POINT2D *before_end = getPoint2d_cp(edge_line->points, npoints - 2);
+		    start_endpoint_tol = _lwt_minToleranceSegment2d(start, after_start);
+		    end_endpoint_tol = _lwt_minToleranceSegment2d(before_end, end);
+		    if (p2d_same(start, end) && start_endpoint_tol != end_endpoint_tol)
+		    {
+			    start_endpoint_tol = end_endpoint_tol = FP_MAX(start_endpoint_tol, end_endpoint_tol);
+		    }
+	    }
+	    else
+	    {
+		    start_endpoint_tol = _lwt_minTolerancePoint2d(start);
+		    end_endpoint_tol = _lwt_minTolerancePoint2d(end);
+	    }
+
+	    if (input_tol_was_zero)
+	    {
+		    startExactNodeSnap = p2d_same(start, original_start) || p2d_same(start, original_end);
+		    endExactNodeSnap = p2d_same(end, original_start) || p2d_same(end, original_end);
+	    }
     }
 
     forward = -1; /* will be set to either 0 or 1 if the edge already existed */
-    id = _lwt_AddLineEdge(
-	topo, lwgeom_as_lwline(g), tol, startExactNodeSnap, endExactNodeSnap, handleFaceSplit, &forward, &edgeNewEdges);
+    id = _lwt_AddLineEdge(topo,
+			  lwgeom_as_lwline(g),
+			  tol,
+			  start_endpoint_tol,
+			  end_endpoint_tol,
+			  startExactNodeSnap,
+			  endExactNodeSnap,
+			  handleFaceSplit,
+			  &forward,
+			  &edgeNewEdges);
     if (id < 0)
     {
       lwgeom_free(noded);
