@@ -133,6 +133,9 @@ These are only changes since 3.7.0alpha1.
 
 * Enhancements *
 
+ - #4862, [topology] Stop using custom return types for topology edge
+          listing functions (Darafei Praliaskouski)
+
  - #1986, ST_GeomFromGML support for GML ArcString and curved polygon rings
           (Darafei Praliaskouski)
 

@@ -61,3 +61,8 @@ EXCEPTION
 		NULL;
 END
 $postgis_upgrade$;
+
+-- Return type changed from topology.GetFaceEdges_ReturnType to OUT parameters.
+SELECT _postgis_drop_function_by_signature('topology.ST_GetFaceEdges(varchar, bigint)', '3.7.0');
+SELECT _postgis_drop_function_by_signature('topology.GetRingEdges(varchar, bigint, int)', '3.7.0');
+SELECT _postgis_drop_function_by_signature('topology.GetNodeEdges(varchar, bigint)', '3.7.0');
