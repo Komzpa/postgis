@@ -105,6 +105,9 @@ These are only changes since 3.7.0alpha1.
 
 * Bug Fixes *
 
+ - #5119, [topology] Allow COPY into topology edge views
+          (Darafei Praliaskouski)
+
  - GH-1160, Adapt topology, regression expectations, and manual examples
           to GEOS 3.15 overlay line merging (Paul Ramsey, Darafei Praliaskouski)
  - #6093, Fix SQL generation on ppc64el when NURBS comments are
