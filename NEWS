@@ -24,7 +24,7 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
           (Darafei Praliaskouski)
 
 
-PostGIS 3.7.0alpha1
+PostGIS 3.7.0beta1
 2026/07/05
 
 This version requires GEOS 3.10+, PostgreSQL 14-19beta1, Proj 6.1+, libgmp.
@@ -102,6 +102,8 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
           (Darafei Praliaskouski)
  - #2804, #4315, [raster] Support two-argument ST_MapAlgebra callbacks
           and pass callback call data as actual arguments (Darafei Praliaskouski)
+ - #1138, [raster] Add raster2pgsql output pixel type option
+          (Darafei Praliaskouski)
  - #2898, Document SQL function cost tiers for contributors
  - #6062, [topology] Stop using recursive snapping, for improved robustness (Sandro Santilli)
  - #6065, Improved winding order computation robustness for rings having collapsed elements
