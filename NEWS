@@ -9,6 +9,10 @@ These are only changes since 3.7.0beta2.
 * Bug Fixes *
 
 
+* Enhancements *
+
+ - #3319, [topology] Avoid full face reconstruction when a polygon covers
+          the candidate face MBR in TopoGeo_AddPolygon (Darafei Praliaskouski)
 
 
 PostGIS 3.7.0beta2

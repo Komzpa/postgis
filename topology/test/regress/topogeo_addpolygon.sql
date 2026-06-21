@@ -111,6 +111,38 @@ SELECT check_changes('ex_hole_snap');
 DROP FUNCTION check_changes(text,boolean);
 SELECT DropTopology('city_data');
 
+-- Exercise both #3319 candidate paths: face 1 is covered despite its MBR
+-- crossing the polygon hole, while face 2 has its whole MBR covered.
+SELECT 'mbr_paths.start', topology.CreateTopology('mbr_paths', 0, 0) > 0;
+SELECT 'mbr_paths.inner', array_agg(id ORDER BY id)
+FROM topology.TopoGeo_AddPolygon(
+  'mbr_paths', 'POLYGON((0 0,0 10,10 10,10 0,0 0))'::geometry
+) AS id;
+SELECT 'mbr_paths.small', array_agg(id ORDER BY id)
+FROM topology.TopoGeo_AddPolygon(
+  'mbr_paths', 'POLYGON((-4 0,-4 2,-2 2,-2 0,-4 0))'::geometry
+) AS id;
+SELECT 'mbr_paths.covered', array_agg(id ORDER BY id)
+FROM topology.TopoGeo_AddPolygon(
+  'mbr_paths',
+  'POLYGON((-5 -5,-5 15,15 15,15 -5,-5 -5),(2 2,8 2,8 8,2 8,2 2))'::geometry
+) AS id;
+WITH input(geom) AS (
+  VALUES (
+    'POLYGON((-5 -5,-5 15,15 15,15 -5,-5 -5),(2 2,8 2,8 8,2 8,2 2))'::geometry
+  )
+)
+SELECT 'mbr_paths.check', f.face_id,
+       ST_Covers(input.geom, f.mbr) AS mbr_covered,
+       ST_Covers(
+         input.geom,
+         topology.ST_GetFaceGeometry('mbr_paths', f.face_id)
+       ) AS face_covered
+FROM input, mbr_paths.face AS f
+WHERE f.face_id IN (1, 2)
+ORDER BY f.face_id;
+SELECT 'mbr_paths.end', topology.DropTopology('mbr_paths');
+
 -- See https://trac.osgeo.org/postgis/ticket/1855
 -- Original submission (more simplifications are
 -- in topogeo_addlinestring.sql)

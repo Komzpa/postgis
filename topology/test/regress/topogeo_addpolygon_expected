@@ -47,6 +47,13 @@ ex_hole_snap|13
 ex_hole_snap|14
 ex_hole_snap|15
 Topology 'city_data' dropped
+mbr_paths.start|t
+mbr_paths.inner|{1}
+mbr_paths.small|{2}
+mbr_paths.covered|{1,2,3}
+mbr_paths.check|1|f|t
+mbr_paths.check|2|t|t
+mbr_paths.end|Topology 'mbr_paths' dropped
 t1855_0.start|t
 t1855_0.0|1
 t1855_0.1|2
