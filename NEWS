@@ -25,12 +25,11 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
 
 * New Features *
 
- - [fuzzers] Centralize OSS-Fuzz build/dependency logic in PostGIS scripts,
-
-
  - #926, Add array overloads for ST_GeometryN, ST_InteriorRingN,
           and ST_PointN
           (Darafei Praliaskouski)
+
+
 PostGIS 3.7.0alpha1
 2026/07/05
 
