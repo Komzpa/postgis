@@ -23,8 +23,13 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
  - GH-1153, [topology] Preserve large ids from edge wrappers
           (Darafei Praliaskouski)
 
+* New Features *
 
-PostGIS 3.7.0beta1
+ - #1986, ST_GeomFromGML support for GML ArcString and curved polygon rings
+          (Darafei Praliaskouski)
+
+
+PostGIS 3.7.0alpha1
 2026/07/05
 
 This version requires GEOS 3.10+, PostgreSQL 14-19beta1, Proj 6.1+, libgmp.
@@ -80,8 +85,6 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
  - #4398, Add ST_CatmullSmoothing smoothes but retains original vertices (Paul Ramsey)
  - #4560, ST_3DInterpolatePoint for M interpolation from XYZ inputs (Paul Ramsey)
  - #1291, ST_MakePolygon support for curved rings (Darafei Praliaskouski)
- - #1986, ST_GeomFromGML support for GML ArcString and curved polygon rings
-          (Darafei Praliaskouski)
  - GT-270, Add NURBSCurve (Loïc Bartoletti)
  - #2863, Add ST_XSize, ST_YSize, ST_ZSize, and ST_MSize dimension helpers
           (Darafei Praliaskouski)
