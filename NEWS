@@ -47,6 +47,11 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
             (Bas Couwenberg)
 
 * Enhancements *
+* New Features *
+
+ - #5776, ST_3DLineSubstring for substring extraction along 3D line length
+          (Darafei Praliaskouski)
+
 
  - #4749, Use point-in-polygon predicate fast paths for point-only
           GeometryCollections, including ST_Disjoint (Darafei Praliaskouski)
@@ -57,7 +62,6 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
  - #2557, #2805, Document ST_MapAlgebra callback argument
           signatures and return semantics (Darafei Praliaskouski)
 
-* New Features *
 
 PostGIS 3.7.0dev
 2026/xx/xx
