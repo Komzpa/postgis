@@ -1,2 +1,0 @@
-# Test long --analyze with short index creation.
--I --analyze -g the_geom {regdir}/loader/TestSkipANALYZE loadedshp

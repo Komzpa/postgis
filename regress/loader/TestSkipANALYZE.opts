@@ -1,2 +1,0 @@
-# Test long --no-analyze skips ANALYZE.
---no-analyze -g the_geom {regdir}/loader/TestSkipANALYZE loadedshp
