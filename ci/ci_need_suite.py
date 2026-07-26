@@ -85,6 +85,49 @@ NEWS_GLOBS = (
     "utils/docs/tests/test_check_news.py",
 )
 
+DIST_GLOBS = (
+    "COPYING",
+    "CONTRIBUTING.md",
+    "README*",
+    "Version.config",
+    "deps/**",
+    "doc/*.css",
+    "doc/*.html",
+    "doc/*.js",
+    "doc/*.jpg",
+    "doc/*.jpeg",
+    "doc/*.png",
+    "doc/*.po",
+    "doc/*.svg",
+    "doc/*.txt",
+    "doc/*.xml",
+    "doc/*.xsl",
+    "doc/**/*.css",
+    "doc/**/*.html",
+    "doc/**/*.js",
+    "doc/**/*.jpg",
+    "doc/**/*.jpeg",
+    "doc/**/*.png",
+    "doc/**/*.po",
+    "doc/**/*.svg",
+    "doc/**/*.txt",
+    "doc/**/*.xml",
+    "doc/**/*.xsl",
+    "extensions/**",
+    "extras/**",
+    "fuzzers/**",
+    "liblwgeom/**",
+    "libpgcommon/**",
+    "loader/**",
+    "postgis/**",
+    "raster/**",
+    "regress/**",
+    "sfcgal/**",
+    "topology/**",
+    "utils/check_dist_manifest.sh",
+    "utils/check_distclean.sh",
+)
+
 
 def match_any(path: str, globs: tuple[str, ...]) -> str | None:
     for pattern in globs:
@@ -128,6 +171,13 @@ def need_for_suite(paths: list[str], suite: str, target: str, extension: str) ->
             if pattern:
                 return True, f"{path} matches NEWS checker pattern {pattern}"
         return False, "no NEWS checker input changed"
+
+    if suite == "dist":
+        for path in paths:
+            pattern = match_any(path, DIST_GLOBS)
+            if pattern:
+                return True, f"{path} matches source distribution pattern {pattern}"
+        return False, "no source distribution input changed"
 
     if suite == "extension-upgrade" or "upgrade" in target or suite == "cluster-upgrade":
         direct_globs = UPGRADE_GLOBS

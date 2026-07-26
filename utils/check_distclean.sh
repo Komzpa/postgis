@@ -1,6 +1,10 @@
 #!/bin/sh
 
-TMPDIR="/tmp/postgis_check_distclean_$$"
+TMPBASE="${TMPDIR:-/tmp}"
+mkdir -p "${TMPBASE}"
+TMPBASE=$(cd "${TMPBASE}" && pwd -P)
+TMPDIR="${TMPBASE}/postgis_check_distclean_$$"
+BASELINE="$1"
 
 cleanup()
 {
@@ -13,7 +17,25 @@ trap 'cleanup' 0
 mkdir -p $TMPDIR
 
 
-find . -type f | sort > ${TMPDIR}/leftover_files_after_distclean
+CHECKDIR=$(pwd -P)
+case "${TMPDIR}/" in
+  "${CHECKDIR}/"*)
+    TMPREL="./${TMPDIR#${CHECKDIR}/}"
+    find . -path "${TMPREL}" -prune -o -type f -print | sort > ${TMPDIR}/files_after_distclean
+    ;;
+  *)
+    find . -type f | sort > ${TMPDIR}/files_after_distclean
+    ;;
+esac
+if test -n "${BASELINE}"; then
+  sort "${BASELINE}" > ${TMPDIR}/baseline_files
+  comm -13 \
+    ${TMPDIR}/baseline_files \
+    ${TMPDIR}/files_after_distclean > \
+    ${TMPDIR}/leftover_files_after_distclean
+else
+  cp ${TMPDIR}/files_after_distclean ${TMPDIR}/leftover_files_after_distclean
+fi
 cat <<EOF > ${TMPDIR}/leftover_files_after_distclean.expected
 ./doc/postgis_comments.sql
 ./doc/raster_comments.sql
