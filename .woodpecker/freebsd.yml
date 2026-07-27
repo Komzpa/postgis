@@ -1,0 +1,28 @@
+labels:
+  platform: freebsd/amd64
+
+# The full FreeBSD suite is measured at 2153 seconds for build+tests, or about
+# 41 minutes with disposable VM boot and source-copy overhead. Keep the
+# workflow manual until a supported FreeBSD runner and its live agent labels
+# have been registered and proven with an exact-commit run.
+when:
+  - event: manual
+
+steps:
+  full-suite:
+    commands:
+      - export MAKE=gmake
+      - export PATH=/usr/local/bin:$${PATH}
+      - export TMPDIR="$${TMPDIR:-/tmp}/postgis-freebsd"
+      - export CPPFLAGS="-I/usr/local/include $${CPPFLAGS:-}"
+      - export LDFLAGS="-L/usr/local/lib $${LDFLAGS:-}"
+      - mkdir -p "$${TMPDIR}"
+      - ./autogen.sh
+      - ./configure --with-pgconfig=/usr/local/bin/pg_config
+      - gmake -j$$(sysctl -n hw.ncpu)
+      - gmake check
+      - gmake install
+      - gmake installcheck-base
+      - gmake installcheck-upgrade-from-unpackaged
+      - gmake installcheck-upgrade-from-unpackaged-by-func
+      - gmake installcheck-upgrade-from-packaged-by-func
