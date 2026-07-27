@@ -3,7 +3,7 @@ import pathlib
 import unittest
 
 
-MODULE_PATH = pathlib.Path(__file__).with_name("ci_need_suite.py")
+MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "ci" / "ci_need_suite.py"
 SPEC = importlib.util.spec_from_file_location("ci_need_suite", MODULE_PATH)
 CI_NEED_SUITE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CI_NEED_SUITE)

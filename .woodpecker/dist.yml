@@ -23,22 +23,19 @@ steps:
     # upload, publish, or update release-facing documentation.
     commands:
       - export SRCDIR=$${CI_WORKSPACE}
-      - python3 $${SRCDIR}/utils/ci_need_suite.py dist --upgrade-surface; gate_status=$$?; if test "$${gate_status}" = 78; then exit 0; elif test "$${gate_status}" != 0; then exit "$${gate_status}"; fi
+      - gate_status=0; python3 $${SRCDIR}/ci/ci_need_suite.py dist --upgrade-surface || gate_status=$$?; if test "$${gate_status}" = 78; then exit 0; elif test "$${gate_status}" != 0; then exit "$${gate_status}"; fi
       - export PGVER=18
       - export PATH=/usr/lib/postgresql/$${PGVER}/bin:$${PATH}
       - export TMPDIR=$${SRCDIR}/build/tmp
-      - export DEBIAN_FRONTEND=noninteractive
       - check_start=$$(date +%s)
       - mkdir -p "$${TMPDIR}" "$${SRCDIR}/build/dist"
       - export MAKE="make -j1"
       - export CONFIGURE_ARGS="--with-pgconfig=/usr/lib/postgresql/$${PGVER}/bin/pg_config --without-raster"
-      - apt-get update
-      - apt-get install -y --no-install-recommends git2cl
-      - rm -rf /var/lib/apt/lists/*
+      - command -v git2cl
       - cd "$${SRCDIR}"
       - rm -rf postgis-dev postgis-ci-dist postgis-ci-dist.tar.gz postgis-ci-dist.tar.gz.md5
       - export newoutdir=postgis-ci-dist
-      - time sh "$${SRCDIR}/make_dist.sh"
+      - sh "$${SRCDIR}/make_dist.sh"
       - package=postgis-ci-dist.tar.gz
       - tail -n 20 "$${package}.md5"
       - '"$${SRCDIR}/utils/check_dist_manifest.sh" "$${package}" "$${SRCDIR}"'
