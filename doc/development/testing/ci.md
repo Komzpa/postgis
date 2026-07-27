@@ -23,6 +23,7 @@ service that owns the behavior:
 | ---------- | --------------- |
 | Linux Docker matrix on GitHub Actions | `.github/workflows/ci.yml` plus `ci/github/run_*.sh` |
 | FreeBSD GitHub Actions job | `.github/workflows/ci-freebsd.yml`; see [FreeBSD development environment](../environment/freebsd.md) |
+| Staged FreeBSD Woodie local-backend job | Manual-only `.woodpecker/freebsd.yml`; draft runner recipe in `postgis/postgis-buildbots` under `freebsd/freebsd14_runner/`; see [FreeBSD development environment](../environment/freebsd.md) |
 | macOS GitHub Actions job | `.github/workflows/ci-macos.yml`; see [macOS development environment](../environment/macos.md) |
 | MSYS2/MinGW GitHub Actions job | `.github/workflows/msys.yml` |
 | GitHub CodeQL, codespell, and contributor-credit jobs | `.github/workflows/codeql.yml`, `.github/workflows/codespell.yml`, and `.github/workflows/contributor-credits.yml` |
@@ -80,6 +81,15 @@ the expensive QA workflow is branch-limited and owns coverage and garden
 checks. Read `.woodpecker/qa.yml` and `.woodpecker/qa-expensive.yml` before
 changing that split.
 
+The staged FreeBSD Woodie workflow is manual-only. Its draft buildbot recipe
+still pins unsupported FreeBSD 14.3, and there is no verified supported
+`freebsd/amd64` local-backend agent to receive integration jobs. Do not enable
+push or pull-request events until the recipe uses a supported release and the
+live agent label, backend, capacity, and a clean exact-commit run have been read
+back. The historical FreeBSD 14.3 run took 2153 seconds for build and tests, or
+about 41 minutes with disposable VM boot and source-copy overhead; that timing
+is planning evidence, not a current CI signal.
+
 ## CI Parity Map
 
 The repository now keeps CI ownership split across several services. Use this
@@ -94,7 +104,7 @@ only overlap part of its defect class.
 | Contributor credits | Woodpecker and GitHub Actions | Covered by `.woodpecker/contributor-credits.yml`. |
 | Debbie Linux regression classes | Jenkins Debbie and Woodpecker | Mostly covered by Woodpecker's Linux regression and expensive QA workflows. Debbie still remains useful for its exact Jenkins host, dependency, and release-job environment. |
 | Make Dist | Jenkins Debbie | In flight in <https://gitea.osgeo.org/postgis/postgis/pulls/534>. Until that lands, Woodpecker does not check source distribution tarballs. |
-| FreeBSD and Bessie | GitHub Actions FreeBSD and Jenkins Bessie | In flight in <https://gitea.osgeo.org/postgis/postgis/pulls/549>. YAML running on a Linux container is not FreeBSD parity; this needs a FreeBSD VM or agent surface. |
+| FreeBSD and Bessie | GitHub Actions FreeBSD and Jenkins Bessie | No active Woodpecker parity. `.woodpecker/freebsd.yml` is manual-only until a supported FreeBSD local-backend agent is registered and proven. |
 | 32-bit ARM and extra portability tiers | Jenkins Berrie | Covered by `.woodpecker/portability.yml` from <https://gitea.osgeo.org/postgis/postgis/pulls/516>, with hostile type-default coverage proposed in <https://gitea.osgeo.org/postgis/postgis/pulls/550>. Plain armhf emulation is useful for pointer-width and alignment assumptions, but the valuable tier is the hostile configuration with explicit type, signedness, alignment, and sanitizer probes. |
 | 64-bit ARM | Jenkins Berrie64 | Partly covered by the `arm64-berrie64-qemu` child in `.woodpecker/portability.yml` on amd64 agents through QEMU arm64 emulation. This is build, ABI, CUnit, install, and focused regression coverage, not Berrie64 parity. |
 | CodeQL | GitHub Actions | In flight as Woodpecker configuration carried separately. Woodpecker can build a CodeQL database and produce SARIF, but GitHub remains authoritative for code-scanning upload, annotations, and alert management unless Woodie artifact retention and SARIF consumption are also configured. |
