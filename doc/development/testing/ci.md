@@ -31,7 +31,7 @@ service that owns the behavior:
 | Winnie Windows jobs | `ci/winnie/` and the Winnie Jenkins jobs |
 | Bessie and Berrie/Berrie64 jobs | `ci/bessie/`, `ci/berrie*`, and the corresponding Jenkins worker labels |
 | Docker build images used by GitHub Actions | `postgis/postgis-build-env` image tags referenced from `.github/workflows/ci.yml` |
-| Docker build images used by Woodpecker | `repo.osgeo.org/postgis/build-test:*` image tags referenced from `.woodpecker/*.yml` |
+| Docker build images used by Woodpecker | `repo.osgeo.org/postgis/build-test:*` image tags referenced from `.woodpecker/*.yml`, plus explicit foreign-platform images named by emulated portability jobs |
 | Woodpecker MinGW Wine job | `.woodpecker/mingw-wine.yml` and `ci/woodie/postgis_mingw_wine.sh` |
 
 When a dashboard row describes dependency versions, operating systems, branch
@@ -79,6 +79,17 @@ sanitizer and `standard_conforming_strings=off` checks for pull requests, while
 the expensive QA workflow is branch-limited and owns coverage and garden
 checks. Read `.woodpecker/qa.yml` and `.woodpecker/qa-expensive.yml` before
 changing that split.
+
+Woodpecker portability coverage is owned by `.woodpecker/portability.yml`. The
+same workflow covers cheap native hostile compiler settings and branch-limited
+QEMU architecture coverage so ARM and big-endian emulation do not drift into
+competing pipelines. Native steps may run on pull requests through the
+changed-surface gate; foreign-architecture steps run on `master`, `stable-*`,
+tags, and scheduled events because emulated runs can occupy scarce amd64 agents
+for tens of minutes or longer. The workflow selects only the amd64 Docker agent
+platform; per-architecture preflight steps prove the required host binfmt
+handler before starting the emulated build instead of pinning an OSGeo
+hostname.
 
 ## CI Parity Map
 

@@ -1,8 +1,7 @@
 labels:
   platform: linux/amd64
-  qemu: "true"
 when:
-  event: [tag, cron]
+  event: [push, pull_request, tag, cron]
 
 # This workflow keeps the existing amd64 CI honest by attacking ABI properties
 # that normal amd64 builds cannot falsify.
@@ -29,28 +28,46 @@ when:
 # OSGeo-hosted Debian Ports rootfs. Do not replace it with i386; that would miss
 # the big-endian and unsigned-char parts of the bug class.
 #
-# QEMU depends on persistent binfmt_misc registrations on the amd64 Woodie agent
-# host and the qemu scheduler label. Woodpecker starts the foreign-architecture
-# step image directly; steps do not need a Docker socket or a nested docker run
-# probe.
+# QEMU depends on persistent binfmt_misc registrations on the amd64 Woodie
+# agent host. Keep the scheduler selection host-neutral and let the preflight
+# steps below fail loudly when an agent cannot execute the requested foreign
+# architecture.
 variables:
   native-image: &native-image repo.osgeo.org/postgis/build-test:debian13
+  integration-when: &integration-when
+    - event: [push, cron]
+      branch: [master, stable-*]
+    - event: tag
+  s390x-when: &s390x-when
+    - event: [push, cron]
+      branch: [master, stable-*]
+    - event: tag
+    - event: pull_request
+      path:
+        include:
+          - .woodpecker/portability.yml
   prepare-debian: &prepare-debian |
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y --no-install-recommends \
       autoconf automake libtool build-essential ca-certificates pkg-config \
+      python3 \
       bison flex \
       postgresql postgresql-server-dev-all \
       libcunit1-dev libgeos-dev libproj-dev libgdal-dev libjson-c-dev \
       libprotobuf-c-dev protobuf-c-compiler libxml2-dev gettext zlib1g-dev
     rm -rf /var/lib/apt/lists/*
+  portability-gate: &portability-gate >-
+    export SRCDIR=$${CI_WORKSPACE}; cd "$${SRCDIR}"; python3
+    "$${SRCDIR}/ci/ci_need_suite.py" portability; gate_status=$$?; if test
+    "$${gate_status}" = 78; then exit 0; elif test "$${gate_status}" != 0; then
+    exit "$${gate_status}"; fi
   abi-env: &abi-env |
     export SRCDIR=$${CI_WORKSPACE}
     export BUILDDIR=$${SRCDIR}/build/portability-$${PORTABILITY_TIER}
     export PG_MAJOR=$$(pg_config --version | awk '{print $$2}' | cut -d. -f1)
     export PATH=/usr/lib/postgresql/$${PG_MAJOR}/bin:$${PATH}
-    export PGROOT=$$(mktemp -d)
+    export PGROOT=$$(runuser -u postgres -- mktemp -d /tmp/postgis-portability.XXXXXX)
     export PGDATA=$${PGROOT}/data
     export PGHOST=$${PGROOT}/socket
     export PGUSER=postgres
@@ -60,13 +77,15 @@ variables:
     dpkg-architecture -qDEB_HOST_GNU_TYPE
     pg_config --version
   start-postgresql: &start-postgresql |
-    chown postgres:postgres "$${PGROOT}"
-    runuser -u postgres -- mkdir "$${PGDATA}" "$${PGHOST}"
+    install -d -o postgres -g postgres -m 700 "$${PGROOT}" "$${PGDATA}" "$${PGHOST}"
     runuser -u postgres -- initdb -D "$${PGDATA}" -A trust --no-sync
-    runuser -u postgres -- pg_ctl -D "$${PGDATA}" \
+    if ! runuser -u postgres -- pg_ctl -D "$${PGDATA}" \
       -l "$${PGROOT}/postgresql.log" \
       -o "-F -k $${PGHOST} -c synchronous_commit=off -c full_page_writes=off $${PORTABILITY_PG_SETTINGS:-}" \
-      -w start
+      -w start; then
+      test ! -s "$${PGROOT}/postgresql.log" || tail -n 200 "$${PGROOT}/postgresql.log"
+      exit 1
+    fi
     trap 'runuser -u postgres -- pg_ctl -D "$${PGDATA}" -m fast -w stop || true' EXIT
     psql -c 'select version()' template1
   build-and-test: &build-and-test |
@@ -114,6 +133,66 @@ variables:
       $${SRCDIR}/raster/test/regress/rt_band \
       $${SRCDIR}/raster/test/regress/clean"
     echo "portability tier $${PORTABILITY_TIER} completed in $$(($$(date +%s) - $${PORTABILITY_STARTED}))s"
+  arm-targeted-test: &arm-targeted-test |
+    set -eux
+    export DEBIAN_FRONTEND=noninteractive
+    export SRCDIR="$${CI_WORKSPACE}"
+    apt-get update
+    apt-get install -y --no-install-recommends $${ARM_TARGETED_DEPS}
+    rm -rf /var/lib/apt/lists/*
+    cd "$${SRCDIR}"
+    uname -m | grep -E "$${ARM_UNAME_RE}"
+    cc --version | sed -n '1p'
+    /usr/lib/postgresql/17/bin/pg_config --version
+    ./autogen.sh
+    rm -rf "build/$${PORTABILITY_TIER}"
+    mkdir -p "build/$${PORTABILITY_TIER}"
+    cd "build/$${PORTABILITY_TIER}"
+    ../../configure \
+      --with-library-minor-version \
+      --disable-spellcheck-tests \
+      --without-interrupt-tests \
+      CFLAGS="-O2 -Wall -fno-omit-frame-pointer -Werror"
+    make -j1
+    make -C liblwgeom/cunit check
+    make install
+    chown -R postgres:postgres "$${SRCDIR}"
+    runuser -u postgres -- /usr/lib/postgresql/17/bin/pg_ctl \
+      -D /var/lib/postgresql/17/main \
+      -l /tmp/postgresql-17.log \
+      -o "-c config_file=/etc/postgresql/17/main/postgresql.conf -c unix_socket_directories=/tmp" \
+      -t 300 start
+    trap 'runuser -u postgres -- /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/17/main -m fast -w stop || true' EXIT
+    export PATH=/usr/lib/postgresql/17/bin:$${PATH}
+    export PGHOST=/tmp
+    export PGPORT=5432
+    export RUNTESTFLAGS="-v --extension"
+    runuser -u postgres -- make -C "$${SRCDIR}/build/$${PORTABILITY_TIER}" check-regress \
+      TESTS="$${SRCDIR}/regress/core/regress_index $${SRCDIR}/regress/core/regress_lrs"
+    runuser -u postgres -- make -C "$${SRCDIR}/build/$${PORTABILITY_TIER}" installcheck-base \
+      TESTS="$${SRCDIR}/regress/core/regress_index $${SRCDIR}/regress/core/regress_lrs"
+  binfmt-preflight: &binfmt-preflight |
+    export DEBIAN_FRONTEND=noninteractive
+    dpkg --add-architecture "$${FOREIGN_DEB_ARCH}"
+    apt-get update
+    mkdir -p "$${CI_WORKSPACE}/.tmp/portability-binfmt-$${FOREIGN_DEB_ARCH}"
+    cd "$${CI_WORKSPACE}/.tmp/portability-binfmt-$${FOREIGN_DEB_ARCH}"
+    apt-get download "busybox-static:$${FOREIGN_DEB_ARCH}"
+    deb="$$(ls -1 busybox-static_*_$${FOREIGN_DEB_ARCH}.deb | tail -n 1)"
+    root="$${PWD}/$${FOREIGN_DEB_ARCH}"
+    mkdir -p "$${root}"
+    dpkg-deb -x "$${deb}" "$${root}"
+    if ! output="$$("$${root}/bin/busybox" uname -m 2>&1)"; then
+      echo "Woodie agent host cannot execute $${FOREIGN_DEB_ARCH} binaries through binfmt_misc/QEMU."
+      echo "Install qemu-user, qemu-user-binfmt, and binfmt-support on the amd64 agent host."
+      echo "Observed error: $${output}"
+      exit 1
+    fi
+    if ! printf '%s\n' "$${output}" | grep -Eq "$${FOREIGN_UNAME_RE}"; then
+      echo "Woodie agent host executed $${FOREIGN_DEB_ARCH}, but uname -m returned unexpected value: $${output}"
+      exit 1
+    fi
+    echo "$${FOREIGN_DEB_ARCH} foreign execution ok: uname -m -> $${output}"
 
 clone:
   git:
@@ -128,6 +207,7 @@ steps:
     pull: true
     commands:
       - export PORTABILITY_TIER=native-unsigned-char
+      - *portability-gate
       - export PORTABILITY_CFLAGS="-O2 -Wall -Werror -fno-omit-frame-pointer -funsigned-char"
       - *abi-env
       - *start-postgresql
@@ -139,6 +219,7 @@ steps:
     pull: true
     commands:
       - export PORTABILITY_TIER=native-alignment-ubsan
+      - *portability-gate
       - export PORTABILITY_CC=clang
       - export DEBIAN_FRONTEND=noninteractive
       - apt-get update
@@ -154,18 +235,38 @@ steps:
       - ./autogen.sh
       - *build-and-test
 
+  preflight-armhf-binfmt:
+    image: debian:trixie-slim
+    pull: true
+    when: *integration-when
+    commands:
+      - export FOREIGN_DEB_ARCH=armhf
+      - export FOREIGN_UNAME_RE='^(armv7l|armv8l)$'
+      - *binfmt-preflight
+
+  preflight-arm64-binfmt:
+    image: debian:trixie-slim
+    pull: true
+    when: *integration-when
+    commands:
+      - export FOREIGN_DEB_ARCH=arm64
+      - export FOREIGN_UNAME_RE='^aarch64$'
+      - *binfmt-preflight
+
+  preflight-s390x-binfmt:
+    image: debian:trixie-slim
+    pull: true
+    when: *s390x-when
+    commands:
+      - export FOREIGN_DEB_ARCH=s390x
+      - export FOREIGN_UNAME_RE='^s390x$'
+      - *binfmt-preflight
+
   arm64-berrie64-qemu:
     image: arm64v8/debian:trixie-slim@sha256:8b5033c95ca60cdffb0e0f4c446e5f714e82d8960a9ef4153c0eaf13e988b0ea
     pull: true
-    # Keep this off broad pull-request runs. The emulated arm64 tier preserves
-    # the former standalone arm64 workflow's branch and cron coverage without
-    # making every contributor wait for expensive QEMU regression coverage.
-    when:
-      - event: push
-        branch:
-          - master
-          - stable-*
-      - event: cron
+    depends_on: preflight-arm64-binfmt
+    when: *integration-when
     commands:
       - uname -m | grep -E '^aarch64$'
       - export PORTABILITY_TIER=arm64-berrie64-qemu
@@ -179,6 +280,8 @@ steps:
   armhf-berrie-qemu:
     image: arm32v7/debian@sha256:743aca1ad24c5e48132df88f561f8d1365bfb6da33e006eb44b44fe32a7a30eb
     pull: true
+    depends_on: preflight-armhf-binfmt
+    when: *integration-when
     commands:
       - uname -m | grep -E '^(armv7l|armv8l)$'
       - export PORTABILITY_TIER=armhf-berrie-qemu
@@ -190,9 +293,37 @@ steps:
       - ./autogen.sh
       - *build-and-test
 
+  armhf-hostile-type-defaults-qemu:
+    image: arm32v7/debian@sha256:743aca1ad24c5e48132df88f561f8d1365bfb6da33e006eb44b44fe32a7a30eb
+    pull: true
+    depends_on: preflight-armhf-binfmt
+    when: *integration-when
+    commands:
+      - uname -m | grep -E '^(armv7l|armv8l)$'
+      - export PORTABILITY_TIER=armhf-hostile-type-defaults-qemu
+      - export PORTABILITY_CFLAGS="-g3 -O2 -Wall -Wcast-align=strict -Wstrict-aliasing=2 -fstrict-aliasing -fno-omit-frame-pointer -fsigned-char -fshort-enums -D_FILE_OFFSET_BITS=64 -fsanitize=alignment,undefined -fno-sanitize-recover=alignment"
+      - export PORTABILITY_LDFLAGS="-fsanitize=alignment,undefined"
+      - *prepare-debian
+      - *abi-env
+      - *start-postgresql
+      - ./autogen.sh
+      - *build-and-test
+
+  armhf-targeted-qemu:
+    image: arm32v7/debian:trixie-slim
+    pull: true
+    depends_on: preflight-armhf-binfmt
+    when: *integration-when
+    commands:
+      - export PORTABILITY_TIER=armhf-targeted-qemu
+      - export ARM_TARGETED_DEPS="autoconf automake bison build-essential ca-certificates file flex git libcurl4-openssl-dev libcunit1-dev libgdal-dev libgeos-dev libjson-c-dev libpcre2-dev libproj-dev libprotobuf-c-dev libsfcgal-dev libtool libxml2-dev locales perl pkg-config postgresql-17 postgresql-server-dev-17 protobuf-c-compiler"
+      - export ARM_UNAME_RE='^(armv7l|armv8l)$'
+      - *arm-targeted-test
+
   s390x-big-endian-qemu:
     image: s390x/debian@sha256:4b236f9aafe8a6201c6dca29ce78c28e1eb1e314ecedc2cd2c545f9e49d060e3
     pull: true
+    depends_on: preflight-s390x-binfmt
     # s390x is the only realistic big-endian coverage. It is intentionally not
     # run on every pull request: QEMU plus the geospatial dependency closure is
     # expensive, so master pushes, tags, and scheduled runs keep the signal
@@ -205,14 +336,7 @@ steps:
     # step completed four times and passed all four; there were no findings under
     # triage, so the mute had nothing left to justify it and a failure here now
     # fails the workflow like any other.
-    when:
-      - event: [push, tag, cron]
-        branch: master
-      - event: tag
-      - event: pull_request
-        path:
-          include:
-            - .woodpecker/portability.yml
+    when: *s390x-when
     commands:
       - uname -m | grep -E '^s390x$'
       - export PORTABILITY_TIER=s390x-big-endian-qemu
