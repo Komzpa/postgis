@@ -1,5 +1,6 @@
 labels:
   platform: linux/amd64
+  qemu: "true"
 when:
   event: [push, pull_request, tag, cron]
 
@@ -28,10 +29,18 @@ when:
 # OSGeo-hosted Debian Ports rootfs. Do not replace it with i386; that would miss
 # the big-endian and unsigned-char parts of the bug class.
 #
-# QEMU depends on persistent binfmt_misc registrations on the amd64 Woodie
-# agent host. Keep the scheduler selection host-neutral and let the preflight
-# steps below fail loudly when an agent cannot execute the requested foreign
-# architecture.
+# QEMU depends on persistent binfmt_misc registrations on the amd64 Woodie agent
+# host, so this workflow asks for the capability and never for a machine. The
+# `qemu` label is not a host pin: it is what keeps these steps off agents that
+# cannot start a foreign-architecture image at all. Measured over the last 25
+# terminal pipelines, portability ran 18 times and every one landed on an agent
+# carrying the label, while ordinary workflows went to the others 163 times --
+# without the label about a third of these runs would be offered to an agent
+# with no binfmt handler.
+#
+# The preflight steps below stay, and are the other half: a label only says an
+# agent claims the capability, and the preflight is what fails loudly, with the
+# packages to install, when the claim is no longer true.
 variables:
   native-image: &native-image repo.osgeo.org/postgis/build-test:debian13
   integration-when: &integration-when
@@ -59,9 +68,9 @@ variables:
     rm -rf /var/lib/apt/lists/*
   portability-gate: &portability-gate >-
     export SRCDIR=$${CI_WORKSPACE}; cd "$${SRCDIR}"; python3
-    "$${SRCDIR}/ci/ci_need_suite.py" portability; gate_status=$$?; if test
-    "$${gate_status}" = 78; then exit 0; elif test "$${gate_status}" != 0; then
-    exit "$${gate_status}"; fi
+    "$${SRCDIR}/ci/ci_need_suite.py" portability || gate_status=$$?;
+    gate_status=$${gate_status:-0}; if test "$${gate_status}" = 78; then exit
+    0; elif test "$${gate_status}" != 0; then exit "$${gate_status}"; fi
   abi-env: &abi-env |
     export SRCDIR=$${CI_WORKSPACE}
     export BUILDDIR=$${SRCDIR}/build/portability-$${PORTABILITY_TIER}
@@ -183,7 +192,7 @@ variables:
     mkdir -p "$${root}"
     dpkg-deb -x "$${deb}" "$${root}"
     if ! output="$$("$${root}/bin/busybox" uname -m 2>&1)"; then
-      echo "Woodie agent host cannot execute $${FOREIGN_DEB_ARCH} binaries through binfmt_misc/QEMU."
+      echo "this agent has no binfmt handler for $${FOREIGN_DEB_ARCH}; the portability job needs one"
       echo "Install qemu-user, qemu-user-binfmt, and binfmt-support on the amd64 agent host."
       echo "Observed error: $${output}"
       exit 1
