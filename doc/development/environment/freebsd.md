@@ -9,7 +9,7 @@ The current FreeBSD pull-request build is defined in
 `.github/workflows/ci-freebsd.yml`. Use that workflow as the source of truth
 when checking platform-specific dependencies or flags.
 
-At the time of this note, the job runs FreeBSD 14.3 through
+At the time of this note, the job runs FreeBSD 14.4 through
 `vmactions/freebsd-vm`, switches the package repository from quarterly to
 latest, installs PostgreSQL 17 packages, and builds with clang through ccache.
 It builds the topology, SFCGAL, and protobuf paths, but disables raster and GUI:
@@ -71,7 +71,7 @@ flags against `.github/workflows/ci-freebsd.yml`.
 
 ## Woodie FreeBSD local-backend runner
 
-PostGIS also has an adoptable FreeBSD 14.3 KVM recipe in the buildbot
+PostGIS also has an adoptable FreeBSD 14.4 KVM recipe in the buildbot
 repository:
 
 ```sh
@@ -87,10 +87,9 @@ image, seeds SSH access, installs the package set, records the resolved package
 lock, and runs the complete PostGIS suite. Generated VM images, logs, runtime
 artifacts, SSH keys, and Woodpecker secrets stay out of git.
 
-The 2026-07-27 geocint run used 16 vCPU and 16 GiB of configured RAM against
-PostGIS commit `173625554850bd7c8214087d5dcccd12c3af5865`. Build plus test time
-was 2153 seconds, or 35m53s. A disposable VM run including boot, SSH wait,
-source copy, and wrapper overhead was about 41 minutes. A persistent Woodie
+The geocint runner uses 16 vCPU and 16 GiB of configured RAM. The complete
+suite should be budgeted at about 41 minutes including boot, SSH wait, source
+copy, and wrapper overhead. A persistent Woodie
 local-backend VM avoids most boot/copy overhead but should still be budgeted as
 an integration-branch signal rather than a default for every pull request.
 
