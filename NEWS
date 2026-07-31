@@ -71,6 +71,8 @@ These are only changes since 3.7.0beta1.
    in geometry_columns and geography_columns views (Regina Obe)
 
 * Enhancements *
+ - #1195, [topology] Add CopyTopology option to skip layer copies
+          (Darafei Praliaskouski)
 
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
@@ -132,9 +134,6 @@ These are only changes since 3.7.0alpha1.
             (Bas Couwenberg)
 
 * Enhancements *
-
- - #1195, [topology] Add CopyTopology option to skip layer copies
-          (Darafei Praliaskouski)
 
  - #1986, ST_GeomFromGML support for GML ArcString and curved polygon rings
           (Darafei Praliaskouski)
