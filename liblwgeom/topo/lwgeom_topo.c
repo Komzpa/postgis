@@ -5499,6 +5499,16 @@ _lwt_SnapEdgeToExistingNode(
   LWCOLLECTION *splitC = lwgeom_as_lwcollection(splitE);
   if ( splitC->ngeoms != 2 )
   {
+	  const POINT2D *pt = getPoint2d_cp(node->geom->point, 0);
+	  LWLINE *snapL = lwgeom_as_lwline(snapE);
+	  const POINT2D *start = getPoint2d_cp(snapL->points, 0);
+	  const POINT2D *end = getPoint2d_cp(snapL->points, snapL->points->npoints - 1);
+	  if (distance2d_pt_pt(pt, start) <= tol || distance2d_pt_pt(pt, end) <= tol)
+	  {
+		  lwgeom_free(splitE);
+		  lwgeom_free(snapE);
+		  return 0;
+	  }
     lwerror("Split of edge resulted in %d components", splitC->ngeoms);
     return -1;
   }
