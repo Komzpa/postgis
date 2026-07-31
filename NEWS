@@ -69,6 +69,8 @@ These are only changes since 3.7.0beta1.
 
  - Schema qualify references to pg_catalog and postgis
    in geometry_columns and geography_columns views (Regina Obe)
+ - #5722, [topology] Use component-scale tolerance when adding
+          noded TopoGeo_AddLineString edges (Sandro Santilli)
 
 * Enhancements *
 
@@ -91,9 +93,6 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
 These are only changes since 3.7.0alpha1.
 
 * Bug Fixes *
-
- - #5722, [topology] Use component-scale tolerance when adding
-          noded TopoGeo_AddLineString edges (Sandro Santilli)
 
  - GH-1160, Adapt topology, regression expectations, and manual examples
           to GEOS 3.15 overlay line merging (Paul Ramsey, Darafei Praliaskouski)
