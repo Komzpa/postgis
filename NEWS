@@ -61,6 +61,8 @@ These are only changes since 3.7.0beta1.
           geometry data (Darafei Praliaskouski)
  - GT-564, Avoid ST_MakePolygon failures with NULL hole array entries
           (Darafei Praliaskouski)
+ - #5886, [topology] Snap line vertices to nearby edge interiors while building
+          topology (Darafei Praliaskouski)
  - #6109, Out-of-bounds heap read in BOX2D_out and BOX2D_expand
    on 65-byte box2d under ASAN (Dennis Tighe, Google)
  - #6110, Fix regression in speed with geometry_columns (Regina Obe)
@@ -92,8 +94,6 @@ These are only changes since 3.7.0alpha1.
 
 * Bug Fixes *
 
- - #5886, [topology] Snap line vertices to nearby edge interiors while building
-          topology (Darafei Praliaskouski)
 
  - GH-1160, Adapt topology, regression expectations, and manual examples
           to GEOS 3.15 overlay line merging (Paul Ramsey, Darafei Praliaskouski)
