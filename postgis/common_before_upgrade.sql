@@ -2059,7 +2059,13 @@ BEGIN
 							WHEN (
 								(
 									skipped_repair
-									AND domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+									AND (
+										domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+										OR (
+											domain_constraint.domain_schema = domain_schema
+											AND domain_constraint.domain_name = domain_name
+										)
+									)
 								)
 								OR (
 									restored_domain_array_columns
@@ -2074,7 +2080,13 @@ BEGIN
 					);
 					EXECUTE sql;
 					IF skipped_repair
-						AND domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+						AND (
+							domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+							OR (
+								domain_constraint.domain_schema = domain_schema
+								AND domain_constraint.domain_name = domain_name
+							)
+						)
 						AND (
 							domain_constraint.not_valid_by_repair
 							OR domain_constraint.constraint_def !~* '[[:space:]]NOT[[:space:]]+VALID[[:space:]]*$'
