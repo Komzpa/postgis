@@ -8,6 +8,9 @@ These are only changes since 3.7.0beta2.
 
 * Bug Fixes *
 
+ - #5932, #5933, [topology] Add TopoElementArray constructor and
+          CreateTopoGeom support for single TopoElements
+          (Darafei Praliaskouski)
 
 
 
@@ -82,7 +85,6 @@ These are only changes since 3.7.0beta1.
 
  - Schema qualify references to pg_catalog and postgis
    in geometry_columns and geography_columns views (Regina Obe)
-
 * Enhancements *
 
  - Add Woodpecker linux/arm64 build and regression coverage under
@@ -104,10 +106,6 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
 These are only changes since 3.7.0alpha1.
 
 * Bug Fixes *
-
- - #5932, #5933, [topology] Add TopoElementArray constructor and
-          CreateTopoGeom support for single TopoElements
-          (Darafei Praliaskouski)
 
  - GH-1160, Adapt topology, regression expectations, and manual examples
           to GEOS 3.15 overlay line merging (Paul Ramsey, Darafei Praliaskouski)
