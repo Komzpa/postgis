@@ -269,6 +269,28 @@ BEGIN
 			FROM nested_type
 				INTO nested_topology_type_oids;
 
+			-- Existing array-of-domain columns force restored constraints on
+			-- the current domain to stay NOT VALID. PostgreSQL otherwise
+			-- validates the newly-added domain constraint against array
+			-- elements during the repair.
+			IF EXISTS (
+				SELECT 1
+				FROM pg_catalog.pg_attribute AS a
+				JOIN pg_catalog.pg_class AS c
+					ON c.oid = a.attrelid
+				JOIN pg_catalog.pg_type AS at
+					ON at.oid = a.atttypid
+				WHERE (
+					a.atttypid = domain_array_oid
+					OR at.typelem = domain_oid
+				)
+				AND a.attnum > 0
+				AND NOT a.attisdropped
+				AND c.relkind IN ('r', 'p', 'm')
+			) THEN
+				restored_domain_array_columns := true;
+			END IF;
+
 			FOR domain_default IN
 				SELECT
 					n.nspname AS domain_schema,
@@ -335,7 +357,14 @@ BEGIN
 						'name', domain_constraint.conname,
 						'definition', domain_constraint.constraint_def,
 						'convalidated', domain_constraint.convalidated,
-						'not_valid_by_repair', domain_constraint.not_valid_by_repair
+						'not_valid_by_repair',
+							domain_constraint.not_valid_by_repair
+							OR (
+								restored_domain_array_columns
+								AND domain_constraint.convalidated
+								AND domain_constraint.domain_schema = domain_schema
+								AND domain_constraint.domain_name = domain_name
+							)
 					)
 				);
 				sql := pg_catalog.format(
@@ -1983,7 +2012,12 @@ BEGIN
 					FROM pg_catalog.pg_attribute AS a
 					JOIN pg_catalog.pg_class AS c
 						ON c.oid = a.attrelid
-					WHERE a.atttypid = domain_array_oid
+					JOIN pg_catalog.pg_type AS at
+						ON at.oid = a.atttypid
+					WHERE (
+						a.atttypid = domain_array_oid
+						OR at.typelem = domain_oid
+					)
 					AND a.attnum > 0
 					AND NOT a.attisdropped
 					AND c.relkind IN ('r', 'p', 'm')
@@ -2091,16 +2125,25 @@ BEGIN
 								)
 							)
 								AND domain_constraint.constraint_def !~* '[[:space:]]NOT[[:space:]]+VALID[[:space:]]*$'
-							THEN ' NOT VALID'
-							ELSE ''
-						END
-					);
-					EXECUTE sql;
-					IF skipped_repair
-						AND (
-							domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+								THEN ' NOT VALID'
+								ELSE ''
+							END
+						);
+						EXECUTE sql;
+					IF (
+							(
+								skipped_repair
+								AND (
+									domain_constraint.domain_oid = ANY(skipped_domain_constraint_oids)
+									OR (
+										domain_constraint.domain_schema = domain_schema
+										AND domain_constraint.domain_name = domain_name
+									)
+								)
+							)
 							OR (
-								domain_constraint.domain_schema = domain_schema
+								restored_domain_array_columns
+								AND domain_constraint.domain_schema = domain_schema
 								AND domain_constraint.domain_name = domain_name
 							)
 						)

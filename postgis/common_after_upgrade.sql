@@ -87,6 +87,279 @@ WHEN undefined_table THEN
 END
 $POSTGIS_DOMAIN_DEFAULT_RESTORE$;
 
+DO LANGUAGE 'plpgsql'
+$POSTGIS_TOPOLOGY_NESTED_DOMAIN_DEFAULT_RESTORE$
+DECLARE
+	rec RECORD;
+	sql TEXT;
+BEGIN
+	FOR rec IN
+		WITH RECURSIVE topology_domain(type_oid) AS (
+			SELECT t.oid
+			FROM pg_catalog.pg_type AS t
+			JOIN pg_catalog.pg_namespace AS n
+				ON n.oid = t.typnamespace
+			WHERE n.nspname = 'topology'
+			AND t.typname IN ('topoelement', 'topoelementarray')
+			UNION
+			SELECT t.oid
+			FROM topology_domain
+			JOIN pg_catalog.pg_type AS t
+				ON t.typbasetype = topology_domain.type_oid
+			WHERE t.typtype = 'd'
+		)
+		SELECT
+			n.nspname AS domain_schema,
+			t.typname AS domain_name,
+			t.oid::regtype::text AS domain_type,
+			pg_catalog.pg_get_expr(t.typdefaultbin, 0) AS default_expr
+		FROM topology_domain
+		JOIN pg_catalog.pg_type AS t
+			ON t.oid = topology_domain.type_oid
+		JOIN pg_catalog.pg_namespace AS n
+			ON n.oid = t.typnamespace
+		WHERE t.typtype = 'd'
+		AND t.typdefaultbin IS NOT NULL
+		AND pg_catalog.pg_get_expr(t.typdefaultbin, 0) NOT LIKE '%::text)%'
+	LOOP
+		sql := pg_catalog.format(
+			'ALTER DOMAIN %I.%I DROP DEFAULT',
+			rec.domain_schema,
+			rec.domain_name
+		);
+		EXECUTE sql;
+
+		sql := pg_catalog.format(
+			'ALTER DOMAIN %I.%I SET DEFAULT ((%s)::text::%s)',
+			rec.domain_schema,
+			rec.domain_name,
+			rec.default_expr,
+			rec.domain_type
+		);
+		EXECUTE sql;
+	END LOOP;
+END
+$POSTGIS_TOPOLOGY_NESTED_DOMAIN_DEFAULT_RESTORE$;
+
+DO LANGUAGE 'plpgsql'
+$POSTGIS_TOPOLOGY_COLUMN_DEFAULT_RESTORE$
+DECLARE
+	rec RECORD;
+	sql TEXT;
+BEGIN
+	FOR rec IN
+		WITH RECURSIVE topology_domain(type_oid) AS (
+			SELECT t.oid
+			FROM pg_catalog.pg_type AS t
+			JOIN pg_catalog.pg_namespace AS n
+				ON n.oid = t.typnamespace
+			WHERE n.nspname = 'topology'
+			AND t.typname IN ('topoelement', 'topoelementarray')
+			UNION
+			SELECT t.oid
+			FROM topology_domain
+			JOIN pg_catalog.pg_type AS t
+				ON t.typbasetype = topology_domain.type_oid
+			WHERE t.typtype = 'd'
+		)
+		SELECT
+			a.attrelid,
+			a.attname,
+			CASE
+				WHEN at.typelem = ANY(pg_catalog.array_agg(topology_domain.type_oid) OVER ())
+				THEN a.atttypid::regtype::text
+				ELSE at.typbasetype::regtype::text
+			END AS target_type,
+			pg_catalog.pg_get_expr(d.adbin, d.adrelid) AS default_expr,
+			CASE
+				WHEN at.typelem = ANY(pg_catalog.array_agg(topology_domain.type_oid) OVER ())
+				THEN 'pg_catalog.text[]'
+				ELSE 'pg_catalog.text'
+			END AS text_type
+		FROM pg_catalog.pg_attribute AS a
+		JOIN pg_catalog.pg_attrdef AS d
+			ON d.adrelid = a.attrelid
+			AND d.adnum = a.attnum
+		JOIN pg_catalog.pg_type AS at
+			ON at.oid = a.atttypid
+		JOIN topology_domain
+			ON a.atttypid = topology_domain.type_oid
+			OR at.typelem = topology_domain.type_oid
+		WHERE a.attnum > 0
+		AND NOT a.attisdropped
+		AND a.attgenerated = ''
+	LOOP
+		IF rec.text_type = 'pg_catalog.text[]'
+			AND rec.default_expr LIKE '%::text[])::%'
+		THEN
+			CONTINUE;
+		END IF;
+
+		IF rec.text_type = 'pg_catalog.text'
+			AND rec.default_expr LIKE '%::text)::%'
+			AND rec.default_expr LIKE '%' || rec.target_type || '%'
+		THEN
+			CONTINUE;
+		END IF;
+
+		sql := pg_catalog.format(
+			'ALTER TABLE %s ALTER COLUMN %I SET DEFAULT ((%s)::%s::%s)',
+			rec.attrelid::regclass,
+			rec.attname,
+			rec.default_expr,
+			rec.text_type,
+			rec.target_type
+		);
+		EXECUTE sql;
+	END LOOP;
+END
+$POSTGIS_TOPOLOGY_COLUMN_DEFAULT_RESTORE$;
+
+DO LANGUAGE 'plpgsql'
+$POSTGIS_TOPOLOGY_DOMAIN_CONSTRAINT_RESTORE$
+DECLARE
+	rec RECORD;
+	domain_constraint RECORD;
+	sql TEXT;
+	constraint_not_valid_marker TEXT := 'postgis-topology-domain-constraint-not-valid-by-repair-306';
+BEGIN
+	FOR rec IN
+		WITH RECURSIVE topology_domain(type_oid) AS (
+			SELECT t.oid
+			FROM pg_catalog.pg_type AS t
+			JOIN pg_catalog.pg_namespace AS n
+				ON n.oid = t.typnamespace
+			WHERE n.nspname = 'topology'
+			AND t.typname IN ('topoelement', 'topoelementarray')
+			UNION
+			SELECT t.oid
+			FROM topology_domain
+			JOIN pg_catalog.pg_type AS t
+				ON t.typbasetype = topology_domain.type_oid
+			WHERE t.typtype = 'd'
+		)
+		SELECT
+			t.oid AS domain_oid,
+			n.nspname AS domain_schema,
+			t.typname AS domain_name
+		FROM topology_domain
+		JOIN pg_catalog.pg_type AS t
+			ON t.oid = topology_domain.type_oid
+		JOIN pg_catalog.pg_namespace AS n
+			ON n.oid = t.typnamespace
+		AND EXISTS (
+			SELECT 1
+			FROM pg_catalog.pg_attribute AS a
+			JOIN pg_catalog.pg_class AS c
+				ON c.oid = a.attrelid
+			JOIN pg_catalog.pg_type AS at
+				ON at.oid = a.atttypid
+			WHERE (
+				a.atttypid = t.typarray
+				OR at.typelem = t.oid
+				OR a.atttypid = t.oid
+			)
+			AND a.attnum > 0
+			AND NOT a.attisdropped
+			AND c.relkind IN ('r', 'p', 'm', 'c')
+		)
+	LOOP
+		FOR domain_constraint IN
+			SELECT
+				con.conname,
+				pg_catalog.regexp_replace(
+					pg_catalog.pg_get_constraintdef(con.oid),
+					'[[:space:]]+NOT[[:space:]]+VALID[[:space:]]*$',
+					'',
+					'i'
+				) AS constraint_def
+			FROM pg_catalog.pg_constraint AS con
+			WHERE con.contypid = rec.domain_oid
+			AND con.convalidated
+		LOOP
+			sql := pg_catalog.format(
+				'ALTER DOMAIN %I.%I DROP CONSTRAINT %I',
+				rec.domain_schema,
+				rec.domain_name,
+				domain_constraint.conname
+			);
+			EXECUTE sql;
+
+			sql := pg_catalog.format(
+				'ALTER DOMAIN %I.%I ADD CONSTRAINT %I %s NOT VALID',
+				rec.domain_schema,
+				rec.domain_name,
+				domain_constraint.conname,
+				domain_constraint.constraint_def
+			);
+			EXECUTE sql;
+
+			sql := pg_catalog.format(
+				'COMMENT ON CONSTRAINT %I ON DOMAIN %I.%I IS %L',
+				domain_constraint.conname,
+				rec.domain_schema,
+				rec.domain_name,
+				constraint_not_valid_marker
+			);
+			EXECUTE sql;
+		END LOOP;
+
+		FOR domain_constraint IN
+			SELECT *
+			FROM (
+				VALUES
+					(
+						'topoelement',
+						'dimensions',
+						'CHECK (array_upper(VALUE, 2) IS NULL AND array_upper(VALUE, 1) = 2)'
+					),
+					(
+						'topoelement',
+						'type_range',
+						'CHECK (VALUE[2] > 0)'
+					),
+					(
+						'topoelement',
+						'lower_dimension',
+						'CHECK (array_lower(VALUE, 1) = 1)'
+					),
+					(
+						'topoelementarray',
+						'type_range',
+						'CHECK (array_upper(VALUE, 2) = 2 AND array_upper(VALUE, 3) IS NULL)'
+					)
+			) AS canonical_constraint(domain_name, conname, constraint_def)
+			WHERE rec.domain_schema = 'topology'
+			AND canonical_constraint.domain_name = rec.domain_name
+			AND NOT EXISTS (
+				SELECT 1
+				FROM pg_catalog.pg_constraint AS con
+				WHERE con.contypid = rec.domain_oid
+				AND con.conname = canonical_constraint.conname
+			)
+		LOOP
+			sql := pg_catalog.format(
+				'ALTER DOMAIN %I.%I ADD CONSTRAINT %I %s NOT VALID',
+				rec.domain_schema,
+				rec.domain_name,
+				domain_constraint.conname,
+				domain_constraint.constraint_def
+			);
+			EXECUTE sql;
+
+			sql := pg_catalog.format(
+				'COMMENT ON CONSTRAINT %I ON DOMAIN %I.%I IS %L',
+				domain_constraint.conname,
+				rec.domain_schema,
+				rec.domain_name,
+				constraint_not_valid_marker
+			);
+			EXECUTE sql;
+		END LOOP;
+	END LOOP;
+END
+$POSTGIS_TOPOLOGY_DOMAIN_CONSTRAINT_RESTORE$;
+
 -- DROP auxiliary function (created by common_before_upgrade.sql)
 DROP FUNCTION _postgis_drop_function_by_identity(text, text, text);
 DROP FUNCTION _postgis_drop_function_by_signature(text, text);
