@@ -1974,6 +1974,23 @@ BEGIN
 				DELETE FROM pg_temp._postgis_topology_domain_array_columns
 				WHERE target_domain_type = pg_catalog.format('%I.%I[]', domain_schema, domain_name);
 
+				-- A half-upgraded database can already expose the new domain base
+				-- type while array-of-domain columns still depend on the domain.
+				-- Even after their storage is rewritten, PostgreSQL requires any
+				-- newly-added domain constraints to be NOT VALID.
+				IF EXISTS (
+					SELECT 1
+					FROM pg_catalog.pg_attribute AS a
+					JOIN pg_catalog.pg_class AS c
+						ON c.oid = a.attrelid
+					WHERE a.atttypid = domain_array_oid
+					AND a.attnum > 0
+					AND NOT a.attisdropped
+					AND c.relkind IN ('r', 'p', 'm')
+				) THEN
+					restored_domain_array_columns := true;
+				END IF;
+
 				-- Skipped carrier types may wrap topology domains through arrays,
 				-- user domains, composites, or table row types. Expose every
 				-- contained type OID before choosing validated restoration for the
