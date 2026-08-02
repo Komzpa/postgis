@@ -71,16 +71,24 @@ flags against `.github/workflows/ci-freebsd.yml`.
 
 ## Woodie FreeBSD local-backend runner
 
-PostGIS also has an adoptable FreeBSD 14.4 KVM recipe in the buildbot
-repository:
+PostGIS also has an adoptable FreeBSD KVM recipe in the buildbot repository. It
+lives on the `freebsd14-runner-iac` branch, not on `master`, so the branch has
+to be named when cloning:
 
 ```sh
-git clone https://gitea.osgeo.org/postgis/postgis-buildbots.git
+git clone -b freebsd14-runner-iac https://gitea.osgeo.org/postgis/postgis-buildbots.git
 cd postgis-buildbots/freebsd/freebsd14_runner
 cp config/runner.env config/runner.local.env
 $EDITOR config/runner.local.env
 make all
 ```
+
+The recipe pins `FREEBSD_VERSION="14.3-RELEASE"`, and the runner deployed on
+geocint reports `14.3-RELEASE-p16`. **FreeBSD 14.3 reached end of life on 30
+June 2026.** Moving to a supported release means rebuilding the guest from a
+newer image, not upgrading in place through this recipe; until that happens the
+Woodie FreeBSD signal comes from an unsupported release. The GitHub workflow is
+a separate matter and already pins 14.4.
 
 The recipe is project-owned infrastructure-as-code. It fetches the FreeBSD cloud
 image, seeds SSH access, installs the package set, records the resolved package
