@@ -338,6 +338,10 @@ BEGIN
 					con.conname,
 					pg_catalog.pg_get_constraintdef(con.oid) AS constraint_def,
 					con.convalidated,
+					-- Keep the user's own comment. It is dropped with the
+					-- constraint and there is nowhere else to read it back from,
+					-- so a successful upgrade would delete it for good.
+					pg_catalog.obj_description(con.oid, 'pg_constraint') AS concomment,
 					pg_catalog.obj_description(con.oid, 'pg_constraint') LIKE '%' || constraint_not_valid_marker || '%' AS not_valid_by_repair
 				FROM pg_catalog.pg_constraint AS con
 				JOIN pg_catalog.pg_type AS t
@@ -355,6 +359,7 @@ BEGIN
 						'name', domain_constraint.conname,
 						'definition', domain_constraint.constraint_def,
 						'convalidated', domain_constraint.convalidated,
+						'comment', domain_constraint.concomment,
 						'not_valid_by_repair',
 							domain_constraint.not_valid_by_repair
 							OR (
@@ -2064,7 +2069,8 @@ BEGIN
 								'i'
 							)
 						END AS constraint_def,
-						COALESCE((value->>'not_valid_by_repair')::boolean, false) AS not_valid_by_repair
+						COALESCE((value->>'not_valid_by_repair')::boolean, false) AS not_valid_by_repair,
+						value->>'comment' AS concomment
 					FROM pg_catalog.jsonb_array_elements(domain_constraint_defs) AS value
 				LOOP
 					-- If some old-width rows were intentionally skipped, restoring
@@ -2132,12 +2138,33 @@ BEGIN
 							OR domain_constraint.constraint_def !~* '[[:space:]]NOT[[:space:]]+VALID[[:space:]]*$'
 						)
 					THEN
+						-- Carry the user's comment along with the marker. The
+						-- marker is matched with LIKE, so appending the original
+						-- text keeps the retry logic working while not destroying
+						-- what the user wrote.
 						sql := pg_catalog.format(
 							'COMMENT ON CONSTRAINT %I ON DOMAIN %I.%I IS %L',
 							domain_constraint.conname,
 							domain_constraint.domain_schema,
 							domain_constraint.domain_name,
-							constraint_not_valid_marker
+							CASE
+								WHEN domain_constraint.concomment IS NULL
+									OR domain_constraint.concomment LIKE '%' || constraint_not_valid_marker || '%'
+								THEN constraint_not_valid_marker
+								ELSE constraint_not_valid_marker || ' ' || domain_constraint.concomment
+							END
+						);
+						EXECUTE sql;
+					ELSIF domain_constraint.concomment IS NOT NULL THEN
+						-- The constraint was dropped and re-added, which drops its
+						-- comment with it. Nothing else remembers it, so a
+						-- successful upgrade would delete user metadata for good.
+						sql := pg_catalog.format(
+							'COMMENT ON CONSTRAINT %I ON DOMAIN %I.%I IS %L',
+							domain_constraint.conname,
+							domain_constraint.domain_schema,
+							domain_constraint.domain_name,
+							domain_constraint.concomment
 						);
 						EXECUTE sql;
 					END IF;
@@ -2187,9 +2214,19 @@ BEGIN
 			GET STACKED DIAGNOSTICS
 				context := PG_EXCEPTION_CONTEXT,
 				detail := PG_EXCEPTION_DETAIL;
-			RAISE WARNING 'Could not modify % from % to %, got % (%)',
+			-- Do not return normally here. PL/pgSQL has already rolled this
+			-- block back, which undoes the catalog rewrite this function exists
+			-- to perform *and* the marker that would have told a later upgrade
+			-- to retry. Returning leaves the caller, and the enclosing
+			-- ALTER EXTENSION, believing the storage was rewritten when it was
+			-- not -- the exact failure this change was written to remove, just
+			-- reached by a different route. One legal user constraint is enough:
+			-- CHECK (pg_typeof(VALUE)::text = 'integer[]') stops being true the
+			-- moment the domain becomes bigint[], validation fails with 23514,
+			-- and the database ends up with a new extension version over old
+			-- storage.
+			RAISE EXCEPTION 'Could not modify % from % to %, got % (%)',
 				domain_name, old_domain_type, new_domain_type, SQLERRM, SQLSTATE USING DETAIL = detail, HINT = context;
-			RETURN;
 		END;
 	ELSE
 		RAISE DEBUG 'Deprecated domain (topology.% with type %) does not exist', domain_name, old_domain_type;
