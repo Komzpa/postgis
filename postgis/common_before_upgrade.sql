@@ -186,6 +186,10 @@ DECLARE
 	domain_schema TEXT := 'topology';
 	domain_constraint RECORD;
 	domain_constraint_defs JSONB := '[]'::JSONB;
+	-- Extension updates can run inside a security-restricted operation, where
+	-- temporary-table DDL is forbidden. Keep transient repair state local.
+	domain_default_defs JSONB := '[]'::JSONB;
+	domain_array_column_defs JSONB := '[]'::JSONB;
 	domain_column RECORD;
 	domain_default_expr TEXT;
 	domain_default RECORD;
@@ -309,13 +313,6 @@ BEGIN
 				-- default expression compiled against the old array storage.
 				-- Save it before the base domain catalog rewrite and restore it
 				-- through text after the new topology storage is in force.
-				CREATE TEMP TABLE IF NOT EXISTS pg_temp._postgis_topology_domain_defaults (
-					domain_schema TEXT,
-					domain_name TEXT,
-					default_expr TEXT,
-					new_domain_type TEXT
-				) ON COMMIT DROP;
-
 				sql := pg_catalog.format(
 					'ALTER DOMAIN %I.%I DROP DEFAULT',
 					domain_default.domain_schema,
@@ -323,13 +320,14 @@ BEGIN
 				);
 				EXECUTE sql;
 
-				INSERT INTO pg_temp._postgis_topology_domain_defaults
-					VALUES (
-						domain_default.domain_schema,
-						domain_default.domain_name,
-						domain_default.default_expr,
-						domain_default.new_domain_type
-					);
+				domain_default_defs := domain_default_defs || pg_catalog.jsonb_build_array(
+					pg_catalog.jsonb_build_object(
+						'domain_schema', domain_default.domain_schema,
+						'domain_name', domain_default.domain_name,
+						'default_expr', domain_default.default_expr,
+						'new_domain_type', domain_default.new_domain_type
+					)
+				);
 			END LOOP;
 
 			FOR domain_constraint IN
@@ -476,20 +474,14 @@ BEGIN
 				);
 				EXECUTE sql;
 
-				CREATE TEMP TABLE IF NOT EXISTS pg_temp._postgis_topology_domain_defaults (
-					domain_schema TEXT,
-					domain_name TEXT,
-					default_expr TEXT,
-					new_domain_type TEXT
-				) ON COMMIT DROP;
-
-				INSERT INTO pg_temp._postgis_topology_domain_defaults
-					VALUES (
-						domain_schema,
-						domain_name,
-						domain_default_expr,
-						new_domain_type
-					);
+				domain_default_defs := domain_default_defs || pg_catalog.jsonb_build_array(
+					pg_catalog.jsonb_build_object(
+						'domain_schema', domain_schema,
+						'domain_name', domain_name,
+						'default_expr', domain_default_expr,
+						'new_domain_type', new_domain_type
+					)
+				);
 			END IF;
 
 			-- Rewrite-rule, row-level security policy, trigger,
@@ -1631,20 +1623,14 @@ BEGIN
 				END IF;
 
 				IF domain_column.is_domain_array THEN
-					CREATE TEMP TABLE IF NOT EXISTS pg_temp._postgis_topology_domain_array_columns (
-						attrelid OID,
-						attname NAME,
-						target_domain_type TEXT,
-						default_expr TEXT
-					) ON COMMIT DROP;
-
-					INSERT INTO pg_temp._postgis_topology_domain_array_columns
-						VALUES (
-							domain_column.attrelid,
-							domain_column.attname,
-							domain_column.target_domain_type,
-							domain_column.default_expr
-						);
+					domain_array_column_defs := domain_array_column_defs || pg_catalog.jsonb_build_array(
+						pg_catalog.jsonb_build_object(
+							'attrelid', domain_column.attrelid,
+							'attname', domain_column.attname,
+							'target_domain_type', domain_column.target_domain_type,
+							'default_expr', domain_column.default_expr
+						)
+					);
 				END IF;
 
 				IF domain_column.is_domain_array THEN
@@ -1965,17 +1951,14 @@ BEGIN
 				-- constraints. Recasting text[] after NOT VALID constraints are
 				-- back would validate each element as a new domain value, which
 				-- defeats the incomplete-repair path for grandfathered rows.
-				CREATE TEMP TABLE IF NOT EXISTS pg_temp._postgis_topology_domain_array_columns (
-					attrelid OID,
-					attname NAME,
-					target_domain_type TEXT,
-					default_expr TEXT
-				) ON COMMIT DROP;
-
 				FOR domain_column IN
-					SELECT *
-					FROM pg_temp._postgis_topology_domain_array_columns
-					WHERE target_domain_type = pg_catalog.format('%I.%I[]', domain_schema, domain_name)
+					SELECT
+						(value->>'attrelid')::OID AS attrelid,
+						value->>'attname' AS attname,
+						value->>'target_domain_type' AS target_domain_type,
+						value->>'default_expr' AS default_expr
+					FROM pg_catalog.jsonb_array_elements(domain_array_column_defs) AS value
+					WHERE value->>'target_domain_type' = pg_catalog.format('%I.%I[]', domain_schema, domain_name)
 				LOOP
 					restored_domain_array_columns := true;
 					sql := pg_catalog.format(
@@ -1999,9 +1982,6 @@ BEGIN
 						EXECUTE sql;
 					END IF;
 				END LOOP;
-
-				DELETE FROM pg_temp._postgis_topology_domain_array_columns
-				WHERE target_domain_type = pg_catalog.format('%I.%I[]', domain_schema, domain_name);
 
 				-- A half-upgraded database can already expose the new domain base
 				-- type while array-of-domain columns still depend on the domain.
@@ -2161,6 +2141,27 @@ BEGIN
 						);
 						EXECUTE sql;
 					END IF;
+				END LOOP;
+
+				-- Restore domain defaults only after their constraints are back.
+				-- Reinstalling a nested default first can recurse through a domain
+				-- whose constraint set is still being rebuilt.
+				FOR domain_default IN
+					SELECT
+						value->>'domain_schema' AS domain_schema,
+						value->>'domain_name' AS domain_name,
+						value->>'default_expr' AS default_expr,
+						value->>'new_domain_type' AS new_domain_type
+					FROM pg_catalog.jsonb_array_elements(domain_default_defs) AS value
+				LOOP
+					sql := pg_catalog.format(
+						'ALTER DOMAIN %I.%I SET DEFAULT ((%s)::text::%s)',
+						domain_default.domain_schema,
+						domain_default.domain_name,
+						domain_default.default_expr,
+						domain_default.new_domain_type
+					);
+					EXECUTE sql;
 				END LOOP;
 
 			IF skipped_repair THEN
