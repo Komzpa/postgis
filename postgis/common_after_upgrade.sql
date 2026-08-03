@@ -207,37 +207,35 @@ BEGIN
 			FROM pg_catalog.pg_constraint AS con
 			WHERE con.contypid = rec.domain_oid
 			AND con.convalidated
-			-- Only demote when this repair actually left the domain's storage
-			-- unrewritten. The repair marks every constraint it demoted itself,
-			-- so the presence of a marked constraint on this domain is the
-			-- evidence that the storage is still old-width and a validated
-			-- constraint can no longer be trusted.
+			-- Only demote when the storage really is still 32 bit, and read that
+			-- from the catalog rather than from anybody's comment: the domain's
+			-- base type is `integer[]` before the repair and `bigint[]` after it,
+			-- so this asks the one question that matters and cannot be forged.
 			--
-			-- Without this guard the loop can only ever do damage: it selects
+			-- Two earlier attempts at this guard were wrong, both caught by an
+			-- adversarial review of this very block. Keying on a *marked*
+			-- constraint accepted a comment a user had written by hand as proof
+			-- that a repair ran, and then demoted every validated constraint on
+			-- the domain and overwrote their comments. Keying on the absence of
+			-- the domain's repair marker punished databases that never needed a
+			-- repair, including fresh installs. And a constraint left NOT VALID
+			-- is not evidence either: PostgreSQL refuses to validate a
+			-- root-domain constraint while a direct `topoelement[]` carrier
+			-- exists, so a *complete* repair leaves that mark for a structural
+			-- reason and the next upgrade must not read it as old-width storage.
+			--
+			-- Without any guard at all the loop can only do damage: it selects
 			-- `con.convalidated`, which is exactly the set the repair chose to
-			-- leave validated, and re-adds every one of them NOT VALID. That
-			-- happens on any database that merely has a topoelement-typed
-			-- column, including one that was already upgraded. Nothing puts the
-			-- validity back -- there is no VALIDATE CONSTRAINT anywhere in the
-			-- tree -- and on a domain with an array-of-domain column PostgreSQL
-			-- refuses to validate at all ("cannot alter type ... because column
-			-- ... uses it"), so the demotion is permanent.
-			--
-			-- The marker alone is not the test. The second loop below marks the
-			-- canonical topology constraints it adds, so from the next upgrade
-			-- onwards every such domain carries a marked constraint and this
-			-- guard would fire again. Only a marked constraint that is NOT one
-			-- of those canonical names is evidence that the repair demoted a
-			-- user constraint, which is what says the storage is unrewritten.
+			-- leave validated, and re-adds every one of them NOT VALID. Nothing
+			-- puts the validity back -- there is no VALIDATE CONSTRAINT anywhere
+			-- in the tree -- and on a domain with an array-of-domain column
+			-- PostgreSQL refuses to validate at all, so the demotion is
+			-- permanent.
 			AND EXISTS (
 				SELECT 1
-				FROM pg_catalog.pg_constraint AS marked
-				WHERE marked.contypid = rec.domain_oid
-				AND marked.conname NOT IN (
-					'dimensions', 'type_range', 'lower_dimension'
-				)
-				AND pg_catalog.obj_description(marked.oid, 'pg_constraint')
-					LIKE '%' || constraint_not_valid_marker || '%'
+				FROM pg_catalog.pg_type AS dom
+				WHERE dom.oid = rec.domain_oid
+				AND dom.typbasetype = 'pg_catalog.int4[]'::regtype::oid
 			)
 		LOOP
 			sql := pg_catalog.format(
