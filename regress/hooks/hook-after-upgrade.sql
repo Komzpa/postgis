@@ -10,6 +10,22 @@ DROP VIEW IF EXISTS upgrade_view_test_clusterkmeans;
 DROP VIEW IF EXISTS upgrade_view_test_distance;
 DROP TABLE IF EXISTS upgrade_test;
 
+DO LANGUAGE plpgsql $postgis_upgrade_test$
+BEGIN
+	IF EXISTS (
+		SELECT 1
+		FROM postgis_upgrade_test_data.issue004_named_argument_operator_calls
+	)
+	THEN
+		RAISE EXCEPTION
+			'generated named-argument guard used the test text-array operator';
+	END IF;
+
+	-- The replacement must leave the supported function available.
+	PERFORM ST_TileEnvelope(0, 0, 0);
+END
+$postgis_upgrade_test$;
+
 -- Drop any upgrade test data
 DROP SCHEMA IF EXISTS postgis_upgrade_test_data CASCADE;
 

@@ -90,3 +90,42 @@ WHERE probin like '%postgis%';
 --       function names
 --
 ALTER FUNCTION postgis_version() SECURITY DEFINER;
+
+-- Verify generated named-argument guards do not use an exact operator from
+-- the extension schema. The callback only records that it ran.
+CREATE SCHEMA IF NOT EXISTS postgis_upgrade_test_data;
+
+CREATE TABLE postgis_upgrade_test_data.issue004_named_argument_operator_calls (
+	called boolean NOT NULL
+);
+
+CREATE FUNCTION postgis_upgrade_test_data.issue004_named_argument_operator_callback(
+	text[], text[]
+)
+RETURNS boolean
+LANGUAGE plpgsql
+AS $postgis_upgrade_test$
+BEGIN
+	INSERT INTO postgis_upgrade_test_data.issue004_named_argument_operator_calls
+	VALUES (true);
+	RETURN false;
+END
+$postgis_upgrade_test$;
+
+CREATE OPERATOR <> (
+	FUNCTION = postgis_upgrade_test_data.issue004_named_argument_operator_callback,
+	LEFTARG = text[],
+	RIGHTARG = text[]
+);
+
+-- Add the deprecated shape that makes the generated replacement guard run.
+CREATE FUNCTION ST_TileEnvelope(
+	zoom integer,
+	x integer,
+	y integer,
+	bounds geometry
+)
+RETURNS geometry
+LANGUAGE sql
+IMMUTABLE STRICT
+AS 'SELECT bounds';
