@@ -22,4 +22,5 @@ make install
 /tmp/pgx/bin/postgis help
 /tmp/pgx/bin/shp2pgsql
 /tmp/pgx/bin/raster2pgsql
+python3 utils/test_ci_need_suite.py
 python3 utils/test_check_all_upgrades.py

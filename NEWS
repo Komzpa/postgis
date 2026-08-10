@@ -72,6 +72,8 @@ These are only changes since 3.7.0beta1.
 
 * Enhancements *
 
+ - Check source-distribution completeness and clean unpacked builds in
+          Woodpecker CI (Darafei Praliaskouski)
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
 
