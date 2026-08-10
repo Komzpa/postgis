@@ -7,10 +7,9 @@ when:
 # This workflow keeps the existing amd64 CI honest by attacking ABI properties
 # that normal amd64 builds cannot falsify.
 #
-# Both emulated tier images pin their platform manifest digest because the
-# Docker backend does not pass a per-step platform override; a tag-only pull
-# from an amd64 daemon asks Docker Hub for an amd64 variant and fails before
-# QEMU can run.
+# The full-suite foreign images pin their architecture-specific manifest digest.
+# Targeted jobs use architecture-specific image repositories because the Docker
+# backend does not pass a per-step platform override.
 #
 # Tier 1: armhf via arm32v7/debian under QEMU. This mirrors berrie: 32-bit
 # pointers and long, unsigned char, and stricter alignment than amd64.
@@ -32,11 +31,7 @@ when:
 # QEMU depends on persistent binfmt_misc registrations on the amd64 Woodie agent
 # host, so this workflow asks for the capability and never for a machine. The
 # `qemu` label is not a host pin: it is what keeps these steps off agents that
-# cannot start a foreign-architecture image at all. Measured over the last 25
-# terminal pipelines, portability ran 18 times and every one landed on an agent
-# carrying the label, while ordinary workflows went to the others 163 times --
-# without the label about a third of these runs would be offered to an agent
-# with no binfmt handler.
+# cannot start a foreign-architecture image at all.
 #
 # The preflight steps below stay, and are the other half: a label only says an
 # agent claims the capability, and the preflight is what fails loudly, with the

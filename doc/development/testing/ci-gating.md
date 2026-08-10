@@ -23,7 +23,7 @@ The gated pull-request bodies are:
 | ---------- | ---------- |
 | Woodpecker regression matrix | build, install, preinstall, extension-upgrade, and cluster-upgrade work in `.woodpecker/regress.yml` |
 | Woodpecker QA matrix | sanitizer and standard-conforming-strings-off work in `.woodpecker/qa.yml` |
-| Woodpecker portability matrix | native hostile compiler checks in `.woodpecker/portability.yml`; emulated architecture steps are branch-limited instead of pull-request gated |
+| Woodpecker portability matrix | native hostile compiler checks in `.woodpecker/portability.yml`; emulated ARM steps are branch-limited, while s390x also runs when a pull request changes the portability workflow itself |
 | GitHub Actions mirror workflows | Linux Docker, FreeBSD, macOS, MSYS2, and CodeQL build or analysis bodies |
 
 The status context still appears. A skipped body exits successfully after
