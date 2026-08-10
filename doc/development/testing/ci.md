@@ -86,10 +86,12 @@ QEMU architecture coverage so ARM and big-endian emulation do not drift into
 competing pipelines. Native steps may run on pull requests through the
 changed-surface gate; foreign-architecture steps run on `master`, `stable-*`,
 tags, and scheduled events because emulated runs can occupy scarce amd64 agents
-for tens of minutes or longer. The workflow selects only the amd64 Docker agent
-platform; per-architecture preflight steps prove the required host binfmt
-handler before starting the emulated build instead of pinning an OSGeo
-hostname.
+for tens of minutes or longer. The s390x step additionally runs when a pull
+request changes the portability workflow itself, so its image and startup path
+are proved before merge. The workflow selects the amd64 Docker platform and the
+`qemu` capability rather than pinning an OSGeo hostname; per-architecture
+preflight steps then prove the selected host's binfmt handler before starting
+the emulated build.
 
 ## CI Parity Map
 
@@ -106,7 +108,7 @@ only overlap part of its defect class.
 | Debbie Linux regression classes | Jenkins Debbie and Woodpecker | Mostly covered by Woodpecker's Linux regression and expensive QA workflows. Debbie still remains useful for its exact Jenkins host, dependency, and release-job environment. |
 | Make Dist | Jenkins Debbie | In flight in <https://gitea.osgeo.org/postgis/postgis/pulls/534>. Until that lands, Woodpecker does not check source distribution tarballs. |
 | FreeBSD and Bessie | GitHub Actions FreeBSD and Jenkins Bessie | In flight in <https://gitea.osgeo.org/postgis/postgis/pulls/549>. YAML running on a Linux container is not FreeBSD parity; this needs a FreeBSD VM or agent surface. |
-| 32-bit ARM and extra portability tiers | Jenkins Berrie | Covered by `.woodpecker/portability.yml` from <https://gitea.osgeo.org/postgis/postgis/pulls/516>, with hostile type-default coverage proposed in <https://gitea.osgeo.org/postgis/postgis/pulls/550>. Plain armhf emulation is useful for pointer-width and alignment assumptions, but the valuable tier is the hostile configuration with explicit type, signedness, alignment, and sanitizer probes. |
+| 32-bit ARM and extra portability tiers | Jenkins Berrie | Covered by `.woodpecker/portability.yml`, including hostile type-default coverage. Plain armhf emulation is useful for pointer-width and alignment assumptions, but the valuable tier is the hostile configuration with explicit type, signedness, alignment, and sanitizer probes. |
 | 64-bit ARM | Jenkins Berrie64 | Partly covered by the `arm64-berrie64-qemu` child in `.woodpecker/portability.yml` on amd64 agents through QEMU arm64 emulation. This is build, ABI, CUnit, install, and focused regression coverage, not Berrie64 parity. |
 | CodeQL | GitHub Actions | In flight as Woodpecker configuration carried separately. Woodpecker can build a CodeQL database and produce SARIF, but GitHub remains authoritative for code-scanning upload, annotations, and alert management unless Woodie artifact retention and SARIF consumption are also configured. |
 | macOS | GitHub Actions macOS | Not coverable by Woodpecker YAML on Linux. See [macOS coverage options](macos-coverage-options.md) for the actual choices, costs, licensing boundary, and current recommendation. |

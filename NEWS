@@ -72,6 +72,9 @@ These are only changes since 3.7.0beta1.
 
 * Enhancements *
 
+ - Consolidate Woodpecker portability coverage with hostile armhf compiler
+          defaults and explicit QEMU/binfmt capability checks
+          (Darafei Praliaskouski)
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
 
