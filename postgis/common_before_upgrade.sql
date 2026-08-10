@@ -399,7 +399,7 @@ BEGIN
 							'domain_name', domain_name,
 							'domain_oid', domain_oid,
 							'name', 'dimensions',
-							'definition', 'CHECK (array_upper(VALUE, 2) IS NULL AND array_upper(VALUE, 1) = 2)',
+							'definition', 'CHECK (pg_catalog.array_upper(VALUE, 2) IS NULL AND pg_catalog.array_upper(VALUE, 1) = 2)',
 							'convalidated', true,
 							'not_valid_by_repair', true
 						)
@@ -439,7 +439,7 @@ BEGIN
 							'domain_name', domain_name,
 							'domain_oid', domain_oid,
 							'name', 'lower_dimension',
-							'definition', 'CHECK (array_lower(VALUE, 1) = 1)',
+							'definition', 'CHECK (pg_catalog.array_lower(VALUE, 1) = 1)',
 							'convalidated', true,
 							'not_valid_by_repair', true
 						)
@@ -459,7 +459,7 @@ BEGIN
 							'domain_name', domain_name,
 							'domain_oid', domain_oid,
 							'name', 'type_range',
-							'definition', 'CHECK (array_upper(VALUE, 2) = 2 AND array_upper(VALUE, 3) IS NULL)',
+							'definition', 'CHECK (pg_catalog.array_upper(VALUE, 2) = 2 AND pg_catalog.array_upper(VALUE, 3) IS NULL)',
 							'convalidated', true,
 							'not_valid_by_repair', true
 						)
@@ -2233,7 +2233,7 @@ BEGIN
 		RETURN;
 	END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = pg_catalog;
 
 CREATE OR REPLACE FUNCTION _postgis_topology_upgrade_user_type_attribute(
   type_name text,

@@ -272,7 +272,7 @@ BEGIN
 					(
 						'topoelement',
 						'dimensions',
-						'CHECK (array_upper(VALUE, 2) IS NULL AND array_upper(VALUE, 1) = 2)'
+						'CHECK (pg_catalog.array_upper(VALUE, 2) IS NULL AND pg_catalog.array_upper(VALUE, 1) = 2)'
 					),
 					(
 						'topoelement',
@@ -282,12 +282,12 @@ BEGIN
 					(
 						'topoelement',
 						'lower_dimension',
-						'CHECK (array_lower(VALUE, 1) = 1)'
+						'CHECK (pg_catalog.array_lower(VALUE, 1) = 1)'
 					),
 					(
 						'topoelementarray',
 						'type_range',
-						'CHECK (array_upper(VALUE, 2) = 2 AND array_upper(VALUE, 3) IS NULL)'
+						'CHECK (pg_catalog.array_upper(VALUE, 2) = 2 AND pg_catalog.array_upper(VALUE, 3) IS NULL)'
 					)
 			) AS canonical_constraint(domain_name, conname, constraint_def)
 			WHERE rec.domain_schema = 'topology'
