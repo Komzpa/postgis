@@ -4968,10 +4968,10 @@ Datum GetNodeByPoint(PG_FUNCTION_ARGS)
   tol = PG_GETARG_FLOAT8(2);
   if (tol < 0 && tol != -1)
   {
-    lwgeom_free(lwgeom);
-    PG_FREE_IF_COPY(geom, 1);
-    lwpgerror("Tolerance must be -1 or >=0");
-    PG_RETURN_NULL();
+	  lwgeom_free(lwgeom);
+	  PG_FREE_IF_COPY(geom, 1);
+	  lwpgerror("Tolerance must be -1 or >=0");
+	  PG_RETURN_NULL();
   }
 
   if ( SPI_OK_CONNECT != SPI_connect() )
@@ -5039,10 +5039,10 @@ Datum GetEdgeByPoint(PG_FUNCTION_ARGS)
   tol = PG_GETARG_FLOAT8(2);
   if (tol < 0 && tol != -1)
   {
-    lwgeom_free(lwgeom);
-    PG_FREE_IF_COPY(geom, 1);
-    lwpgerror("Tolerance must be -1 or >=0");
-    PG_RETURN_NULL();
+	  lwgeom_free(lwgeom);
+	  PG_FREE_IF_COPY(geom, 1);
+	  lwpgerror("Tolerance must be -1 or >=0");
+	  PG_RETURN_NULL();
   }
 
   if ( SPI_OK_CONNECT != SPI_connect() )
@@ -5112,10 +5112,10 @@ Datum GetFaceByPoint(PG_FUNCTION_ARGS)
   tol = PG_GETARG_FLOAT8(2);
   if (tol < 0 && tol != -1)
   {
-    lwgeom_free(lwgeom);
-    PG_FREE_IF_COPY(geom, 1);
-    lwpgerror("Tolerance must be -1 or >=0");
-    PG_RETURN_NULL();
+	  lwgeom_free(lwgeom);
+	  PG_FREE_IF_COPY(geom, 1);
+	  lwpgerror("Tolerance must be -1 or >=0");
+	  PG_RETURN_NULL();
   }
 
   if ( SPI_OK_CONNECT != SPI_connect() )
@@ -5206,10 +5206,10 @@ TopoGeo_AddPoint_impl(FunctionCallInfo fcinfo, int allow_private_tolerance)
   tol = PG_GETARG_FLOAT8(2);
   if (topogeo_tolerance_is_invalid(tol, allow_private_tolerance))
   {
-    lwgeom_free(lwgeom);
-    PG_FREE_IF_COPY(geom, 1);
-    lwpgerror("Tolerance must be -1 or >=0");
-    PG_RETURN_NULL();
+	  lwgeom_free(lwgeom);
+	  PG_FREE_IF_COPY(geom, 1);
+	  lwpgerror("Tolerance must be -1 or >=0");
+	  PG_RETURN_NULL();
   }
 
   if ( SPI_OK_CONNECT != SPI_connect() )
@@ -5472,10 +5472,10 @@ Datum TopoGeo_AddLinestringNoFace(PG_FUNCTION_ARGS)
   tol = PG_GETARG_FLOAT8(2);
   if (tol < 0 && tol != -1)
   {
-    lwgeom_free(lwgeom);
-    PG_FREE_IF_COPY(geom, 1);
-    lwpgerror("Tolerance must be -1 or >=0");
-    PG_RETURN_NULL();
+	  lwgeom_free(lwgeom);
+	  PG_FREE_IF_COPY(geom, 1);
+	  lwpgerror("Tolerance must be -1 or >=0");
+	  PG_RETURN_NULL();
   }
 
   if ( SPI_OK_CONNECT != SPI_connect() )
@@ -5562,10 +5562,10 @@ TopoGeo_AddPolygon_impl(FunctionCallInfo fcinfo, int allow_private_tolerance)
     tol = PG_GETARG_FLOAT8(2);
     if (topogeo_tolerance_is_invalid(tol, allow_private_tolerance))
     {
-      lwgeom_free(lwgeom);
-      PG_FREE_IF_COPY(geom, 1);
-      lwpgerror("Tolerance must be -1 or >=0");
-      PG_RETURN_NULL();
+	    lwgeom_free(lwgeom);
+	    PG_FREE_IF_COPY(geom, 1);
+	    lwpgerror("Tolerance must be -1 or >=0");
+	    PG_RETURN_NULL();
     }
 
     if ( SPI_OK_CONNECT != SPI_connect() )
