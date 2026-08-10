@@ -9,6 +9,11 @@ These are only changes since 3.7.0beta2.
 * Bug Fixes *
 
 
+* Enhancements *
+
+ - #5119, #5334, [topology] Replace edge insert rules with COPY-safe
+          triggers and maintain edge_data absolute links
+          (Darafei Praliaskouski)
 
 
 PostGIS 3.7.0beta2

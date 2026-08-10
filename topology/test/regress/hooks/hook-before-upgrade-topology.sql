@@ -1,5 +1,25 @@
 SELECT topology.createTopology('upgrade_test');
 
+-- Simulate a topology created before #5119 and #5334. The extension upgrade
+-- must replace the edge view rule and install both trigger layers.
+SELECT topology.createTopology('upgrade_edge_triggers');
+DROP TRIGGER edge_insert ON upgrade_edge_triggers.edge;
+DROP FUNCTION upgrade_edge_triggers._edge_insert();
+DROP TRIGGER edge_data_abs_next_edges ON upgrade_edge_triggers.edge_data;
+CREATE RULE edge_insert_rule AS
+ON INSERT TO upgrade_edge_triggers.edge
+DO INSTEAD INSERT INTO upgrade_edge_triggers.edge_data
+VALUES (
+	NEW.edge_id, NEW.start_node, NEW.end_node,
+	NEW.next_left_edge, pg_catalog.abs(NEW.next_left_edge),
+	NEW.next_right_edge, pg_catalog.abs(NEW.next_right_edge),
+	NEW.left_face, NEW.right_face, NEW.geom
+);
+INSERT INTO upgrade_edge_triggers.node(node_id, containing_face, geom)
+VALUES
+	(100, NULL, 'POINT(0 0)'::geometry),
+	(101, NULL, 'POINT(1 0)'::geometry);
+
 -- Create some TopoGeometry data
 CREATE TABLE upgrade_test.feature(id serial primary key);
 SELECT topology.AddTopoGeometryColumn('upgrade_test', 'upgrade_test', 'feature', 'tg', 'linear');

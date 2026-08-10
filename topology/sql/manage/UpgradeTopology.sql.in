@@ -85,6 +85,8 @@ BEGIN
 		-- Upgrade the edge_data table
   	-- Drop the edge view
     DROP VIEW IF EXISTS %1$I.edge;
+		-- The derived-column trigger references columns altered below.
+		DROP TRIGGER IF EXISTS edge_data_abs_next_edges ON %1$I.edge_data;
 
 		ALTER TABLE %1$I.edge_data
     	ALTER COLUMN edge_id TYPE BIGINT;
@@ -153,6 +155,7 @@ BEGIN
 		'The geometry of the edge';
 
 		-- edge standard view (insert trigger)
+		SELECT topology._install_edge_data_trigger(%1$L);
 		SELECT topology._install_edge_insert_trigger(%1$L);
 
 		-- Upgrade the node table

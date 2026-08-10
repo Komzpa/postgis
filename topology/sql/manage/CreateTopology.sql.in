@@ -201,6 +201,7 @@ BEGIN
       'The geometry of the edge';
 
       -- edge standard view (insert trigger)
+      SELECT topology._install_edge_data_trigger(%1$L);
       SELECT topology._install_edge_insert_trigger(%1$L);
 
       ------- Add support indices supporting edge linking foreign keys

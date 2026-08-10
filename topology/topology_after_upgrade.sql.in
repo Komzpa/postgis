@@ -41,6 +41,7 @@ BEGIN
     SELECT name
     FROM topology.topology
   LOOP
+    PERFORM topology._install_edge_data_trigger(rec.name);
     PERFORM topology._install_edge_insert_trigger(rec.name);
   END LOOP;
 END;

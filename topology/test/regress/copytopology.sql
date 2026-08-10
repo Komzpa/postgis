@@ -65,6 +65,55 @@ INSERT INTO "CITY_data_UP_down".edge (
 )
 RETURNING '#5119-returning', edge_id, ST_AsText(geom);
 
+-- See https://trac.osgeo.org/postgis/ticket/5334
+INSERT INTO "CITY_data_UP_down".edge_data (
+  edge_id, start_node, end_node,
+  next_left_edge, abs_next_left_edge,
+  next_right_edge, abs_next_right_edge,
+  left_face, right_face, geom
+) VALUES (
+  1003, 1, 2,
+  -1003, 0,
+  1003, 0,
+  0, 0, 'SRID=4326;LINESTRING(3 3,4 4)'::geometry
+);
+SELECT '#5334-insert', edge_id,
+       next_left_edge, abs_next_left_edge,
+       next_right_edge, abs_next_right_edge
+FROM "CITY_data_UP_down".edge_data
+WHERE edge_id = 1003;
+UPDATE "CITY_data_UP_down".edge_data
+SET next_left_edge = 1003,
+    next_right_edge = -1003
+WHERE edge_id = 1003;
+SELECT '#5334-next-update', edge_id,
+       next_left_edge, abs_next_left_edge,
+       next_right_edge, abs_next_right_edge
+FROM "CITY_data_UP_down".edge_data
+WHERE edge_id = 1003;
+UPDATE "CITY_data_UP_down".edge_data
+SET abs_next_left_edge = 0,
+    abs_next_right_edge = 0
+WHERE edge_id = 1003;
+SELECT '#5334-abs-update', edge_id,
+       next_left_edge, abs_next_left_edge,
+       next_right_edge, abs_next_right_edge
+FROM "CITY_data_UP_down".edge_data
+WHERE edge_id = 1003;
+COPY "CITY_data_UP_down".edge_data (
+  edge_id, start_node, end_node,
+  next_left_edge, abs_next_left_edge,
+  next_right_edge, abs_next_right_edge,
+  left_face, right_face, geom
+) FROM stdin;
+1004	1	2	-1004	0	1004	0	0	0	SRID=4326;LINESTRING(4 4,5 5)
+\.
+SELECT '#5334-copy', edge_id,
+       next_left_edge, abs_next_left_edge,
+       next_right_edge, abs_next_right_edge
+FROM "CITY_data_UP_down".edge_data
+WHERE edge_id = 1004;
+
 BEGIN;
 CREATE SCHEMA fake_5119;
 CREATE TABLE fake_5119.edge_data (

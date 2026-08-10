@@ -94,6 +94,64 @@ LANGUAGE 'plpgsql' VOLATILE
 SET search_path = pg_catalog, pg_temp
 ;
 
+CREATE OR REPLACE FUNCTION topology._edge_data_abs_next_edges()
+RETURNS trigger
+AS
+$BODY$
+BEGIN
+  NEW.abs_next_left_edge := pg_catalog.abs(NEW.next_left_edge);
+  NEW.abs_next_right_edge := pg_catalog.abs(NEW.next_right_edge);
+  RETURN NEW;
+END
+$BODY$
+LANGUAGE 'plpgsql' VOLATILE
+SET search_path = pg_catalog, pg_temp
+;
+
+CREATE OR REPLACE FUNCTION topology._install_edge_data_trigger(atopology name)
+RETURNS void
+AS
+$BODY$
+DECLARE
+  edge_table regclass;
+BEGIN
+  edge_table := pg_catalog.to_regclass(pg_catalog.format('%I.edge_data', atopology));
+
+  IF edge_table IS NULL
+  THEN
+    RAISE EXCEPTION 'Topology edge table %.edge_data does not exist', atopology;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_catalog.pg_trigger
+    WHERE tgrelid = edge_table
+      AND tgname = 'edge_data_abs_next_edges'
+      AND NOT tgisinternal
+  )
+  THEN
+    EXECUTE pg_catalog.format(
+      'DROP TRIGGER edge_data_abs_next_edges ON %I.edge_data',
+      atopology
+    );
+  END IF;
+
+  EXECUTE pg_catalog.format(
+    'CREATE TRIGGER edge_data_abs_next_edges
+     BEFORE INSERT OR UPDATE OF
+       next_left_edge, next_right_edge,
+       abs_next_left_edge, abs_next_right_edge
+     ON %I.edge_data
+     FOR EACH ROW
+     EXECUTE FUNCTION topology._edge_data_abs_next_edges()',
+    atopology
+  );
+END
+$BODY$
+LANGUAGE 'plpgsql' VOLATILE STRICT
+SET search_path = pg_catalog, pg_temp
+;
+
 CREATE OR REPLACE FUNCTION topology._install_edge_insert_trigger(atopology name)
 RETURNS void
 AS
@@ -181,13 +239,11 @@ BEGIN
       'BEGIN
         INSERT INTO %I.edge_data (
           edge_id, start_node, end_node,
-          next_left_edge, abs_next_left_edge,
-          next_right_edge, abs_next_right_edge,
+          next_left_edge, next_right_edge,
           left_face, right_face, geom
         ) VALUES (
           NEW.edge_id, NEW.start_node, NEW.end_node,
-          NEW.next_left_edge, abs(NEW.next_left_edge),
-          NEW.next_right_edge, abs(NEW.next_right_edge),
+          NEW.next_left_edge, NEW.next_right_edge,
           NEW.left_face, NEW.right_face, NEW.geom
         )
       ' || chr(59) || '
@@ -231,4 +287,5 @@ BEGIN
 END
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE STRICT
+SET search_path = pg_catalog, pg_temp
 ;
