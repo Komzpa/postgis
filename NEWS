@@ -6,6 +6,11 @@ To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed
 
 These are only changes since 3.7.0beta2.
 
+* New Features *
+
+ - #6034, [topology] Add snap_edges parameter to TopoGeo_AddLinestring
+          (Darafei Praliaskouski)
+
 * Bug Fixes *
 
 
@@ -18,11 +23,6 @@ To take advantage of all features postgis extension features, GEOS 3.15+ is need
 To take advantage of all postgis_sfcgal extension features SFCGAL 2.3+ is needed.
 
 These are only changes since 3.7.0beta1.
-
-* New Features *
-
- - #6034, [topology] Add snap_edges parameter to TopoGeo_AddLinestring
-          (Darafei Praliaskouski)
 
 * Bug Fixes *
 

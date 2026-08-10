@@ -1071,9 +1071,8 @@ LWT_ELEMID lwt_AddPoint(LWT_TOPOLOGY* topo, LWPOINT* point, double tol);
  *         will build up the input linestring (after snapping). Caller
  *         will need to free the array using lwfree(), if not null.
  */
-LWT_ELEMID* lwt_AddLine(LWT_TOPOLOGY* topo, LWLINE* line, double tol,
-                        int* nedges, int max_edges,
-                        int snap_existing_edges);
+LWT_ELEMID *
+lwt_AddLine(LWT_TOPOLOGY *topo, LWLINE *line, double tol, int *nedges, int max_edges, int snap_existing_edges);
 
 /**
  * Adds a linestring to the topology without determining generated faces

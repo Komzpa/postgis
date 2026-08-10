@@ -5279,7 +5279,7 @@ Datum TopoGeo_AddLinestring(PG_FUNCTION_ARGS)
 
     if (PG_NARGS() > 4 && !PG_ARGISNULL(4))
     {
-      snap_existing_edges = PG_GETARG_BOOL(4);
+	    snap_existing_edges = PG_GETARG_BOOL(4);
     }
 
     toponame_text = PG_GETARG_TEXT_P(0);

@@ -809,6 +809,23 @@ FROM topology.TopoGeo_AddLinestring(
 SELECT 't6034.snap.staged_closed_swept_collision.invalid', * FROM topology.ValidateTopology('t6034_staged_closed_swept_collision');
 SELECT NULL FROM topology.DropTopology('t6034_staged_closed_swept_collision');
 
+SELECT NULL FROM topology.CreateTopology('t6034_max_edges_rollback', 0, 0);
+SELECT NULL FROM topology.TopoGeo_AddLinestring(
+  't6034_max_edges_rollback',
+  'LINESTRING(0 0,5 0.4,10 0)'::geometry
+);
+SELECT topology.TopoGeo_AddLinestring(
+  't6034_max_edges_rollback',
+  'LINESTRING(5 1,5 2)'::geometry,
+  1,
+  0,
+  true
+);
+SELECT 't6034.snap.max_edges.rollback', ST_AsText(geom) = 'LINESTRING(0 0,5 0.4,10 0)'
+FROM t6034_max_edges_rollback.edge_data;
+SELECT 't6034.snap.max_edges.invalid', * FROM topology.ValidateTopology('t6034_max_edges_rollback');
+SELECT NULL FROM topology.DropTopology('t6034_max_edges_rollback');
+
 \i :top_builddir/topology/test/load_topology.sql
 SELECT NULL FROM topology.ST_AddEdgeModFace(
   'city_data',

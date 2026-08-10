@@ -1049,6 +1049,11 @@ _lwt_EdgeMoveWillHitNode(LWT_TOPOLOGY *topo,
 		lwline_free(motion_bounds);
 		motion_poly = lwgeom_make_valid(motion_poly_bare);
 		lwgeom_free(motion_poly_bare);
+		if (!motion_poly)
+		{
+			lwerror("Could not build edge motion range");
+			return -1;
+		}
 
 		motion_poly_g = LWGEOM2GEOS(motion_poly, 0);
 		lwgeom_free(motion_poly);
@@ -1206,10 +1211,21 @@ _lwt_EdgeMoveWillHitStagedEdges(LWLINE *oldedge, LWLINE *newedge, LWLINE **stage
 		oldpoly_bare = (LWGEOM *)lwpoly_from_lwlines(oldedge, 0, NULL);
 		oldpoly = lwgeom_make_valid(oldpoly_bare);
 		lwgeom_free(oldpoly_bare);
+		if (!oldpoly)
+		{
+			lwerror("Could not build old closed edge polygon");
+			return -1;
+		}
 
 		newpoly_bare = (LWGEOM *)lwpoly_from_lwlines(newedge, 0, NULL);
 		newpoly = lwgeom_make_valid(newpoly_bare);
 		lwgeom_free(newpoly_bare);
+		if (!newpoly)
+		{
+			lwgeom_free(oldpoly);
+			lwerror("Could not build new closed edge polygon");
+			return -1;
+		}
 
 		motion_poly = lwgeom_symdifference(oldpoly, newpoly);
 		lwgeom_free(oldpoly);
@@ -1244,6 +1260,11 @@ _lwt_EdgeMoveWillHitStagedEdges(LWLINE *oldedge, LWLINE *newedge, LWLINE **stage
 		lwline_free(motion_bounds);
 		motion_poly = lwgeom_make_valid(motion_poly_bare);
 		lwgeom_free(motion_poly_bare);
+		if (!motion_poly)
+		{
+			lwerror("Could not build edge motion range");
+			return -1;
+		}
 	}
 
 	initGEOS(lwnotice, lwgeom_geos_error);
