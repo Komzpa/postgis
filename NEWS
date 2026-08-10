@@ -72,6 +72,8 @@ These are only changes since 3.7.0beta1.
 
 * Enhancements *
 
+ - Update GitHub FreeBSD CI to supported FreeBSD 14.4 and stage a manual-only
+          Woodie FreeBSD workflow (Darafei Praliaskouski)
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
 

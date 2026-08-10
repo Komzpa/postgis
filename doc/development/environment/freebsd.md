@@ -71,7 +71,7 @@ flags against `.github/workflows/ci-freebsd.yml`.
 
 ## Woodie FreeBSD local-backend runner
 
-PostGIS also has an adoptable FreeBSD KVM recipe in the buildbot repository. It
+PostGIS also has a draft FreeBSD KVM recipe in the buildbot repository. It
 lives on the `freebsd14-runner-iac` branch, not on `master`, so the branch has
 to be named when cloning:
 
@@ -83,29 +83,33 @@ $EDITOR config/runner.local.env
 make all
 ```
 
-The recipe pins `FREEBSD_VERSION="14.3-RELEASE"`, and the runner deployed on
-geocint reports `14.3-RELEASE-p16`. **FreeBSD 14.3 reached end of life on 30
-June 2026.** Moving to a supported release means rebuilding the guest from a
-newer image, not upgrading in place through this recipe; until that happens the
-Woodie FreeBSD signal comes from an unsupported release. The GitHub workflow is
-a separate matter and already pins 14.4.
+The recipe pins `FREEBSD_VERSION="14.3-RELEASE"`, and the last recorded geocint
+guest reported `14.3-RELEASE-p16`. **FreeBSD 14.3 reached end of life on 30 June
+2026.** Moving to a supported release means rebuilding the guest from a newer
+image, not upgrading in place through this recipe. Until that happens, the
+recipe cannot provide a current FreeBSD CI signal. The GitHub workflow is a
+separate matter and pins supported FreeBSD 14.4. Check the
+[FreeBSD security support table](https://www.freebsd.org/security/) before the
+next version bump.
 
 The recipe is project-owned infrastructure-as-code. It fetches the FreeBSD cloud
 image, seeds SSH access, installs the package set, records the resolved package
 lock, and runs the complete PostGIS suite. Generated VM images, logs, runtime
 artifacts, SSH keys, and Woodpecker secrets stay out of git.
 
-The geocint runner uses 16 vCPU and 16 GiB of configured RAM. The complete
-suite should be budgeted at about 41 minutes including boot, SSH wait, source
-copy, and wrapper overhead. A persistent Woodie
+The recorded geocint deployment used 16 vCPU and 16 GiB of configured RAM. The
+complete suite should be budgeted at about 41 minutes including boot, SSH wait,
+source copy, and wrapper overhead. A persistent Woodie
 local-backend VM avoids most boot/copy overhead but should still be budgeted as
 an integration-branch signal rather than a default for every pull request.
 
-The corresponding Woodie workflow is `.woodpecker/freebsd.yml`. It runs on
-pushes to `master` and `stable-*`, not on pull requests. If maintainers later
-decide to enable pull-request FreeBSD runs, keep the status context present and
-gate the expensive body with the changed-surface and ABI checks proposed in
-<https://gitea.osgeo.org/postgis/postgis/pulls/529>.
+The corresponding Woodie workflow is `.woodpecker/freebsd.yml`. It is
+manual-only while the available recipe pins an unsupported release. Do not add
+push or pull-request events until a supported guest and matching live Woodie
+agent have completed a clean exact-commit run. If maintainers later enable
+pull-request FreeBSD runs, keep the status context present and gate the
+expensive body with the checks described in
+[Pull request CI gating](../testing/ci-gating.md).
 
 ### Package and link traps
 
@@ -138,8 +142,9 @@ failure.
 
 ### Reproducing a FreeBSD-only failure
 
-To reproduce a failure from Woodie, first read the job's commit SHA and branch.
-Check out that exact PostGIS commit locally, then point `POSTGIS_SRC` in
+After the recipe has been updated to a supported release, reproduce a manual
+Woodie failure by first reading the job's commit SHA and branch. Check out that
+exact PostGIS commit locally, then point `POSTGIS_SRC` in
 `config/runner.local.env` at that checkout and run the buildbot recipe:
 
 ```sh
