@@ -9,34 +9,34 @@ BASELINE="$1"
 cleanup()
 {
   #echo "${TMPDIR} has things"
-  rm -rf ${TMPDIR}
+  rm -rf "${TMPDIR}"
 }
 
 trap 'cleanup' 0
 
-mkdir -p $TMPDIR
+mkdir -p "${TMPDIR}"
 
 
 CHECKDIR=$(pwd -P)
 case "${TMPDIR}/" in
   "${CHECKDIR}/"*)
-    TMPREL="./${TMPDIR#${CHECKDIR}/}"
-    find . -path "${TMPREL}" -prune -o -type f -print | sort > ${TMPDIR}/files_after_distclean
+    TMPREL="./${TMPDIR#"${CHECKDIR}"/}"
+    find . -path "${TMPREL}" -prune -o -type f -print | sort > "${TMPDIR}/files_after_distclean"
     ;;
   *)
-    find . -type f | sort > ${TMPDIR}/files_after_distclean
+    find . -type f | sort > "${TMPDIR}/files_after_distclean"
     ;;
 esac
 if test -n "${BASELINE}"; then
-  sort "${BASELINE}" > ${TMPDIR}/baseline_files
+  sort "${BASELINE}" > "${TMPDIR}/baseline_files"
   comm -13 \
-    ${TMPDIR}/baseline_files \
-    ${TMPDIR}/files_after_distclean > \
-    ${TMPDIR}/leftover_files_after_distclean
+    "${TMPDIR}/baseline_files" \
+    "${TMPDIR}/files_after_distclean" > \
+    "${TMPDIR}/leftover_files_after_distclean"
 else
-  cp ${TMPDIR}/files_after_distclean ${TMPDIR}/leftover_files_after_distclean
+  cp "${TMPDIR}/files_after_distclean" "${TMPDIR}/leftover_files_after_distclean"
 fi
-cat <<EOF > ${TMPDIR}/leftover_files_after_distclean.expected
+cat <<EOF > "${TMPDIR}/leftover_files_after_distclean.expected"
 ./doc/postgis_comments.sql
 ./doc/raster_comments.sql
 ./doc/sfcgal_comments.sql
@@ -47,13 +47,13 @@ cat <<EOF > ${TMPDIR}/leftover_files_after_distclean.expected
 ./postgis_revision.h
 EOF
 
-fgrep -vf \
-  ${TMPDIR}/leftover_files_after_distclean.expected \
-  ${TMPDIR}/leftover_files_after_distclean > \
-  ${TMPDIR}/unexpected_leftovers
+grep -F -v -f \
+  "${TMPDIR}/leftover_files_after_distclean.expected" \
+  "${TMPDIR}/leftover_files_after_distclean" > \
+  "${TMPDIR}/unexpected_leftovers"
 
-if test $(cat ${TMPDIR}/unexpected_leftovers | wc -l) != 0; then
+if test -s "${TMPDIR}/unexpected_leftovers"; then
   echo "Unexpected left over files after distclean:" >&2
-  cat ${TMPDIR}/unexpected_leftovers >&2
+  cat "${TMPDIR}/unexpected_leftovers" >&2
   false
 fi

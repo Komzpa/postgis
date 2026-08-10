@@ -15,6 +15,7 @@ class NeedForSuiteTest(unittest.TestCase):
             "liblwgeom/lwgeom.c",
             "postgis/geography.sql.in",
             "doc/reference_constructor.xml",
+            "make_dist.sh",
             "regress/core/affine.sql",
             "utils/check_dist_manifest.sh",
         ):

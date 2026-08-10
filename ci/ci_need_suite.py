@@ -91,6 +91,7 @@ DIST_GLOBS = (
     "CONTRIBUTING.md",
     "README*",
     "Version.config",
+    "make_dist.sh",
     "deps/**",
     "doc/*.css",
     "doc/*.html",
