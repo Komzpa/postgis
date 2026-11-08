@@ -1,6 +1,9 @@
 PostGIS 3.7.1dev
 2026/xx/xx
 
+ - #6016, [topology] Rewrite existing topoelement domain columns while
+          upgrading them from integer arrays to bigint arrays
+          (Darafei Praliaskouski)
 
 PostGIS 3.7.0
 2026/10/29
@@ -310,9 +313,6 @@ These are only changes since 3.7.0beta1.
 
  - Schema qualify references to pg_catalog and postgis
    in geometry_columns and geography_columns views (Regina Obe)
- - #6016, [topology] Rewrite existing topoelement domain columns while
-          upgrading them from integer arrays to bigint arrays
-          (Darafei Praliaskouski)
 
 * Enhancements *
 
