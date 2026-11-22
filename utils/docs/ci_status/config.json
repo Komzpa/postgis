@@ -161,6 +161,13 @@
       "branch_parameter": "reference"
     },
     {
+      "name": "Woodpecker / FreeBSD (staged, manual)",
+      "provider": "disabled",
+      "required": false,
+      "status": "staged",
+      "message": "The .woodpecker/freebsd.yml workflow runs only on manual events and has no registered FreeBSD runner yet, so the push-event Woodpecker row cannot show it. Not a release gate until an exact-commit manual run has passed."
+    },
+    {
       "name": "Cirrus CI",
       "provider": "disabled",
       "required": false,

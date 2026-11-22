@@ -148,12 +148,18 @@ exact PostGIS commit locally, then point `POSTGIS_SRC` in
 `config/runner.local.env` at that checkout and run the buildbot recipe:
 
 ```sh
-git -C /path/to/postgis fetch https://gitea.osgeo.org/postgis/postgis.git
+git -C /path/to/postgis fetch https://gitea.osgeo.org/postgis/postgis.git \
+  <branch-from-woodie>
 git -C /path/to/postgis checkout <commit-sha-from-woodie>
+git -C /path/to/postgis rev-parse HEAD   # must equal the SHA Woodie recorded
 cd postgis-buildbots/freebsd/freebsd14_runner
 printf 'POSTGIS_SRC=%s\n' /path/to/postgis >> config/runner.local.env
 make verify
 ```
+
+If `make verify` fails, the phase output stays in guest files and the result
+bundle may not be created. Copy the logs out of the guest over the SSH host,
+port, user, and key from `config/runner.local.env` before the guest is stopped.
 
 The runner writes host-side logs and result bundles under
 `freebsd/freebsd14_runner/logs/` and `freebsd/freebsd14_runner/artifacts/`.
