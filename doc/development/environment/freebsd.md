@@ -9,7 +9,7 @@ The current FreeBSD pull-request build is defined in
 `.github/workflows/ci-freebsd.yml`. Use that workflow as the source of truth
 when checking platform-specific dependencies or flags.
 
-At the time of this note, the job runs FreeBSD 14.4 through
+At the time of this note, the job runs FreeBSD 15.1 through
 `vmactions/freebsd-vm`, switches the package repository from quarterly to
 latest, installs PostgreSQL 17 packages, and builds with clang through ccache.
 It builds the topology, SFCGAL, and protobuf paths, but disables raster and GUI:
@@ -88,7 +88,7 @@ guest reported `14.3-RELEASE-p16`. **FreeBSD 14.3 reached end of life on 30 June
 2026.** Moving to a supported release means rebuilding the guest from a newer
 image, not upgrading in place through this recipe. Until that happens, the
 recipe cannot provide a current FreeBSD CI signal. The GitHub workflow is a
-separate matter and pins supported FreeBSD 14.4. Check the
+separate matter and pins supported FreeBSD 15.1. Check the
 [FreeBSD security support table](https://www.freebsd.org/security/) before the
 next version bump.
 

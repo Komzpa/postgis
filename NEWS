@@ -21,6 +21,8 @@ PostGIS 3.8.0dev
           (Andrew Kroh)
  - #1558, GT-419, Document RETURNS TABLE signatures with returned columns
           (Darafei Praliaskouski)
+ - GT-549, Stage a manual-only Woodie FreeBSD workflow and document the
+          FreeBSD runner recipe (Darafei Praliaskouski)
 
 * Bug Fixes *
 
@@ -346,8 +348,6 @@ These are only changes since 3.7.0beta1.
 
 * Enhancements *
 
- - Update GitHub FreeBSD CI to supported FreeBSD 14.4 and stage a manual-only
-          Woodie FreeBSD workflow (Darafei Praliaskouski)
  - Add Woodpecker linux/arm64 build and regression coverage under
           QEMU to match the Jenkins Berrie64 platform (Darafei Praliaskouski)
 
