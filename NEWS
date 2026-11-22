@@ -21,8 +21,6 @@ PostGIS 3.8.0dev
           (Andrew Kroh)
  - #1558, GT-419, Document RETURNS TABLE signatures with returned columns
           (Darafei Praliaskouski)
- - GT-549, Stage a manual-only Woodie FreeBSD workflow and document the
-          FreeBSD runner recipe (Darafei Praliaskouski)
 
 * Bug Fixes *
 

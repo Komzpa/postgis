@@ -11,7 +11,7 @@ when checking platform-specific dependencies or flags.
 
 At the time of this note, the job runs FreeBSD 15.1 through
 `vmactions/freebsd-vm`, switches the package repository from quarterly to
-latest, installs PostgreSQL 17 packages, and builds with clang through ccache.
+latest, installs PostgreSQL 18 packages, and builds with clang through ccache.
 It builds the topology, SFCGAL, and protobuf paths, but disables raster and GUI:
 
 ```sh
@@ -23,7 +23,7 @@ env IGNORE_OSVERSION=yes pkg update -f
 env IGNORE_OSVERSION=yes pkg install -y \
   autoconf automake bison ccache-static cunit docbook \
   gdal geos gmake iconv json-c libtool libxml2 libxslt \
-  pkgconf postgresql17-contrib postgresql17-server \
+  pkgconf postgresql18-contrib postgresql18-server \
   proj protobuf-c sfcgal
 projsync --system-directory --source-id us_noaa
 projsync --system-directory --source-id ch_swisstopo
