@@ -146,7 +146,7 @@ def need_for_suite(paths: list[str], suite: str, target: str, extension: str) ->
 
     if suite in {"preinstall", "install", "qa", "github-ci", "portability"}:
         for path in paths:
-            if suite == "github-ci":
+            if suite in {"github-ci", "portability"}:
                 pattern = match_any(path, UPGRADE_GLOBS)
                 if pattern:
                     return True, f"{path} matches upgrade-visible platform test pattern {pattern}"
