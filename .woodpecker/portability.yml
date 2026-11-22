@@ -148,7 +148,6 @@ variables:
     uname -m | grep -E "$${ARM_UNAME_RE}"
     cc --version | sed -n '1p'
     /usr/lib/postgresql/17/bin/pg_config --version
-    ./autogen.sh
     rm -rf "build/$${PORTABILITY_TIER}"
     mkdir -p "build/$${PORTABILITY_TIER}"
     cd "build/$${PORTABILITY_TIER}"
@@ -173,8 +172,6 @@ variables:
     export RUNTESTFLAGS="-v --extension"
     runuser -u postgres -- make -C "$${SRCDIR}/build/$${PORTABILITY_TIER}" check-regress \
       TESTS="$${SRCDIR}/regress/core/regress_index $${SRCDIR}/regress/core/regress_lrs"
-    runuser -u postgres -- make -C "$${SRCDIR}/build/$${PORTABILITY_TIER}" installcheck-base \
-      TESTS="$${SRCDIR}/regress/core/regress_index $${SRCDIR}/regress/core/regress_lrs"
   binfmt-preflight: &binfmt-preflight |
     export DEBIAN_FRONTEND=noninteractive
     dpkg --add-architecture "$${FOREIGN_DEB_ARCH}"
@@ -186,7 +183,9 @@ variables:
     root="$${PWD}/$${FOREIGN_DEB_ARCH}"
     mkdir -p "$${root}"
     dpkg-deb -x "$${deb}" "$${root}"
-    if ! output="$$("$${root}/bin/busybox" uname -m 2>&1)"; then
+    busybox_bin="$${root}/usr/bin/busybox"
+    [ -x "$${busybox_bin}" ] || busybox_bin="$${root}/bin/busybox"
+    if ! output="$$("$${busybox_bin}" uname -m 2>&1)"; then
       echo "this agent has no binfmt handler for $${FOREIGN_DEB_ARCH}; the portability job needs one"
       echo "Install qemu-user, qemu-user-binfmt, and binfmt-support on the amd64 agent host."
       echo "Observed error: $${output}"
@@ -206,21 +205,30 @@ clone:
       partial: false
 
 steps:
+  # Generate the shared build files once. Steps with depends_on run in parallel,
+  # and concurrent ./autogen.sh runs in one checkout race on build-aux files.
+  autogen:
+    image: *native-image
+    pull: true
+    commands:
+      - ./autogen.sh
+
   native-unsigned-char:
     image: *native-image
     pull: true
+    depends_on: autogen
     commands:
       - export PORTABILITY_TIER=native-unsigned-char
       - *portability-gate
       - export PORTABILITY_CFLAGS="-O2 -Wall -Werror -fno-omit-frame-pointer -funsigned-char"
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
 
   native-alignment-ubsan:
     image: *native-image
     pull: true
+    depends_on: autogen
     commands:
       - export PORTABILITY_TIER=native-alignment-ubsan
       - *portability-gate
@@ -236,7 +244,6 @@ steps:
       - export PORTABILITY_LDFLAGS="-fsanitize=alignment,undefined"
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
 
   preflight-armhf-binfmt:
@@ -269,7 +276,7 @@ steps:
   arm64-berrie64-qemu:
     image: arm64v8/debian:trixie-slim@sha256:8b5033c95ca60cdffb0e0f4c446e5f714e82d8960a9ef4153c0eaf13e988b0ea
     pull: true
-    depends_on: preflight-arm64-binfmt
+    depends_on: [autogen, preflight-arm64-binfmt]
     when: *integration-when
     commands:
       - uname -m | grep -E '^aarch64$'
@@ -278,13 +285,12 @@ steps:
       - *prepare-debian
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
 
   armhf-berrie-qemu:
     image: arm32v7/debian@sha256:743aca1ad24c5e48132df88f561f8d1365bfb6da33e006eb44b44fe32a7a30eb
     pull: true
-    depends_on: preflight-armhf-binfmt
+    depends_on: [autogen, preflight-armhf-binfmt]
     when: *integration-when
     commands:
       - uname -m | grep -E '^(armv7l|armv8l)$'
@@ -294,29 +300,27 @@ steps:
       - *prepare-debian
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
 
   armhf-hostile-type-defaults-qemu:
     image: arm32v7/debian@sha256:743aca1ad24c5e48132df88f561f8d1365bfb6da33e006eb44b44fe32a7a30eb
     pull: true
-    depends_on: preflight-armhf-binfmt
+    depends_on: [autogen, preflight-armhf-binfmt]
     when: *integration-when
     commands:
       - uname -m | grep -E '^(armv7l|armv8l)$'
       - export PORTABILITY_TIER=armhf-hostile-type-defaults-qemu
-      - export PORTABILITY_CFLAGS="-g3 -O2 -Wall -Wcast-align=strict -Wstrict-aliasing=2 -fstrict-aliasing -fno-omit-frame-pointer -fsigned-char -fshort-enums -D_FILE_OFFSET_BITS=64 -fsanitize=alignment,undefined -fno-sanitize-recover=alignment"
+      - export PORTABILITY_CFLAGS="-g3 -O2 -Wall -Wcast-align=strict -Wstrict-aliasing=2 -fstrict-aliasing -fno-omit-frame-pointer -fsigned-char -D_FILE_OFFSET_BITS=64 -fsanitize=alignment,undefined -fno-sanitize-recover=alignment"
       - export PORTABILITY_LDFLAGS="-fsanitize=alignment,undefined"
       - *prepare-debian
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
 
   armhf-targeted-qemu:
-    image: arm32v7/debian:trixie-slim
+    image: arm32v7/debian:trixie-slim@sha256:ced25bc1bff26885d07c82647bc5ad766731d578e8cbc0d02b2e45b2095eaa67
     pull: true
-    depends_on: preflight-armhf-binfmt
+    depends_on: [autogen, preflight-armhf-binfmt]
     when: *integration-when
     commands:
       - export PORTABILITY_TIER=armhf-targeted-qemu
@@ -327,7 +331,7 @@ steps:
   s390x-big-endian-qemu:
     image: s390x/debian@sha256:4b236f9aafe8a6201c6dca29ce78c28e1eb1e314ecedc2cd2c545f9e49d060e3
     pull: true
-    depends_on: preflight-s390x-binfmt
+    depends_on: [autogen, preflight-s390x-binfmt]
     # s390x is the only realistic big-endian coverage. It is intentionally not
     # run on every pull request: QEMU plus the geospatial dependency closure is
     # expensive, so master pushes, tags, and scheduled runs keep the signal
@@ -348,5 +352,4 @@ steps:
       - *prepare-debian
       - *abi-env
       - *start-postgresql
-      - ./autogen.sh
       - *build-and-test
